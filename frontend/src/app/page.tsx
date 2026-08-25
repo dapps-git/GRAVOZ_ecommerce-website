@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import { ArrowRight, ChevronLeft, ChevronRight, Star, Eye } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Star, Eye, Truck, ShieldCheck, Leaf, Globe } from 'lucide-react';
 
 interface CategoryCardData {
   key: string;
@@ -30,8 +30,8 @@ export default function StorefrontHomePage() {
 
   // Dynamic Category Cards state
   const [categoryCards, setCategoryCards] = useState<CategoryCardData[]>([
-    { key: 'men', title: 'Men', href: '/category/men', imageUrl: '/images/men.webp' },
     { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/women.webp' },
+    { key: 'men', title: 'Men', href: '/category/men', imageUrl: '/images/men.webp' },
     { key: 'kids', title: 'Kids', href: '/category/kids', imageUrl: '/images/kid.webp' },
   ]);
 
@@ -109,10 +109,10 @@ export default function StorefrontHomePage() {
       <Header />
 
       {/* 2. Main Body Content (Overall Pure White Background & Wide Container) */}
-      <main className="flex-1 max-w-[1530px] w-full mx-auto px-8 sm:px-12 md:px-20 lg:px-28 py-4 md:py-6 space-y-10 bg-white">
+      <main className="flex-1 max-w-[1530px] w-full mx-auto px-4 sm:px-8 md:px-20 lg:px-28 pt-0 pb-6 md:pb-10 space-y-6 sm:space-y-10 bg-white">
         
         {/* A. Top Hero Banner Card */}
-        <section className="relative w-[calc(100%+4rem)] sm:w-[calc(100%+6rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[21/9] sm:aspect-[16/7] md:aspect-[16/6.2] -mx-8 sm:-mx-12 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
+        <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[1816/866] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
             src={bannerImageUrl}
             alt="GRAVOZ Step Better. Feel the Comfort. Quality Sandals for Every Family Moment."
@@ -139,26 +139,28 @@ export default function StorefrontHomePage() {
           </button>
         </section>
 
-        {/* B. 3 Category Cards Section (Men, Women, Kids) */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        {/* B. 3 Category Cards Section (Women, Men, Kids in 1 row on mobile & desktop) */}
+        <section className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
           {categoryCards.map((card) => (
             <Link
               key={card.key}
               href={card.href}
-              className="group flex flex-col rounded-2xl overflow-hidden border border-[#e8e2d8] shadow-xs hover:shadow-md transition-all bg-[#f4f2ee]"
+              className="group flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e2d8] shadow-2xs hover:shadow-md transition-all bg-[#f4f2ee]"
             >
-              <div className="relative aspect-[4/5] w-full bg-[#f4f2ee] overflow-hidden">
+              <div className="relative aspect-[3/4] sm:aspect-[4/5] w-full bg-[#f4f2ee] overflow-hidden">
                 <Image
                   src={card.imageUrl}
                   alt={`${card.title} Footwear Collection`}
                   fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 768px) 33vw, 33vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div className="bg-[#f4f2ee] px-5 py-3.5 flex items-center justify-between border-t border-[#e8e2d8]">
-                <span className="text-base font-semibold text-[#030303]">{card.title}</span>
-                <ArrowRight className="w-4 h-4 text-[#030303] group-hover:translate-x-1 transition-transform" />
+              <div className="bg-[#f4f2ee] px-2.5 sm:px-4 md:px-5 py-2 sm:py-3.5 flex items-center justify-between border-t border-[#e8e2d8]">
+                <span className="text-[11px] sm:text-sm md:text-base font-semibold text-[#030303] truncate">
+                  {card.title}
+                </span>
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#030303] group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </div>
             </Link>
           ))}
@@ -166,13 +168,13 @@ export default function StorefrontHomePage() {
 
         {/* C. "Suggested for You" Products Section */}
         <section className="space-y-4 pt-2">
-          {/* Header Row: Centered title, arrows pinned right */}
+          {/* Header Row: Centered title, arrows pinned right on desktop only */}
           <div className="relative flex items-center justify-center">
-            <h2 className="font-sansation font-light text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center">
+            <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center px-4">
               Suggested for You
             </h2>
-            {/* Circular Carousel Controls (< >) — pinned right */}
-            <div className="absolute right-0 flex items-center gap-2">
+            {/* Circular Carousel Controls (< >) — pinned right (Desktop only to prevent mobile overlap) */}
+            <div className="hidden sm:flex absolute right-0 items-center gap-2">
               <button
                 type="button"
                 aria-label="Previous Product"
@@ -190,17 +192,17 @@ export default function StorefrontHomePage() {
             </div>
           </div>
 
-          {/* Product Cards Grid (Floating images, Sansation font for product details) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+          {/* Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {products.map((product) => (
               <div key={product.id} className="group flex flex-col cursor-pointer">
                 
                 {/* Floating Product Image (Boxless & Borderless) */}
-                <div className="relative aspect-square w-full flex items-center justify-center p-2 overflow-hidden bg-transparent">
+                <div className="relative aspect-square w-full flex items-center justify-center p-1 sm:p-2 overflow-hidden bg-transparent">
                   
                   {/* Star Rating Badge (Top Right) with #C19968 Star Color */}
-                  <div className="absolute top-2 right-2 flex items-center gap-1 text-[11px] font-semibold text-slate-700 z-10">
-                    <Star className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
+                  <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10">
+                    <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
                     <span>{product.rating.toFixed(1)}</span>
                   </div>
 
@@ -209,28 +211,28 @@ export default function StorefrontHomePage() {
                     src={product.imageUrl}
                     alt={product.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-contain p-1 group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
 
                 {/* Bottom Info Pill Box with Sansation Typography */}
-                <div className="mt-2 bg-[#f4f2ee] rounded-2xl px-4 py-3 flex items-center justify-between border border-[#e8e2d8] shadow-2xs gap-3">
+                <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] shadow-2xs gap-1 sm:gap-3">
                   <div className="min-w-0 flex-1 space-y-0.5">
-                    <span className="font-sansation font-normal text-[10px] text-slate-500 uppercase tracking-[0.03em] block">
+                    <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">
                       {product.brand}
                     </span>
-                    <h3 className="font-sansation font-normal text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
+                    <h3 className="font-sansation font-normal text-[11px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
                       {product.title}
                     </h3>
                   </div>
 
-                  {/* Pricing (Right Aligned) */}
-                  <div className="flex items-baseline gap-1 flex-shrink-0 text-right">
+                  {/* Pricing */}
+                  <div className="flex items-baseline gap-1 flex-shrink-0">
                     <span className="font-sansation text-xs sm:text-sm font-bold text-[#89591C]">
                       ₹{product.price}
                     </span>
-                    <span className="font-sansation text-[10px] text-slate-400 line-through">
+                    <span className="font-sansation text-[9px] sm:text-[10px] text-slate-400 line-through">
                       ₹{product.originalPrice}
                     </span>
                   </div>
@@ -242,7 +244,7 @@ export default function StorefrontHomePage() {
         </section>
 
         {/* D. Promotional Secondary Banner Section (banner1.webp) */}
-        <section className="relative w-[calc(100%+4rem)] sm:w-[calc(100%+6rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[21/8] sm:aspect-[16/6] -mx-8 sm:-mx-12 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
+        <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[2001/786] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
             src="/images/banner1.webp"
             alt="GRAVOZ Luxury Leather Shoes Banner"
@@ -256,7 +258,7 @@ export default function StorefrontHomePage() {
         <section className="space-y-4 pt-2">
           {/* Header Row — centered title only */}
           <div className="flex justify-center">
-            <h2 className="font-sansation font-light text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center">
+            <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center px-4">
               Category
             </h2>
           </div>
@@ -267,13 +269,13 @@ export default function StorefrontHomePage() {
             <button
               type="button"
               aria-label="Previous Category Product"
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-[#030303] text-white flex items-center justify-center shadow-md hover:bg-[#89591C] transition-all cursor-pointer"
+              className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-[#030303] text-white items-center justify-center shadow-md hover:bg-[#89591C] transition-all cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
 
-            {/* Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+            {/* Cards Grid (2 in 1 row on mobile) */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {[
                 { id: 'c1', label: 'Casual Shoe',    imageUrl: '/products/product5.webp' },
                 { id: 'c2', label: 'Casual Sandal',  imageUrl: '/products/product6.webp' },
@@ -282,17 +284,17 @@ export default function StorefrontHomePage() {
               ].map((cat) => (
                 <div key={cat.id} className="group flex flex-col items-center cursor-pointer">
                   {/* Product Image */}
-                  <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
+                  <div className="relative w-full aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
                     <Image
                       src={cat.imageUrl}
                       alt={cat.label}
                       fill
-                      sizes="(max-width: 768px) 100vw, 25vw"
+                      sizes="(max-width: 768px) 50vw, 25vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   {/* Label */}
-                  <p className="mt-2.5 font-sansation font-normal text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] text-center">
+                  <p className="mt-2 font-sansation font-normal text-[11px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] text-center">
                     {cat.label}
                   </p>
                 </div>
@@ -303,7 +305,7 @@ export default function StorefrontHomePage() {
             <button
               type="button"
               aria-label="Next Category Product"
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-10 h-10 rounded-full bg-[#030303] text-white flex items-center justify-center shadow-md hover:bg-[#89591C] transition-all cursor-pointer"
+              className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-10 h-10 rounded-full bg-[#030303] text-white items-center justify-center shadow-md hover:bg-[#89591C] transition-all cursor-pointer"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -311,7 +313,7 @@ export default function StorefrontHomePage() {
         </section>
 
         {/* F. Promotional Banner (banner3.webp — Comfort Sandal) */}
-        <section className="relative w-[calc(100%+4rem)] sm:w-[calc(100%+6rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[21/8] sm:aspect-[16/6] -mx-8 sm:-mx-12 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
+        <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3076/1208] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
             src="/images/banner3.webp"
             alt="GRAVOZ Comfort Sandal Banner"
@@ -325,11 +327,11 @@ export default function StorefrontHomePage() {
         <section className="space-y-4 pt-2">
           {/* Header Row: Centered title, arrows pinned right */}
           <div className="relative flex items-center justify-center">
-            <h2 className="font-sansation font-light text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center">
+            <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center px-4">
               Best Seller
             </h2>
-            {/* Nav arrows — pinned right */}
-            <div className="absolute right-0 flex items-center gap-2">
+            {/* Nav arrows — pinned right (Desktop only) */}
+            <div className="hidden sm:flex absolute right-0 items-center gap-2">
               <button
                 type="button"
                 aria-label="Previous Best Seller"
@@ -352,7 +354,7 @@ export default function StorefrontHomePage() {
 
             {/* Left — Large Featured Product Card */}
             <div className="group flex flex-col cursor-pointer h-full">
-              <div className="relative w-full h-full min-h-[340px] lg:min-h-[480px] rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
+              <div className="relative w-full h-full min-h-[280px] sm:min-h-[340px] lg:min-h-[480px] rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
                 <Image
                   src="/products/product9.webp"
                   alt="Men's Casual Comfort Sandals – WGP50020"
@@ -362,22 +364,22 @@ export default function StorefrontHomePage() {
                 />
               </div>
               {/* Info pill */}
-              <div className="mt-2 bg-[#f4f2ee] rounded-2xl px-4 py-3 flex items-center justify-between border border-[#e8e2d8] gap-3">
+              <div className="mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border border-[#e8e2d8] gap-3">
                 <div className="min-w-0 flex-1 space-y-0.5">
                   <span className="font-sansation font-normal text-[10px] text-slate-500 uppercase tracking-[0.03em] block">Gravoz</span>
-                  <h3 className="font-sansation font-normal text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303]">
+                  <h3 className="font-sansation font-normal text-[12px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303]">
                     Men&apos;s Casual Comfort Sandals – WGP50020 Black
                   </h3>
                 </div>
                 <div className="flex items-baseline gap-1 flex-shrink-0">
-                  <span className="font-sansation text-sm font-bold text-[#89591C]">₹1399</span>
+                  <span className="font-sansation text-xs sm:text-sm font-bold text-[#89591C]">₹1399</span>
                   <span className="font-sansation text-[10px] text-slate-400 line-through">₹1429</span>
                 </div>
               </div>
             </div>
 
             {/* Right — 2×2 Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
               {[
                 { id: 'b1', imageUrl: '/products/product10.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
                 { id: 'b2', imageUrl: '/products/product11.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
@@ -386,10 +388,10 @@ export default function StorefrontHomePage() {
               ].map((item) => (
                 <div key={item.id} className="group flex flex-col cursor-pointer">
                   {/* Image with star badge */}
-                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
+                  <div className="relative w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
                     {/* Star Badge */}
-                    <div className="absolute top-2 right-2 flex items-center gap-1 text-[11px] font-semibold text-slate-700 z-10">
-                      <Star className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
+                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10">
+                      <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
                       <span>5.0</span>
                     </div>
                     <Image
@@ -401,16 +403,16 @@ export default function StorefrontHomePage() {
                     />
                   </div>
                   {/* Info pill */}
-                  <div className="mt-2 bg-[#f4f2ee] rounded-2xl px-3 py-2.5 flex items-center justify-between border border-[#e8e2d8] gap-2">
+                  <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-2 sm:py-2.5 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] gap-1 sm:gap-2">
                     <div className="min-w-0 flex-1 space-y-0.5">
-                      <span className="font-sansation font-normal text-[10px] text-slate-500 uppercase tracking-[0.03em] block">Gravoz</span>
-                      <h3 className="font-sansation font-normal text-[12px] leading-[1.31] tracking-[0.03em] text-[#030303] line-clamp-2">
+                      <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">Gravoz</span>
+                      <h3 className="font-sansation font-normal text-[11px] sm:text-[12px] leading-[1.31] tracking-[0.03em] text-[#030303] line-clamp-1 sm:line-clamp-2">
                         {item.title}
                       </h3>
                     </div>
                     <div className="flex items-baseline gap-1 flex-shrink-0">
                       <span className="font-sansation text-xs font-bold text-[#89591C]">₹1399</span>
-                      <span className="font-sansation text-[10px] text-slate-400 line-through">₹1429</span>
+                      <span className="font-sansation text-[9px] sm:text-[10px] text-slate-400 line-through">₹1429</span>
                     </div>
                   </div>
                 </div>
@@ -421,7 +423,7 @@ export default function StorefrontHomePage() {
         </section>
 
         {/* H. Product Showcase — 2 products side by side */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
 
           {/* Product 1 — Men's (p1=main, p2=tall right, p3=thumbnail overlay) */}
           <div className="grid grid-cols-2 gap-3 items-start">
@@ -429,7 +431,7 @@ export default function StorefrontHomePage() {
             {/* Left col: main image with overlapping thumbnail + info + button */}
             <div className="flex flex-col gap-2">
               {/* Main image with p3 thumbnail overlapping bottom-left */}
-              <div className="relative rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] aspect-[3/4]">
+              <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] aspect-[3/4]">
                 <Image
                   src="/products/p1.webp"
                   alt="Men's Casual Comfort Sandals – main"
@@ -438,7 +440,7 @@ export default function StorefrontHomePage() {
                   className="object-cover"
                 />
                 {/* Thumbnail floating at bottom-left */}
-                <div className="absolute bottom-3 left-3 w-[38%] aspect-square rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
+                <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 w-[38%] aspect-square rounded-lg sm:rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
                   <Image
                     src="/products/p3.webp"
                     alt="Men's Casual Comfort Sandals – thumbnail"
@@ -450,22 +452,22 @@ export default function StorefrontHomePage() {
               </div>
               {/* Product Info */}
               <div className="space-y-0.5 pt-1">
-                <p className="font-sansation font-normal text-[14px] leading-[1.31] tracking-[0.03em] text-[#030303]">
+                <p className="font-sansation font-normal text-[13px] sm:text-[14px] leading-[1.31] tracking-[0.03em] text-[#030303]">
                   Men&apos;s Casual Comfort Sandals
                 </p>
-                <p className="font-sansation font-bold text-[14px] text-[#89591C]">₹1399</p>
+                <p className="font-sansation font-bold text-[13px] sm:text-[14px] text-[#89591C]">₹1399</p>
               </div>
               {/* Add to Cart */}
               <button
                 type="button"
-                className="w-full bg-[#030303] text-white font-sansation font-normal text-[13px] tracking-[0.03em] py-3 rounded-xl hover:bg-[#89591C] transition-colors duration-300 cursor-pointer"
+                className="w-full bg-[#030303] text-white font-sansation font-normal text-[12px] sm:text-[13px] tracking-[0.03em] py-2.5 sm:py-3 rounded-xl hover:bg-[#89591C] transition-colors duration-300 cursor-pointer"
               >
                 Add to Cart
               </button>
             </div>
 
             {/* Right col: tall portrait image only */}
-            <div className="relative rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] h-full min-h-[420px]">
+            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] h-full min-h-[300px] sm:min-h-[420px]">
               <Image
                 src="/products/p2.webp"
                 alt="Men's Casual Comfort Sandals – lifestyle"
@@ -483,7 +485,7 @@ export default function StorefrontHomePage() {
             {/* Left col: main image with overlapping thumbnail + info + button */}
             <div className="flex flex-col gap-2">
               {/* Main image with p6 thumbnail overlapping bottom-left */}
-              <div className="relative rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] aspect-[3/4]">
+              <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] aspect-[3/4]">
                 <Image
                   src="/products/p4.webp"
                   alt="Women's Casual Comfort Sandals – main"
@@ -492,7 +494,7 @@ export default function StorefrontHomePage() {
                   className="object-cover"
                 />
                 {/* Thumbnail floating at bottom-left */}
-                <div className="absolute bottom-3 left-3 w-[38%] aspect-square rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
+                <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 w-[38%] aspect-square rounded-lg sm:rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
                   <Image
                     src="/products/p6.webp"
                     alt="Women's Casual Comfort Sandals – thumbnail"
@@ -504,22 +506,22 @@ export default function StorefrontHomePage() {
               </div>
               {/* Product Info */}
               <div className="space-y-0.5 pt-1">
-                <p className="font-sansation font-normal text-[14px] leading-[1.31] tracking-[0.03em] text-[#030303]">
+                <p className="font-sansation font-normal text-[13px] sm:text-[14px] leading-[1.31] tracking-[0.03em] text-[#030303]">
                   Women&apos;s Casual Comfort Sandals
                 </p>
-                <p className="font-sansation font-bold text-[14px] text-[#89591C]">₹1399</p>
+                <p className="font-sansation font-bold text-[13px] sm:text-[14px] text-[#89591C]">₹1399</p>
               </div>
               {/* Add to Cart */}
               <button
                 type="button"
-                className="w-full bg-[#030303] text-white font-sansation font-normal text-[13px] tracking-[0.03em] py-3 rounded-xl hover:bg-[#89591C] transition-colors duration-300 cursor-pointer"
+                className="w-full bg-[#030303] text-white font-sansation font-normal text-[12px] sm:text-[13px] tracking-[0.03em] py-2.5 sm:py-3 rounded-xl hover:bg-[#89591C] transition-colors duration-300 cursor-pointer"
               >
                 Add to Cart
               </button>
             </div>
 
             {/* Right col: tall portrait image only */}
-            <div className="relative rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] h-full min-h-[420px]">
+            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] h-full min-h-[300px] sm:min-h-[420px]">
               <Image
                 src="/products/p5.webp"
                 alt="Women's Casual Comfort Sandals – lifestyle"
@@ -534,7 +536,7 @@ export default function StorefrontHomePage() {
         </section>
 
         {/* I. Promotional Banner (banner4.webp) */}
-        <section className="relative w-[calc(100%+4rem)] sm:w-[calc(100%+6rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[21/8] sm:aspect-[16/6] -mx-8 sm:-mx-12 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
+        <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3200/1034] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
             src="/images/banner4.webp"
             alt="GRAVOZ Promotional Banner"
@@ -544,9 +546,9 @@ export default function StorefrontHomePage() {
           />
         </section>
 
-        {/* J. New Arrivals Row — product14 to product17 (4 floating cards) */}
+        {/* J. New Arrivals Row — product14 to product17 (4 floating cards, 2 in 1 row on mobile) */}
         <section className="space-y-4 pt-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {[
               { id: 'n1', imageUrl: '/products/product14.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black", featured: false },
               { id: 'n2', imageUrl: '/products/product15.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black", featured: true  },
@@ -559,16 +561,16 @@ export default function StorefrontHomePage() {
                 <div className="relative aspect-square w-full overflow-hidden bg-transparent">
                   {/* Star badge — top right (not on featured card) */}
                   {!item.featured && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 text-[11px] font-semibold text-slate-700 z-10">
-                      <Star className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
+                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10">
+                      <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
                       <span>5.0</span>
                     </div>
                   )}
 
                   {/* Eye icon badge — only on featured card */}
                   {item.featured && (
-                    <div className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white border border-[#e8e2d8] flex items-center justify-center shadow-sm">
-                      <Eye className="w-3.5 h-3.5 text-[#030303]" />
+                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 z-10 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white border border-[#e8e2d8] flex items-center justify-center shadow-sm">
+                      <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#030303]" />
                     </div>
                   )}
 
@@ -576,14 +578,14 @@ export default function StorefrontHomePage() {
                     src={item.imageUrl}
                     alt={item.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-contain p-1 group-hover:scale-105 transition-transform duration-500"
                   />
 
                   {/* "Choose Option" hover overlay — only on featured card */}
                   {item.featured && (
-                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center pb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="bg-white text-[#030303] font-sansation font-normal text-[12px] tracking-[0.03em] px-4 py-1.5 rounded-full shadow border border-[#e8e2d8]">
+                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center pb-2 sm:pb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="bg-white text-[#030303] font-sansation font-normal text-[10px] sm:text-[12px] tracking-[0.03em] px-3 sm:px-4 py-1 sm:py-1.5 rounded-full shadow border border-[#e8e2d8]">
                         Choose Option
                       </span>
                     </div>
@@ -591,16 +593,16 @@ export default function StorefrontHomePage() {
                 </div>
 
                 {/* Info Pill */}
-                <div className="mt-2 bg-[#f4f2ee] rounded-2xl px-4 py-3 flex items-center justify-between border border-[#e8e2d8] shadow-2xs gap-3">
+                <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] shadow-2xs gap-1 sm:gap-3">
                   <div className="min-w-0 flex-1 space-y-0.5">
-                    <span className="font-sansation font-normal text-[10px] text-slate-500 uppercase tracking-[0.03em] block">Gravoz</span>
-                    <h3 className="font-sansation font-normal text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
+                    <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">Gravoz</span>
+                    <h3 className="font-sansation font-normal text-[11px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
                       {item.title}
                     </h3>
                   </div>
                   <div className="flex items-baseline gap-1 flex-shrink-0">
                     <span className="font-sansation text-xs sm:text-sm font-bold text-[#89591C]">₹1399</span>
-                    <span className="font-sansation text-[10px] text-slate-400 line-through">₹1429</span>
+                    <span className="font-sansation text-[9px] sm:text-[10px] text-slate-400 line-through">₹1429</span>
                   </div>
                 </div>
 
@@ -609,7 +611,7 @@ export default function StorefrontHomePage() {
           </div>
         </section>
 
-        {/* K. Year Sale Section — product18 to product21 */}
+        {/* K. Year Sale Section — product18 to product21 (2 in 1 row on mobile) */}
         <section className="space-y-4 pt-2">
           {/* Header Row — centered title only */}
           <div className="flex justify-center">
@@ -618,18 +620,18 @@ export default function StorefrontHomePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
             {[
               { id: 'y1', imageUrl: '/products/product18.webp', price: 1199, original: 1169, sale: false,  discount: null },
               { id: 'y2', imageUrl: '/products/product19.webp', price: 1669, original: 1699, sale: true,   discount: '20% off' },
               { id: 'y3', imageUrl: '/products/product20.webp', price: 1199, original: 1169, sale: false,  discount: null },
               { id: 'y4', imageUrl: '/products/product21.webp', price: 1199, original: 1169, sale: false,  discount: null },
             ].map((item) => (
-              <div key={item.id} className="group relative flex flex-col cursor-pointer bg-[#f4f2ee] border border-[#e8e2d8] rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+              <div key={item.id} className="group relative flex flex-col cursor-pointer bg-[#f4f2ee] border border-[#e8e2d8] rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
 
                 {/* Sale badge — top left, only on sale card */}
                 {item.sale && (
-                  <div className="absolute top-3 left-3 z-10 bg-[#030303] text-white font-sansation text-[11px] font-bold tracking-wide px-3 py-1 rounded-md">
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 bg-[#030303] text-white font-sansation text-[9px] sm:text-[11px] font-bold tracking-wide px-2 sm:px-3 py-0.5 sm:py-1 rounded-md">
                     Sale
                   </div>
                 )}
@@ -640,21 +642,21 @@ export default function StorefrontHomePage() {
                     src={item.imageUrl}
                     alt={`GRAVOZ Product ${item.id}`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-contain p-2 sm:p-4 group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
 
                 {/* Price row */}
-                <div className="px-4 pb-4 flex items-center gap-2 flex-wrap">
+                <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 flex items-center gap-1.5 sm:gap-2 flex-wrap">
                   {/* 20% off pill */}
                   {item.discount && (
-                    <span className="font-sansation text-[10px] font-bold text-white bg-[#89591C] px-2 py-0.5 rounded-full">
+                    <span className="font-sansation text-[8px] sm:text-[10px] font-bold text-white bg-[#89591C] px-1.5 sm:px-2 py-0.5 rounded-full">
                       {item.discount}
                     </span>
                   )}
-                  <span className="font-sansation font-bold text-[14px] text-[#89591C]">₹{item.price}</span>
-                  <span className="font-sansation text-[12px] text-slate-400 line-through">₹{item.original}</span>
+                  <span className="font-sansation font-bold text-xs sm:text-[14px] text-[#89591C]">₹{item.price}</span>
+                  <span className="font-sansation text-[9px] sm:text-[12px] text-slate-400 line-through">₹{item.original}</span>
                 </div>
 
               </div>
@@ -665,7 +667,7 @@ export default function StorefrontHomePage() {
         {/* L. Top Selling — Infinite Logo Marquee Strip */}
         <section className="pt-2">
           {/* Marquee container */}
-          <div className="w-full overflow-hidden border-y border-[#e8e2d8] py-5 bg-white -mx-8 sm:-mx-12 md:-mx-20 lg:-mx-28 px-8 sm:px-12 md:px-20 lg:px-28">
+          <div className="w-full overflow-hidden border-y border-[#e8e2d8] py-3 sm:py-5 bg-white -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 px-4 sm:px-8 md:px-20 lg:px-28">
             {/* The track is doubled (logo set × 2) so the loop is seamless */}
             <div className="flex items-center animate-marquee whitespace-nowrap" style={{ width: 'max-content' }}>
               {[...Array(2)].map((_, setIdx) => (
@@ -760,28 +762,17 @@ export default function StorefrontHomePage() {
           ))}
         </section>
 
-        {/* N. Promotional Banner (banner5.webp) */}
-        <section className="relative w-[calc(100%+4rem)] sm:w-[calc(100%+6rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[21/8] sm:aspect-[16/6] -mx-8 sm:-mx-12 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
-          <Image
-            src="/images/banner5.webp"
-            alt="GRAVOZ Daily Collection Banner"
-            fill
-            sizes="100vw"
-            className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
-          />
-        </section>
-
-        {/* O. Daily Collection Section — 12 Product Cards Grid (3 rows × 4 cols) */}
+        {/* N. Daily Collection Section — 12 Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
         <section className="space-y-4 pt-2">
           {/* Header Row — centered title only */}
           <div className="flex justify-center">
-            <h2 className="font-sansation font-light text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center">
+            <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center px-4">
               Daily Collection
             </h2>
           </div>
 
           {/* 12 Product Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {[
               { id: 'dc1',  imageUrl: '/products/product1.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
               { id: 'dc2',  imageUrl: '/products/product2.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
@@ -799,10 +790,10 @@ export default function StorefrontHomePage() {
               <div key={product.id} className="group flex flex-col cursor-pointer">
 
                 {/* Floating Product Image (Boxless & Borderless) */}
-                <div className="relative aspect-square w-full flex items-center justify-center p-2 overflow-hidden bg-transparent">
+                <div className="relative aspect-square w-full flex items-center justify-center p-1 sm:p-2 overflow-hidden bg-transparent">
                   {/* Star Rating Badge (Top Right) */}
-                  <div className="absolute top-2 right-2 flex items-center gap-1 text-[11px] font-semibold text-slate-700 z-10">
-                    <Star className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
+                  <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10">
+                    <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
                     <span>5.0</span>
                   </div>
 
@@ -811,28 +802,28 @@ export default function StorefrontHomePage() {
                     src={product.imageUrl}
                     alt={product.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-contain p-1 group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
 
                 {/* Bottom Info Pill Box */}
-                <div className="mt-2 bg-[#f4f2ee] rounded-2xl px-4 py-3 flex items-center justify-between border border-[#e8e2d8] shadow-2xs gap-3">
+                <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] shadow-2xs gap-1 sm:gap-3">
                   <div className="min-w-0 flex-1 space-y-0.5">
-                    <span className="font-sansation font-normal text-[10px] text-slate-500 uppercase tracking-[0.03em] block">
+                    <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">
                       Gravoz
                     </span>
-                    <h3 className="font-sansation font-normal text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
+                    <h3 className="font-sansation font-normal text-[11px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
                       {product.title}
                     </h3>
                   </div>
 
-                  {/* Pricing (Right Aligned) */}
-                  <div className="flex items-baseline gap-1 flex-shrink-0 text-right">
+                  {/* Pricing */}
+                  <div className="flex items-baseline gap-1 flex-shrink-0">
                     <span className="font-sansation text-xs sm:text-sm font-bold text-[#89591C]">
                       ₹1399
                     </span>
-                    <span className="font-sansation text-[10px] text-slate-400 line-through">
+                    <span className="font-sansation text-[9px] sm:text-[10px] text-slate-400 line-through">
                       ₹1429
                     </span>
                   </div>
@@ -843,15 +834,291 @@ export default function StorefrontHomePage() {
           </div>
         </section>
 
+        {/* O. Promotional Banner (banner5.webp — below Daily Collection) */}
+        <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3172/1230] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
+          <Image
+            src="/images/banner5.webp"
+            alt="GRAVOZ Daily Collection Banner"
+            fill
+            sizes="100vw"
+            className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
+          />
+        </section>
+
+        {/* P. Testimonials Section ("What Our Client Says") */}
+        <section className="space-y-6 pt-6 pb-2">
+          {/* Header Title & Subtitle */}
+          <div className="text-center space-y-1.5">
+            <h2 className="font-sansation font-bold text-2xl sm:text-3xl md:text-4xl text-[#030303] tracking-tight">
+              What Our Client Says
+            </h2>
+            <p className="font-sansation font-normal text-xs sm:text-sm text-slate-600 tracking-[0.1em]">
+              Testimonial
+            </p>
+          </div>
+
+          {/* 2 Testimonial Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-5xl mx-auto">
+            
+            {/* Card 1 — Hashim */}
+            <div className="bg-white border border-[#e8e2d8] rounded-2xl p-6 sm:p-7 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3.5">
+                  {/* Avatar Illustration */}
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-red-500 p-0.5 flex-shrink-0 flex items-center justify-center shadow-xs">
+                    <div className="w-full h-full rounded-full bg-[#fceddc] flex items-center justify-center text-lg">
+                      🧑‍💼
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-sansation font-bold text-sm sm:text-base text-[#030303]">
+                      Hashim
+                    </h4>
+                    <span className="font-sansation text-[11px] text-slate-400 block font-normal">
+                      Verified User
+                    </span>
+                  </div>
+                </div>
+                {/* 5 Gold Stars */}
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
+                  ))}
+                </div>
+              </div>
+              <p className="font-sansation text-xs sm:text-[13px] leading-relaxed text-slate-700">
+                “The quality is exceptional, and the shoes feel incredibly comfortable from the first wear. The craftsmanship and finish are truly impressive.”
+              </p>
+            </div>
+
+            {/* Card 2 — lakshmi */}
+            <div className="bg-white border border-[#e8e2d8] rounded-2xl p-6 sm:p-7 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3.5">
+                  {/* Avatar Illustration */}
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-amber-300 to-yellow-500 p-0.5 flex-shrink-0 flex items-center justify-center shadow-xs">
+                    <div className="w-full h-full rounded-full bg-[#fef7ee] flex items-center justify-center text-lg">
+                      👩‍💼
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-sansation font-bold text-sm sm:text-base text-[#030303]">
+                      lakshmi
+                    </h4>
+                    <span className="font-sansation text-[11px] text-slate-400 block font-normal">
+                      Verified User
+                    </span>
+                  </div>
+                </div>
+                {/* 5 Gold Stars */}
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
+                  ))}
+                </div>
+              </div>
+              <p className="font-sansation text-xs sm:text-[13px] leading-relaxed text-slate-700">
+                “Gravoz has the perfect balance of premium style and comfort. The leather feels luxurious, and the fit is excellent.”
+              </p>
+            </div>
+
+          </div>
+
+          {/* Dots Indicator */}
+          <div className="flex items-center justify-center gap-1.5 pt-2">
+            <span className="w-6 h-2 rounded-full bg-slate-500"></span>
+            <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+            <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+          </div>
+        </section>
+
       </main>
 
-      {/* 3. Footer */}
-      <footer className="bg-white border-t border-[#e8e2d8] py-6 mt-12">
-        <div className="max-w-[1530px] w-full mx-auto px-4 text-center space-y-1">
-          <p className="text-xs font-semibold text-[#030303] uppercase tracking-wider">GRAVOZ</p>
-          <p className="text-[11px] text-slate-500 font-normal">
-            © {new Date().getFullYear()} GRAVOZ Shoes. Quality Sandals for Every Family Moment.
-          </p>
+      {/* 3. Rich Premium Footer Section */}
+      <footer className="w-full bg-white mt-10">
+        
+        {/* Black Feature Highlights Strip with 4 White Cards (2 in 1 row on mobile, 4 on desktop) */}
+        <div className="w-full bg-[#030303] py-6 sm:py-10 px-3 sm:px-8 md:px-20 lg:px-28">
+          <div className="max-w-[1530px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
+            
+            {/* Feature 1: Delivery & Shipping */}
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm min-h-[125px] sm:min-h-[145px]">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#f4f2ee] border border-[#e8e2d8] flex items-center justify-center text-[#030303] mb-2 sm:mb-3 flex-shrink-0">
+                <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700" />
+              </div>
+              <div>
+                <h4 className="font-sansation font-bold text-xs sm:text-[14px] text-[#030303] leading-snug">
+                  Delivery & Shipping
+                </h4>
+                <p className="font-sansation text-[10px] sm:text-[11px] text-slate-600 mt-0.5 sm:mt-1 leading-relaxed">
+                  Your shoes will be dispatched within 1-2 business days
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2: Warranty Included */}
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm min-h-[125px] sm:min-h-[145px]">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#f4f2ee] border border-[#e8e2d8] flex items-center justify-center text-[#030303] mb-2 sm:mb-3 flex-shrink-0">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700" />
+              </div>
+              <div>
+                <h4 className="font-sansation font-bold text-xs sm:text-[14px] text-[#030303] leading-snug">
+                  Warranty Included
+                </h4>
+                <p className="font-sansation text-[10px] sm:text-[11px] text-slate-600 mt-0.5 sm:mt-1 leading-relaxed">
+                  Every pair comes with a hassle free 6 month warranty
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3: Eco-Friendly Fabric */}
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm min-h-[125px] sm:min-h-[145px]">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#f4f2ee] border border-[#e8e2d8] flex items-center justify-center text-[#030303] mb-2 sm:mb-3 flex-shrink-0">
+                <Leaf className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700" />
+              </div>
+              <div>
+                <h4 className="font-sansation font-bold text-xs sm:text-[14px] text-[#030303] leading-snug">
+                  Eco-Friendly Fabric
+                </h4>
+                <p className="font-sansation text-[10px] sm:text-[11px] text-slate-600 mt-0.5 sm:mt-1 leading-relaxed">
+                  Crafted with sustainability shoes feature echo-friendly fabric
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 4: Sustainable Materials */}
+            <div className="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm min-h-[125px] sm:min-h-[145px]">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#f4f2ee] border border-[#e8e2d8] flex items-center justify-center text-[#030303] mb-2 sm:mb-3 flex-shrink-0">
+                <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700" />
+              </div>
+              <div>
+                <h4 className="font-sansation font-bold text-xs sm:text-[14px] text-[#030303] leading-snug">
+                  Sustainable Materials
+                </h4>
+                <p className="font-sansation text-[10px] sm:text-[11px] text-slate-600 mt-0.5 sm:mt-1 leading-relaxed">
+                  Where premium comfort meets conscious materials.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Main Footer Links & Branding */}
+        <div className="max-w-[1530px] mx-auto px-4 sm:px-8 md:px-20 lg:px-28 pt-12 pb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1.2fr_1fr] gap-8 sm:gap-10">
+            
+            {/* Brand column */}
+            <div className="space-y-4 max-w-sm">
+              <div className="flex items-center gap-2">
+                <span className="font-sansation font-black text-2xl sm:text-3xl tracking-[0.08em] text-[#030303] uppercase">
+                  GRAVOZ
+                </span>
+              </div>
+              <p className="font-sansation text-xs leading-relaxed text-slate-600">
+                Premium leather footwear crafted with timeless style, exceptional comfort, and attention to every detail. Made for those who appreciate quality that lasts, from everyday essentials to refined classics. Step into quality. Step into Gravoz.
+              </p>
+            </div>
+
+            {/* SHOP Column */}
+            <div className="space-y-3">
+              <h5 className="font-sansation font-bold text-xs uppercase tracking-wider text-[#030303]">
+                SHOP
+              </h5>
+              <ul className="space-y-2.5 font-sansation text-xs text-slate-600">
+                <li><Link href="/category/men" className="hover:text-[#89591C] transition-colors">Men Shoes</Link></li>
+                <li><Link href="/category/women" className="hover:text-[#89591C] transition-colors">Women Shoes</Link></li>
+                <li><Link href="/category/unisex" className="hover:text-[#89591C] transition-colors">Unisex</Link></li>
+              </ul>
+            </div>
+
+            {/* POLICIES Column */}
+            <div className="space-y-3">
+              <h5 className="font-sansation font-bold text-xs uppercase tracking-wider text-[#030303]">
+                POLICIES
+              </h5>
+              <ul className="space-y-2.5 font-sansation text-xs text-slate-600">
+                <li><Link href="/terms" className="hover:text-[#89591C] transition-colors">Terms & Conditions</Link></li>
+                <li><Link href="/privacy" className="hover:text-[#89591C] transition-colors">Privacy policy</Link></li>
+                <li><Link href="/refund" className="hover:text-[#89591C] transition-colors">Return & Refund</Link></li>
+                <li><Link href="/shipping" className="hover:text-[#89591C] transition-colors">Shipping & Delivery</Link></li>
+                <li><Link href="/faq" className="hover:text-[#89591C] transition-colors">FAQ</Link></li>
+              </ul>
+            </div>
+
+            {/* FOLLOW US Column */}
+            <div className="space-y-3">
+              <h5 className="font-sansation font-bold text-xs uppercase tracking-wider text-[#030303]">
+                FOLLOW US
+              </h5>
+              <div className="flex items-center gap-3">
+                {/* Facebook */}
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-8 h-8 rounded-lg bg-[#1877F2] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-xs"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </a>
+                {/* Instagram */}
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-xs"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                  </svg>
+                </a>
+                {/* WhatsApp */}
+                <a
+                  href="https://whatsapp.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp"
+                  className="w-8 h-8 rounded-lg bg-[#25D366] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-xs"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom Copyright & Payment Methods */}
+          <div className="border-t border-[#e8e2d8] mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-sansation text-xs text-slate-500">
+            <p>© 2026 Gravoz. All Rights Reserved.</p>
+            
+            {/* Payment Icons */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="bg-[#003087] text-white font-bold text-[10px] px-2 py-0.5 rounded tracking-wider flex items-center gap-0.5">
+                <span className="italic font-serif">PayPal</span>
+              </span>
+              <span className="bg-[#002663] text-white font-bold text-[10px] px-2 py-0.5 rounded tracking-wider">
+                AMEX
+              </span>
+              <span className="bg-[#1A1F71] text-white font-bold text-[10px] px-2 py-0.5 rounded tracking-wider">
+                VISA
+              </span>
+              <span className="bg-[#030303] text-white font-bold text-[10px] px-2 py-0.5 rounded tracking-wider flex items-center">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#EB001B] -mr-1 z-10 inline-block"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F79E1B] inline-block"></span>
+                <span className="ml-1 text-[9px]">mastercard</span>
+              </span>
+              <span className="bg-[#FF6000] text-white font-bold text-[10px] px-2 py-0.5 rounded tracking-wider">
+                DISCOVER
+              </span>
+            </div>
+          </div>
+
         </div>
       </footer>
     </div>
