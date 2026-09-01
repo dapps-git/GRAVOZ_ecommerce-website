@@ -16,8 +16,9 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+        montserrat: ['var(--font-montserrat)', 'sans-serif'],
         playfair: ['var(--font-playfair)', 'Playfair Display', 'serif'],
-        sansation: ['Sansation', 'system-ui', 'sans-serif'],
+        sansation: ['var(--font-montserrat)', 'Sansation', 'system-ui', 'sans-serif'],
       },
     },
   },

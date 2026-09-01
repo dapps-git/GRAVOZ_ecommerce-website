@@ -1,18 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Sansation:ital,wght@0,300;0,400;0,700;1,400&display=swap');
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+
+:root {
+  --font-sansation: 'Montserrat', var(--font-montserrat), sans-serif;
+  --font-montserrat: 'Montserrat', var(--font-montserrat), sans-serif;
+}
 
 .font-sansation {
-  font-family: 'Sansation', system-ui, -apple-system, sans-serif;
+  font-family: 'Montserrat', var(--font-montserrat), sans-serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', var(--font-montserrat), sans-serif;
 }
 
 .font-playfair {
   font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
+  margin: 0;
+  padding: 0;
   background-color: #ffffff;
   color: #030303;
-  font-family: var(--font-poppins), sans-serif;
+  font-family: 'Montserrat', var(--font-montserrat), system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+input, button, select, textarea, span, p, h1, h2, h3, h4, h5, h6, a {
+  font-family: 'Montserrat', var(--font-montserrat), system-ui, -apple-system, sans-serif;
 }
 
 @keyframes marquee {

@@ -4,7 +4,50 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import RecommendationStrip from '@/components/RecommendationStrip';
+import RecentlyViewedStrip from '@/components/RecentlyViewedStrip';
+import DynamicProductSection from '@/components/DynamicProductSection';
 import { ArrowRight, ChevronLeft, ChevronRight, Star, Eye, Truck, ShieldCheck, Leaf, Globe } from 'lucide-react';
+
+// ─── Skeleton shimmer components ─────────────────────────────────────────────
+
+function SkeletonProductCard() {
+  return (
+    <div className="flex flex-col animate-pulse">
+      <div className="relative w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-[#ede9e2]">
+        <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-10 h-5 rounded-full bg-[#ddd8cf]" />
+      </div>
+      <div className="mt-1.5 sm:mt-2 bg-[#ede9e2] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col gap-1.5 border border-[#e3ddd5]">
+        <div className="h-2 w-12 rounded bg-[#ddd8cf]" />
+        <div className="h-3 w-3/4 rounded bg-[#ddd8cf]" />
+        <div className="flex gap-2 mt-0.5">
+          <div className="h-3 w-12 rounded bg-[#c9c3bc]" />
+          <div className="h-3 w-8 rounded bg-[#ddd8cf]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SkeletonBannerHero() {
+  return (
+    <div className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[1816/866] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden bg-[#ede9e2] animate-pulse rounded-none" />
+  );
+}
+
+function SkeletonCategoryCard() {
+  return (
+    <div className="flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e2d8] bg-[#ede9e2] animate-pulse">
+      <div className="aspect-[3/4] sm:aspect-[4/5] w-full bg-[#ddd8cf]" />
+      <div className="px-2.5 sm:px-4 py-2 sm:py-3 flex items-center justify-between bg-[#ede9e2]">
+        <div className="h-3 w-12 rounded bg-[#c9c3bc]" />
+        <div className="h-3 w-3 rounded bg-[#c9c3bc]" />
+      </div>
+    </div>
+  );
+}
+
+// ─── Interfaces ───────────────────────────────────────────────────────────────
 
 interface CategoryCardData {
   key: string;
@@ -24,83 +67,79 @@ interface ProductItem {
   href: string;
 }
 
+// ─── Static fallback data ─────────────────────────────────────────────────────
+
+const DEFAULT_PRODUCTS: ProductItem[] = [
+  { id: 'p1', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Black", price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product1.webp', href: '/products/p1' },
+  { id: 'p2', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Tan",   price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product2.webp', href: '/products/p2' },
+  { id: 'p3', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Brown",  price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product3.webp', href: '/products/p3' },
+  { id: 'p4', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Olive",  price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product4.webp', href: '/products/p4' },
+];
+
+const DEFAULT_CATEGORIES: CategoryCardData[] = [
+  { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/women.webp' },
+  { key: 'men',   title: 'Men',   href: '/category/men',   imageUrl: '/images/men.webp'   },
+  { key: 'kids',  title: 'Kids',  href: '/category/kids',  imageUrl: '/images/kid.webp'   },
+];
+
+// ─── Page Component ───────────────────────────────────────────────────────────
+
 export default function StorefrontHomePage() {
-  // Banner state pointing to static demo banner.webp
+  const [banners, setBanners] = useState<Record<string, any>>({});
   const [bannerImageUrl, setBannerImageUrl] = useState<string>('/images/banner.webp');
+  const [bannerLoading, setBannerLoading] = useState<boolean>(true);
 
-  // Dynamic Category Cards state
-  const [categoryCards, setCategoryCards] = useState<CategoryCardData[]>([
-    { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/women.webp' },
-    { key: 'men', title: 'Men', href: '/category/men', imageUrl: '/images/men.webp' },
-    { key: 'kids', title: 'Kids', href: '/category/kids', imageUrl: '/images/kid.webp' },
-  ]);
+  const [categoryCards, setCategoryCards] = useState<CategoryCardData[]>(DEFAULT_CATEGORIES);
+  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
 
-  // Suggested Products state (Using images from /products folder)
-  const [products, setProducts] = useState<ProductItem[]>([
-    {
-      id: 'p1',
-      brand: 'Gravoz',
-      title: "Men's Casual Comfort Sandals – WGP50020 Black",
-      price: 1399,
-      originalPrice: 1429,
-      rating: 5.0,
-      imageUrl: '/products/product1.webp',
-      href: '/products/p1',
-    },
-    {
-      id: 'p2',
-      brand: 'Gravoz',
-      title: "Men's Casual Comfort Sandals – WGP50020 Tan",
-      price: 1399,
-      originalPrice: 1429,
-      rating: 5.0,
-      imageUrl: '/products/product2.webp',
-      href: '/products/p2',
-    },
-    {
-      id: 'p3',
-      brand: 'Gravoz',
-      title: "Men's Casual Comfort Sandals – WGP50020 Brown",
-      price: 1399,
-      originalPrice: 1429,
-      rating: 5.0,
-      imageUrl: '/products/product3.webp',
-      href: '/products/p3',
-    },
-    {
-      id: 'p4',
-      brand: 'Gravoz',
-      title: "Men's Casual Comfort Sandals – WGP50020 Olive",
-      price: 1399,
-      originalPrice: 1429,
-      rating: 5.0,
-      imageUrl: '/products/product4.webp',
-      href: '/products/p4',
-    },
-  ]);
+  const [products, setProducts] = useState<ProductItem[]>(DEFAULT_PRODUCTS);
+  const [productsLoading, setProductsLoading] = useState<boolean>(true);
 
-  // Optional backend sync for live API data
+  // ── Fetch banners + categories + products in parallel on mount ──────────────
   useEffect(() => {
-    fetch('/api/products?limit=4')
-      .then((res) => res.json())
+    // 1. Banners API
+    fetch('/api/banners', { cache: 'no-store' })
+      .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data?.products) && data.products.length > 0) {
-          const apiProducts: ProductItem[] = data.products.map((p: any, idx: number) => ({
-            id: p._id || `p${idx + 1}`,
-            brand: p.brand?.name || 'Gravoz',
-            title: p.name || `Men's Casual Comfort Sandals – WGP50020`,
-            price: p.price || 1399,
-            originalPrice: p.compareAtPrice || 1429,
-            rating: p.rating || 5.0,
-            imageUrl: p.images?.[0] || `/products/product${(idx % 4) + 1}.webp`,
-            href: `/products/${p._id || idx + 1}`,
-          }));
-          setProducts(apiProducts);
+        if (data?.banners) {
+          setBanners(data.banners);
+          if (data.banners.hero?.imageUrl) {
+            setBannerImageUrl(data.banners.hero.imageUrl);
+          }
+          // Dynamic category card images
+          setCategoryCards([
+            { key: 'women', title: data.banners.category_women?.title || 'Women', href: data.banners.category_women?.linkUrl || '/category/women', imageUrl: data.banners.category_women?.imageUrl || '/images/women.webp' },
+            { key: 'men',   title: data.banners.category_men?.title || 'Men',   href: data.banners.category_men?.linkUrl || '/category/men',   imageUrl: data.banners.category_men?.imageUrl || '/images/men.webp' },
+            { key: 'kids',  title: data.banners.category_kids?.title || 'Kids',  href: data.banners.category_kids?.linkUrl || '/category/kids',  imageUrl: data.banners.category_kids?.imageUrl || '/images/kid.webp' },
+          ]);
         }
       })
-      .catch(() => {
-        // Silently use static demo products from /products folder
+      .catch(() => {/* keep default */})
+      .finally(() => {
+        setBannerLoading(false);
+        setCategoriesLoading(false);
       });
+
+    // 3. Products API (suggested for you — first 4)
+    fetch('/api/products?limit=4&section=suggested', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data?.products) && data.products.length > 0) {
+          const mapped: ProductItem[] = data.products.map((p: any, idx: number) => ({
+            id:            p._id || `p${idx + 1}`,
+            brand:         p.brand || 'Gravoz',
+            title:         p.name  || p.title || "Men's Casual Comfort Sandals",
+            price:         p.discountPrice || p.price || 1399,
+            originalPrice: p.price || p.originalPrice || 1429,
+            rating:        p.rating ?? 5.0,
+            imageUrl:      p.images?.[0]?.url || p.images?.[0] || `/products/product${(idx % 4) + 1}.webp`,
+            href:          `/products/${p.slug || p._id || idx + 1}`,
+          }));
+          setProducts(mapped);
+        }
+      })
+      .catch(() => {/* keep default */})
+      .finally(() => setProductsLoading(false));
   }, []);
 
   return (
@@ -112,6 +151,9 @@ export default function StorefrontHomePage() {
       <main className="flex-1 max-w-[1530px] w-full mx-auto px-4 sm:px-8 md:px-20 lg:px-28 pt-0 pb-6 md:pb-10 space-y-6 sm:space-y-10 bg-white">
         
         {/* A. Top Hero Banner Card */}
+        {bannerLoading ? (
+          <SkeletonBannerHero />
+        ) : (
         <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[1816/866] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
             src={bannerImageUrl}
@@ -138,10 +180,13 @@ export default function StorefrontHomePage() {
             <ChevronRight className="w-4 h-4" />
           </button>
         </section>
+        )}
 
         {/* B. 3 Category Cards Section (Women, Men, Kids in 1 row on mobile & desktop) */}
         <section className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
-          {categoryCards.map((card) => (
+          {categoriesLoading
+            ? [0, 1, 2].map((i) => <SkeletonCategoryCard key={i} />)
+            : categoryCards.map((card) => (
             <Link
               key={card.key}
               href={card.href}
@@ -194,14 +239,20 @@ export default function StorefrontHomePage() {
 
           {/* Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            {products.map((product) => (
-              <div key={product.id} className="group flex flex-col cursor-pointer">
+            {productsLoading
+              ? [0, 1, 2, 3].map((i) => <SkeletonProductCard key={i} />)
+              : products.map((product) => (
+              <Link
+                key={product.id}
+                href={product.href || `/products/${product.id}`}
+                className="group flex flex-col cursor-pointer"
+              >
                 
                 {/* Floating Product Image (Boxless & Borderless) */}
                 <div className="relative aspect-square w-full flex items-center justify-center p-1 sm:p-2 overflow-hidden bg-transparent">
                   
                   {/* Star Rating Badge (Top Right) with #C19968 Star Color */}
-                  <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10">
+                  <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10 bg-white/80 backdrop-blur-xs px-1.5 py-0.5 rounded-full shadow-2xs">
                     <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
                     <span>{product.rating.toFixed(1)}</span>
                   </div>
@@ -217,7 +268,7 @@ export default function StorefrontHomePage() {
                 </div>
 
                 {/* Bottom Info Pill Box with Sansation Typography */}
-                <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] shadow-2xs gap-1 sm:gap-3">
+                <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] shadow-2xs gap-1 sm:gap-3 group-hover:border-slate-400 transition-colors">
                   <div className="min-w-0 flex-1 space-y-0.5">
                     <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">
                       {product.brand}
@@ -238,15 +289,18 @@ export default function StorefrontHomePage() {
                   </div>
                 </div>
 
-              </div>
+              </Link>
             ))}
           </div>
         </section>
 
+        {/* Recently Viewed Products Strip */}
+        <RecentlyViewedStrip limit={4} />
+
         {/* D. Promotional Secondary Banner Section (banner1.webp) */}
         <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[2001/786] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
-            src="/images/banner1.webp"
+            src={banners.secondary?.imageUrl || '/images/banner1.webp'}
             alt="GRAVOZ Luxury Leather Shoes Banner"
             fill
             sizes="100vw"
@@ -353,7 +407,7 @@ export default function StorefrontHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4 md:gap-6 items-start">
 
             {/* Left — Large Featured Product Card */}
-            <div className="group flex flex-col cursor-pointer h-full">
+            <Link href="/products/p1" className="group flex flex-col cursor-pointer h-full">
               <div className="relative w-full h-full min-h-[280px] sm:min-h-[340px] lg:min-h-[480px] rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
                 <Image
                   src="/products/product9.webp"
@@ -364,7 +418,7 @@ export default function StorefrontHomePage() {
                 />
               </div>
               {/* Info pill */}
-              <div className="mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border border-[#e8e2d8] gap-3">
+              <div className="mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border border-[#e8e2d8] gap-3 group-hover:border-slate-400 transition-colors">
                 <div className="min-w-0 flex-1 space-y-0.5">
                   <span className="font-sansation font-normal text-[10px] text-slate-500 uppercase tracking-[0.03em] block">Gravoz</span>
                   <h3 className="font-sansation font-normal text-[12px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303]">
@@ -376,21 +430,21 @@ export default function StorefrontHomePage() {
                   <span className="font-sansation text-[10px] text-slate-400 line-through">₹1429</span>
                 </div>
               </div>
-            </div>
+            </Link>
 
             {/* Right — 2×2 Grid */}
             <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
               {[
-                { id: 'b1', imageUrl: '/products/product10.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-                { id: 'b2', imageUrl: '/products/product11.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-                { id: 'b3', imageUrl: '/products/product12.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-                { id: 'b4', imageUrl: '/products/product13.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
+                { id: 'p1', imageUrl: '/products/product10.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
+                { id: 'p2', imageUrl: '/products/product11.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
+                { id: 'p3', imageUrl: '/products/product12.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
+                { id: 'p4', imageUrl: '/products/product13.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
               ].map((item) => (
-                <div key={item.id} className="group flex flex-col cursor-pointer">
+                <Link key={item.id} href={`/products/${item.id}`} className="group flex flex-col cursor-pointer">
                   {/* Image with star badge */}
                   <div className="relative w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
                     {/* Star Badge */}
-                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10">
+                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10 bg-white/80 backdrop-blur-xs px-1.5 py-0.5 rounded-full shadow-2xs">
                       <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
                       <span>5.0</span>
                     </div>
@@ -403,7 +457,7 @@ export default function StorefrontHomePage() {
                     />
                   </div>
                   {/* Info pill */}
-                  <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-2 sm:py-2.5 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] gap-1 sm:gap-2">
+                  <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-3 py-2 sm:py-2.5 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] gap-1 sm:gap-2 group-hover:border-slate-400 transition-colors">
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">Gravoz</span>
                       <h3 className="font-sansation font-normal text-[11px] sm:text-[12px] leading-[1.31] tracking-[0.03em] text-[#030303] line-clamp-1 sm:line-clamp-2">
@@ -415,7 +469,7 @@ export default function StorefrontHomePage() {
                       <span className="font-sansation text-[9px] sm:text-[10px] text-slate-400 line-through">₹1429</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
@@ -538,7 +592,7 @@ export default function StorefrontHomePage() {
         {/* I. Promotional Banner (banner4.webp) */}
         <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3200/1034] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
-            src="/images/banner4.webp"
+            src={banners.promo_strip?.imageUrl || '/images/banner4.webp'}
             alt="GRAVOZ Promotional Banner"
             fill
             sizes="100vw"
@@ -611,58 +665,12 @@ export default function StorefrontHomePage() {
           </div>
         </section>
 
-        {/* K. Year Sale Section — product18 to product21 (2 in 1 row on mobile) */}
-        <section className="space-y-4 pt-2">
-          {/* Header Row — centered title only */}
-          <div className="flex justify-center">
-            <h2 className="font-sansation font-light text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center">
-              Year Sale
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
-            {[
-              { id: 'y1', imageUrl: '/products/product18.webp', price: 1199, original: 1169, sale: false,  discount: null },
-              { id: 'y2', imageUrl: '/products/product19.webp', price: 1669, original: 1699, sale: true,   discount: '20% off' },
-              { id: 'y3', imageUrl: '/products/product20.webp', price: 1199, original: 1169, sale: false,  discount: null },
-              { id: 'y4', imageUrl: '/products/product21.webp', price: 1199, original: 1169, sale: false,  discount: null },
-            ].map((item) => (
-              <div key={item.id} className="group relative flex flex-col cursor-pointer bg-[#f4f2ee] border border-[#e8e2d8] rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
-
-                {/* Sale badge — top left, only on sale card */}
-                {item.sale && (
-                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 bg-[#030303] text-white font-sansation text-[9px] sm:text-[11px] font-bold tracking-wide px-2 sm:px-3 py-0.5 sm:py-1 rounded-md">
-                    Sale
-                  </div>
-                )}
-
-                {/* Product Image */}
-                <div className="relative aspect-square w-full overflow-hidden">
-                  <Image
-                    src={item.imageUrl}
-                    alt={`GRAVOZ Product ${item.id}`}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-contain p-2 sm:p-4 group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-
-                {/* Price row */}
-                <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                  {/* 20% off pill */}
-                  {item.discount && (
-                    <span className="font-sansation text-[8px] sm:text-[10px] font-bold text-white bg-[#89591C] px-1.5 sm:px-2 py-0.5 rounded-full">
-                      {item.discount}
-                    </span>
-                  )}
-                  <span className="font-sansation font-bold text-xs sm:text-[14px] text-[#89591C]">₹{item.price}</span>
-                  <span className="font-sansation text-[9px] sm:text-[12px] text-slate-400 line-through">₹{item.original}</span>
-                </div>
-
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* K. Latest Products — Dynamic from Admin */}
+        <DynamicProductSection
+          heading="Latest Products"
+          filter="isLatest"
+          limit={4}
+        />
 
         {/* L. Top Selling — Infinite Logo Marquee Strip */}
         <section className="pt-2">
@@ -699,151 +707,43 @@ export default function StorefrontHomePage() {
           </div>
         </section>
 
-        {/* M. Top Selling Products List */}
-        <section className="space-y-3 pt-2">
-          {/* Header */}
-          <div className="relative flex items-center justify-center">
-            <h2 className="font-sansation font-light text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center">
-              Top Selling
-            </h2>
-            <a href="/products" className="absolute right-0 font-sansation text-[13px] font-normal text-[#030303] underline underline-offset-2 hover:text-[#89591C] transition-colors">
-              View All
-            </a>
-          </div>
+        {/* M. Top Selling — Dynamic from Admin (2 per row on laptop) */}
+        <DynamicProductSection
+          heading="Top Selling"
+          filter="isTopSeller"
+          limit={6}
+          layout="list"
+        />
 
-          <hr className="border-[#e8e2d8]" />
-
-          {/* 3 col × 3 row grid */}
-          {[
-            [
-              { img: '/products/product1.webp',  brand: 'Gravoz',  name: 'Leather Shoe',   price: 1969, original: 1999 },
-              { img: '/products/product9.webp',   brand: 'Jackrob', name: 'Leather Sandal', price: 1169, original: 1199 },
-              { img: '/products/product13.webp',  brand: 'Ellora',  name: 'Leather Sandal', price: 1169, original: 1199 },
-            ],
-            [
-              { img: '/products/product10.webp', brand: 'Gravoz',  name: 'Leather Shoe',   price: 1969, original: 1999 },
-              { img: '/products/product11.webp', brand: 'Ellora',  name: 'Leather Sandal', price: 969,  original: 999  },
-              { img: '/products/product12.webp', brand: 'Ellora',  name: 'Leather Sandal', price: 1969, original: 1699 },
-            ],
-            [
-              { img: '/products/product5.webp',  brand: 'Ellora',  name: 'Leather Sandal', price: 1169, original: 1199 },
-              { img: '/products/product7.webp',  brand: 'Ellora',  name: 'Leather Shoe',   price: 1669, original: 1699 },
-              { img: '/products/product6.webp',  brand: 'Ellora',  name: 'Leather Sandal', price: 1069, original: 1099 },
-            ],
-          ].map((row, rowIdx) => (
-            <div key={rowIdx}>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-[#e8e2d8]">
-                {row.map((item, colIdx) => (
-                  <div key={colIdx} className="flex items-center gap-4 px-4 py-4 hover:bg-[#faf8f5] transition-colors cursor-pointer group">
-                    {/* Small product image */}
-                    <div className="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
-                      <Image
-                        src={item.img}
-                        alt={`${item.brand} ${item.name}`}
-                        fill
-                        sizes="80px"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    {/* Info */}
-                    <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="font-sansation text-[11px] text-slate-500 tracking-[0.03em]">{item.brand}</span>
-                      <p className="font-sansation font-bold text-[14px] leading-[1.31] tracking-[0.03em] text-[#030303]">{item.name}</p>
-                      <div className="flex items-baseline gap-2 mt-0.5">
-                        <span className="font-sansation font-bold text-[13px] text-[#89591C]">₹{item.price}</span>
-                        <span className="font-sansation text-[12px] text-slate-400 line-through">₹{item.original}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {rowIdx < 2 && <hr className="border-[#e8e2d8]" />}
-            </div>
-          ))}
-        </section>
-
-        {/* N. Daily Collection Section — 12 Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
-        <section className="space-y-4 pt-2">
-          {/* Header Row — centered title only */}
-          <div className="flex justify-center">
-            <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center px-4">
-              Daily Collection
-            </h2>
-          </div>
-
-          {/* 12 Product Cards Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            {[
-              { id: 'dc1',  imageUrl: '/products/product1.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc2',  imageUrl: '/products/product2.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc3',  imageUrl: '/products/product3.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc4',  imageUrl: '/products/product4.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc5',  imageUrl: '/products/product5.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc6',  imageUrl: '/products/product6.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc7',  imageUrl: '/products/product7.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc8',  imageUrl: '/products/product.8.png',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc9',  imageUrl: '/products/product9.webp',  title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc10', imageUrl: '/products/product10.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc11', imageUrl: '/products/product11.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-              { id: 'dc12', imageUrl: '/products/product12.webp', title: "Men's Casual Comfort Sandals – WGP50020 Black" },
-            ].map((product) => (
-              <div key={product.id} className="group flex flex-col cursor-pointer">
-
-                {/* Floating Product Image (Boxless & Borderless) */}
-                <div className="relative aspect-square w-full flex items-center justify-center p-1 sm:p-2 overflow-hidden bg-transparent">
-                  {/* Star Rating Badge (Top Right) */}
-                  <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10">
-                    <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
-                    <span>5.0</span>
-                  </div>
-
-                  {/* Product Shoe Image */}
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.title}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-contain p-1 group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-
-                {/* Bottom Info Pill Box */}
-                <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] shadow-2xs gap-1 sm:gap-3">
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">
-                      Gravoz
-                    </span>
-                    <h3 className="font-sansation font-normal text-[11px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
-                      {product.title}
-                    </h3>
-                  </div>
-
-                  {/* Pricing */}
-                  <div className="flex items-baseline gap-1 flex-shrink-0">
-                    <span className="font-sansation text-xs sm:text-sm font-bold text-[#89591C]">
-                      ₹1399
-                    </span>
-                    <span className="font-sansation text-[9px] sm:text-[10px] text-slate-400 line-through">
-                      ₹1429
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* N. Featured Products — Dynamic from Admin */}
+        <DynamicProductSection
+          heading="Featured Products"
+          filter="isFeatured"
+          limit={8}
+        />
 
         {/* O. Promotional Banner (banner5.webp — below Daily Collection) */}
         <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3172/1230] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
           <Image
-            src="/images/banner5.webp"
+            src={banners.daily_collection?.imageUrl || '/images/banner5.webp'}
             alt="GRAVOZ Daily Collection Banner"
             fill
             sizes="100vw"
             className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
           />
         </section>
+
+        {/* Dynamic Behavioral Recommendation Strip (You May Also Like) */}
+        <section className="pt-4">
+          <RecommendationStrip limit={6} />
+        </section>
+
+        {/* Best Sellers — Dynamic from Admin */}
+        <DynamicProductSection
+          heading="Best Sellers"
+          filter="isBestSeller"
+          limit={8}
+        />
 
         {/* P. Testimonials Section ("What Our Client Says") */}
         <section className="space-y-6 pt-6 pb-2">

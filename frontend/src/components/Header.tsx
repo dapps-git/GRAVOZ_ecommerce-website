@@ -8,20 +8,22 @@ import {
   ChevronDown, 
   UserCheck, 
   LogIn, 
-  Search, 
   Menu, 
   X, 
   ChevronRight,
   Package,
-  Sparkles,
-  Store
+  Sparkles
 } from 'lucide-react';
+import SearchBar from './SearchBar';
+import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
+import { useUser } from '@/context/UserContext';
 
 export default function Header() {
-  const [cartCount, setCartCount] = useState(0);
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
+  const { user, isLoggedIn, logout } = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -87,26 +89,38 @@ export default function Header() {
             </a>
           </div>
 
-          {/* Right Items: Be a Seller, Register, Login */}
+          {/* Right Items: Register, Login / Profile */}
           <div className="flex items-center gap-3.5 uppercase font-medium tracking-[0.03em] text-[#030303]">
-            <Link href="/admin/login" className="flex items-center gap-1 hover:text-[#89591C] transition-colors">
-              <Store className="w-3 h-3 text-[#89591C]" />
-              <span>BE A SELLER</span>
-            </Link>
+            {isLoggedIn && user ? (
+              <>
+                <Link href="/profile" className="flex items-center gap-1 hover:text-[#89591C] transition-colors font-bold text-[#89591C]">
+                  <UserCheck className="w-3 h-3 text-[#89591C]" />
+                  <span>HI, {user.name.split(' ')[0].toUpperCase()}</span>
+                </Link>
+                <span className="text-[#d8cebe]">|</span>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="hover:text-rose-600 transition-colors text-[11px] font-semibold cursor-pointer uppercase"
+                >
+                  LOGOUT
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/signup" className="flex items-center gap-1 hover:text-[#89591C] transition-colors">
+                  <UserCheck className="w-3 h-3 text-[#89591C]" />
+                  <span>REGISTER</span>
+                </Link>
 
-            <span className="text-[#d8cebe]">|</span>
+                <span className="text-[#d8cebe]">|</span>
 
-            <Link href="/register" className="flex items-center gap-1 hover:text-[#89591C] transition-colors">
-              <UserCheck className="w-3 h-3 text-[#89591C]" />
-              <span>REGISTER</span>
-            </Link>
-
-            <span className="text-[#d8cebe]">|</span>
-
-            <Link href="/login" className="flex items-center gap-1 hover:text-[#89591C] transition-colors">
-              <LogIn className="w-3 h-3 text-[#89591C]" />
-              <span>LOGIN</span>
-            </Link>
+                <Link href="/login" className="flex items-center gap-1 hover:text-[#89591C] transition-colors">
+                  <LogIn className="w-3 h-3 text-[#89591C]" />
+                  <span>LOGIN</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -139,15 +153,8 @@ export default function Header() {
 
           {/* Action Icons (Search, Wishlist, Cart, Profile) */}
           <div className="flex items-center gap-3 sm:gap-4 md:gap-5">
-            {/* Search Button */}
-            <button
-              type="button"
-              onClick={() => setSearchOpen(!searchOpen)}
-              aria-label="Search Catalog"
-              className="p-1 text-[#030303] hover:text-[#89591C] transition-colors"
-            >
-              <Search className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
-            </button>
+            {/* Live Search Bar Component */}
+            <SearchBar />
 
             {/* Wishlist Icon */}
             <Link 
@@ -162,6 +169,11 @@ export default function Header() {
                 height={20}
                 className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
               />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#89591C] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center animate-in zoom-in-50 duration-200">
+                  {wishlistCount}
+                </span>
+              )}
             </Link>
 
             {/* Cart Icon */}
@@ -182,56 +194,35 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* Profile Icon */}
+            {/* Profile Icon / Avatar */}
             <Link 
-              href="/account" 
-              className="relative p-1 text-[#030303] hover:text-[#89591C] transition-colors"
+              href={isLoggedIn ? "/profile" : "/login"} 
+              className="relative flex items-center justify-center p-1 text-[#030303] hover:text-[#89591C] transition-colors"
               aria-label="User Account"
+              title={isLoggedIn && user?.name ? `Profile (${user.name})` : 'Log In'}
             >
-              <Image
-                src="/icons/profile.webp"
-                alt="Profile"
-                width={20}
-                height={20}
-                className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
-              />
+              {isLoggedIn && user?.avatarUrl ? (
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden border border-[#89591C]/50 shadow-2xs">
+                  <Image
+                    src={user.avatarUrl}
+                    alt={user.name || 'User Avatar'}
+                    width={24}
+                    height={24}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <Image
+                  src="/icons/profile.webp"
+                  alt="Profile"
+                  width={20}
+                  height={20}
+                  className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
+                />
+              )}
             </Link>
           </div>
         </div>
-
-        {/* Expandable Search Input (Toggleable on Mobile & Desktop) */}
-        {searchOpen && (
-          <div className="pt-3 pb-1 border-t border-[#f0eae1] mt-2 animate-fadeIn">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (searchQuery.trim()) {
-                  window.location.href = `/products?search=${encodeURIComponent(searchQuery)}`;
-                }
-              }}
-              className="max-w-[1530px] mx-auto flex items-center gap-2"
-            >
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search footwear for Men, Women & Kids..."
-                  className="w-full pl-9 pr-4 py-2 text-xs md:text-sm bg-[#faf8f5] border border-[#e8e2d8] rounded-full focus:outline-none focus:border-[#89591C] text-[#030303]"
-                  autoFocus
-                />
-                <Search className="w-4 h-4 text-[#888] absolute left-3 top-1/2 -translate-y-1/2" />
-              </div>
-              <button
-                type="button"
-                onClick={() => setSearchOpen(false)}
-                className="p-2 text-xs text-[#666] hover:text-[#030303] font-medium"
-              >
-                Cancel
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
       {/* 4. Desktop Category Links Navbar (Desktop Only) */}
@@ -401,33 +392,49 @@ export default function Header() {
             <div className="p-4 border-t border-[#e8e2d8] bg-[#faf8f5] space-y-3">
               {/* Login / Register Buttons */}
               <div className="grid grid-cols-2 gap-2">
-                <Link
-                  href="/login"
-                  onClick={closeMobileMenu}
-                  className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-white bg-[#030303] rounded-md hover:bg-[#89591C] transition-colors"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>LOGIN</span>
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={closeMobileMenu}
-                  className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-[#030303] bg-white border border-[#e8e2d8] rounded-md hover:border-[#89591C] transition-colors"
-                >
-                  <UserCheck className="w-3.5 h-3.5 text-[#89591C]" />
-                  <span>REGISTER</span>
-                </Link>
+                {isLoggedIn && user ? (
+                  <>
+                    <Link
+                      href="/profile"
+                      onClick={closeMobileMenu}
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-white bg-[#89591C] rounded-md hover:bg-[#724a17] transition-colors"
+                    >
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>MY PROFILE</span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logout();
+                        closeMobileMenu();
+                      }}
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-md hover:bg-rose-100 transition-colors"
+                    >
+                      <LogIn className="w-3.5 h-3.5" />
+                      <span>LOGOUT</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={closeMobileMenu}
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-white bg-[#030303] rounded-md hover:bg-[#89591C] transition-colors"
+                    >
+                      <LogIn className="w-3.5 h-3.5" />
+                      <span>LOGIN</span>
+                    </Link>
+                    <Link
+                      href="/signup"
+                      onClick={closeMobileMenu}
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-[#030303] bg-white border border-[#e8e2d8] rounded-md hover:border-[#89591C] transition-colors"
+                    >
+                      <UserCheck className="w-3.5 h-3.5 text-[#89591C]" />
+                      <span>SIGN UP</span>
+                    </Link>
+                  </>
+                )}
               </div>
-
-              {/* Seller Link */}
-              <Link
-                href="/admin/login"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-center gap-1.5 py-2 text-[11px] font-medium text-[#89591C] bg-white border border-[#e8e2d8] rounded-md hover:bg-[#89591C] hover:text-white transition-all text-center"
-              >
-                <Store className="w-3.5 h-3.5" />
-                <span>BECOME A SELLER</span>
-              </Link>
 
               {/* Contact Info */}
               <div className="pt-2 text-[10px] text-[#666] space-y-1.5 border-t border-[#e8e2d8]/60">
