@@ -9,7 +9,9 @@ import { Eye, FileText, ShoppingCart } from 'lucide-react';
 interface OrderItem {
   _id: string;
   orderNumber: string;
-  customer: { name: string; email: string; phone: string };
+  customerName?: string;
+  customerEmail?: string;
+  customer?: { name?: string; email?: string; phone?: string };
   totalAmount: number;
   orderStatus: string;
   paymentStatus: string;
@@ -65,23 +67,27 @@ export default function OrdersPage() {
             <Link href={`/admin/orders/${row._id}`} className="font-bold text-[#89591C] text-xs hover:underline">
               {row.orderNumber}
             </Link>
-            <div className="text-[10px] text-slate-400 font-normal">{new Date(row.createdAt).toLocaleDateString()}</div>
+            <div className="text-[10px] text-slate-400 font-normal">{new Date(row.createdAt).toLocaleDateString('en-IN')}</div>
           </div>
         </div>
       ),
     },
     {
       header: 'Customer Details',
-      accessor: (row: OrderItem) => (
-        <div>
-          <div className="font-bold text-slate-900 text-xs">{row.customer?.name}</div>
-          <div className="text-[10px] text-slate-500 font-normal">{row.customer?.email}</div>
-        </div>
-      ),
+      accessor: (row: OrderItem) => {
+        const name = row.customerName || row.customer?.name || 'Customer';
+        const email = row.customerEmail || row.customer?.email || '';
+        return (
+          <div>
+            <div className="font-bold text-slate-900 text-xs">{name}</div>
+            <div className="text-[10px] text-slate-500 font-normal">{email}</div>
+          </div>
+        );
+      },
     },
     {
       header: 'Total Amount',
-      accessor: (row: OrderItem) => <span className="font-extrabold text-slate-900 text-xs">${row.totalAmount.toFixed(2)}</span>,
+      accessor: (row: OrderItem) => <span className="font-extrabold text-slate-900 text-xs">₹{(row.totalAmount || 0).toLocaleString('en-IN')}</span>,
     },
     {
       header: 'Payment Status',
@@ -116,7 +122,7 @@ export default function OrdersPage() {
     <div className="space-y-4 font-light">
       {/* Filter Tabs Header */}
       <div className="flex items-center gap-1.5 border-b border-[#e8e2d8] pb-3 overflow-x-auto">
-        {['all', 'pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((tab) => (
+        {['all', 'ordered', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'return_requested'].map((tab) => (
           <button
             key={tab}
             type="button"
@@ -130,7 +136,7 @@ export default function OrdersPage() {
                 : 'bg-white text-slate-600 hover:text-[#89591C] border border-[#e8e2d8]'
             }`}
           >
-            {tab}
+            {tab.replace(/_/g, ' ')}
           </button>
         ))}
       </div>

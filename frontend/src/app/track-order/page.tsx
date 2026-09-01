@@ -350,7 +350,7 @@ function TrackOrderContent() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-14 h-14 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0">
                         <Image
-                          src={item.imageUrl || '/products/product1.webp'}
+                          src={item.imageUrl || '/products/placeholder.svg'}
                           alt={item.name}
                           width={56}
                           height={56}

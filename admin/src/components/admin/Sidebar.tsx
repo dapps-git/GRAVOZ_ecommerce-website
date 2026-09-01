@@ -9,6 +9,7 @@ import {
   FolderTree,
   Tag,
   Users,
+  UserCheck,
   Boxes,
   ShoppingCart,
   RotateCcw,
@@ -17,13 +18,16 @@ import {
   CreditCard,
   Settings,
   LogOut,
+  ImageIcon,
 } from 'lucide-react';
 
 const menuItems = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Products', href: '/admin/products', icon: ShoppingBag },
+  { name: 'Banners', href: '/admin/banners', icon: ImageIcon },
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
   { name: 'Brands', href: '/admin/brands', icon: Tag },
+  { name: 'Users', href: '/admin/users', icon: UserCheck },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'Stock Control', href: '/admin/stock', icon: Boxes },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },

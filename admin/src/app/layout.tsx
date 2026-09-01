@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   keywords: ['shoes', 'men shoes', 'women shoes', 'baby shoes', 'leather footwear', 'GRAVOZ'],
 };
 
+import ScrollToTop from '@/components/admin/ScrollToTop';
+
 export default function RootLayout({
   children,
 }: {
@@ -31,6 +33,7 @@ export default function RootLayout({
     <html lang="en" className={`${poppins.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="bg-[#faf8f5] text-[#1e293b] font-sans min-h-screen antialiased selection:bg-[#89591C] selection:text-white" suppressHydrationWarning>
         {children}
+        <ScrollToTop />
       </body>
     </html>
   );

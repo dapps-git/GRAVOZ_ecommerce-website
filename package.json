@@ -9,6 +9,7 @@
     "seed": "node --import tsx src/scripts/seed.ts"
   },
   "dependencies": {
+    "@types/nodemailer": "^8.0.1",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.6.0",
     "clsx": "^2.1.1",
@@ -17,6 +18,7 @@
     "lucide-react": "^1.16.0",
     "mongoose": "^8.13.0",
     "next": "^15.1.7",
+    "nodemailer": "^9.0.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.2"

@@ -6,7 +6,7 @@ const DEFAULT_BANNER_MAP: Record<string, any> = {
   hero: {
     title: 'Step Better. Feel the Comfort.',
     subtitle: 'Quality Sandals for Every Family Moment',
-    imageUrl: '/images/banner.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/products',
     aspectRatio: '1816/866',
     isActive: true,
@@ -14,7 +14,7 @@ const DEFAULT_BANNER_MAP: Record<string, any> = {
   secondary: {
     title: 'GRAVOZ Luxury Leather Shoes',
     subtitle: 'Crafted with premium Italian grade finish',
-    imageUrl: '/images/banner1.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/category/men',
     aspectRatio: '2001/786',
     isActive: true,
@@ -22,7 +22,7 @@ const DEFAULT_BANNER_MAP: Record<string, any> = {
   comfort_sandal: {
     title: 'GRAVOZ Ultra Comfort Everyday Sandal',
     subtitle: 'Ergonomic footbed with shock absorption',
-    imageUrl: '/images/banner3.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/category/women',
     aspectRatio: '3076/1208',
     isActive: true,
@@ -30,7 +30,7 @@ const DEFAULT_BANNER_MAP: Record<string, any> = {
   promo_strip: {
     title: 'GRAVOZ Seasonal Showcase',
     subtitle: 'New Season New Styles',
-    imageUrl: '/images/banner4.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/products',
     aspectRatio: '3200/1034',
     isActive: true,
@@ -38,7 +38,7 @@ const DEFAULT_BANNER_MAP: Record<string, any> = {
   daily_collection: {
     title: 'GRAVOZ Daily Collection',
     subtitle: 'Everyday elegance crafted for you',
-    imageUrl: '/images/banner5.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/products',
     aspectRatio: '3172/1230',
     isActive: true,
@@ -46,21 +46,21 @@ const DEFAULT_BANNER_MAP: Record<string, any> = {
   category_women: {
     title: 'Women',
     subtitle: 'Collection',
-    imageUrl: '/images/women.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/category/women',
     isActive: true,
   },
   category_men: {
     title: 'Men',
     subtitle: 'Collection',
-    imageUrl: '/images/men.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/category/men',
     isActive: true,
   },
   category_kids: {
     title: 'Kids',
     subtitle: 'Collection',
-    imageUrl: '/images/kid.webp',
+    imageUrl: '/images/placeholder.svg',
     linkUrl: '/category/kids',
     isActive: true,
   },

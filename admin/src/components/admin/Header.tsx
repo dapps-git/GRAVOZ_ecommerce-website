@@ -27,7 +27,7 @@ const routeTitleMap: Record<string, string> = {
   '/admin/settings': 'Store Configuration',
 };
 
-export default function Header({ adminName = 'Admin', adminEmail = 'admin@gravoz.com' }: HeaderProps) {
+export default function Header({ adminName = 'Admin', adminEmail = 'gravoxshopadmin@gmail.com' }: HeaderProps) {
   const pathname = usePathname();
   const [timeStr, setTimeStr] = useState<string>('');
   const [dateStr, setDateStr] = useState<string>('');

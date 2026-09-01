@@ -20,7 +20,7 @@ export function comparePassword(password: string, hash: string): Promise<boolean
 }
 
 export function signAdminToken(payload: AdminJwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
 }
 
 export function verifyAdminToken(token: string): AdminJwtPayload | null {
@@ -45,11 +45,18 @@ export async function setAdminAuthCookie(token: string): Promise<void> {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 7 * 24 * 60 * 60, // 7 days
+    maxAge: 24 * 60 * 60, // 1 day (24 hours)
   });
 }
 
 export async function removeAdminAuthCookie(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(TOKEN_COOKIE_NAME);
+  cookieStore.set(TOKEN_COOKIE_NAME, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+    expires: new Date(0),
+  });
 }

@@ -20,7 +20,15 @@ const CustomerSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, index: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
-    phone: { type: String, default: '' },
+    passwordHash: { type: String },
+    authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
+    googleId: { type: String, sparse: true, index: true },
+    isEmailVerified: { type: Boolean, default: false },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
+    phone: { type: String, default: '', sparse: true },
+    otpCode: { type: String, default: null },
+    otpExpires: { type: Date, default: null },
     avatarUrl: { type: String, default: '' },
     addresses: [AddressSchema],
     rewardPoints: { type: Number, default: 0 },
@@ -30,6 +38,8 @@ const CustomerSchema = new mongoose.Schema(
     totalOrders: { type: Number, default: 0 },
     totalSpent: { type: Number, default: 0 },
     tier: { type: String, default: 'Silver', enum: ['Silver', 'Gold', 'Platinum'] },
+    isActive: { type: Boolean, default: true },
+    lastLogin: { type: Date },
   },
   { timestamps: true }
 );

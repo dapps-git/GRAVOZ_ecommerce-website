@@ -16,6 +16,21 @@ export interface IProductSEO {
   ogImage?: string;
 }
 
+export interface IProductSizeItem {
+  size: string;
+  isAvailable: boolean;
+  stock?: number;
+}
+
+export interface IProductColorVariant {
+  id?: string;
+  name: string;
+  colorCode?: string;
+  imageUrl?: string;
+  images?: IProductImage[];
+  isAvailable?: boolean;
+}
+
 export interface IProduct extends Document {
   name: string;
   sku: string;
@@ -28,11 +43,16 @@ export interface IProduct extends Document {
   discountPrice?: number;
   stock: number;
   sizes: string[];
+  sizeAvailability?: IProductSizeItem[];
   colors: string[];
+  colorVariants?: IProductColorVariant[];
   images: IProductImage[];
   seo?: IProductSEO;
   isBestSeller: boolean;
+  isTopSeller?: boolean;
   isFeatured: boolean;
+  isLatest?: boolean;
+  badge?: string;
   status: 'active' | 'draft' | 'archived';
   createdAt: Date;
   updatedAt: Date;
@@ -43,6 +63,24 @@ const ProductImageSchema = new Schema<IProductImage>({
   alt: { type: String, required: true, default: 'Shoe image' },
   publicId: { type: String },
 });
+
+const ProductSizeItemSchema = new Schema<IProductSizeItem>({
+  size: { type: String, required: true },
+  isAvailable: { type: Boolean, default: true },
+  stock: { type: Number, default: 10 },
+}, { _id: false });
+
+const ProductColorVariantSchema = new Schema<IProductColorVariant>(
+  {
+    id: { type: String, default: '' },
+    name: { type: String, required: true },
+    colorCode: { type: String, default: '#000000' },
+    imageUrl: { type: String, default: '' },
+    images: { type: [ProductImageSchema], default: [] },
+    isAvailable: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
 
 const ProductSEOSchema = new Schema<IProductSEO>({
   metaTitle: { type: String, default: '' },
@@ -67,19 +105,24 @@ const ProductSchema = new Schema<IProduct>(
     discountPrice: { type: Number, min: 0 },
     stock: { type: Number, required: true, min: 0, default: 0, index: true },
     sizes: [{ type: String }],
+    sizeAvailability: { type: [ProductSizeItemSchema], default: [] },
     colors: [{ type: String }],
+    colorVariants: { type: [ProductColorVariantSchema], default: [] },
     images: {
       type: [ProductImageSchema],
       validate: [
         function (val: IProductImage[]) {
-          return val.length >= 1 && val.length <= 3;
+          return val.length >= 1 && val.length <= 6;
         },
-        'Product must have between 1 and 3 photos',
+        'Product must have between 1 and 6 photos',
       ],
     },
     seo: { type: ProductSEOSchema, default: () => ({}) },
     isBestSeller: { type: Boolean, default: false, index: true },
+    isTopSeller: { type: Boolean, default: false, index: true },
     isFeatured: { type: Boolean, default: false, index: true },
+    isLatest: { type: Boolean, default: false, index: true },
+    badge: { type: String, default: '' },
     status: { type: String, default: 'active', enum: ['active', 'draft', 'archived'] },
   },
   { timestamps: true }

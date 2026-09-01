@@ -98,7 +98,7 @@ export default function DynamicProductSection({
             price: p.discountPrice || p.price || 1399,
             originalPrice: p.price || p.originalPrice || 1429,
             rating: p.rating ?? 5.0,
-            imageUrl: p.images?.[0]?.url || `/products/product${(idx % 13) + 1}.webp`,
+            imageUrl: (typeof p.images?.[0] === 'string' ? p.images[0] : p.images?.[0]?.url) || '/products/placeholder.svg',
             href: `/products/${p.slug || p._id}`,
           }));
           setProducts(mapped);

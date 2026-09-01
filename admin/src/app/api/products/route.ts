@@ -88,15 +88,21 @@ export async function POST(req: NextRequest) {
       targetAudience,
       categoryId,
       subCategory,
-      images, // Expected array of 3 photos [{ url, alt }]
+      images, // Expected array of 1 to 6 photos [{ url, alt }]
       price,
       discountPrice,
       stock,
       sizes,
+      sizeAvailability,
       colors,
+      colorVariants,
       isBestSeller,
+      isTopSeller,
       isFeatured,
+      isLatest,
+      badge,
       status,
+      seo,
     } = body;
 
     if (!name || !targetAudience || !categoryId || !price || stock === undefined) {
@@ -106,9 +112,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure exactly 1-3 photos provided
+    // Ensure 1 to 6 photos provided
     if (!images || !Array.isArray(images) || images.length === 0) {
-      return NextResponse.json({ error: 'Product must include at least 1 image (up to 3 photos max)' }, { status: 400 });
+      return NextResponse.json({ error: 'Product must include at least 1 image (up to 6 photos max)' }, { status: 400 });
+    }
+
+    if (images.length > 6) {
+      return NextResponse.json({ error: 'Maximum 6 photos allowed per product' }, { status: 400 });
     }
 
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '-' + Date.now();
@@ -121,15 +131,21 @@ export async function POST(req: NextRequest) {
       description: description || '',
       targetAudience,
       category: categoryId,
-      subCategory: subCategory || 'Casual',
+      subCategory: subCategory || 'Casual Sandals',
       images,
       price: Number(price),
       discountPrice: discountPrice ? Number(discountPrice) : undefined,
       stock: Number(stock),
-      sizes: sizes || ['7', '8', '9', '10'],
-      colors: colors || ['Black', 'White'],
+      sizes: sizes || ['4', '5', '6', '7', '9', '10'],
+      sizeAvailability: sizeAvailability || [],
+      colors: colors || ['Brown', 'Black', 'Tan'],
+      colorVariants: colorVariants || [],
+      seo: seo || undefined,
       isBestSeller: Boolean(isBestSeller),
+      isTopSeller: Boolean(isTopSeller),
       isFeatured: Boolean(isFeatured),
+      isLatest: Boolean(isLatest),
+      badge: badge || '',
       status: status || 'active',
     });
 

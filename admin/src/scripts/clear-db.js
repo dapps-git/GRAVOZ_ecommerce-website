@@ -20,17 +20,21 @@ async function clearAndSeedSuperAdmin() {
   console.log('✔ Wiped all static sample products, categories, orders & testimonials!');
 
   // 2. Ensure Super Admin account exists with hashed password
-  const adminPasswordHash = await bcrypt.hash('admin123456', 10);
+  const adminEmail = process.env.ADMIN_EMAIL || 'gravoxshopadmin@gmail.com';
+  const rawAdminPass = process.env.ADMIN_PASSWORD || 'admin123456';
+  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || 
+    (rawAdminPass.startsWith('$2') ? rawAdminPass : await bcrypt.hash(rawAdminPass, 10));
+
   await db.collection('admins').deleteMany({});
   await db.collection('admins').insertOne({
     name: 'Super Admin',
-    email: 'admin@gravoz.com',
+    email: adminEmail,
     passwordHash: adminPasswordHash,
     role: 'superadmin',
     createdAt: new Date(),
     updatedAt: new Date(),
   });
-  console.log('✔ Super Admin account ready: admin@gravoz.com / admin123456');
+  console.log(`✔ Super Admin account ready: ${adminEmail}`);
 
   // 3. Initialize default Store Settings
   await db.collection('settings').deleteMany({});

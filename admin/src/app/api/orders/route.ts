@@ -23,6 +23,8 @@ export async function GET(req: NextRequest) {
     if (search) {
       query.$or = [
         { orderNumber: { $regex: search, $options: 'i' } },
+        { customerName: { $regex: search, $options: 'i' } },
+        { customerEmail: { $regex: search, $options: 'i' } },
         { 'customer.name': { $regex: search, $options: 'i' } },
         { 'customer.email': { $regex: search, $options: 'i' } },
       ];

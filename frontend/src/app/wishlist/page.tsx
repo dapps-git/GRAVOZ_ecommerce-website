@@ -102,7 +102,7 @@ export default function WishlistPage() {
                   <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-0">
                     <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#f2f0ed] flex-shrink-0 flex items-center justify-center p-2.5 overflow-hidden border border-[#eae6e1]">
                       <Image
-                        src={item.imageUrl || '/products/product1.webp'}
+                        src={item.imageUrl || '/products/placeholder.svg'}
                         alt={item.title}
                         width={112}
                         height={112}

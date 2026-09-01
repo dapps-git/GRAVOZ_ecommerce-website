@@ -192,7 +192,7 @@ export default function CartPage() {
                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
                       <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] flex-shrink-0">
                         <Image
-                          src={item.imageUrl || '/products/product1.webp'}
+                          src={item.imageUrl || '/products/placeholder.svg'}
                           alt={item.title}
                           fill
                           sizes="80px"

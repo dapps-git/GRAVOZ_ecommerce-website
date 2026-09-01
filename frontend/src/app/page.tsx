@@ -67,26 +67,26 @@ interface ProductItem {
   href: string;
 }
 
-// ─── Static fallback data ─────────────────────────────────────────────────────
+// ─── Fallback data ─────────────────────────────────────────────────────────
 
 const DEFAULT_PRODUCTS: ProductItem[] = [
-  { id: 'p1', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Black", price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product1.webp', href: '/products/p1' },
-  { id: 'p2', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Tan",   price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product2.webp', href: '/products/p2' },
-  { id: 'p3', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Brown",  price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product3.webp', href: '/products/p3' },
-  { id: 'p4', brand: 'Gravoz', title: "Men's Casual Comfort Sandals – WGP50020 Olive",  price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/product4.webp', href: '/products/p4' },
+  { id: 'p1', brand: 'Gravoz', title: "Men's Casual Comfort Sandals", price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/placeholder.svg', href: '/products' },
+  { id: 'p2', brand: 'Gravoz', title: "Men's Casual Comfort Sandals", price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/placeholder.svg', href: '/products' },
+  { id: 'p3', brand: 'Gravoz', title: "Men's Casual Comfort Sandals", price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/placeholder.svg', href: '/products' },
+  { id: 'p4', brand: 'Gravoz', title: "Men's Casual Comfort Sandals", price: 1399, originalPrice: 1429, rating: 5.0, imageUrl: '/products/placeholder.svg', href: '/products' },
 ];
 
 const DEFAULT_CATEGORIES: CategoryCardData[] = [
-  { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/women.webp' },
-  { key: 'men',   title: 'Men',   href: '/category/men',   imageUrl: '/images/men.webp'   },
-  { key: 'kids',  title: 'Kids',  href: '/category/kids',  imageUrl: '/images/kid.webp'   },
+  { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/placeholder.svg' },
+  { key: 'men',   title: 'Men',   href: '/category/men',   imageUrl: '/images/placeholder.svg' },
+  { key: 'kids',  title: 'Kids',  href: '/category/kids',  imageUrl: '/images/placeholder.svg' },
 ];
 
 // ─── Page Component ───────────────────────────────────────────────────────────
 
 export default function StorefrontHomePage() {
   const [banners, setBanners] = useState<Record<string, any>>({});
-  const [bannerImageUrl, setBannerImageUrl] = useState<string>('/images/banner.webp');
+  const [bannerImageUrl, setBannerImageUrl] = useState<string>('/images/placeholder.svg');
   const [bannerLoading, setBannerLoading] = useState<boolean>(true);
 
   const [categoryCards, setCategoryCards] = useState<CategoryCardData[]>(DEFAULT_CATEGORIES);
@@ -108,9 +108,9 @@ export default function StorefrontHomePage() {
           }
           // Dynamic category card images
           setCategoryCards([
-            { key: 'women', title: data.banners.category_women?.title || 'Women', href: data.banners.category_women?.linkUrl || '/category/women', imageUrl: data.banners.category_women?.imageUrl || '/images/women.webp' },
-            { key: 'men',   title: data.banners.category_men?.title || 'Men',   href: data.banners.category_men?.linkUrl || '/category/men',   imageUrl: data.banners.category_men?.imageUrl || '/images/men.webp' },
-            { key: 'kids',  title: data.banners.category_kids?.title || 'Kids',  href: data.banners.category_kids?.linkUrl || '/category/kids',  imageUrl: data.banners.category_kids?.imageUrl || '/images/kid.webp' },
+            { key: 'women', title: data.banners.category_women?.title || 'Women', href: data.banners.category_women?.linkUrl || '/category/women', imageUrl: data.banners.category_women?.imageUrl || '/images/placeholder.svg' },
+            { key: 'men',   title: data.banners.category_men?.title || 'Men',   href: data.banners.category_men?.linkUrl || '/category/men',   imageUrl: data.banners.category_men?.imageUrl || '/images/placeholder.svg' },
+            { key: 'kids',  title: data.banners.category_kids?.title || 'Kids',  href: data.banners.category_kids?.linkUrl || '/category/kids',  imageUrl: data.banners.category_kids?.imageUrl || '/images/placeholder.svg' },
           ]);
         }
       })

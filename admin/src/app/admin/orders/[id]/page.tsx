@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
+import Image from 'next/image';
 import StatusBadge from '@/components/admin/StatusBadge';
 import { ArrowLeft, FileText } from 'lucide-react';
 import Link from 'next/link';
@@ -8,16 +9,30 @@ import Link from 'next/link';
 interface OrderDetail {
   _id: string;
   orderNumber: string;
-  customer: {
-    name: string;
-    email: string;
-    phone: string;
-    shippingAddress: { street: string; city: string; state: string; postalCode: string; country: string };
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  customer?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    shippingAddress?: { street?: string; city?: string; state?: string; postalCode?: string; country?: string };
   };
-  items: Array<{ name: string; size: string; color: string; quantity: number; price: number; image?: string }>;
+  shippingAddress?: {
+    name?: string;
+    phone?: string;
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
+  items: Array<{ name: string; size: string; color?: string; quantity: number; price: number; imageUrl?: string; image?: string }>;
   subtotal: number;
-  tax: number;
-  shippingFee: number;
+  tax?: number;
+  shippingFee?: number;
+  discountAmount?: number;
+  couponCode?: string;
   totalAmount: number;
   paymentStatus: string;
   orderStatus: string;
@@ -49,7 +64,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       });
 
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.order) {
         setOrder(data.order);
       }
     } catch (err) {
@@ -67,8 +82,36 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     return <div className="p-8 text-center text-rose-600 font-light">Order not found.</div>;
   }
 
+  // Robust safe fallbacks for customer details
+  const customerName =
+    order.customerName ||
+    order.customer?.name ||
+    order.shippingAddress?.name ||
+    'Customer';
+
+  const customerEmail =
+    order.customerEmail ||
+    order.customer?.email ||
+    'Not provided';
+
+  const customerPhone =
+    order.customerPhone ||
+    order.customer?.phone ||
+    order.shippingAddress?.phone ||
+    'Not provided';
+
+  const shippingAddr =
+    order.shippingAddress ||
+    order.customer?.shippingAddress || {
+      street: 'N/A',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'India',
+    };
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6 font-light">
+    <div className="max-w-4xl mx-auto space-y-6 font-sansation">
       <div className="flex items-center justify-between">
         <Link href="/admin/orders" className="text-xs font-semibold text-slate-600 hover:text-[#89591C] flex items-center gap-1.5">
           <ArrowLeft className="w-4 h-4" /> Back to Orders
@@ -89,7 +132,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <StatusBadge status={order.orderStatus} />
             <StatusBadge status={order.paymentStatus} />
           </div>
-          <p className="text-xs text-slate-500 mt-1 font-normal">Placed on {new Date(order.createdAt).toLocaleString()}</p>
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Placed on {new Date(order.createdAt).toLocaleString('en-IN')} via {order.paymentMethod || 'COD'}
+          </p>
         </div>
 
         {/* Status Actions */}
@@ -99,13 +144,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             value={order.orderStatus}
             disabled={updating}
             onChange={(e) => handleUpdateStatus(e.target.value)}
-            className="bg-[#faf8f5] border border-[#e8e2d8] rounded-2xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+            className="bg-[#faf8f5] border border-[#e8e2d8] rounded-2xl px-3.5 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#89591C]"
           >
-            <option value="pending">Pending</option>
+            <option value="ordered">Ordered</option>
+            <option value="confirmed">Confirmed</option>
             <option value="processing">Processing</option>
             <option value="shipped">Shipped</option>
+            <option value="out_for_delivery">Out for Delivery</option>
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
+            <option value="return_requested">Return Requested</option>
+            <option value="returned">Returned</option>
+            <option value="refunded">Refunded</option>
           </select>
         </div>
       </div>
@@ -117,41 +167,51 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             Customer Information
           </h3>
           <div className="text-xs space-y-1">
-            <p className="font-bold text-slate-900 text-sm">{order.customer.name}</p>
-            <p className="text-slate-600 font-normal">{order.customer.email}</p>
-            <p className="text-slate-600 font-normal">{order.customer.phone}</p>
+            <p className="font-bold text-slate-900 text-sm">{customerName}</p>
+            <p className="text-slate-600 font-normal">{customerEmail}</p>
+            <p className="text-slate-600 font-normal">{customerPhone}</p>
           </div>
 
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#e8e2d8] pb-2 pt-2">
             Shipping Address
           </h3>
           <div className="text-xs text-slate-700 space-y-0.5 font-normal">
-            <p>{order.customer.shippingAddress?.street}</p>
+            <p>{shippingAddr.street}</p>
             <p>
-              {order.customer.shippingAddress?.city}, {order.customer.shippingAddress?.state}{' '}
-              {order.customer.shippingAddress?.postalCode}
+              {shippingAddr.city}{shippingAddr.state ? `, ${shippingAddr.state}` : ''}{' '}
+              {shippingAddr.postalCode}
             </p>
-            <p className="font-bold text-slate-900">{order.customer.shippingAddress?.country}</p>
+            <p className="font-bold text-slate-900">{shippingAddr.country || 'India'}</p>
           </div>
         </div>
 
         {/* Itemized Order Breakdown (2 Cols) */}
         <div className="md:col-span-2 bg-white rounded-3xl p-5 border border-[#e8e2d8] shadow-sm space-y-4">
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#e8e2d8] pb-2">
-            Ordered Shoe Items ({order.items.length})
+            Ordered Shoe Items ({order.items?.length || 0})
           </h3>
 
           <div className="divide-y divide-[#f0ebd9]">
-            {order.items.map((item, idx) => (
-              <div key={idx} className="py-3 flex items-center justify-between text-xs">
-                <div>
-                  <h4 className="font-bold text-slate-900">{item.name}</h4>
+            {order.items?.map((item, idx) => (
+              <div key={idx} className="py-3 flex items-center gap-3 text-xs">
+                {/* Product Thumbnail */}
+                <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#faf8f5] border border-[#e8e2d8] flex-shrink-0">
+                  <Image
+                    src={item.imageUrl || item.image || '/products/product1.webp'}
+                    alt={item.name}
+                    width={56}
+                    height={56}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-slate-900 truncate">{item.name}</h4>
                   <p className="text-[10px] text-slate-500 font-normal">
                     Size: {item.size} • Color: {item.color || 'Default'} • Qty: {item.quantity}
                   </p>
                 </div>
-                <div className="text-right font-bold text-slate-900">
-                  ${(item.price * item.quantity).toFixed(2)}
+                <div className="text-right font-bold text-slate-900 flex-shrink-0">
+                  ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                 </div>
               </div>
             ))}
@@ -161,19 +221,21 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="border-t border-[#e8e2d8] pt-3 space-y-1.5 text-xs text-slate-600 font-normal">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span className="text-slate-900 font-semibold">${order.subtotal.toFixed(2)}</span>
+              <span className="text-slate-900 font-semibold">₹{(order.subtotal || 0).toLocaleString('en-IN')}</span>
             </div>
+            {order.discountAmount && order.discountAmount > 0 ? (
+              <div className="flex justify-between text-emerald-600 font-semibold">
+                <span>Coupon Discount {order.couponCode ? `(${order.couponCode})` : ''}</span>
+                <span>− ₹{order.discountAmount.toLocaleString('en-IN')}</span>
+              </div>
+            ) : null}
             <div className="flex justify-between">
-              <span>Tax (5%)</span>
-              <span className="text-slate-900 font-semibold">${order.tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping Fee</span>
-              <span className="text-slate-900 font-semibold">${order.shippingFee.toFixed(2)}</span>
+              <span>Delivery / Shipping</span>
+              <span className="text-emerald-700 font-semibold">FREE</span>
             </div>
             <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-[#e8e2d8]">
               <span>Total Amount</span>
-              <span className="text-[#89591C]">${order.totalAmount.toFixed(2)}</span>
+              <span className="text-[#89591C]">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>

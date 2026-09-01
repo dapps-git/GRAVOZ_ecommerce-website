@@ -10,17 +10,21 @@ async function seed() {
   const db = mongoose.connection;
   
   // 1. Seed Admin
-  const adminPasswordHash = await bcrypt.hash('admin123456', 10);
+  const adminEmail = process.env.ADMIN_EMAIL || 'gravoxshopadmin@gmail.com';
+  const rawAdminPass = process.env.ADMIN_PASSWORD || 'admin123456';
+  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || 
+    (rawAdminPass.startsWith('$2') ? rawAdminPass : await bcrypt.hash(rawAdminPass, 10));
+
   await db.collection('admins').deleteMany({});
   await db.collection('admins').insertOne({
     name: 'Super Admin',
-    email: 'admin@gravoz.com',
+    email: adminEmail,
     passwordHash: adminPasswordHash,
     role: 'superadmin',
     createdAt: new Date(),
     updatedAt: new Date(),
   });
-  console.log('✔ Super Admin created: admin@gravoz.com / admin123456');
+  console.log(`✔ Super Admin created: ${adminEmail}`);
 
   // 2. Seed Categories
   await db.collection('categories').deleteMany({});

@@ -25,7 +25,11 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     const body = await req.json();
 
     if (body.images && (!Array.isArray(body.images) || body.images.length === 0)) {
-      return NextResponse.json({ error: 'At least 1 photo required (up to 3 max)' }, { status: 400 });
+      return NextResponse.json({ error: 'At least 1 photo required (up to 6 max)' }, { status: 400 });
+    }
+
+    if (body.images && body.images.length > 6) {
+      return NextResponse.json({ error: 'Maximum 6 photos allowed per product' }, { status: 400 });
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(params.id, { $set: body }, { new: true, runValidators: true });

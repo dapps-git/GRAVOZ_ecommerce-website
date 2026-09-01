@@ -4,15 +4,32 @@ import { Admin } from '@/models/Admin';
 import { comparePassword, signAdminToken, setAdminAuthCookie } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
+  // 1. Parse body
+  let email: string, password: string;
+  try {
+    const body = await req.json();
+    email = body.email?.trim().toLowerCase();
+    password = body.password;
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+  }
+
+  // 2. Connect to DB
   try {
     await connectDB();
-    const { email, password } = await req.json();
+  } catch (dbErr: unknown) {
+    const err = dbErr as Error;
+    console.error('[Admin Login] DB connection failed:', err.message);
+    return NextResponse.json({ error: 'Service temporarily unavailable. Please try again.' }, { status: 503 });
+  }
 
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
-    }
-
-    const admin = await Admin.findOne({ email: email.toLowerCase() });
+  // 3. Authenticate
+  try {
+    const admin = await Admin.findOne({ email });
     if (!admin) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
@@ -41,6 +58,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: unknown) {
     const err = error as Error;
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+    console.error('[Admin Login] Auth error:', err.message);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

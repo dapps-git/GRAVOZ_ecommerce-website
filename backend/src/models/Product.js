@@ -29,19 +29,39 @@ const ProductSchema = new mongoose.Schema(
     discountPrice: { type: Number, min: 0 },
     stock: { type: Number, required: true, min: 0, default: 0, index: true },
     sizes: [{ type: String }],
+    sizeAvailability: [
+      {
+        size: { type: String, required: true },
+        isAvailable: { type: Boolean, default: true },
+        stock: { type: Number, default: 10 },
+      },
+    ],
     colors: [{ type: String }],
+    colorVariants: [
+      {
+        id: { type: String, default: '' },
+        name: { type: String, required: true },
+        colorCode: { type: String, default: '#000000' },
+        imageUrl: { type: String, default: '' },
+        images: { type: [ProductImageSchema], default: [] },
+        isAvailable: { type: Boolean, default: true },
+      },
+    ],
     images: {
       type: [ProductImageSchema],
       validate: [
         function (val) {
-          return val.length >= 1 && val.length <= 3;
+          return val.length >= 1 && val.length <= 6;
         },
-        'Product must have between 1 and 3 photos',
+        'Product must have between 1 and 6 photos',
       ],
     },
     seo: { type: ProductSEOSchema, default: () => ({}) },
     isBestSeller: { type: Boolean, default: false, index: true },
+    isTopSeller: { type: Boolean, default: false, index: true },
     isFeatured: { type: Boolean, default: false, index: true },
+    isLatest: { type: Boolean, default: false, index: true },
+    badge: { type: String, default: '' },
     status: { type: String, default: 'active', enum: ['active', 'draft', 'archived'] },
   },
   { timestamps: true }

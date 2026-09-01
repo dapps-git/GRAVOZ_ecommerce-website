@@ -19,6 +19,12 @@ export interface ICustomerActivityLog {
 export interface ICustomer extends Document {
   name: string;
   email: string;
+  passwordHash?: string;
+  authProvider: 'local' | 'google';
+  googleId?: string;
+  isEmailVerified: boolean;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   phone?: string;
   avatarUrl?: string;
   addresses: ICustomerAddress[];
@@ -29,6 +35,8 @@ export interface ICustomer extends Document {
   totalOrders: number;
   totalSpent: number;
   tier: 'Silver' | 'Gold' | 'Platinum';
+  isActive: boolean;
+  lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,6 +61,12 @@ const CustomerSchema = new Schema<ICustomer>(
   {
     name: { type: String, required: true, index: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+    passwordHash: { type: String },
+    authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
+    googleId: { type: String, sparse: true, index: true },
+    isEmailVerified: { type: Boolean, default: false },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     phone: { type: String, default: '' },
     avatarUrl: { type: String, default: '' },
     addresses: [AddressSchema],
@@ -63,6 +77,8 @@ const CustomerSchema = new Schema<ICustomer>(
     totalOrders: { type: Number, default: 0 },
     totalSpent: { type: Number, default: 0 },
     tier: { type: String, default: 'Silver', enum: ['Silver', 'Gold', 'Platinum'] },
+    isActive: { type: Boolean, default: true },
+    lastLogin: { type: Date },
   },
   { timestamps: true }
 );

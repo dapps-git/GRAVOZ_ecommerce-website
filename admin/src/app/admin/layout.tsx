@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen bg-[#faf8f5] flex font-sans text-slate-800">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <Header adminName="Super Admin" adminEmail="admin@gravoz.com" />
+        <Header adminName="Super Admin" adminEmail="gravoxshopadmin@gmail.com" />
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto">{children}</main>
       </div>
     </div>
