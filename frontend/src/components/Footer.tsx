@@ -8,11 +8,11 @@ import { Truck, ShieldCheck, Leaf, Globe } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="w-full bg-white mt-12 sm:mt-16">
-      
+
       {/* 1. Black Feature Highlights Strip with 4 White Cards */}
       <div className="w-full bg-[#030303] py-6 sm:py-8 md:py-10 px-4 sm:px-8 md:px-16 lg:px-24">
         <div className="max-w-[1440px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-          
+
           {/* Feature 1: Delivery & Shipping */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs min-h-[120px] sm:min-h-[135px]">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#f4f2ee] border border-[#e8e2d8] flex items-center justify-center text-[#030303] mb-2 flex-shrink-0">
@@ -20,7 +20,7 @@ export default function Footer() {
             </div>
             <div>
               <h4 className="font-sansation font-bold text-xs sm:text-[13px] text-[#030303] leading-snug">
-                Delivery & Shipping
+                Delivery and Shipping
               </h4>
               <p className="font-sansation text-[10px] sm:text-[11px] text-slate-600 mt-0.5 leading-relaxed">
                 Your shoes will be dispatched within 1-2 business days
@@ -79,7 +79,7 @@ export default function Footer() {
       {/* 2. Main Footer Links & Branding */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-16 lg:px-24 pt-10 pb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1.2fr_1fr] gap-8 sm:gap-10">
-          
+
           {/* Brand column */}
           <div className="space-y-3.5 max-w-sm">
             <div className="relative h-7 w-32">
