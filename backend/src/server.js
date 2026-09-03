@@ -19,7 +19,11 @@ mongoose
   .then(() => console.log('✅  Connected to MongoDB (gravoz)'))
   .catch((err) => console.error('❌  MongoDB connection error:', err));
 
-// ── Health Check ──────────────────────────────────────────────────────────────
+// ── Root & Health Check for cPanel Passenger ────────────────────────────────
+app.get('/', (_req, res) =>
+  res.status(200).send('GRAVOZ Backend API is running successfully.')
+);
+
 app.get('/api/health', (_req, res) =>
   res.json({ status: 'ok', time: new Date().toISOString() })
 );
