@@ -25,8 +25,10 @@ const ProductSchema = new mongoose.Schema(
     brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', index: true },
     subCategory: { type: String, required: true, index: true },
     description: { type: String, default: '' },
+    features: { type: String, default: '' },
     price: { type: Number, required: true, min: 0 },
     discountPrice: { type: Number, min: 0 },
+    gst: { type: Number, default: 12, min: 0 },
     stock: { type: Number, required: true, min: 0, default: 0, index: true },
     sizes: [{ type: String }],
     sizeAvailability: [
@@ -44,6 +46,13 @@ const ProductSchema = new mongoose.Schema(
         colorCode: { type: String, default: '#000000' },
         imageUrl: { type: String, default: '' },
         images: { type: [ProductImageSchema], default: [] },
+        sizes: [
+          {
+            size: { type: String, required: true },
+            isAvailable: { type: Boolean, default: true },
+            stock: { type: Number, default: 10 },
+          },
+        ],
         isAvailable: { type: Boolean, default: true },
       },
     ],
@@ -51,11 +60,23 @@ const ProductSchema = new mongoose.Schema(
       type: [ProductImageSchema],
       validate: [
         function (val) {
-          return val.length >= 1 && val.length <= 6;
+          return val.length >= 1;
         },
-        'Product must have between 1 and 6 photos',
+        'Product must have at least 1 photo',
       ],
     },
+    // Product Specifications
+    material: { type: String, default: '' },
+    ageRange: { type: String, default: '' },
+    occasion: { type: String, default: '' },
+    strapType: { type: String, default: '' },
+    closureType: { type: String, default: '' },
+    shoeType: { type: String, default: '' },
+    manufacturer: { type: String, default: '' },
+    hsnCode: { type: String, default: '' },
+    packingLength: { type: Number, default: 0 },
+    packingWidth: { type: Number, default: 0 },
+    packingHeight: { type: Number, default: 0 },
     seo: { type: ProductSEOSchema, default: () => ({}) },
     isBestSeller: { type: Boolean, default: false, index: true },
     isTopSeller: { type: Boolean, default: false, index: true },
