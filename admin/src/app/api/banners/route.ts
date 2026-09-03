@@ -99,6 +99,40 @@ const DEFAULT_BANNER_LIST = [
     isActive: true,
     displayOrder: 8,
   },
+  {
+    slot: 'duo_product_1',
+    name: 'Duo Spotlight Product 1 (Below Best Sellers)',
+    category: 'duo_showcase',
+    imageUrl: '',
+    thumbnailUrl: '',
+    lifestyleUrl: '',
+    title: "Men's Casual Comfort Sandals",
+    subtitle: '',
+    price: 1399,
+    originalPrice: 1429,
+    productId: '',
+    linkUrl: '/products',
+    aspectRatio: '4/3',
+    isActive: true,
+    displayOrder: 9,
+  },
+  {
+    slot: 'duo_product_2',
+    name: 'Duo Spotlight Product 2 (Below Best Sellers)',
+    category: 'duo_showcase',
+    imageUrl: '',
+    thumbnailUrl: '',
+    lifestyleUrl: '',
+    title: "Women's Casual Comfort Sandals",
+    subtitle: '',
+    price: 1399,
+    originalPrice: 1429,
+    productId: '',
+    linkUrl: '/products',
+    aspectRatio: '4/3',
+    isActive: true,
+    displayOrder: 10,
+  },
 ];
 
 // GET /api/banners
@@ -107,10 +141,19 @@ export async function GET() {
     await connectDB();
     let banners = await Banner.find().sort({ displayOrder: 1 }).lean();
 
-    // Auto-seed defaults if collection is empty
+    // Auto-seed defaults if collection is empty or missing duo showcase slots
     if (!banners || banners.length === 0) {
       await Banner.insertMany(DEFAULT_BANNER_LIST);
       banners = await Banner.find().sort({ displayOrder: 1 }).lean();
+    } else {
+      // Ensure duo slots exist
+      const hasDuo1 = banners.some((b) => b.slot === 'duo_product_1');
+      const hasDuo2 = banners.some((b) => b.slot === 'duo_product_2');
+      if (!hasDuo1 || !hasDuo2) {
+        if (!hasDuo1) await Banner.create(DEFAULT_BANNER_LIST.find((b) => b.slot === 'duo_product_1'));
+        if (!hasDuo2) await Banner.create(DEFAULT_BANNER_LIST.find((b) => b.slot === 'duo_product_2'));
+        banners = await Banner.find().sort({ displayOrder: 1 }).lean();
+      }
     }
 
     return NextResponse.json({ success: true, banners });
@@ -128,15 +171,28 @@ export async function PUT(req: NextRequest) {
 
     // If single banner update
     if (body.slot) {
-      const { slot, imageUrl, title, subtitle, linkUrl, isActive } = body;
+      const {
+        slot, imageUrl, thumbnailUrl, lifestyleUrl,
+        title, subtitle, description,
+        price, originalPrice, productId, linkUrl,
+        sizes, colors, isActive,
+      } = body;
       const updated = await Banner.findOneAndUpdate(
         { slot },
         {
           $set: {
             ...(imageUrl !== undefined && { imageUrl }),
+            ...(thumbnailUrl !== undefined && { thumbnailUrl }),
+            ...(lifestyleUrl !== undefined && { lifestyleUrl }),
             ...(title !== undefined && { title }),
             ...(subtitle !== undefined && { subtitle }),
+            ...(description !== undefined && { description }),
+            ...(price !== undefined && { price: Number(price) }),
+            ...(originalPrice !== undefined && { originalPrice: Number(originalPrice) }),
+            ...(productId !== undefined && { productId }),
             ...(linkUrl !== undefined && { linkUrl }),
+            ...(Array.isArray(sizes) && { sizes }),
+            ...(Array.isArray(colors) && { colors }),
             ...(isActive !== undefined && { isActive }),
           },
         },

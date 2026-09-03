@@ -19,6 +19,8 @@ import {
   Settings,
   LogOut,
   ImageIcon,
+  LayoutGrid,
+  TicketPercent,
 } from 'lucide-react';
 
 const menuItems = [
@@ -27,6 +29,7 @@ const menuItems = [
   { name: 'Banners', href: '/admin/banners', icon: ImageIcon },
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
   { name: 'Brands', href: '/admin/brands', icon: Tag },
+  { name: 'Coupons', href: '/admin/coupons', icon: TicketPercent },
   { name: 'Users', href: '/admin/users', icon: UserCheck },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'Stock Control', href: '/admin/stock', icon: Boxes },

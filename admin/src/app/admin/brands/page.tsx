@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import DataTable, { Column } from '@/components/admin/DataTable';
 import Modal from '@/components/admin/Modal';
 import Image from 'next/image';
-import { Plus, Tag, Globe } from 'lucide-react';
+import { Plus, Tag, Globe, Percent, Edit2 } from 'lucide-react';
 
 interface BrandItem {
   _id: string;
@@ -12,6 +12,7 @@ interface BrandItem {
   slug: string;
   logoUrl?: string;
   description?: string;
+  discountPercentage?: number;
   status: 'active' | 'inactive';
   seo?: { metaTitle?: string; metaDescription?: string; keywords?: string[] };
 }
@@ -20,9 +21,11 @@ export default function BrandsPage() {
   const [brands, setBrands] = useState<BrandItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingBrand, setEditingBrand] = useState<BrandItem | null>(null);
 
   const [name, setName] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
+  const [discountPercentage, setDiscountPercentage] = useState('');
   const [description, setDescription] = useState('');
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
@@ -48,30 +51,61 @@ export default function BrandsPage() {
     fetchBrands();
   }, []);
 
-  const handleCreateBrand = async (e: React.FormEvent) => {
+  const openCreateModal = () => {
+    setEditingBrand(null);
+    setName('');
+    setLogoUrl('');
+    setDiscountPercentage('');
+    setDescription('');
+    setMetaTitle('');
+    setMetaDescription('');
+    setKeywordsStr('');
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (brand: BrandItem) => {
+    setEditingBrand(brand);
+    setName(brand.name);
+    setLogoUrl(brand.logoUrl || '');
+    setDiscountPercentage(brand.discountPercentage ? brand.discountPercentage.toString() : '');
+    setDescription(brand.description || '');
+    setMetaTitle(brand.seo?.metaTitle || '');
+    setMetaDescription(brand.seo?.metaDescription || '');
+    setKeywordsStr(brand.seo?.keywords?.join(', ') || '');
+    setIsModalOpen(true);
+  };
+
+  const handleSaveBrand = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch('/api/brands', {
-        method: 'POST',
+      const payload = {
+        name,
+        logoUrl,
+        discountPercentage: discountPercentage ? Number(discountPercentage) : 0,
+        description,
+        status: 'active',
+        seo: {
+          metaTitle: metaTitle || name,
+          metaDescription: metaDescription || description,
+          keywords: keywordsStr.split(',').map((k) => k.trim()).filter(Boolean),
+        },
+      };
+
+      const url = editingBrand ? `/api/brands/${editingBrand._id}` : '/api/brands';
+      const method = editingBrand ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          logoUrl,
-          description,
-          status: 'active',
-          seo: {
-            metaTitle: metaTitle || name,
-            metaDescription: metaDescription || description,
-            keywords: keywordsStr.split(',').map((k) => k.trim()).filter(Boolean),
-          },
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         setIsModalOpen(false);
         setName('');
         setLogoUrl('');
+        setDiscountPercentage('');
         setDescription('');
         fetchBrands();
       }
@@ -102,122 +136,142 @@ export default function BrandsPage() {
       ),
     },
     {
-      header: 'Brand Description',
-      accessor: (row) => <p className="text-xs text-slate-600 italic font-normal max-w-xs">{row.description || 'No description provided.'}</p>,
+      header: 'Brand Discount',
+      accessor: (row) => (
+        <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold border ${
+          row.discountPercentage && row.discountPercentage > 0
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+            : 'bg-slate-50 text-slate-400 border-slate-200'
+        }`}>
+          {row.discountPercentage && row.discountPercentage > 0 ? `${row.discountPercentage}% OFF` : 'None'}
+        </span>
+      ),
     },
     {
-      header: 'SEO Meta Title',
+      header: 'Description',
       accessor: (row) => (
-        <div className="flex items-center gap-1.5 text-xs text-slate-700 font-normal">
-          <Globe className="w-3.5 h-3.5 text-[#89591C]" />
-          <span>{row.seo?.metaTitle || row.name}</span>
-        </div>
+        <span className="text-xs text-slate-600 line-clamp-1 max-w-xs">{row.description || '—'}</span>
       ),
     },
     {
       header: 'Status',
       accessor: (row) => (
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-sm border ${
-          row.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'
-        }`}>
-          {row.status.toUpperCase()}
+        <span className="text-xs font-semibold text-emerald-600 capitalize">
+          ● {row.status}
         </span>
+      ),
+    },
+    {
+      header: 'Actions',
+      accessor: (row) => (
+        <button
+          type="button"
+          onClick={() => openEditModal(row)}
+          className="text-xs font-semibold text-[#89591C] hover:underline cursor-pointer"
+        >
+          Edit
+        </button>
       ),
     },
   ];
 
   return (
-    <div className="space-y-4 font-light">
+    <div className="space-y-4 font-sansation">
       <div className="flex items-center justify-between gap-4 border-b border-[#e8e2d8] pb-3">
-        <p className="text-xs text-slate-500 font-normal">Manage footwear brand portfolio, logos, and search engine SEO metadata</p>
+        <div>
+          <h1 className="text-xl font-bold text-[#030303]">Footwear Brands</h1>
+          <p className="text-xs text-slate-500 font-normal mt-0.5">Manage partner brands, brand discounts, and manufacturer information.</p>
+        </div>
         <button
           type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="px-3.5 py-1.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-md shadow-xs flex items-center gap-1.5"
+          onClick={openCreateModal}
+          className="px-4 py-2 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
         >
-          <Plus className="w-4 h-4" /> Create Brand
+          <Plus className="w-4 h-4" /> Add Brand
         </button>
       </div>
 
       <DataTable columns={columns} data={brands} loading={loading} />
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Footwear Brand">
-        <form onSubmit={handleCreateBrand} className="space-y-3 font-light">
+      {/* Modal */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingBrand ? `Edit Brand: ${editingBrand.name}` : "Add New Brand"}>
+        <form onSubmit={handleSaveBrand} className="space-y-4 font-sansation">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Brand Name *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Gravoz Artisans"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Brand Discount (%)
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  max="90"
+                  placeholder="e.g. 10 for 10% OFF"
+                  value={discountPercentage}
+                  onChange={(e) => setDiscountPercentage(e.target.value)}
+                  className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl pl-3 pr-8 py-2 text-xs text-slate-900 font-bold focus:outline-none focus:border-[#89591C]"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">%</span>
+              </div>
+            </div>
+          </div>
+
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Brand Name</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Logo URL
+            </label>
             <input
               type="text"
-              required
-              placeholder="e.g. GRAVOZ Atelier"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Brand Logo Image URL</label>
-            <input
-              type="url"
-              placeholder="https://res.cloudinary.com/.../brand-logo.png"
+              placeholder="https://..."
               value={logoUrl}
               onChange={(e) => setLogoUrl(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Description</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Description
+            </label>
             <textarea
               rows={2}
-              placeholder="Premium handcrafted leather shoe brand..."
+              placeholder="Brand story and heritage..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
             />
           </div>
 
-          <div className="border-t border-[#e8e2d8] pt-2 space-y-2">
-            <h4 className="text-xs font-bold text-slate-900 uppercase">SEO Management</h4>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-1">Meta Title</label>
-              <input
-                type="text"
-                placeholder="GRAVOZ Atelier - Handcrafted Luxury Shoes"
-                value={metaTitle}
-                onChange={(e) => setMetaTitle(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-1">Meta Description</label>
-              <input
-                type="text"
-                placeholder="Shop official GRAVOZ Atelier premium footwear..."
-                value={metaDescription}
-                onChange={(e) => setMetaDescription(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-600 mb-1">Keywords (Comma separated)</label>
-              <input
-                type="text"
-                placeholder="gravoz, luxury shoes, men footwear, leather sneakers"
-                value={keywordsStr}
-                onChange={(e) => setKeywordsStr(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
-              />
-            </div>
+          <div className="flex justify-end gap-2 pt-2 border-t border-[#f0ece5]">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="px-4 py-2 rounded-xl border border-[#e8e2d8] text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-5 py-2 rounded-xl bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+            >
+              {submitting ? 'Saving...' : 'Save Brand'}
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full py-2.5 bg-[#89591C] hover:bg-[#724816] text-white font-bold text-xs rounded-md shadow-xs"
-          >
-            {submitting ? 'Creating Brand...' : 'Save Brand'}
-          </button>
         </form>
       </Modal>
     </div>

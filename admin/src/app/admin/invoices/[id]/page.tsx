@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { Footprints, Printer, ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
+import { Footprints, Printer, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface OrderItem {
@@ -55,7 +56,6 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
     fetch(`/api/orders/${resolvedParams.id}`)
       .then((res) => res.json())
       .then((data) => {
-        // API may return { order: {...} } or directly the order
         setOrder(data.order || data);
       })
       .catch((err) => console.error(err))
@@ -70,7 +70,6 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
     return <div className="p-8 text-center text-rose-500">Invoice not found.</div>;
   }
 
-  // Safe customer field extraction
   const customerName =
     order.customerName || order.customer?.name || order.shippingAddress?.name || 'Customer';
   const customerEmail = order.customerEmail || order.customer?.email || '—';
@@ -84,66 +83,83 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
   const addrPin = addr.postalCode || '';
   const addrCountry = addr.country || 'India';
 
-  const subtotal = order.subtotal ?? order.items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const subtotal = order.subtotal ?? (order.items || []).reduce((s, i) => s + i.price * i.quantity, 0);
   const discount = order.discountAmount || 0;
-  const tax = order.tax || 0;
   const shipping = order.shippingFee || 0;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Top Controller Bar */}
-      <div className="flex items-center justify-between print:hidden">
+    <div className="max-w-4xl mx-auto space-y-6 print:m-0 print:p-0 print:max-w-none print:w-full font-sansation">
+      {/* Top Controller Bar (Hidden on Print) */}
+      <div className="flex items-center justify-between print:hidden bg-white p-4 rounded-2xl border border-[#e8e2d8] shadow-2xs">
         <Link
           href="/admin/invoices"
-          className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5"
+          className="text-xs font-semibold text-slate-600 hover:text-[#89591C] flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Invoices
         </Link>
         <button
           type="button"
           onClick={() => window.print()}
-          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-2"
+          className="px-5 py-2.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-all"
         >
           <Printer className="w-4 h-4" /> Print / Save as PDF
         </button>
       </div>
 
       {/* Printable Paper Document */}
-      <div className="bg-white text-slate-900 rounded-2xl p-8 border border-slate-200 shadow-xl space-y-8 print:border-none print:shadow-none print:p-0">
-
+      <div className="printable-invoice-container bg-white text-slate-900 rounded-2xl p-8 sm:p-10 border border-[#e8e2d8] shadow-sm space-y-8 print:border-none print:shadow-none print:p-0 print:rounded-none">
+        
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-200 pb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-white">
-              <Footprints className="w-7 h-7" />
+        <div className="flex items-start justify-between border-b border-[#e8e2d8] pb-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900 font-sansation">
+                GRAVOZ
+              </h1>
             </div>
-            <div>
-              <h1 className="text-2xl font-black tracking-wider text-slate-900">GRAVOZ</h1>
-              <p className="text-xs text-slate-500 font-semibold">Premium Shoes for Men, Women &amp; Babies</p>
-            </div>
+            <p className="text-xs text-[#89591C] font-semibold tracking-wide uppercase">
+              Premium Shoes for Men, Women &amp; Babies
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Official Tax Invoice &amp; Purchase Receipt
+            </p>
           </div>
-          <div className="text-right">
-            <h2 className="text-lg font-extrabold text-indigo-600">INVOICE</h2>
-            <p className="text-xs font-bold text-slate-700">#INV-{order.orderNumber}</p>
-            <p className="text-[11px] text-slate-500">Date: {new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+
+          <div className="text-right space-y-1">
+            <h2 className="text-xl font-bold text-[#89591C] uppercase tracking-wider">
+              INVOICE
+            </h2>
+            <p className="text-xs font-bold text-slate-900 font-mono">
+              #INV-{order.orderNumber}
+            </p>
+            <p className="text-[11px] text-slate-500">
+              Date: {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </p>
             {order.paymentMethod && (
-              <p className="text-[11px] text-slate-500 mt-0.5">via {order.paymentMethod.toUpperCase()}</p>
+              <p className="text-[11px] font-semibold text-slate-700">
+                Payment: {order.paymentMethod.toUpperCase()} ({order.paymentStatus || 'COMPLETED'})
+              </p>
             )}
           </div>
         </div>
 
         {/* Customer & Billed Address */}
-        <div className="grid grid-cols-2 gap-6 text-xs">
-          <div>
-            <h3 className="font-bold text-slate-400 uppercase tracking-wider mb-1">Billed To:</h3>
-            <p className="font-extrabold text-slate-900 text-sm">{customerName}</p>
+        <div className="grid grid-cols-2 gap-8 text-xs">
+          <div className="space-y-1 bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] print:bg-transparent print:border-none print:p-0">
+            <h3 className="font-bold text-[#89591C] uppercase tracking-wider text-[11px]">
+              Billed To:
+            </h3>
+            <p className="font-bold text-slate-900 text-sm">{customerName}</p>
             <p className="text-slate-600">{customerEmail}</p>
             <p className="text-slate-600">{customerPhone}</p>
           </div>
-          <div className="text-right">
-            <h3 className="font-bold text-slate-400 uppercase tracking-wider mb-1">Shipping Address:</h3>
-            <p className="text-slate-700">{addrStreet}</p>
-            <p className="text-slate-700">
+
+          <div className="space-y-1 bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] text-right print:bg-transparent print:border-none print:p-0">
+            <h3 className="font-bold text-[#89591C] uppercase tracking-wider text-[11px]">
+              Shipping Address:
+            </h3>
+            <p className="text-slate-800 font-medium">{addrStreet}</p>
+            <p className="text-slate-600">
               {[addrCity, addrState, addrPin].filter(Boolean).join(', ')}
             </p>
             <p className="font-bold text-slate-900">{addrCountry}</p>
@@ -151,67 +167,66 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
         </div>
 
         {/* Items Table */}
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="bg-slate-100 text-slate-700 font-bold uppercase border-b border-slate-200">
-              <th className="py-2.5 px-3">Item Description</th>
-              <th className="py-2.5 px-3">Size</th>
-              <th className="py-2.5 px-3 text-center">Qty</th>
-              <th className="py-2.5 px-3 text-right">Unit Price</th>
-              <th className="py-2.5 px-3 text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200">
-            {order.items.map((item, idx) => (
-              <tr key={idx}>
-                <td className="py-3 px-3 font-bold text-slate-900">{item.name}</td>
-                <td className="py-3 px-3 text-slate-600">Size {item.size}{item.color ? ` / ${item.color}` : ''}</td>
-                <td className="py-3 px-3 text-center font-bold text-slate-800">{item.quantity}</td>
-                <td className="py-3 px-3 text-right text-slate-700">₹{item.price.toLocaleString('en-IN')}</td>
-                <td className="py-3 px-3 text-right font-bold text-slate-900">
-                  ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                </td>
+        <div className="border border-[#e8e2d8] rounded-xl overflow-hidden print:border-slate-300">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-[#faf8f5] text-slate-800 font-bold uppercase border-b border-[#e8e2d8] print:bg-slate-100">
+                <th className="py-3 px-4">Item Description</th>
+                <th className="py-3 px-4">Size &amp; Variant</th>
+                <th className="py-3 px-4 text-center">Qty</th>
+                <th className="py-3 px-4 text-right">Unit Price</th>
+                <th className="py-3 px-4 text-right">Total</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[#e8e2d8] print:divide-slate-200">
+              {(order.items || []).map((item, idx) => (
+                <tr key={idx}>
+                  <td className="py-3.5 px-4 font-bold text-slate-900">{item.name}</td>
+                  <td className="py-3.5 px-4 text-slate-600">
+                    Size {item.size || '9'}{item.color ? ` / ${item.color}` : ''}
+                  </td>
+                  <td className="py-3.5 px-4 text-center font-bold text-slate-800">{item.quantity}</td>
+                  <td className="py-3.5 px-4 text-right text-slate-700">₹{item.price?.toLocaleString('en-IN')}</td>
+                  <td className="py-3.5 px-4 text-right font-bold text-slate-900">
+                    ₹{((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {/* Summary Totals */}
-        <div className="flex justify-end">
-          <div className="w-64 space-y-1.5 text-xs text-slate-600 border-t border-slate-200 pt-3">
+        <div className="flex justify-end pt-2">
+          <div className="w-72 space-y-2 text-xs text-slate-600 bg-[#faf8f5] p-5 rounded-2xl border border-[#e8e2d8] print:bg-transparent print:border-none print:p-0">
             <div className="flex justify-between">
               <span>Subtotal</span>
               <span className="font-semibold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
             </div>
             {discount > 0 && (
-              <div className="flex justify-between text-emerald-600 font-semibold">
+              <div className="flex justify-between text-emerald-700 font-semibold">
                 <span>Discount{order.couponCode ? ` (${order.couponCode})` : ''}</span>
                 <span>− ₹{discount.toLocaleString('en-IN')}</span>
               </div>
             )}
-            {tax > 0 && (
-              <div className="flex justify-between">
-                <span>Tax</span>
-                <span className="font-semibold text-slate-900">₹{tax.toLocaleString('en-IN')}</span>
-              </div>
-            )}
             <div className="flex justify-between">
-              <span>Shipping</span>
+              <span>Shipping Delivery</span>
               <span className="font-semibold text-slate-900">
                 {shipping > 0 ? `₹${shipping.toLocaleString('en-IN')}` : 'FREE'}
               </span>
             </div>
-            <div className="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-200">
+            <div className="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-[#e8e2d8]">
               <span>Total Paid</span>
-              <span className="text-indigo-600">₹{order.totalAmount.toLocaleString('en-IN')}</span>
+              <span className="text-[#89591C]">₹{order.totalAmount.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-slate-200 pt-4 text-center text-[10px] text-slate-500">
-          <p>Thank you for choosing GRAVOZ!</p>
-          <p>For questions or support, contact gravozcontact@gmail.com</p>
+        {/* Footer Note */}
+        <div className="border-t border-[#e8e2d8] pt-6 text-center space-y-1 text-[11px] text-slate-500">
+          <p className="font-semibold text-slate-700">Thank you for choosing GRAVOZ!</p>
+          <p>For questions or warranty assistance, contact gravozcontact@gmail.com</p>
+          <p className="text-[10px] text-slate-400">This is a computer-generated tax invoice and requires no physical signature.</p>
         </div>
       </div>
     </div>

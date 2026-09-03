@@ -37,6 +37,13 @@ interface OrderDetail {
   paymentStatus: string;
   orderStatus: string;
   paymentMethod: string;
+  returnDetails?: {
+    reason?: string;
+    description?: string;
+    images?: string[];
+    status?: string;
+    rejectionReason?: string;
+  };
   createdAt: string;
 }
 
@@ -154,8 +161,14 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
             <option value="return_requested">Return Requested</option>
-            <option value="returned">Returned</option>
+            <option value="under_review">Under Review</option>
+            <option value="return_approved">Approved (Return Accepted)</option>
+            <option value="pickup_scheduled">Pickup Scheduled</option>
+            <option value="return_received">Received at Hub</option>
+            <option value="refund_initiated">Refund Initiated</option>
             <option value="refunded">Refunded</option>
+            <option value="returned">Returned</option>
+            <option value="return_rejected">Return Rejected</option>
           </select>
         </div>
       </div>
@@ -183,6 +196,49 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </p>
             <p className="font-bold text-slate-900">{shippingAddr.country || 'India'}</p>
           </div>
+
+          {/* Return Request Details (If Return Initiated) */}
+          {order.returnDetails && order.returnDetails.reason && [
+            'return_requested',
+            'under_review',
+            'return_approved',
+            'pickup_scheduled',
+            'return_received',
+            'refund_initiated',
+            'refunded',
+            'returned',
+            'return_rejected',
+          ].includes(order.orderStatus) && (
+            <div className="pt-3 border-t border-[#e8e2d8] space-y-2">
+              <h3 className="text-xs font-bold text-[#89591C] uppercase tracking-wider">
+                Return &amp; Refund Request
+              </h3>
+              <div className="p-3 bg-[#faf4ec] rounded-xl border border-[#e8d5b5] space-y-1.5 text-xs">
+                <div>
+                  <span className="text-slate-500 block text-[10px] uppercase font-medium">Reason:</span>
+                  <span className="font-bold text-slate-900">{order.returnDetails.reason}</span>
+                </div>
+                {order.returnDetails.description && (
+                  <div>
+                    <span className="text-slate-500 block text-[10px] uppercase font-medium">Description:</span>
+                    <p className="text-slate-700">{order.returnDetails.description}</p>
+                  </div>
+                )}
+                {Array.isArray(order.returnDetails.images) && order.returnDetails.images.length > 0 && (
+                  <div>
+                    <span className="text-slate-500 block text-[10px] uppercase font-medium mb-1">Photos:</span>
+                    <div className="flex gap-2">
+                      {order.returnDetails.images.map((img: string, i: number) => (
+                        <div key={i} className="w-12 h-12 rounded-lg border border-[#e8d5b5] overflow-hidden">
+                          <img src={img} alt="Return photo" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Itemized Order Breakdown (2 Cols) */}

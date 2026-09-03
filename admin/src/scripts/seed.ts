@@ -32,7 +32,7 @@ async function seed() {
     name: "Men's Footwear",
     slug: 'mens-footwear',
     targetAudience: 'Men',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1560343090-f0409e92791a?q=80&w=800',
     subCategories: ['Sneakers', 'Boots', 'Formal Oxford', 'Running'],
     displayOrder: 1,
     isActive: true,

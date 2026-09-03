@@ -34,20 +34,72 @@ export async function PUT(req: NextRequest) {
 
     returnItem.status = status;
     if (adminNotes) returnItem.adminNotes = adminNotes;
-    if (status === 'processed') returnItem.processedAt = new Date();
+
+    const now = new Date();
+    const orderUpdate: Record<string, any> = {};
+
+    if (status === 'under_review') {
+      orderUpdate['orderStatus'] = 'under_review';
+      orderUpdate['returnDetails.status'] = 'under_review';
+    } else if (status === 'approved') {
+      returnItem.approvedAt = now;
+      orderUpdate['orderStatus'] = 'return_approved';
+      orderUpdate['returnDetails.status'] = 'approved';
+      orderUpdate['returnDetails.approvedAt'] = now;
+    } else if (status === 'pickup_scheduled') {
+      returnItem.pickupScheduledAt = now;
+      orderUpdate['orderStatus'] = 'pickup_scheduled';
+      orderUpdate['returnDetails.status'] = 'pickup_scheduled';
+      orderUpdate['returnDetails.pickupScheduledAt'] = now;
+    } else if (status === 'received') {
+      returnItem.receivedAt = now;
+      orderUpdate['orderStatus'] = 'return_received';
+      orderUpdate['returnDetails.status'] = 'received';
+      orderUpdate['returnDetails.receivedAt'] = now;
+    } else if (status === 'refund_initiated') {
+      returnItem.refundInitiatedAt = now;
+      orderUpdate['orderStatus'] = 'refund_initiated';
+      orderUpdate['returnDetails.status'] = 'refund_initiated';
+      orderUpdate['returnDetails.refundInitiatedAt'] = now;
+    } else if (status === 'refunded' || status === 'processed') {
+      returnItem.status = 'refunded';
+      returnItem.refundedAt = now;
+      returnItem.processedAt = now;
+      orderUpdate['orderStatus'] = 'refunded';
+      orderUpdate['paymentStatus'] = 'refunded';
+      orderUpdate['returnDetails.status'] = 'refunded';
+      orderUpdate['returnDetails.refundedAt'] = now;
+
+      // Background refund processing task
+      try {
+        await backgroundQueue.addJob('PROCESS_REFUND', {
+          orderNumber: returnItem.orderNumber,
+          amount: returnItem.refundAmount,
+          email: returnItem.customerEmail,
+        });
+      } catch (bgErr) {
+        console.error('Background refund job error:', bgErr);
+      }
+    } else if (status === 'rejected') {
+      returnItem.rejectedAt = now;
+      orderUpdate['orderStatus'] = 'return_rejected';
+      orderUpdate['returnDetails.status'] = 'rejected';
+      orderUpdate['returnDetails.rejectedAt'] = now;
+      if (adminNotes) orderUpdate['returnDetails.rejectionReason'] = adminNotes;
+    }
+
     await returnItem.save();
 
-    // If status processed, update order status to refunded / returned
-    if (status === 'processed') {
+    if (returnItem.order && Object.keys(orderUpdate).length > 0) {
       await Order.findByIdAndUpdate(returnItem.order, {
-        $set: { paymentStatus: 'refunded', orderStatus: 'returned' },
-      });
-
-      // Background refund processing task (Rule 15)
-      await backgroundQueue.addJob('PROCESS_REFUND', {
-        orderNumber: returnItem.orderNumber,
-        amount: returnItem.refundAmount,
-        email: returnItem.customerEmail,
+        $set: orderUpdate,
+        $push: {
+          statusHistory: {
+            status: orderUpdate['orderStatus'] || status,
+            timestamp: now,
+            note: adminNotes || `Return status updated to ${status}`,
+          },
+        },
       });
     }
 
