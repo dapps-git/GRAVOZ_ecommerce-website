@@ -13,6 +13,14 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gravoz
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
+// Support cPanel sub-path deployments (e.g., /gravoz)
+app.use((req, res, next) => {
+  if (req.url.startsWith('/gravoz')) {
+    req.url = req.url.replace(/^\/gravoz/, '') || '/';
+  }
+  next();
+});
+
 // ── Database ──────────────────────────────────────────────────────────────────
 mongoose
   .connect(MONGODB_URI)
