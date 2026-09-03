@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
               title: item.title,
               price: Number(item.price),
               originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
-              imageUrl: item.imageUrl || '/products/product1.webp',
+              imageUrl: item.imageUrl || '/products/placeholder.svg',
               size: item.size,
               color: item.color,
             },
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
             title: item.title,
             price: Number(item.price),
             originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
-            imageUrl: item.imageUrl || '/products/product1.webp',
+            imageUrl: item.imageUrl || '/products/placeholder.svg',
             size: item.size,
             color: item.color,
           });

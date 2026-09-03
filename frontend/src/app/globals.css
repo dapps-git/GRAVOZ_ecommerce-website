@@ -1,49 +1,193 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Sansation:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 :root {
-  --font-sansation: 'Montserrat', var(--font-montserrat), sans-serif;
-  --font-montserrat: 'Montserrat', var(--font-montserrat), sans-serif;
+  /* ── GRAVOZ Brand Style Guide v1.0 ── */
+  --font-poppins: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sansation: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-montserrat: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+
+  /* 🎨 Color System */
+  --color-primary: #8A5B2A;
+  --color-primary-hover: #68421A;
+  --color-primary-light: #F6E9D7;
+  --color-background: #FAF7F3;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #111111;
+  --color-text-secondary: #555555;
+  --color-text-muted: #888888;
+  --color-text-light: #B6B6B6;
+  --color-border: #E5E1DC;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
 }
 
-.font-sansation {
-  font-family: 'Montserrat', var(--font-montserrat), sans-serif;
-}
-
+/* Enforce Poppins globally across all elements */
+.font-poppins,
+.font-sansation,
 .font-montserrat {
-  font-family: 'Montserrat', var(--font-montserrat), sans-serif;
+  font-family: var(--font-poppins) !important;
 }
 
 .font-playfair {
-  font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  font-family: var(--font-playfair) !important;
 }
 
 html {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: var(--font-poppins);
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #ffffff;
-  color: #030303;
-  font-family: 'Montserrat', var(--font-montserrat), system-ui, -apple-system, sans-serif;
+  background-color: #FAF7F3;
+  color: #111111;
+  font-family: var(--font-poppins);
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
+  font-family: inherit;
 }
 
-input, button, select, textarea, span, p, h1, h2, h3, h4, h5, h6, a {
-  font-family: 'Montserrat', var(--font-montserrat), system-ui, -apple-system, sans-serif;
+input,
+button,
+select,
+textarea,
+span,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a {
+  font-family: var(--font-poppins);
+}
+
+/* ── Typography Utility Classes from Style Guide ── */
+.heading-h1 {
+  font-family: var(--font-poppins);
+  font-size: 40px;
+  line-height: 56px;
+  font-weight: 600;
+  color: #111111;
+}
+
+.heading-h2 {
+  font-family: var(--font-poppins);
+  font-size: 32px;
+  line-height: 44px;
+  font-weight: 600;
+  color: #111111;
+}
+
+.heading-h3 {
+  font-family: var(--font-poppins);
+  font-size: 24px;
+  line-height: 34px;
+  font-weight: 500;
+  color: #111111;
+}
+
+.heading-h4 {
+  font-family: var(--font-poppins);
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 500;
+  color: #111111;
+}
+
+.heading-h5 {
+  font-family: var(--font-poppins);
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 500;
+  color: #111111;
+}
+
+.body-large {
+  font-family: var(--font-poppins);
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 400;
+  color: #555555;
+}
+
+.body-default {
+  font-family: var(--font-poppins);
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+  color: #555555;
+}
+
+.text-small {
+  font-family: var(--font-poppins);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #888888;
+}
+
+.text-caption {
+  font-family: var(--font-poppins);
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 400;
+  color: #888888;
+}
+
+/* ── Style Guide Buttons ── */
+.btn-primary {
+  background-color: #8A5B2A;
+  color: #FFFFFF;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #68421A;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #8A5B2A;
+  border: 1px solid #8A5B2A;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: rgba(246, 233, 215, 0.4);
 }
 
 @keyframes marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {

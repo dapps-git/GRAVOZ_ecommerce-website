@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Order } from '@/models/Order';
+import { ReturnRefund } from '@/models/ReturnRefund';
 
 // GET /api/orders/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -32,7 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const { id } = await params;
     const body = await req.json();
-    const { status, note } = body;
+    const { status, note, returnReason, returnDescription, returnImages } = body;
 
     await connectDB();
 
@@ -58,11 +59,46 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
 
     order.orderStatus = status;
+
+    if (status === 'return_requested') {
+      order.returnDetails = {
+        reason: returnReason || 'Return requested by customer',
+        description: returnDescription || '',
+        images: Array.isArray(returnImages) ? returnImages : [],
+        status: 'return_requested',
+        requestedAt: new Date(),
+      };
+
+      // Also upsert into ReturnRefund collection for Admin Return Management
+      try {
+        await ReturnRefund.findOneAndUpdate(
+          { order: order._id },
+          {
+            $set: {
+              order: order._id,
+              orderNumber: order.orderNumber,
+              customerName: order.customerName || order.shippingAddress?.name || 'Customer',
+              customerEmail: order.customerEmail || 'customer@gravoz.com',
+              customerPhone: order.customerPhone || order.shippingAddress?.phone || '',
+              reason: returnReason || 'Other Reason',
+              description: returnDescription || '',
+              images: Array.isArray(returnImages) ? returnImages : [],
+              refundAmount: order.totalAmount || 0,
+              status: 'return_requested',
+            },
+          },
+          { upsert: true, new: true }
+        );
+      } catch (rrErr) {
+        console.error('Error upserting ReturnRefund record:', rrErr);
+      }
+    }
+
     if (!order.statusHistory) order.statusHistory = [];
     order.statusHistory.push({
       status,
       timestamp: new Date(),
-      note: note || `Status updated to ${status}`,
+      note: note || returnReason || `Status updated to ${status}`,
     });
 
     await order.save();

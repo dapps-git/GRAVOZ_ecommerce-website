@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, ChevronRight } from 'lucide-react';
+import { Star, Heart } from 'lucide-react';
 
 interface RecentlyViewedItem {
   _id: string;
@@ -25,7 +25,9 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setItems(parsed.slice(0, limit));
+          // Filter out legacy mock IDs from prior testing
+          const valid = parsed.filter((item: any) => item?._id && !item._id.startsWith('p'));
+          setItems(valid.slice(0, limit));
         }
       }
     } catch {
@@ -38,67 +40,70 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
   }
 
   return (
-    <section className="space-y-4 font-sansation">
+    <section className="space-y-4 font-poppins pt-2">
       {/* Section Header */}
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#030303] tracking-tight">
+      <div className="relative flex items-center justify-center">
+        <h2 className="font-poppins font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#111111] uppercase text-center px-4">
           Recently Viewed
         </h2>
-        <Link
-          href="/products"
-          className="text-xs font-semibold text-[#89591C] hover:underline flex items-center gap-0.5 whitespace-nowrap flex-shrink-0"
-        >
-          View all <ChevronRight className="w-3.5 h-3.5" />
-        </Link>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
+      {/* Product Cards Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
         {items.map((product, idx) => (
           <Link
             key={`${product._id}-${idx}`}
             href={`/products/${product._id}`}
-            className="group flex flex-col cursor-pointer bg-white"
+            className="group bg-white rounded-2xl border border-[#e8e2d8] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
           >
-            {/* Product Image Box */}
-            <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] p-2 flex items-center justify-center shadow-2xs group-hover:border-slate-300 transition-colors">
-              {/* Star Rating Badge */}
-              <div className="absolute top-2 right-2 flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 z-10 bg-white/90 backdrop-blur-xs px-1.5 py-0.5 rounded-full shadow-2xs">
-                <Star className="w-2.5 h-2.5 text-[#C19968] fill-[#C19968]" />
-                <span>{(product.rating || 5).toFixed(1)}</span>
-              </div>
-
-              {/* Tag/Badge */}
+            {/* Product Image Card */}
+            <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#faf8f5]">
+              {/* Best Seller Badge */}
               {product.badge && (
                 <div className="absolute top-2 left-2 z-10">
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#89591C] text-white">
+                  <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
                     {product.badge}
                   </span>
                 </div>
               )}
 
-              {/* Product Image */}
+              {/* Wishlist Button */}
+              <div className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center">
+                <Heart className="w-3.5 h-3.5 text-slate-600" />
+              </div>
+
+              {/* Product Shoe Image */}
               <Image
-                src={product.imageUrl || '/products/product1.webp'}
+                src={product.imageUrl || '/products/placeholder.svg'}
                 alt={product.name}
                 fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
               />
             </div>
 
-            {/* Info Container */}
-            <div className="mt-1.5 bg-[#f4f2ee] rounded-xl px-2.5 py-2 flex flex-col gap-0.5 border border-[#e8e2d8] group-hover:border-slate-300 transition-colors">
-              <span className="text-[9px] text-slate-400 uppercase tracking-wider font-sansation truncate">
-                Gravoz Footwear
-              </span>
-              <h3 className="text-[11px] sm:text-xs font-normal text-[#030303] truncate font-sansation leading-snug">
+            {/* Card Meta (Title, Rating, Discount Price) */}
+            <div className="mt-2 space-y-1">
+              <h3 className="text-[11px] sm:text-xs font-bold text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
                 {product.name}
               </h3>
-              <div className="flex items-baseline gap-1 pt-0.5">
-                <span className="text-[11px] sm:text-xs font-bold text-[#c25e09]">₹{product.price}</span>
+
+              {/* Star Rating */}
+              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span className="font-bold text-slate-800">{(product.rating || 5.0).toFixed(1)}</span>
+                <span className="text-slate-400 font-normal">(120)</span>
+              </div>
+
+              {/* Pricing with Discount */}
+              <div className="flex items-baseline gap-1.5 pt-0.5">
+                <span className="text-xs sm:text-sm font-bold text-[#89591C]">
+                  ₹{product.price}
+                </span>
                 {product.originalPrice && product.originalPrice > product.price && (
-                  <span className="text-[9px] text-slate-400 line-through">₹{product.originalPrice}</span>
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
+                    ₹{product.originalPrice}
+                  </span>
                 )}
               </div>
             </div>

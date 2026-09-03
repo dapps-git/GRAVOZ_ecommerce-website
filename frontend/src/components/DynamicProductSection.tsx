@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star } from 'lucide-react';
+import { Star, Heart } from 'lucide-react';
 
 interface ApiProduct {
   _id: string;
@@ -94,7 +94,7 @@ export default function DynamicProductSection({
           const mapped: MappedProduct[] = (data.products as ApiProduct[]).map((p, idx) => ({
             id: p._id || `fallback-${idx}`,
             title: p.name || 'Gravoz Footwear',
-            brand: p.brand || 'Gravoz',
+            brand: typeof p.brand === 'object' && p.brand !== null ? (p.brand as any).name || 'Gravoz' : (p.brand || 'Gravoz'),
             price: p.discountPrice || p.price || 1399,
             originalPrice: p.price || p.originalPrice || 1429,
             rating: p.rating ?? 5.0,
@@ -173,15 +173,15 @@ export default function DynamicProductSection({
 
   // Grid Layout for Latest Products, Featured Products, Best Sellers
   return (
-    <section className="space-y-4 pt-2 font-sansation">
+    <section className="space-y-4 pt-2 font-poppins">
       {/* Header — clean centered uppercase font-light title */}
       <div className="flex flex-col items-center justify-center gap-1 text-center">
         {subLabel && (
-          <span className="text-[10px] uppercase tracking-widest font-semibold text-[#89591C]">
+          <span className="text-[10px] uppercase tracking-widest font-semibold text-[#8A5B2A]">
             {subLabel}
           </span>
         )}
-        <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase text-center px-4">
+        <h2 className="font-poppins font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#111111] uppercase text-center px-4">
           {heading}
         </h2>
         {description && (
@@ -190,47 +190,51 @@ export default function DynamicProductSection({
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
         {loading
           ? [0, 1, 2, 3].map((i) => <SkeletonCard key={i} />)
           : products.slice(0, limit).map((product) => (
             <Link
               key={product.id}
               href={product.href}
-              className="group flex flex-col cursor-pointer"
+              className="group bg-white rounded-2xl border border-[#e8e2d8] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
             >
-              {/* Product Image */}
-              <div className="relative aspect-square w-full flex items-center justify-center p-1 sm:p-2 overflow-hidden bg-transparent">
-                {/* Star Rating */}
-                <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-700 z-10 bg-white/80 backdrop-blur-xs px-1.5 py-0.5 rounded-full shadow-2xs">
-                  <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C19968] fill-[#C19968]" />
-                  <span>{(product.rating || 5).toFixed(1)}</span>
+              {/* Product Image Card */}
+              <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#faf8f5]">
+                {/* Wishlist Button */}
+                <div className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center">
+                  <Heart className="w-3.5 h-3.5 text-slate-600" />
                 </div>
+
                 <Image
                   src={product.imageUrl}
                   alt={product.title}
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-contain p-1 group-hover:scale-105 transition-transform duration-500"
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
-              {/* Info Pill */}
-              <div className="mt-1.5 sm:mt-2 bg-[#f4f2ee] rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between border border-[#e8e2d8] shadow-2xs gap-1 sm:gap-3 group-hover:border-slate-300 transition-colors">
-                <div className="min-w-0 flex-1 space-y-0.5">
-                  <span className="font-sansation font-normal text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.03em] block">
-                    {product.brand}
-                  </span>
-                  <h3 className="font-sansation font-normal text-[11px] sm:text-[13px] leading-[1.31] tracking-[0.03em] text-[#030303] truncate">
-                    {product.title}
-                  </h3>
+              {/* Card Meta (Title, Rating, Discount Price) */}
+              <div className="mt-2 space-y-1">
+                <h3 className="text-[11px] sm:text-xs font-bold text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+                  {product.title}
+                </h3>
+
+                {/* Star Rating */}
+                <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                  <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                  <span className="font-bold text-slate-800">{(product.rating || 5).toFixed(1)}</span>
+                  <span className="text-slate-400 font-normal">(120)</span>
                 </div>
-                <div className="flex items-baseline gap-1 flex-shrink-0">
-                  <span className="font-sansation text-xs sm:text-sm font-bold text-[#89591C]">
+
+                {/* Price with Discount */}
+                <div className="flex items-baseline gap-1.5 pt-0.5">
+                  <span className="text-xs sm:text-sm font-bold text-[#89591C]">
                     ₹{product.price}
                   </span>
                   {product.originalPrice > product.price && (
-                    <span className="font-sansation text-[9px] sm:text-[10px] text-slate-400 line-through">
+                    <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
                       ₹{product.originalPrice}
                     </span>
                   )}

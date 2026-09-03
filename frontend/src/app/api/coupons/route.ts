@@ -21,46 +21,32 @@ export async function GET() {
     })
       .select('code type value description minPurchaseAmount maxDiscountAmount')
       .sort({ createdAt: -1 })
-      .limit(20)
       .lean();
 
     const result: CouponItem[] = coupons.map((c: any) => ({
       code: c.code,
       type: c.type,
       value: c.value,
-      description: c.description || (c.type === 'percentage' ? `Get ${c.value}% OFF on your order` : `Flat ₹${c.value} OFF`),
+      description:
+        c.description ||
+        (c.type === 'percentage'
+          ? `Get ${c.value}% OFF on your order`
+          : c.type === 'fixed_amount'
+          ? `Flat ₹${c.value} OFF`
+          : 'Free Shipping'),
       minPurchaseAmount: c.minPurchaseAmount || 0,
       maxDiscountAmount: c.maxDiscountAmount || null,
     }));
 
-    // Ensure built-in coupons appear
-    const builtIn: CouponItem[] = [
-      { code: 'GRAVOZ10', type: 'percentage', value: 10, description: 'Get 10% OFF on your order', minPurchaseAmount: 999, maxDiscountAmount: null },
-      { code: 'GRAVOZ20', type: 'percentage', value: 20, description: 'Get 20% OFF on your order', minPurchaseAmount: 1999, maxDiscountAmount: null },
-      { code: 'SAVE100', type: 'fixed_amount', value: 100, description: 'Flat ₹100 OFF', minPurchaseAmount: 799, maxDiscountAmount: null },
-      { code: 'FREESHIP', type: 'free_shipping', value: 0, description: 'Free Shipping on your order', minPurchaseAmount: 499, maxDiscountAmount: null },
-      { code: 'NEW200', type: 'fixed_amount', value: 200, description: 'Flat ₹200 OFF', minPurchaseAmount: 1499, maxDiscountAmount: null },
-    ];
-
-    const codes = new Set(result.map((c) => c.code));
-    for (const b of builtIn) {
-      if (!codes.has(b.code)) result.push(b);
-    }
-
-    return NextResponse.json({ success: true, coupons: result }, {
-      headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=60' },
-    });
-  } catch {
-    // Return built-in fallback
-    return NextResponse.json({
-      success: true,
-      coupons: [
-        { code: 'GRAVOZ10', type: 'percentage', value: 10, description: 'Get 10% OFF on your order', minPurchaseAmount: 999, maxDiscountAmount: null },
-        { code: 'GRAVOZ20', type: 'percentage', value: 20, description: 'Get 20% OFF on your order', minPurchaseAmount: 1999, maxDiscountAmount: null },
-        { code: 'SAVE100', type: 'fixed_amount', value: 100, description: 'Flat ₹100 OFF', minPurchaseAmount: 799, maxDiscountAmount: null },
-        { code: 'FREESHIP', type: 'free_shipping', value: 0, description: 'Free Shipping on your order', minPurchaseAmount: 499, maxDiscountAmount: null },
-        { code: 'NEW200', type: 'fixed_amount', value: 200, description: 'Flat ₹200 OFF', minPurchaseAmount: 1499, maxDiscountAmount: null },
-      ],
-    });
+    return NextResponse.json(
+      { success: true, coupons: result },
+      {
+        headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' },
+      }
+    );
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Failed to fetch real coupons from DB:', err);
+    return NextResponse.json({ success: true, coupons: [] });
   }
 }

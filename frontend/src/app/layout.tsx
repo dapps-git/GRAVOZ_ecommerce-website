@@ -30,6 +30,7 @@ export const metadata: Metadata = {
 };
 
 import Providers from '@/components/Providers';
+import BottomNav from '@/components/BottomNav';
 
 export default function RootLayout({
   children,
@@ -38,9 +39,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${poppins.variable} ${montserrat.variable} ${playfair.variable}`} suppressHydrationWarning>
-      <body className="bg-white text-[#1e293b] font-sans min-h-screen antialiased selection:bg-[#89591C] selection:text-white" suppressHydrationWarning>
+      <body className="bg-[#FAF7F3] text-[#111111] min-h-screen antialiased selection:bg-[#8A5B2A] selection:text-white" suppressHydrationWarning>
         <Providers>
           {children}
+          <BottomNav />
         </Providers>
       </body>
     </html>

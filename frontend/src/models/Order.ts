@@ -51,8 +51,36 @@ export interface IOrder extends Document {
     | 'delivered'
     | 'cancelled'
     | 'return_requested'
+    | 'under_review'
+    | 'return_approved'
+    | 'pickup_scheduled'
+    | 'return_received'
+    | 'refund_initiated'
+    | 'refunded'
     | 'returned'
-    | 'refunded';
+    | 'return_rejected';
+  returnDetails?: {
+    reason?: string;
+    description?: string;
+    images?: string[];
+    status?:
+      | 'return_requested'
+      | 'under_review'
+      | 'approved'
+      | 'pickup_scheduled'
+      | 'received'
+      | 'refund_initiated'
+      | 'refunded'
+      | 'rejected';
+    requestedAt?: Date;
+    approvedAt?: Date;
+    pickupScheduledAt?: Date;
+    receivedAt?: Date;
+    refundInitiatedAt?: Date;
+    refundedAt?: Date;
+    rejectedAt?: Date;
+    rejectionReason?: string;
+  };
   statusHistory: IStatusHistory[];
   estimatedDelivery?: Date;
   notes?: string;
@@ -132,11 +160,47 @@ const OrderSchema = new Schema<IOrder>(
         'delivered',
         'cancelled',
         'return_requested',
-        'returned',
+        'under_review',
+        'return_approved',
+        'pickup_scheduled',
+        'return_received',
+        'refund_initiated',
         'refunded',
+        'returned',
+        'return_rejected',
       ],
       default: 'ordered',
       index: true,
+    },
+    returnDetails: {
+      type: {
+        reason: { type: String },
+        description: { type: String },
+        images: [{ type: String }],
+        status: {
+          type: String,
+          enum: [
+            'return_requested',
+            'under_review',
+            'approved',
+            'pickup_scheduled',
+            'received',
+            'refund_initiated',
+            'refunded',
+            'rejected',
+          ],
+        },
+        requestedAt: { type: Date },
+        approvedAt: { type: Date },
+        pickupScheduledAt: { type: Date },
+        receivedAt: { type: Date },
+        refundInitiatedAt: { type: Date },
+        refundedAt: { type: Date },
+        rejectedAt: { type: Date },
+        rejectionReason: { type: String },
+      },
+      required: false,
+      _id: false,
     },
     statusHistory: { type: [StatusHistorySchema], default: [] },
     estimatedDelivery: { type: Date },

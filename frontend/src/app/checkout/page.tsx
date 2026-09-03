@@ -409,7 +409,7 @@ export default function CheckoutPage() {
     }
   };
 
-  // ── Stepper Component matching exact screenshot design ──
+  // ── Stepper Component matching exact UI Style Guide design ──
   const renderStepper = () => {
     const steps = [
       { id: 'cart', label: 'Cart', icon: ShoppingBag },
@@ -434,12 +434,12 @@ export default function CheckoutPage() {
     };
 
     return (
-      <div className="w-full max-w-2xl mx-auto mb-8 sm:mb-10 px-2 font-montserrat">
-        <div className="relative flex items-start justify-between">
-          {/* Absolute Background Line */}
-          <div className="absolute top-4 sm:top-5 left-6 right-6 h-[2px] bg-[#e8e2d8] z-0">
+      <div className="w-full max-w-xl mx-auto mb-6 sm:mb-8 px-2 font-poppins">
+        <div className="relative flex items-center justify-between">
+          {/* Background Connecting Line */}
+          <div className="absolute top-4 sm:top-4.5 left-8 right-8 h-[2px] bg-[#E8E1D9] z-0">
             <div
-              className="h-full bg-[#557244] transition-all duration-500"
+              className="h-full bg-[#4F7D45] transition-all duration-500"
               style={{
                 width: `${(activeIdx / (steps.length - 1)) * 100}%`,
               }}
@@ -451,29 +451,29 @@ export default function CheckoutPage() {
             const Icon = step.icon;
 
             return (
-              <div key={step.id} className="flex flex-col items-center relative z-10 flex-1 max-w-[72px] sm:max-w-[100px] text-center">
+              <div key={step.id} className="flex flex-col items-center relative z-10 flex-1 text-center">
                 <div
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all ${
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
                     state === 'completed'
-                      ? 'bg-[#557244] text-white shadow-xs border border-[#557244]'
+                      ? 'bg-[#4F7D45] text-white shadow-xs'
                       : state === 'active'
-                      ? 'bg-[#89591C] text-white shadow-xs ring-3 sm:ring-4 ring-[#89591C]/20 border border-[#89591C]'
-                      : 'bg-white border border-[#d8cebe] text-slate-400'
+                      ? 'bg-[#8B4A12] text-white shadow-xs'
+                      : 'bg-white border border-[#D8D0C7] text-[#98A2B3]'
                   }`}
                 >
                   {state === 'completed' ? (
-                    <Check className="w-4 h-4 text-white stroke-[2.5]" />
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5]" />
                   ) : (
-                    <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${state === 'active' ? 'text-white' : 'text-slate-400'}`} />
+                    <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${state === 'active' ? 'text-white' : 'text-[#98A2B3]'}`} />
                   )}
                 </div>
                 <span
-                  className={`text-[10px] sm:text-xs mt-1.5 sm:mt-2 capitalize ${
-                    state === 'active'
-                      ? 'font-semibold text-[#030303]'
-                      : state === 'completed'
-                      ? 'font-medium text-[#557244]'
-                      : 'font-normal text-slate-400'
+                  className={`text-[9px] sm:text-[10px] mt-1.5 ${
+                    state === 'completed'
+                      ? 'text-[#4F7D45] font-medium'
+                      : state === 'active'
+                      ? 'text-[#8B4A12] font-semibold'
+                      : 'text-[#98A2B3] font-normal'
                   }`}
                 >
                   {step.label}
@@ -488,36 +488,36 @@ export default function CheckoutPage() {
 
   // ── Order Summary Sidebar Component ──
   const renderOrderSummary = (ctaButtonText: string, onCtaClick: () => void) => (
-    <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-[#e8e2d8] p-5 sm:p-6 shadow-2xs space-y-4 font-sansation">
-        <h3 className="text-base font-bold text-[#030303]">Order Summary</h3>
+    <div className="space-y-4 font-poppins">
+      <div className="bg-white rounded-[14px] border border-[#E8E1D9] p-4 sm:p-5 shadow-gravoz space-y-4">
+        <h3 className="text-[15px] sm:text-[17px] font-semibold text-[#171717]">ORDER SUMMARY</h3>
 
-        <div className="space-y-2.5 text-xs text-slate-600 divide-y divide-[#f0ece5] pt-1">
-          <div className="flex justify-between py-1">
+        <div className="space-y-2.5 text-[11px] divide-y divide-[#F0ECE5] pt-1">
+          <div className="flex justify-between py-1 text-[#667085]">
             <span>Subtotal ({totalItemCount} {totalItemCount === 1 ? 'item' : 'items'})</span>
-            <span className="font-semibold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
+            <span className="font-semibold text-[#171717]">₹{subtotal.toLocaleString('en-IN')}</span>
           </div>
 
-          <div className="flex justify-between py-2">
+          <div className="flex justify-between py-2 text-[#667085]">
             <span>Shipping</span>
-            <span className="font-semibold text-emerald-700">₹0</span>
+            <span className="font-semibold text-[#16A34A]">FREE</span>
           </div>
 
           {calculatedDiscount > 0 && (
-            <div className="flex justify-between py-2 text-slate-700">
+            <div className="flex justify-between py-2 text-[#16A34A]">
               <span>Discount</span>
-              <span className="font-semibold text-slate-900">- ₹{calculatedDiscount.toLocaleString('en-IN')}</span>
+              <span className="font-semibold">- ₹{calculatedDiscount.toLocaleString('en-IN')}</span>
             </div>
           )}
 
-          <div className="flex justify-between pt-3 pb-1 text-base font-bold text-[#030303]">
+          <div className="flex justify-between pt-3 pb-1 text-[15px] sm:text-[17px] font-bold text-[#171717]">
             <div>
-              <span>Total</span>
-              <span className="block text-[10px] text-slate-400 font-normal mt-0.5">
+              <span>Total Amount</span>
+              <span className="block text-[10px] text-[#667085] font-normal mt-0.5">
                 (Inclusive of all taxes)
               </span>
             </div>
-            <span className="text-lg font-extrabold text-[#030303]">
+            <span className="text-[17px] sm:text-[19px] font-bold text-[#8B4A12]">
               ₹{finalTotal.toLocaleString('en-IN')}
             </span>
           </div>
@@ -525,8 +525,8 @@ export default function CheckoutPage() {
 
         {/* You will save banner */}
         {calculatedDiscount > 0 && (
-          <div className="bg-[#f0f8ec] border border-[#d2eac3] rounded-xl p-3 flex items-center gap-2 text-xs font-semibold text-[#3b6e22]">
-            <CheckCircle2 className="w-4 h-4 text-[#4f8a32] flex-shrink-0" />
+          <div className="bg-[#F0F8EC] border border-[#D2EAC3] rounded-[10px] p-2.5 flex items-center gap-2 text-[11px] font-semibold text-[#16A34A]">
+            <CheckCircle2 className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
             <span>You will save ₹{calculatedDiscount.toLocaleString('en-IN')} on this order</span>
           </div>
         )}
@@ -536,7 +536,7 @@ export default function CheckoutPage() {
           type="button"
           disabled={isPlacingOrder || (currentStep === 'cart' && items.length === 0)}
           onClick={onCtaClick}
-          className="w-full h-11 sm:h-12 rounded-xl bg-[#1c1c1c] hover:bg-[#030303] text-white text-xs sm:text-sm font-medium tracking-wider uppercase transition-all shadow-2xs hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 font-montserrat"
+          className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 font-poppins"
         >
           <span>{ctaButtonText}</span>
           <ArrowRight className="w-4 h-4" />
@@ -545,11 +545,11 @@ export default function CheckoutPage() {
 
       {/* SSL Safe & Secure Card */}
       {currentStep === 'payment' && (
-        <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-2xl p-4 flex items-start gap-3 text-xs font-sansation">
-          <ShieldCheck className="w-5 h-5 text-[#89591C] flex-shrink-0 mt-0.5" />
+        <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-[14px] p-3.5 flex items-start gap-2.5 text-xs font-poppins shadow-gravoz">
+          <ShieldCheck className="w-4 h-4 text-[#8B4A12] flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-bold text-[#030303]">Safe & Secure Payments</h4>
-            <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+            <h4 className="font-semibold text-[12px] text-[#171717]">Safe & Secure Payments</h4>
+            <p className="text-[10px] text-[#667085] mt-0.5 leading-relaxed">
               Your transaction is protected with 256-bit SSL encryption.
             </p>
           </div>
@@ -558,20 +558,37 @@ export default function CheckoutPage() {
     </div>
   );
 
-  // ── Bottom 3 Trust Badges (1 Row on Mobile) ──
+  // ── Bottom 3 Trust Badges (Matching Screenshot) ──
   const renderBottomTrustBadges = () => (
-    <div className="grid grid-cols-3 gap-1.5 sm:gap-3 pt-4 sm:pt-6 font-sansation">
-      <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl py-2 sm:py-3 px-1.5 sm:px-4 flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-2 text-[10px] sm:text-xs font-normal sm:font-medium text-slate-700 shadow-2xs">
-        <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#89591C] flex-shrink-0" />
-        <span className="leading-tight">100% Secure Payments</span>
+    <div className="bg-[#FAF8F5] rounded-[14px] border border-[#E8E1D9] p-3.5 sm:p-4 grid grid-cols-3 gap-2 text-left shadow-gravoz mt-6 font-poppins">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-2.5 text-center sm:text-left">
+        <div className="w-8 h-8 rounded-full bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
+          <ShieldCheck className="w-4 h-4" />
+        </div>
+        <div>
+          <h4 className="text-[10px] sm:text-xs font-semibold text-[#171717]">Secure Payments</h4>
+          <p className="text-[9px] sm:text-[10px] text-[#667085]">100% Protected</p>
+        </div>
       </div>
-      <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl py-2 sm:py-3 px-1.5 sm:px-4 flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-2 text-[10px] sm:text-xs font-normal sm:font-medium text-slate-700 shadow-2xs">
-        <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#89591C] flex-shrink-0" />
-        <span className="leading-tight">Easy 7-Day Returns</span>
+
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-2.5 text-center sm:text-left border-x border-[#E8E1D9] px-1.5 sm:px-3">
+        <div className="w-8 h-8 rounded-full bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
+          <span className="font-bold text-xs text-[#8B4A12]">₹</span>
+        </div>
+        <div>
+          <h4 className="text-[10px] sm:text-xs font-semibold text-[#171717]">Multiple Options</h4>
+          <p className="text-[9px] sm:text-[10px] text-[#667085]">Choose what suits you</p>
+        </div>
       </div>
-      <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl py-2 sm:py-3 px-1.5 sm:px-4 flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-1 sm:gap-2 text-[10px] sm:text-xs font-normal sm:font-medium text-slate-700 shadow-2xs">
-        <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#89591C] flex-shrink-0" />
-        <span className="leading-tight">Genuine Products</span>
+
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-2.5 text-center sm:text-left">
+        <div className="w-8 h-8 rounded-full bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
+          <Headphones className="w-4 h-4" />
+        </div>
+        <div>
+          <h4 className="text-[10px] sm:text-xs font-semibold text-[#171717]">24/7 Support</h4>
+          <p className="text-[9px] sm:text-[10px] text-[#667085]">We&apos;re here to help</p>
+        </div>
       </div>
     </div>
   );
@@ -982,22 +999,22 @@ export default function CheckoutPage() {
 
           {/* STAGE 2: DELIVERY ADDRESS SELECTION */}
           {currentStep === 'address' && (
-            <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300 font-sansation">
+            <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300 font-poppins">
               <div>
                 <button
                   type="button"
                   onClick={() => setCurrentStep('cart')}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-[#89591C] mb-3"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#667085] hover:text-[#8B4A12] mb-3"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to Cart
                 </button>
-                <h2 className="text-xl sm:text-2xl font-bold text-[#030303]">Delivery Address</h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <h2 className="text-[22px] sm:text-[26px] font-bold text-[#171717]">Delivery Address</h2>
+                <p className="text-xs text-[#667085] mt-0.5">
                   Choose where you want your order to be delivered
                 </p>
               </div>
 
-              <div className="space-y-3.5">
+              <div className="space-y-3">
                 {savedAddresses.map((addr) => {
                   const isSelected = selectedAddressId === addr.id;
 
@@ -1005,39 +1022,39 @@ export default function CheckoutPage() {
                     <div
                       key={addr.id}
                       onClick={() => setSelectedAddressId(addr.id)}
-                      className={`rounded-2xl p-5 border-2 transition-all cursor-pointer ${
+                      className={`rounded-[12px] p-4 sm:p-5 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#89591C] bg-[#faf6f0] shadow-xs'
-                          : 'border-[#e8e2d8] bg-white hover:border-[#cfc3b2]'
+                          ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
+                          : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3.5 min-w-0">
+                        <div className="flex items-start gap-3 min-w-0">
                           <div
                             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
                               isSelected
-                                ? 'border-[#89591C] bg-[#89591C]'
-                                : 'border-[#cfc3b2] bg-white'
+                                ? 'border-[#8B4A12] bg-[#8B4A12]'
+                                : 'border-[#D9D1C8] bg-white'
                             }`}
                           >
                             {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                           </div>
 
-                          <div className="space-y-1 text-xs text-slate-600">
+                          <div className="space-y-1 text-xs text-[#667085]">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm text-[#030303]">{addr.name}</span>
+                              <span className="font-semibold text-[13px] text-[#171717]">{addr.name}</span>
                               {addr.isDefault && (
-                                <span className="text-[10px] font-semibold bg-[#ece3d4] text-[#714614] px-2 py-0.5 rounded-md">
+                                <span className="text-[9px] font-semibold bg-[#F2E7DA] text-[#8B4A12] px-[6px] py-[3px] rounded-[5px]">
                                   Default
                                 </span>
                               )}
                             </div>
-                            <p className="leading-relaxed">{addr.street},</p>
-                            <p className="leading-relaxed">
+                            <p className="text-[11px] leading-[1.6] text-[#667085]">{addr.street},</p>
+                            <p className="text-[11px] leading-[1.6] text-[#667085]">
                               {addr.city} - {addr.postalCode}
                             </p>
-                            <p className="leading-relaxed">
-                              {addr.state}, {addr.country} • <strong className="text-slate-800">{addr.phone}</strong>
+                            <p className="text-[11px] leading-[1.6] text-[#667085]">
+                              {addr.state}, {addr.country} • <strong className="text-[#171717] font-semibold">{addr.phone}</strong>
                             </p>
                           </div>
                         </div>
@@ -1048,7 +1065,7 @@ export default function CheckoutPage() {
                             e.stopPropagation();
                             handleOpenEditAddress(addr);
                           }}
-                          className="text-xs font-bold text-[#89591C] hover:underline flex-shrink-0"
+                          className="text-xs font-semibold text-[#8B4A12] hover:underline flex-shrink-0"
                         >
                           Edit
                         </button>
@@ -1060,9 +1077,9 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={handleOpenAddAddress}
-                  className="w-full py-4 rounded-2xl border border-dashed border-[#cfc3b2] bg-[#faf8f5] hover:bg-[#f5ede2] text-xs font-bold text-[#030303] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
+                  className="w-full h-[46px] rounded-[12px] border border-dashed border-[#D9D1C8] bg-white hover:bg-[#FAF8F5] text-xs font-semibold text-[#171717] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
                 >
-                  <Plus className="w-4 h-4 text-[#89591C]" />
+                  <Plus className="w-4 h-4 text-[#8B4A12]" />
                   <span>Add New Address</span>
                 </button>
               </div>
@@ -1070,172 +1087,218 @@ export default function CheckoutPage() {
               <button
                 type="button"
                 onClick={() => setCurrentStep('payment')}
-                className="w-full h-12 rounded-xl bg-[#1c1c1c] hover:bg-[#030303] text-white text-xs sm:text-sm font-bold tracking-wider uppercase transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer mt-4"
+                className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-4"
               >
-                <span>CONTINUE TO PAYMENT</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>CONTINUE TO PAYMENT →</span>
               </button>
             </div>
           )}
 
           {/* STAGE 3: PAYMENT OPTIONS */}
           {currentStep === 'payment' && (
-            <div className="space-y-6 animate-in fade-in duration-300 font-sansation">
+            <div className="space-y-6 animate-in fade-in duration-300 font-poppins">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                 <div className="lg:col-span-7 xl:col-span-8 space-y-4">
                   <div>
                     <button
                       type="button"
                       onClick={() => setCurrentStep('address')}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-[#89591C] mb-2"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#667085] hover:text-[#8B4A12] mb-2"
                     >
                       <ArrowLeft className="w-3.5 h-3.5" /> Back to Address
                     </button>
-                    <h2 className="text-xl sm:text-2xl font-bold text-[#030303]">Payment Options</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <h2 className="text-[22px] sm:text-[26px] font-bold text-[#171717]">Payment Options</h2>
+                    <p className="text-xs text-[#667085] mt-0.5">
                       Choose a safe and convenient payment method
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    {/* UPI */}
+                    {/* UPI (Selected) */}
                     <div
                       onClick={() => setPaymentMethod('UPI')}
-                      className={`rounded-2xl p-4 sm:p-5 border-2 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'UPI'
-                          ? 'border-[#89591C] bg-[#faf6f0] shadow-xs'
-                          : 'border-[#e8e2d8] bg-white hover:border-[#cfc3b2]'
+                          ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
+                          : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-3">
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'UPI'
-                              ? 'border-[#89591C] bg-[#89591C]'
-                              : 'border-[#cfc3b2] bg-white'
+                              ? 'border-[#8B4A12] bg-white'
+                              : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
-                          {paymentMethod === 'UPI' && <div className="w-2 h-2 rounded-full bg-white" />}
+                          {paymentMethod === 'UPI' && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                          )}
                         </div>
+
                         <div>
-                          <h4 className="font-bold text-sm text-[#030303]">UPI</h4>
-                          <p className="text-[11px] text-slate-500">Pay using any UPI app</p>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-extrabold text-[12px] text-[#2b2b2b] tracking-wider italic">
+                              UPI
+                            </span>
+                            <span className="text-[#3ba241] font-bold text-xs">❯</span>
+                          </div>
+                          <p className="text-[10px] text-[#667085] font-normal">
+                            Pay using any UPI app
+                          </p>
                         </div>
                       </div>
-                      <div className="px-2.5 py-1 bg-white border border-[#e8e2d8] rounded-md font-bold text-xs tracking-wider text-[#2e6b30] italic">
-                        UPI ❯
-                      </div>
+
+                      <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-bold text-[11px] rounded-lg border border-[#C4E8BC]">
+                        SAVE ₹35
+                      </span>
                     </div>
 
-                    {/* Card */}
+                    {/* Credit / Debit Card */}
                     <div
                       onClick={() => setPaymentMethod('Card')}
-                      className={`rounded-2xl p-4 sm:p-5 border-2 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'Card'
-                          ? 'border-[#89591C] bg-[#faf6f0] shadow-xs'
-                          : 'border-[#e8e2d8] bg-white hover:border-[#cfc3b2]'
+                          ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
+                          : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-3">
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'Card'
-                              ? 'border-[#89591C] bg-[#89591C]'
-                              : 'border-[#cfc3b2] bg-white'
+                              ? 'border-[#8B4A12] bg-white'
+                              : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
-                          {paymentMethod === 'Card' && <div className="w-2 h-2 rounded-full bg-white" />}
+                          {paymentMethod === 'Card' && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                          )}
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-[#030303]">Credit / Debit Card</h4>
-                          <p className="text-[11px] text-slate-500">Visa, Mastercard, Rupay</p>
+                          <h4 className="font-semibold text-[12px] text-[#171717]">
+                            Credit / Debit Card
+                          </h4>
+                          <p className="text-[10px] text-[#667085] font-normal">
+                            Visa, Mastercard & RuPay
+                          </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="px-2 py-0.5 bg-[#1a1f71] text-white font-extrabold text-[10px] rounded italic">VISA</span>
-                        <span className="px-2 py-0.5 bg-[#eb001b] text-white font-extrabold text-[10px] rounded">MC</span>
+
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 bg-[#1a1f71] text-white font-extrabold text-[10px] rounded italic shadow-2xs">
+                          VISA
+                        </span>
+                        <div className="flex -space-x-1.5 items-center">
+                          <div className="w-4 h-4 rounded-full bg-[#eb001b]" />
+                          <div className="w-4 h-4 rounded-full bg-[#f79e1b] opacity-80" />
+                        </div>
                       </div>
                     </div>
 
                     {/* Net Banking */}
                     <div
                       onClick={() => setPaymentMethod('NetBanking')}
-                      className={`rounded-2xl p-4 sm:p-5 border-2 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'NetBanking'
-                          ? 'border-[#89591C] bg-[#faf6f0] shadow-xs'
-                          : 'border-[#e8e2d8] bg-white hover:border-[#cfc3b2]'
+                          ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
+                          : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-3">
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'NetBanking'
-                              ? 'border-[#89591C] bg-[#89591C]'
-                              : 'border-[#cfc3b2] bg-white'
+                              ? 'border-[#8B4A12] bg-white'
+                              : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
-                          {paymentMethod === 'NetBanking' && <div className="w-2 h-2 rounded-full bg-white" />}
+                          {paymentMethod === 'NetBanking' && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                          )}
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-[#030303]">Net Banking</h4>
-                          <p className="text-[11px] text-slate-500">All major banks supported</p>
+                          <h4 className="font-semibold text-[12px] text-[#171717]">
+                            Net Banking
+                          </h4>
+                          <p className="text-[10px] text-[#667085] font-normal">
+                            All major banks supported
+                          </p>
                         </div>
                       </div>
-                      <Building2 className="w-5 h-5 text-slate-400" />
+
+                      <Building2 className="w-5 h-5 text-slate-400 stroke-[1.5]" />
                     </div>
 
                     {/* Wallets */}
                     <div
                       onClick={() => setPaymentMethod('Wallet')}
-                      className={`rounded-2xl p-4 sm:p-5 border-2 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'Wallet'
-                          ? 'border-[#89591C] bg-[#faf6f0] shadow-xs'
-                          : 'border-[#e8e2d8] bg-white hover:border-[#cfc3b2]'
+                          ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
+                          : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-3">
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'Wallet'
-                              ? 'border-[#89591C] bg-[#89591C]'
-                              : 'border-[#cfc3b2] bg-white'
+                              ? 'border-[#8B4A12] bg-white'
+                              : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
-                          {paymentMethod === 'Wallet' && <div className="w-2 h-2 rounded-full bg-white" />}
+                          {paymentMethod === 'Wallet' && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                          )}
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-[#030303]">Wallets</h4>
-                          <p className="text-[11px] text-slate-500">Paytm, PhonePe, Amazon Pay</p>
+                          <h4 className="font-semibold text-[12px] text-[#171717]">
+                            Wallets
+                          </h4>
+                          <p className="text-[10px] text-[#667085] font-normal">
+                            Paytm, PhonePe, Amazon Pay
+                          </p>
                         </div>
                       </div>
-                      <span className="text-xs font-extrabold text-[#002e6e] tracking-tight">Paytm</span>
+
+                      <span className="text-xs font-extrabold tracking-tight">
+                        <span className="text-[#002e6e]">pay</span>
+                        <span className="text-[#00b9f5]">tm</span>
+                      </span>
                     </div>
 
-                    {/* COD */}
+                    {/* Cash on Delivery */}
                     <div
                       onClick={() => setPaymentMethod('COD')}
-                      className={`rounded-2xl p-4 sm:p-5 border-2 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'COD'
-                          ? 'border-[#89591C] bg-[#faf6f0] shadow-xs'
-                          : 'border-[#e8e2d8] bg-white hover:border-[#cfc3b2]'
+                          ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
+                          : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-3">
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'COD'
-                              ? 'border-[#89591C] bg-[#89591C]'
-                              : 'border-[#cfc3b2] bg-white'
+                              ? 'border-[#8B4A12] bg-white'
+                              : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
-                          {paymentMethod === 'COD' && <div className="w-2 h-2 rounded-full bg-white" />}
+                          {paymentMethod === 'COD' && (
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                          )}
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-[#030303]">Cash on Delivery</h4>
-                          <p className="text-[11px] text-slate-500">Pay when you receive</p>
+                          <h4 className="font-semibold text-[12px] text-[#171717]">
+                            Cash on Delivery
+                          </h4>
+                          <p className="text-[10px] text-[#667085] font-normal">
+                            Pay when you receive your order
+                          </p>
                         </div>
                       </div>
-                      <span className="text-[10px] font-bold bg-[#e8f5e4] text-[#2e7422] px-2.5 py-1 rounded-md">
+
+                      <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-semibold text-[11px] rounded-lg border border-[#C4E8BC]">
                         Available
                       </span>
                     </div>
@@ -1246,11 +1309,6 @@ export default function CheckoutPage() {
                       {orderError}
                     </div>
                   )}
-
-                  <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-slate-600 font-medium">
-                    <Lock className="w-4 h-4 text-[#89591C] flex-shrink-0" />
-                    <span>Your payment information is safe with us.</span>
-                  </div>
                 </div>
 
                 <div className="lg:col-span-5 xl:col-span-4">
@@ -1262,6 +1320,9 @@ export default function CheckoutPage() {
                   )}
                 </div>
               </div>
+
+              {/* Bottom Trust Badges matching screenshot */}
+              {renderBottomTrustBadges()}
             </div>
           )}
         </main>

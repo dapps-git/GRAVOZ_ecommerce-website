@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
               originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
               size: item.size,
               quantity: Number(item.quantity) || 1,
-              imageUrl: item.imageUrl || '/products/product1.webp',
+              imageUrl: item.imageUrl || '/products/placeholder.svg',
               color: item.color,
             },
           ],
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
             originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
             size: item.size,
             quantity: Number(item.quantity) || 1,
-            imageUrl: item.imageUrl || '/products/product1.webp',
+            imageUrl: item.imageUrl || '/products/placeholder.svg',
             color: item.color,
           });
         }

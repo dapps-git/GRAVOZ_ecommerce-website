@@ -386,22 +386,45 @@ export default function ProfilePage() {
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span
-                                className={`px-2.5 py-1 rounded-full text-[11px] font-semibold capitalize border ${
-                                  isCancelled
-                                    ? 'bg-rose-50 text-rose-700 border-rose-200'
-                                    : isDelivered
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                    : 'bg-amber-50 text-amber-700 border-amber-200'
-                                }`}
-                              >
-                                {ord.orderStatus.replace(/_/g, ' ')}
-                              </span>
+                              {(() => {
+                                const st = ord.orderStatus;
+                                if (st === 'cancelled') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>;
+                                }
+                                if (st === 'return_approved') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#E8F8EE] text-[#22C55E] border border-[#22C55E]/30">Return Accepted</span>;
+                                }
+                                if (st === 'return_requested') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Return Requested</span>;
+                                }
+                                if (st === 'under_review') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-50 text-blue-800 border border-blue-200">Under Review</span>;
+                                }
+                                if (st === 'pickup_scheduled') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">Pickup Scheduled</span>;
+                                }
+                                if (st === 'return_received') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">Return Received</span>;
+                                }
+                                if (st === 'refund_initiated') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-teal-50 text-teal-800 border border-teal-200">Refund Initiated</span>;
+                                }
+                                if (st === 'refunded') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">Refunded</span>;
+                                }
+                                if (st === 'return_rejected') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Return Declined</span>;
+                                }
+                                if (st === 'delivered') {
+                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>;
+                                }
+                                return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 capitalize">{st.replace(/_/g, ' ')}</span>;
+                              })()}
                               <Link
                                 href={`/orders/${ord._id}`}
-                                className="px-3 py-1 bg-[#faf8f5] hover:bg-[#faf4ec] text-[#89591C] text-[11px] font-bold rounded-lg border border-[#e8e2d8] transition-colors"
+                                className="px-3 py-1 bg-[#FAF7F3] hover:bg-[#F6E9D7]/50 text-[#8A5B2A] text-[11px] font-medium rounded-lg border border-[#E5E1DC] transition-colors"
                               >
-                                Track
+                                Track / Manage
                               </Link>
                             </div>
                           </div>
@@ -412,7 +435,7 @@ export default function ProfilePage() {
                                 <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden">
                                     <Image
-                                      src={item.imageUrl || '/products/product1.webp'}
+                                      src={item.imageUrl || '/products/placeholder.svg'}
                                       alt={item.name}
                                       width={64}
                                       height={64}
@@ -426,7 +449,7 @@ export default function ProfilePage() {
                                     <p className="text-[11px] text-slate-500">
                                       Size: {item.size} {item.color ? `| Color: ${item.color}` : ''} | Qty: {item.quantity}
                                     </p>
-                                    <span className="text-xs font-bold text-[#c25e09]">₹{(item.price * item.quantity).toLocaleString()}</span>
+                                    <span className="text-xs font-bold text-[#c25e09]">Γé╣{(item.price * item.quantity).toLocaleString()}</span>
                                   </div>
                                 </div>
 
@@ -468,7 +491,7 @@ export default function ProfilePage() {
                   <div className="p-3.5 sm:p-4 rounded-xl border border-[#e5e5e5] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-sansation bg-white">
                     <div className="flex items-center gap-3">
                       <Clock className="w-4 h-4 text-[#89591C] flex-shrink-0" />
-                      <span>Viewed <strong>Men’s Casual Comfort Sandals – WGP50020 Black</strong></span>
+                      <span>Viewed <strong>MenΓÇÖs Casual Comfort Sandals ΓÇô WGP50020 Black</strong></span>
                     </div>
                     <span className="text-slate-400 text-[11px]">Today, 11:30 AM</span>
                   </div>
@@ -507,11 +530,11 @@ export default function ProfilePage() {
                       <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="w-14 h-14 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1]">
-                            <Image src={item.imageUrl || '/products/product1.webp'} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
+                            <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
                           </div>
                           <div className="min-w-0 flex-1 font-sansation space-y-0.5">
                             <h4 className="text-xs font-semibold text-[#030303] truncate">{item.title}</h4>
-                            <span className="text-xs font-bold text-[#c25e09]">₹{item.price}</span>
+                            <span className="text-xs font-bold text-[#c25e09]">Γé╣{item.price}</span>
                           </div>
                         </div>
 
@@ -567,19 +590,19 @@ export default function ProfilePage() {
                       <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between bg-white">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1]">
-                            <Image src={item.imageUrl || '/products/product1.webp'} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
+                            <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
                           </div>
                           <div>
                             <h4 className="text-xs font-semibold text-[#030303]">{item.title}</h4>
                             <p className="text-[11px] text-slate-400">Qty: {item.quantity}</p>
                           </div>
                         </div>
-                        <span className="text-xs font-bold text-[#c25e09]">₹{item.price * item.quantity}</span>
+                        <span className="text-xs font-bold text-[#c25e09]">Γé╣{item.price * item.quantity}</span>
                       </div>
                     ))}
                     <div className="pt-3 border-t border-[#e5e5e5] flex items-center justify-between text-sm">
                       <span className="font-semibold text-slate-700">Subtotal:</span>
-                      <span className="font-bold text-[#c25e09]">₹{subtotal}</span>
+                      <span className="font-bold text-[#c25e09]">Γé╣{subtotal}</span>
                     </div>
                   </div>
                 )}
@@ -742,7 +765,7 @@ export default function ProfilePage() {
       {/* Footer includes the 4 black feature highlight cards & brand footer */}
       <Footer />
 
-      {/* ── WRITE REVIEW MODAL ── */}
+      {/* ΓöÇΓöÇ WRITE REVIEW MODAL ΓöÇΓöÇ */}
       {reviewModalOpen && reviewItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto font-sansation">
@@ -761,7 +784,7 @@ export default function ProfilePage() {
             <div className="mt-3 flex items-center gap-3 p-2.5 bg-[#faf8f5] rounded-xl border border-[#e8e2d8]">
               <div className="w-12 h-12 rounded-lg bg-white border border-[#e8e2d8] overflow-hidden flex-shrink-0">
                 <Image
-                  src={reviewItem.imageUrl || '/products/product1.webp'}
+                  src={reviewItem.imageUrl || '/products/placeholder.svg'}
                   alt={reviewItem.name}
                   width={48}
                   height={48}
@@ -832,7 +855,7 @@ export default function ProfilePage() {
                       onClick={() => setReviewMedia(reviewMedia.filter((_, i) => i !== idx))}
                       className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/70 text-white flex items-center justify-center text-[10px]"
                     >
-                      ×
+                      ├ù
                     </button>
                   </div>
                 ))}
