@@ -170,12 +170,8 @@ const ProductSchema = new Schema<IProduct>(
 ProductSchema.index({ targetAudience: 1, isBestSeller: 1 });
 ProductSchema.index({ name: 'text', description: 'text', subCategory: 'text' });
 
-// In Next.js dev mode, clear cached model so schema updates take effect immediately
-if (mongoose.models && mongoose.models.Product) {
-  delete (mongoose.models as any).Product;
-}
+export const Product: Model<IProduct> =
+  mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
 
-const Product: Model<IProduct> = mongoose.model<IProduct>('Product', ProductSchema);
-
-export { Product };
 export default Product;
+

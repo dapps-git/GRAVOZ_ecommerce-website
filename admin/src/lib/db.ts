@@ -1,6 +1,22 @@
 import mongoose from 'mongoose';
 
+// Ensure all schemas are registered for populate queries
+import '@/models/Category';
+import '@/models/Brand';
+import '@/models/Product';
+import '@/models/Order';
+import '@/models/Customer';
+import '@/models/Admin';
+import '@/models/Banner';
+import '@/models/Coupon';
+import '@/models/HomeSection';
+import '@/models/ReturnRefund';
+import '@/models/Review';
+import '@/models/Setting';
+import '@/models/Testimonial';
+
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gravoz';
+
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');

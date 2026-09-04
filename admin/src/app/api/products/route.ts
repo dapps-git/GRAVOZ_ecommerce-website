@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Product } from '@/models/Product';
 import { Category } from '@/models/Category';
+import { Brand } from '@/models/Brand';
 import { invalidateCache } from '@/lib/redis';
+
 
 // GET /api/products (Rule 8, 9, 10, 12)
 export async function GET(req: NextRequest) {
