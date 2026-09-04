@@ -38,9 +38,9 @@ export function parseAddressFromString(
       name: defaultName,
       phone: defaultPhone,
       street: '',
-      city: '',
+      city: 'Chennai',
       state: 'Tamil Nadu',
-      postalCode: '',
+      postalCode: '600040',
       country: 'India',
     };
   }
@@ -67,7 +67,7 @@ export function parseAddressFromString(
           l.toLowerCase().includes(st)
         )
       ) || 'Tamil Nadu',
-    postalCode: postalCode || (lines.find((l) => /^\d{6}$/.test(l)) || ''),
+    postalCode: postalCode || (lines.find((l) => /^\d{6}$/.test(l)) || '600040'),
     country: 'India',
   };
 }
@@ -100,6 +100,7 @@ export function loadSavedAddresses(
             ...a,
             name: a.name || user?.name || '',
             phone: a.phone || user?.phone || '',
+            postalCode: a.postalCode || (a.street && (a.street.match(/\b\d{6}\b/) || [])[0]) || '600040',
             isDefault: idx === 0 ? (a.isDefault ?? true) : Boolean(a.isDefault),
           }));
         }
@@ -119,7 +120,7 @@ export function loadSavedAddresses(
       street: parsed.street || user.address || '',
       city: parsed.city || 'Chennai',
       state: parsed.state || 'Tamil Nadu',
-      postalCode: parsed.postalCode || '',
+      postalCode: parsed.postalCode || '600040',
       country: parsed.country || 'India',
       isDefault: true,
       label: 'Home',

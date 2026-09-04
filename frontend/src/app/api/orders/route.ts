@@ -69,18 +69,32 @@ export async function POST(req: NextRequest) {
 
     const paymentStatus = paymentMethod === 'COD' ? 'pending' : 'paid';
 
-    const cleanCustomerId =
-      customerId && typeof customerId === 'string' && mongoose.Types.ObjectId.isValid(customerId)
-        ? customerId
-        : '';
+    const cleanCustomerId = customerId && mongoose.Types.ObjectId.isValid(customerId) ? customerId : undefined;
+
+    const cleanPostalCode =
+      (typeof shippingAddress.postalCode === 'string' && shippingAddress.postalCode.trim()) ||
+      (shippingAddress.pinCode && String(shippingAddress.pinCode).trim()) ||
+      (shippingAddress.pincode && String(shippingAddress.pincode).trim()) ||
+      (typeof shippingAddress.street === 'string' && (shippingAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
+      '600040';
+
+    const sanitizedAddress = {
+      name: shippingAddress.name || customerName || 'Customer',
+      phone: shippingAddress.phone || customerPhone || '',
+      street: shippingAddress.street || shippingAddress.address || 'Street Address',
+      city: shippingAddress.city || 'Chennai',
+      state: shippingAddress.state || 'Tamil Nadu',
+      postalCode: cleanPostalCode,
+      country: shippingAddress.country || 'India',
+    };
 
     const newOrder = await Order.create({
       orderNumber,
       customerId: cleanCustomerId,
       customerEmail: customerEmail.toLowerCase().trim(),
-      customerName: customerName || 'Customer',
-      customerPhone: customerPhone || shippingAddress.phone || '',
-      shippingAddress,
+      customerName: customerName || sanitizedAddress.name,
+      customerPhone: customerPhone || sanitizedAddress.phone,
+      shippingAddress: sanitizedAddress,
       items,
       subtotal: Number(subtotal) || 0,
       discountAmount: Number(discountAmount) || 0,

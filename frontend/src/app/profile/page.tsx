@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { compressImage } from '@/lib/imageCompression';
 import { useUser } from '@/context/UserContext';
 
 import {
@@ -512,7 +513,7 @@ export default function ProfilePage() {
                                     <p className="text-[11px] text-slate-500">
                                       Size: {item.size} {item.color ? `| Color: ${item.color}` : ''} | Qty: {item.quantity}
                                     </p>
-                                    <span className="text-xs font-bold text-[#c25e09]">Γé╣{(item.price * item.quantity).toLocaleString()}</span>
+                                    <span className="text-xs font-bold text-[#c25e09]">₹{(item.price * item.quantity).toLocaleString()}</span>
                                   </div>
                                 </div>
 
@@ -554,7 +555,7 @@ export default function ProfilePage() {
                   <div className="p-3.5 sm:p-4 rounded-xl border border-[#e5e5e5] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-sansation bg-white">
                     <div className="flex items-center gap-3">
                       <Clock className="w-4 h-4 text-[#89591C] flex-shrink-0" />
-                      <span>Viewed <strong>MenΓÇÖs Casual Comfort Sandals ΓÇô WGP50020 Black</strong></span>
+                      <span>Viewed <strong>Men’s Casual Comfort Sandals – WGP50020 Black</strong></span>
                     </div>
                     <span className="text-slate-400 text-[11px]">Today, 11:30 AM</span>
                   </div>
@@ -597,7 +598,7 @@ export default function ProfilePage() {
                           </div>
                           <div className="min-w-0 flex-1 font-sansation space-y-0.5">
                             <h4 className="text-xs font-semibold text-[#030303] truncate">{item.title}</h4>
-                            <span className="text-xs font-bold text-[#c25e09]">Γé╣{item.price}</span>
+                            <span className="text-xs font-bold text-[#c25e09]">₹{item.price}</span>
                           </div>
                         </div>
 
@@ -660,12 +661,12 @@ export default function ProfilePage() {
                             <p className="text-[11px] text-slate-400">Qty: {item.quantity}</p>
                           </div>
                         </div>
-                        <span className="text-xs font-bold text-[#c25e09]">Γé╣{item.price * item.quantity}</span>
+                        <span className="text-xs font-bold text-[#c25e09]">₹{item.price * item.quantity}</span>
                       </div>
                     ))}
                     <div className="pt-3 border-t border-[#e5e5e5] flex items-center justify-between text-sm">
                       <span className="font-semibold text-slate-700">Subtotal:</span>
-                      <span className="font-bold text-[#c25e09]">Γé╣{subtotal}</span>
+                      <span className="font-bold text-[#c25e09]">₹{subtotal}</span>
                     </div>
                   </div>
                 )}
@@ -828,7 +829,7 @@ export default function ProfilePage() {
       {/* Footer includes the 4 black feature highlight cards & brand footer */}
       <Footer />
 
-      {/* ΓöÇΓöÇ WRITE REVIEW MODAL ΓöÇΓöÇ */}
+      {/* ── WRITE REVIEW MODAL ── */}
       {reviewModalOpen && reviewItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto font-sansation">
@@ -943,8 +944,9 @@ export default function ProfilePage() {
                         if (!file) return;
                         setUploadingMedia(true);
                         try {
+                          const optimizedFile = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.82 });
                           const formData = new FormData();
-                          formData.append('file', file);
+                          formData.append('file', optimizedFile);
                           const res = await fetch('/api/reviews/upload', {
                             method: 'POST',
                             body: formData,

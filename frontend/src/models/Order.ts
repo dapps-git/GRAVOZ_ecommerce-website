@@ -109,7 +109,7 @@ const ShippingAddressSchema = new Schema<IShippingAddress>(
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    postalCode: { type: String, required: true },
+    postalCode: { type: String, default: '600040' },
     country: { type: String, default: 'India' },
   },
   { _id: false }
