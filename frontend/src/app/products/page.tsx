@@ -916,14 +916,26 @@ function ProductsContent() {
                           />
                         </button>
 
-                        {/* Best Seller Badge */}
-                        {product.isBestSeller && (
+                        {/* Out of Stock / Low Stock / Best Seller Badges */}
+                        {product.stock !== undefined && product.stock <= 0 ? (
+                          <div className="absolute top-2 left-2 z-10">
+                            <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-rose-600 text-white shadow-xs">
+                              OUT OF STOCK
+                            </span>
+                          </div>
+                        ) : product.stock !== undefined && product.stock > 0 && product.stock <= 3 ? (
+                          <div className="absolute top-2 left-2 z-10">
+                            <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-amber-600 text-white shadow-xs">
+                              {product.stock === 1 ? '1 LEFT' : `${product.stock} LEFT`}
+                            </span>
+                          </div>
+                        ) : product.isBestSeller ? (
                           <div className="absolute top-2 left-2 z-10">
                             <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
                               BEST SELLER
                             </span>
                           </div>
-                        )}
+                        ) : null}
 
                         {/* Product Photo */}
                         <Image
@@ -931,7 +943,9 @@ function ProductsContent() {
                           alt={product.name || 'Footwear'}
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                          className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                          className={`object-cover object-center group-hover:scale-105 transition-transform duration-500 ${
+                            product.stock !== undefined && product.stock <= 0 ? 'grayscale-[20%] opacity-85' : ''
+                          }`}
                         />
                       </div>
 

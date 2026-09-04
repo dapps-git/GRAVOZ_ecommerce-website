@@ -34,62 +34,28 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-interface SavedAddress {
-  id: string;
-  name: string;
-  phone: string;
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  isDefault?: boolean;
-  label?: string;
-}
+import {
+  loadSavedAddresses,
+  saveSavedAddresses,
+  formatAddressToString,
+  parseAddressFromString,
+  SavedAddress,
+} from '@/lib/addresses';
 
 type CheckoutStep = 'cart' | 'address' | 'payment' | 'success';
 type PaymentMethodType = 'UPI' | 'Card' | 'NetBanking' | 'Wallet' | 'COD';
 
-const DEFAULT_ADDRESS: SavedAddress = {
-  id: 'addr_1',
-  name: 'Sarah Johnson',
-  phone: '+91 98765 43210',
-  street: '123, Green Park Street, Anna Nagar',
-  city: 'Chennai',
-  state: 'Tamil Nadu',
-  postalCode: '600040',
-  country: 'India',
-  isDefault: true,
-  label: 'Home',
-};
-
-const SECONDARY_ADDRESS: SavedAddress = {
-  id: 'addr_2',
-  name: 'John Doe',
-  phone: '+91 91234 56789',
-  street: '456, 5th Cross Street, T. Nagar',
-  city: 'Chennai',
-  state: 'Tamil Nadu',
-  postalCode: '600017',
-  country: 'India',
-  isDefault: false,
-  label: 'Office',
-};
-
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user, isLoggedIn, isLoading: userLoading } = useUser();
+  const { user, isLoggedIn, isLoading: userLoading, updateUser } = useUser();
   const { items, subtotal, clearCart } = useCart();
 
   // Current Step: 'cart' -> 'address' -> 'payment' -> 'success'
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('cart');
 
-  // Addresses State
-  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([
-    DEFAULT_ADDRESS,
-    SECONDARY_ADDRESS,
-  ]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>('addr_1');
+  // Addresses State (loaded dynamically from real profile/storage)
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
 
   // Add/Edit Address Modal
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -106,6 +72,16 @@ export default function CheckoutPage() {
     label: 'Home',
   });
   const [formError, setFormError] = useState('');
+
+  // Load real saved addresses when component mounts or user updates
+  useEffect(() => {
+    const loaded = loadSavedAddresses(user);
+    if (loaded.length > 0) {
+      setSavedAddresses(loaded);
+      const defaultOne = loaded.find((a) => a.isDefault) || loaded[0];
+      setSelectedAddressId((prev) => (prev && loaded.some((a) => a.id === prev) ? prev : defaultOne.id));
+    }
+  }, [user]);
 
   // Coupon State
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; description: string } | null>({
@@ -139,21 +115,6 @@ export default function CheckoutPage() {
       router.push('/login?redirect=/checkout');
     }
   }, [userLoading, isLoggedIn, router]);
-
-  // Sync user profile to primary address if available
-  useEffect(() => {
-    if (user?.name) {
-      setSavedAddresses((prev) => {
-        const updated = [...prev];
-        updated[0] = {
-          ...updated[0],
-          name: user.name,
-          phone: user.phone || updated[0].phone,
-        };
-        return updated;
-      });
-    }
-  }, [user]);
 
   // Celebration audio chime
   function playOrderSuccessSound() {
@@ -272,8 +233,20 @@ export default function CheckoutPage() {
   }
 
   // Active address object
-  const activeAddress =
-    savedAddresses.find((a) => a.id === selectedAddressId) || savedAddresses[0] || DEFAULT_ADDRESS;
+  const activeAddress: SavedAddress =
+    savedAddresses.find((a) => a.id === selectedAddressId) ||
+    savedAddresses[0] || {
+      id: 'addr_temp',
+      name: user?.name || '',
+      phone: user?.phone || '',
+      street: user?.address || '',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      postalCode: '',
+      country: 'India',
+      isDefault: true,
+      label: 'Home',
+    };
 
   // Pricing Calculations
   const calculatedDiscount = appliedCoupon ? appliedCoupon.discount : 0;
@@ -328,17 +301,39 @@ export default function CheckoutPage() {
       return;
     }
 
+    let updated: SavedAddress[];
+    let targetId = editingAddressId;
+
     if (editingAddressId) {
-      setSavedAddresses((prev) =>
-        prev.map((a) =>
-          a.id === editingAddressId ? { ...addressFormData, id: editingAddressId } : a
-        )
+      updated = savedAddresses.map((a) =>
+        a.id === editingAddressId ? { ...addressFormData, id: editingAddressId } : a
       );
     } else {
       const newId = 'addr_' + Date.now();
-      setSavedAddresses((prev) => [...prev, { ...addressFormData, id: newId }]);
+      targetId = newId;
+      const isFirst = savedAddresses.length === 0;
+      const newAddr: SavedAddress = {
+        ...addressFormData,
+        id: newId,
+        isDefault: isFirst || addressFormData.isDefault,
+      };
+      updated = isFirst ? [newAddr] : [...savedAddresses, newAddr];
       setSelectedAddressId(newId);
     }
+
+    setSavedAddresses(updated);
+    saveSavedAddresses(updated);
+
+    // Bidirectional sync to profile
+    const activeOne = updated.find((a) => a.id === (targetId || selectedAddressId)) || updated[0];
+    if (activeOne) {
+      updateUser({
+        name: activeOne.name,
+        phone: activeOne.phone,
+        address: formatAddressToString(activeOne),
+      });
+    }
+
     setIsAddressModalOpen(false);
   };
 
@@ -914,29 +909,52 @@ export default function CheckoutPage() {
                   <div className="bg-white rounded-2xl border border-[#e8e2d8] p-4 sm:p-6 shadow-2xs font-sansation space-y-3">
                     <div className="flex items-center justify-between border-b border-[#f0ece5] pb-2.5">
                       <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-800">Delivery Address</h3>
-                      <button
-                        type="button"
-                        onClick={() => setCurrentStep('address')}
-                        className="text-xs font-semibold text-[#89591C] hover:underline cursor-pointer"
-                      >
-                        Edit
-                      </button>
+                      {savedAddresses.length > 0 && activeAddress.street && (
+                        <button
+                          type="button"
+                          onClick={() => setCurrentStep('address')}
+                          className="text-xs font-semibold text-[#89591C] hover:underline cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                      )}
                     </div>
 
-                    <div className="flex items-start gap-3 pt-1">
-                      <div className="w-8 h-8 rounded-full bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <MapPin className="w-4 h-4" />
+                    {savedAddresses.length > 0 && activeAddress.street ? (
+                      <div className="flex items-start gap-3 pt-1">
+                        <div className="w-8 h-8 rounded-full bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <MapPin className="w-4 h-4" />
+                        </div>
+                        <div className="space-y-1 text-xs text-slate-600">
+                          <h4 className="font-bold text-sm text-[#030303]">{activeAddress.name}</h4>
+                          <p className="leading-relaxed">{activeAddress.street},</p>
+                          <p className="leading-relaxed">
+                            {activeAddress.city} - {activeAddress.postalCode}
+                          </p>
+                          <p className="leading-relaxed">{activeAddress.state}, {activeAddress.country}</p>
+                          <p className="font-semibold text-slate-800 pt-0.5">{activeAddress.phone}</p>
+                        </div>
                       </div>
-                      <div className="space-y-1 text-xs text-slate-600">
-                        <h4 className="font-bold text-sm text-[#030303]">{activeAddress.name}</h4>
-                        <p className="leading-relaxed">{activeAddress.street},</p>
-                        <p className="leading-relaxed">
-                          {activeAddress.city} - {activeAddress.postalCode}
-                        </p>
-                        <p className="leading-relaxed">{activeAddress.state}, {activeAddress.country}</p>
-                        <p className="font-semibold text-slate-800 pt-0.5">{activeAddress.phone}</p>
+                    ) : (
+                      <div className="flex items-center justify-between py-2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0">
+                            <MapPin className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-slate-800">No delivery address saved</p>
+                            <p className="text-[11px] text-slate-500">Please add your shipping address to proceed.</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleOpenAddAddress}
+                          className="px-3.5 py-1.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold rounded-lg shadow-xs cursor-pointer"
+                        >
+                          + Add Address
+                        </button>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Items in Cart Card */}
@@ -989,7 +1007,13 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="lg:col-span-5 xl:col-span-4">
-                  {renderOrderSummary('CONTINUE TO ADDRESS', () => setCurrentStep('address'))}
+                  {renderOrderSummary('CONTINUE TO ADDRESS', () => {
+                    if (savedAddresses.length === 0 || !activeAddress.street) {
+                      handleOpenAddAddress();
+                    } else {
+                      setCurrentStep('address');
+                    }
+                  })}
                 </div>
               </div>
 
@@ -1021,7 +1045,14 @@ export default function CheckoutPage() {
                   return (
                     <div
                       key={addr.id}
-                      onClick={() => setSelectedAddressId(addr.id)}
+                      onClick={() => {
+                        setSelectedAddressId(addr.id);
+                        updateUser({
+                          name: addr.name,
+                          phone: addr.phone,
+                          address: formatAddressToString(addr),
+                        });
+                      }}
                       className={`rounded-[12px] p-4 sm:p-5 transition-all cursor-pointer ${
                         isSelected
                           ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
@@ -1086,7 +1117,13 @@ export default function CheckoutPage() {
 
               <button
                 type="button"
-                onClick={() => setCurrentStep('payment')}
+                onClick={() => {
+                  if (savedAddresses.length === 0 || !activeAddress.street) {
+                    handleOpenAddAddress();
+                    return;
+                  }
+                  setCurrentStep('payment');
+                }}
                 className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-4"
               >
                 <span>CONTINUE TO PAYMENT →</span>

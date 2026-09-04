@@ -30,6 +30,14 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { useUser } from '@/context/UserContext';
 
+import {
+  loadSavedAddresses,
+  saveSavedAddresses,
+  formatAddressToString,
+  parseAddressFromString,
+  SavedAddress,
+} from '@/lib/addresses';
+
 type TabType = 'profile' | 'orders' | 'history' | 'wishlist' | 'cart' | 'returns' | 'notifications' | 'security';
 
 export default function ProfilePage() {
@@ -45,6 +53,24 @@ export default function ProfilePage() {
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [address, setAddress] = useState(user?.address || '');
+
+  // Populate form when user or saved addresses load
+  useEffect(() => {
+    if (user) {
+      if (user.name && !name) setName(user.name);
+      if (user.email && !email) setEmail(user.email);
+      if (user.phone && !phone) setPhone(user.phone);
+      if (user.address) {
+        setAddress(user.address);
+      } else {
+        const saved = loadSavedAddresses(user);
+        if (saved.length > 0) {
+          const defaultAddr = saved.find((a) => a.isDefault) || saved[0];
+          setAddress(formatAddressToString(defaultAddr));
+        }
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -100,7 +126,44 @@ export default function ProfilePage() {
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     updateUser({ name, email, phone, address });
-    showToast('Profile updated successfully!');
+
+    // Bidirectional sync: Update saved addresses for checkout
+    const existing = loadSavedAddresses(user);
+    const parsed = parseAddressFromString(address, name, phone);
+
+    if (existing.length > 0) {
+      const updatedList = existing.map((a, idx) =>
+        idx === 0 || a.isDefault
+          ? {
+              ...a,
+              name: name || a.name,
+              phone: phone || a.phone,
+              street: parsed.street || a.street,
+              city: parsed.city || a.city,
+              state: parsed.state || a.state,
+              postalCode: parsed.postalCode || a.postalCode,
+              country: parsed.country || a.country,
+            }
+          : a
+      );
+      saveSavedAddresses(updatedList);
+    } else {
+      const newAddr: SavedAddress = {
+        id: 'addr_' + Date.now(),
+        name: name || 'User',
+        phone: phone || '',
+        street: parsed.street || address,
+        city: parsed.city || 'Chennai',
+        state: parsed.state || 'Tamil Nadu',
+        postalCode: parsed.postalCode || '',
+        country: parsed.country || 'India',
+        isDefault: true,
+        label: 'Home',
+      };
+      saveSavedAddresses([newAddr]);
+    }
+
+    showToast('Profile & delivery address updated successfully!');
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -42,6 +42,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           name: res.user.name,
           email: res.user.email,
           phone: res.user.phone || '',
+          address: res.user.address || '',
           avatarUrl: res.user.avatarUrl || null,
           rewardPoints: res.user.rewardPoints,
           referralCode: res.user.referralCode,

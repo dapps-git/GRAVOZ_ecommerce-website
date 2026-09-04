@@ -82,6 +82,7 @@ interface ProductDetails {
   isFeatured?: boolean;
   isLatest?: boolean;
   badge?: string;
+  status?: string;
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -101,6 +102,7 @@ const EMPTY_PRODUCT: ProductDetails = {
   targetAudience: '',
   subCategory: '',
   stock: 0,
+  status: 'active',
   sizes: [],
   sizeAvailability: [],
   colors: [],
@@ -379,15 +381,21 @@ export default function ProductInnerPage() {
   };
 
   // Normalized size availability array (color-specific if available, else product-level)
+  const isProductInStock =
+    (product.stock !== undefined ? product.stock > 0 : true) &&
+    product.status !== 'inactive' &&
+    product.status !== 'draft';
+
   const currentSizeList: ProductSizeItem[] = 
     activeColorVariantSizes && activeColorVariantSizes.length > 0
       ? activeColorVariantSizes
       : Array.isArray(product.sizeAvailability) && product.sizeAvailability.length > 0
       ? product.sizeAvailability
-      : (product.sizes || []).map((s) => ({ size: s, isAvailable: true }));
+      : (product.sizes || []).map((s) => ({ size: s, isAvailable: isProductInStock }));
 
   const currentSelectedSizeObj = currentSizeList.find((s) => s.size === selectedSize);
-  const isCurrentSizeAvailable = currentSelectedSizeObj ? currentSelectedSizeObj.isAvailable : true;
+  const isCurrentSizeAvailable = isProductInStock && (currentSelectedSizeObj ? currentSelectedSizeObj.isAvailable : true);
+
 
   return (
     <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between selection:bg-[#89591C]/20 selection:text-[#89591C]">
@@ -743,23 +751,30 @@ export default function ProductInnerPage() {
                 </div>
               </div>
 
-              {/* Low Stock Availability Indicator */}
-              {product.stock !== undefined && product.stock > 0 && product.stock <= 5 && (
-                <div className={`flex items-center gap-1.5 text-[12px] font-medium rounded-md px-3 py-2 ${
-                  product.stock <= 2
+              {/* Low Stock / Out of Stock Availability Indicator */}
+              {(!isProductInStock || (product.stock !== undefined && product.stock <= 0)) ? (
+                <div className="inline-flex items-center gap-2 text-[12px] font-semibold rounded-lg px-3.5 py-2 bg-rose-50 border border-rose-200 text-rose-700 shadow-2xs">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  <span>Out of Stock</span>
+                </div>
+              ) : product.stock !== undefined && product.stock > 0 && product.stock <= 5 ? (
+                <div className={`inline-flex items-center gap-2 text-[12px] font-semibold rounded-lg px-3.5 py-2 shadow-2xs ${
+                  product.stock <= 3
                     ? 'bg-rose-50 border border-rose-200 text-rose-700'
                     : 'bg-amber-50 border border-amber-200 text-amber-700'
                 }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0 ${
-                    product.stock <= 2 ? 'bg-rose-500' : 'bg-amber-500'
+                  <span className={`w-2 h-2 rounded-full animate-pulse flex-shrink-0 ${
+                    product.stock <= 3 ? 'bg-rose-500' : 'bg-amber-500'
                   }`} />
-                  {product.stock === 1 && 'Only 1 available — order now!'}
-                  {product.stock === 2 && 'Only 2 available — selling fast!'}
-                  {product.stock === 3 && 'Only 3 left in stock'}
-                  {product.stock === 4 && 'Only 4 left in stock'}
-                  {product.stock === 5 && 'Only 5 left in stock'}
+                  <span>
+                    {product.stock === 1 && 'Hurry! 1 left in stock!'}
+                    {product.stock === 2 && 'Hurry! 2 left in stock!'}
+                    {product.stock === 3 && 'Hurry! 3 left in stock!'}
+                    {product.stock === 4 && 'Only 4 available'}
+                    {product.stock === 5 && 'Only 5 available'}
+                  </span>
                 </div>
-              )}
+              ) : null}
 
               {/* Options : Color Swatches Row */}
               <div className="space-y-1.5 pt-1">
@@ -799,19 +814,23 @@ export default function ProductInnerPage() {
               <div className="space-y-3 pt-2 font-poppins">
                 
                 {/* Quantity Selector Pill: < 1 > */}
-                <div className="flex items-center justify-between w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E8E1D9] text-[#171717]">
+                <div className={`flex items-center justify-between w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E8E1D9] text-[#171717] ${
+                  !isCurrentSizeAvailable ? 'opacity-60 pointer-events-none' : ''
+                }`}>
                   <button
                     type="button"
+                    disabled={!isCurrentSizeAvailable}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     aria-label="Decrease quantity"
                     className="text-[#667085] hover:text-[#171717] font-bold text-base px-2 py-1 cursor-pointer transition-colors"
                   >
                     &lt;
                   </button>
-                  <span className="text-[15px] font-semibold select-none">{quantity}</span>
+                  <span className="text-[15px] font-semibold select-none">{isCurrentSizeAvailable ? quantity : 0}</span>
                   <button
                     type="button"
-                    onClick={() => setQuantity((q) => q + 1)}
+                    disabled={!isCurrentSizeAvailable}
+                    onClick={() => setQuantity((q) => Math.min(product.stock || 10, q + 1))}
                     aria-label="Increase quantity"
                     className="text-[#667085] hover:text-[#171717] font-bold text-base px-2 py-1 cursor-pointer transition-colors"
                   >
@@ -825,7 +844,11 @@ export default function ProductInnerPage() {
                   disabled={!isCurrentSizeAvailable}
                   onClick={async () => {
                     if (!isCurrentSizeAvailable) {
-                      showToast(`Please choose an available size.`);
+                      showToast(
+                        !isProductInStock
+                          ? 'This product is currently out of stock.'
+                          : 'Please choose an available size.'
+                      );
                       return;
                     }
                     await addToCart({
@@ -846,7 +869,11 @@ export default function ProductInnerPage() {
                       : 'bg-[#E8E1D9] text-[#98A2B3] cursor-not-allowed'
                   }`}
                 >
-                  {isCurrentSizeAvailable ? 'ADD TO CART' : 'SIZE OUT OF STOCK'}
+                  {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
+                    ? 'OUT OF STOCK'
+                    : isCurrentSizeAvailable
+                    ? 'ADD TO CART'
+                    : 'SIZE OUT OF STOCK'}
                 </button>
 
                 {/* BUY NOW Button (Outline Button: border #8B4A12 text #8B4A12) */}
@@ -855,7 +882,11 @@ export default function ProductInnerPage() {
                   disabled={!isCurrentSizeAvailable}
                   onClick={async () => {
                     if (!isCurrentSizeAvailable) {
-                      showToast(`Please choose an available size.`);
+                      showToast(
+                        !isProductInStock
+                          ? 'This product is currently out of stock.'
+                          : 'Please choose an available size.'
+                      );
                       return;
                     }
                     await addToCart({
@@ -886,7 +917,9 @@ export default function ProductInnerPage() {
                       : 'border-[#E8E1D9] text-[#98A2B3] bg-[#FCFAF7] cursor-not-allowed'
                   }`}
                 >
-                  BUY NOW
+                  {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
+                    ? 'OUT OF STOCK'
+                    : 'BUY NOW'}
                 </button>
               </div>
 
