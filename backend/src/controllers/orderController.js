@@ -24,20 +24,37 @@ exports.placeOrder = async (req, res) => {
 
     const paymentStatus = paymentMethod === 'COD' ? 'pending' : 'paid';
 
+    const cleanPostalCode =
+      (typeof shippingAddress.postalCode === 'string' && shippingAddress.postalCode.trim()) ||
+      (shippingAddress.pinCode && String(shippingAddress.pinCode).trim()) ||
+      (shippingAddress.pincode && String(shippingAddress.pincode).trim()) ||
+      (typeof shippingAddress.street === 'string' && (shippingAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
+      '600040';
+
+    const sanitizedAddress = {
+      name: shippingAddress.name || customerName || 'Customer',
+      phone: shippingAddress.phone || customerPhone || '',
+      street: shippingAddress.street || shippingAddress.address || 'Street Address',
+      city: shippingAddress.city || 'Chennai',
+      state: shippingAddress.state || 'Tamil Nadu',
+      postalCode: cleanPostalCode,
+      country: shippingAddress.country || 'India',
+    };
+
     const order = await Order.create({
       orderNumber,
       customerId,
       customerEmail,
-      customerName,
-      customerPhone,
-      shippingAddress,
+      customerName: customerName || sanitizedAddress.name,
+      customerPhone: customerPhone || sanitizedAddress.phone,
+      shippingAddress: sanitizedAddress,
       items,
       subtotal,
       discountAmount:  discountAmount || 0,
       couponCode:      couponCode || '',
       shippingFee:     shippingFee || 0,
       totalAmount,
-      paymentMethod,
+      paymentMethod:   paymentMethod || 'COD',
       paymentStatus,
       orderStatus: 'ordered',
       estimatedDelivery,
