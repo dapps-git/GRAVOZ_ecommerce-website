@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Plus, X, Upload, Link as LinkIcon, Check, Ruler } from 'lucide-react';
 import { ProductImageItem } from './ImageUploader';
+import { compressImage } from '@/lib/imageCompression';
 
 export interface ColorVariantImageItem {
   url: string;
@@ -167,9 +168,10 @@ export default function ColorVariantManager({
     setUploading((prev) => ({ ...prev, [uploadKey]: true }));
 
     try {
+      const optimizedFile = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.82 });
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('alt', `${variant.name} color photo`);
+      formData.append('file', optimizedFile);
+      formData.append('alt', `${variant.name || 'Variant'} color photo`);
 
       const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
       const data = await res.json();

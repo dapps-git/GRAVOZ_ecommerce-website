@@ -19,6 +19,7 @@ import {
   Check,
   RotateCcw,
 } from 'lucide-react';
+import { compressImage } from '@/lib/imageCompression';
 
 interface CategoryItem {
   _id: string;
@@ -98,8 +99,9 @@ export default function CategoriesPage() {
 
     setUploading(true);
     try {
+      const optimizedFile = await compressImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', optimizedFile);
       formData.append('alt', `${name || 'Category'} Image`);
 
       const res = await fetch('/api/admin/upload', {

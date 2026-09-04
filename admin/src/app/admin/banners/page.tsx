@@ -18,6 +18,7 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
+import { compressImage } from '@/lib/imageCompression';
 
 interface BannerData {
   _id?: string;
@@ -125,8 +126,9 @@ export default function AdminBannersPage() {
     const uploadKey = `${slot}-${field}`;
     try {
       setUploadingField(uploadKey);
+      const optimizedFile = await compressImage(file, { maxWidth: 2000, maxHeight: 2000, quality: 0.85 });
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', optimizedFile);
       formData.append('folder', 'gravoz/banners');
 
       const res = await fetch('/api/admin/upload', {

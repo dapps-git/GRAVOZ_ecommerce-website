@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { compressImage } from '@/lib/imageCompression';
 import {
   ArrowLeft,
   Save,
@@ -260,16 +261,23 @@ export default function NewProductPage() {
 
     setUploadingVariantId(variantId);
     try {
-      // Upload all files in parallel
+      // Compress and upload all files in parallel
       const uploadResults = await Promise.all(
         filesToUpload.map(async (file) => {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('alt', `${name} photo`);
-          const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-          const data = await res.json();
-          if (res.ok && data.url) return { url: data.url, alt: `${name} photo` };
-          return null;
+          try {
+            const optimizedFile = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.82 });
+            const formData = new FormData();
+            formData.append('file', optimizedFile);
+            formData.append('alt', `${name || 'Product'} photo`);
+            const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (res.ok && data.url) return { url: data.url, alt: `${name || 'Product'} photo` };
+            console.error('Variant upload error:', data.error);
+            return null;
+          } catch (itemErr) {
+            console.error('Failed to upload image item:', itemErr);
+            return null;
+          }
         })
       );
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Upload, X, Link as LinkIcon, Plus } from 'lucide-react';
+import { compressImage } from '@/lib/imageCompression';
 
 export interface ProductImageItem {
   url: string;
@@ -26,8 +27,9 @@ export default function ImageUploader({ images = [], onChange, maxPhotos = 6 }: 
 
     setUploadingIndex(targetIndex);
     try {
+      const optimizedFile = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.82 });
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', optimizedFile);
       formData.append('alt', `Product photo ${targetIndex + 1}`);
 
       const res = await fetch('/api/admin/upload', {

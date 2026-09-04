@@ -9,6 +9,7 @@ import {
   GripVertical, X, Eye, EyeOff, Check, Palette, Ruler,
   FileText,
 } from 'lucide-react';
+import { compressImage } from '@/lib/imageCompression';
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -847,8 +848,9 @@ export default function AdminHomeContentPage() {
     if (!file) return;
     setUploading({ itemIdx, field });
     try {
+      const optimizedFile = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.82 });
       const form = new FormData();
-      form.append('file', file);
+      form.append('file', optimizedFile);
       form.append('alt', `${currentSection.title} card ${itemIdx + 1}`);
       const res  = await fetch('/api/admin/upload', { method: 'POST', body: form });
       const data = await res.json();

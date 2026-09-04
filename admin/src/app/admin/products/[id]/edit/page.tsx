@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { compressImage } from '@/lib/imageCompression';
 import {
   ArrowLeft,
   Save,
@@ -298,9 +299,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
     setUploadingVariantId(variantId);
     try {
+      const optimizedFile = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.82 });
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('alt', `${name} photo`);
+      formData.append('file', optimizedFile);
+      formData.append('alt', `${name || 'Product'} photo`);
 
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
