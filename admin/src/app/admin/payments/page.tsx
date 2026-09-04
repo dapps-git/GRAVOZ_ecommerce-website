@@ -31,7 +31,7 @@ export default function PaymentsPage() {
             transactionId: `TXN-${o.orderNumber}-GATEWAY`,
             paymentGateway: o.paymentMethod || 'Stripe / Credit Card',
             amount: o.totalAmount,
-            currency: 'USD',
+            currency: 'INR',
             status: o.paymentStatus || 'paid',
             createdAt: o.createdAt,
           }));
@@ -65,7 +65,7 @@ export default function PaymentsPage() {
       header: 'Amount Paid',
       accessor: (row: PaymentLog) => (
         <span className="font-extrabold text-[#89591C] text-xs">
-          ${row.amount.toFixed(2)} {row.currency}
+          ₹{(row.amount || 0).toLocaleString('en-IN')} {row.currency}
         </span>
       ),
     },

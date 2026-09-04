@@ -55,7 +55,7 @@ export default function InvoicesPage() {
     },
     {
       header: 'Total Amount',
-      accessor: (row: InvoiceOrder) => <span className="font-extrabold text-slate-900 text-xs">${row.totalAmount.toFixed(2)}</span>,
+      accessor: (row: InvoiceOrder) => <span className="font-extrabold text-slate-900 text-xs">₹{(row.totalAmount || 0).toLocaleString('en-IN')}</span>,
     },
     {
       header: 'Payment Status',

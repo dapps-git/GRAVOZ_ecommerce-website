@@ -7,10 +7,10 @@ export default function SettingsPage() {
   const [storeName, setStoreName] = useState('GRAVOZ Shoes');
   const [contactEmail, setContactEmail] = useState('support@gravoz.com');
   const [contactPhone, setContactPhone] = useState('+1 (800) 555-GRAV');
-  const [currencySymbol, setCurrencySymbol] = useState('$');
+  const [currencySymbol, setCurrencySymbol] = useState('₹');
   const [taxRatePercent, setTaxRatePercent] = useState('5');
-  const [freeShippingThreshold, setFreeShippingThreshold] = useState('100');
-  const [flatShippingRate, setFlatShippingRate] = useState('15');
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState('1299');
+  const [flatShippingRate, setFlatShippingRate] = useState('0');
   const [bannerMessage, setBannerMessage] = useState('Welcome to GRAVOZ - Premium Shoes for Men, Women & Babies');
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -23,7 +23,7 @@ export default function SettingsPage() {
           setStoreName(data.storeName || 'GRAVOZ Shoes');
           setContactEmail(data.contactEmail || 'support@gravoz.com');
           setContactPhone(data.contactPhone || '+1 (800) 555-GRAV');
-          setCurrencySymbol(data.currencySymbol || '$');
+          setCurrencySymbol(data.currencySymbol || '₹');
           setTaxRatePercent(data.taxRatePercent?.toString() || '5');
           setFreeShippingThreshold(data.freeShippingThreshold?.toString() || '100');
           setFlatShippingRate(data.flatShippingRate?.toString() || '15');

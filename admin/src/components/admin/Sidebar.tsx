@@ -26,6 +26,7 @@ import {
 const menuItems = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Products', href: '/admin/products', icon: ShoppingBag },
+  { name: 'Home Content', href: '/admin/home-content', icon: LayoutGrid },
   { name: 'Banners', href: '/admin/banners', icon: ImageIcon },
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
   { name: 'Brands', href: '/admin/brands', icon: Tag },
@@ -56,27 +57,27 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-60 bg-white border-r border-[#e8e2d8] flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 z-30 font-light">
-      <div className="p-4 space-y-4">
-        {/* Brand Header with Official GRAVOZ Logo */}
-        <div className="px-2 py-2 border-b border-[#e8e2d8] flex flex-col items-start gap-1">
-          <Link href="/admin/dashboard" className="block py-1">
-            <Image
-              src="/gravoz-logo.png"
-              alt="GRAVOZ Brand Logo"
-              width={140}
-              height={34}
-              priority
-              className="h-8 w-auto object-contain"
-            />
-          </Link>
-          <span className="text-[10px] text-[#89591C] font-semibold tracking-wider uppercase block">
-            Shoe Admin Suite
-          </span>
-        </div>
+    <aside className="w-60 bg-white border-r border-[#e8e2d8] flex flex-col h-screen sticky top-0 flex-shrink-0 z-30 font-light overflow-hidden shadow-2xs">
+      {/* Brand Header with Official GRAVOZ Logo (Fixed) */}
+      <div className="p-4 pb-3 border-b border-[#e8e2d8] flex-shrink-0 bg-white">
+        <Link href="/admin/dashboard" className="block py-0.5">
+          <Image
+            src="/gravoz-logo.png"
+            alt="GRAVOZ Brand Logo"
+            width={140}
+            height={34}
+            priority
+            className="h-8 w-auto object-contain"
+          />
+        </Link>
+        <span className="text-[10px] text-[#89591C] font-semibold tracking-wider uppercase block mt-1">
+          Shoe Admin Suite
+        </span>
+      </div>
 
-        {/* Navigation Menu */}
-        <nav className="space-y-1">
+      {/* Scrollable Navigation Menu */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-1 overscroll-contain">
+        <nav className="space-y-1 pb-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
@@ -91,22 +92,22 @@ export default function Sidebar() {
                     : 'text-slate-700 hover:bg-[#faf4ec] hover:text-[#89591C] font-normal'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#89591C]'}`} />
-                <span>{item.name}</span>
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#89591C]'}`} />
+                <span className="truncate">{item.name}</span>
               </Link>
             );
           })}
         </nav>
       </div>
 
-      {/* Sidebar Footer: #89591C Brown Logout Button */}
-      <div className="p-3 border-t border-[#e8e2d8] bg-[#faf8f5]">
+      {/* Sidebar Footer: Fixed Logout Button */}
+      <div className="p-3 border-t border-[#e8e2d8] bg-[#faf8f5] flex-shrink-0">
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-[#89591C] hover:bg-[#724816] text-white rounded-md text-xs font-bold transition-all shadow-xs"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-[#89591C] hover:bg-[#724816] text-white rounded-md text-xs font-bold transition-all shadow-xs cursor-pointer"
         >
-          <LogOut className="w-4 h-4 text-white" />
+          <LogOut className="w-4 h-4 text-white flex-shrink-0" />
           <span>Logout</span>
         </button>
       </div>

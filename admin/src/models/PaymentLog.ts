@@ -19,7 +19,7 @@ const PaymentLogSchema: Schema<IPaymentLog> = new Schema(
     gateway: { type: String, default: 'Stripe' },
     transactionId: { type: String, required: true },
     amount: { type: Number, required: true },
-    currency: { type: String, default: 'USD' },
+    currency: { type: String, default: 'INR' },
     status: {
       type: String,
       enum: ['pending', 'success', 'failed', 'refunded'],
