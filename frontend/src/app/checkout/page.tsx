@@ -84,11 +84,7 @@ export default function CheckoutPage() {
   }, [user]);
 
   // Coupon State
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; description: string } | null>({
-    code: 'STYLE20',
-    discount: 199,
-    description: 'Special Launch Discount',
-  });
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; description: string } | null>(null);
 
   // Payment State
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('UPI');
