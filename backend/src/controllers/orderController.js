@@ -1,6 +1,8 @@
 const Order    = require('../models/Order');
 const Customer = require('../models/Customer');
 const Cart     = require('../models/Cart');
+const Product  = require('../models/Product');
+const mongoose = require('mongoose');
 
 // ── POST /api/orders ──────────────────────────────────────────────────────────
 exports.placeOrder = async (req, res) => {
@@ -13,6 +15,18 @@ exports.placeOrder = async (req, res) => {
 
     if (!customerEmail || !items?.length || !shippingAddress) {
       return res.status(400).json({ error: 'Missing required order fields' });
+    }
+
+    // Verify all items are in stock
+    for (const itm of items) {
+      if (itm.productId && mongoose.Types.ObjectId.isValid(itm.productId)) {
+        const prod = await Product.findById(itm.productId).lean();
+        if (!prod || (prod.stock !== undefined && prod.stock <= 0)) {
+          return res.status(400).json({
+            error: `Item "${itm.name || prod?.name || 'Product'}" is currently out of stock. Please remove it from your cart.`,
+          });
+        }
+      }
     }
 
     const orderNumber =
