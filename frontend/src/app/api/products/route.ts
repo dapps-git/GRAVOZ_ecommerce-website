@@ -7,9 +7,9 @@ import { Brand } from '@/models/Brand';
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 50);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 100);
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const targetAudience = searchParams.get('targetAudience');
+    const targetAudience = searchParams.get('targetAudience') || searchParams.get('audience');
     const isBestSeller = searchParams.get('isBestSeller');
     const isTopSeller = searchParams.get('isTopSeller');
     const isFeatured = searchParams.get('isFeatured');
@@ -25,7 +25,13 @@ export async function GET(req: NextRequest) {
     await connectDB();
     const query: Record<string, any> = { status: 'active' };
 
-    if (targetAudience) query.targetAudience = targetAudience;
+    if (targetAudience) {
+      if (targetAudience.toLowerCase() === 'kids' || targetAudience.toLowerCase() === 'babies') {
+        query.targetAudience = { $in: [new RegExp('^kids$', 'i'), new RegExp('^babies$', 'i')] };
+      } else {
+        query.targetAudience = new RegExp(`^${targetAudience}$`, 'i');
+      }
+    }
     if (isBestSeller === 'true') query.isBestSeller = true;
     if (isTopSeller === 'true') query.isTopSeller = true;
     if (isFeatured === 'true') query.isFeatured = true;
@@ -41,16 +47,31 @@ export async function GET(req: NextRequest) {
     }
 
     const skip = (page - 1) * limit;
-    const [dbProducts, total] = await Promise.all([
-      Product.find(query)
-        .populate({ path: 'category', select: 'name slug targetAudience', strictPopulate: false })
-        .populate({ path: 'brand', select: 'name slug logoUrl', strictPopulate: false })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Product.countDocuments(query),
-    ]);
+    let dbProducts: any[] = [];
+    let total = 0;
+
+    try {
+      [dbProducts, total] = await Promise.all([
+        Product.find(query)
+          .populate({ path: 'category', select: 'name slug targetAudience', strictPopulate: false })
+          .populate({ path: 'brand', select: 'name slug logoUrl', strictPopulate: false })
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        Product.countDocuments(query),
+      ]);
+    } catch (popErr) {
+      console.warn('Populate failed, retrying without populate:', popErr);
+      [dbProducts, total] = await Promise.all([
+        Product.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        Product.countDocuments(query),
+      ]);
+    }
 
     const formattedProducts = (dbProducts || []).map((p: any) => ({
       ...p,
@@ -73,6 +94,7 @@ export async function GET(req: NextRequest) {
     );
   } catch (error: unknown) {
     const err = error as Error;
+    console.error('Fetch products error in /api/products:', err);
     return NextResponse.json({ error: err.message || 'Failed to fetch products', products: [] }, { status: 500 });
   }
 }

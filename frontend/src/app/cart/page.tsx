@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Check,
   X,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface CouponData {
@@ -45,11 +46,43 @@ export default function CartPage() {
   const [showCoupons, setShowCoupons] = useState(false);
   const [availableCoupons, setAvailableCoupons] = useState<CouponData[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [productStockMap, setProductStockMap] = useState<Record<string, number>>({});
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  // Fetch product stocks to detect out of stock items
+  useEffect(() => {
+    if (items.length === 0) return;
+    fetch('/api/products?limit=100')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.products && Array.isArray(data.products)) {
+          const map: Record<string, number> = {};
+          data.products.forEach((p: any) => {
+            map[p._id] = p.stock !== undefined ? p.stock : 10;
+            if (p.slug) map[p.slug] = p.stock !== undefined ? p.stock : 10;
+          });
+          setProductStockMap(map);
+        }
+      })
+      .catch(() => {});
+  }, [items]);
+
+  const isItemOutOfStock = useCallback(
+    (item: any) => {
+      const stock = productStockMap[item.productId];
+      if (stock !== undefined) {
+        return stock <= 0;
+      }
+      return item.stock !== undefined ? item.stock <= 0 : false;
+    },
+    [productStockMap]
+  );
+
+  const hasOutOfStockItems = items.some((item) => isItemOutOfStock(item));
 
   // Fetch available coupons from backend
   useEffect(() => {
@@ -172,7 +205,10 @@ export default function CartPage() {
                     {/* Top Row: Thumbnail + Product Info */}
                     <div className="flex items-start gap-3.5 sm:gap-4">
                       {/* Product Thumbnail */}
-                      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-[#faf8f5] flex items-center justify-center overflow-hidden border border-[#f0ece5] flex-shrink-0">
+                      <Link
+                        href={`/products/${item.productId}`}
+                        className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-[#faf8f5] flex items-center justify-center overflow-hidden border border-[#f0ece5] flex-shrink-0 hover:opacity-85 transition-opacity block"
+                      >
                         <Image
                           src={item.imageUrl || '/products/placeholder.svg'}
                           alt={item.title}
@@ -180,7 +216,7 @@ export default function CartPage() {
                           sizes="(max-width: 640px) 100px, 120px"
                           className="object-contain p-2"
                         />
-                      </div>
+                      </Link>
 
                       {/* Info & Details */}
                       <div className="flex-1 min-w-0 pr-7 sm:pr-8 space-y-1">
@@ -193,13 +229,19 @@ export default function CartPage() {
                         >
                           {item.title}
                         </Link>
-                        {item.size && (
-                          <div className="pt-0.5">
+                        <div className="flex items-center gap-2 pt-0.5 flex-wrap">
+                          {item.size && (
                             <span className="inline-block bg-[#f4f2ee] text-slate-700 text-[11px] font-medium px-2.5 py-0.5 rounded-lg border border-[#e8e2d8]">
                               Size: {item.size}
                             </span>
-                          </div>
-                        )}
+                          )}
+                          {isItemOutOfStock(item) && (
+                            <span className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider animate-pulse">
+                              <AlertTriangle className="w-3 h-3 text-rose-600" />
+                              <span>Out of Stock</span>
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Top-Right Wishlist Heart Button */}
@@ -437,20 +479,36 @@ export default function CartPage() {
                 </div>
 
                 {/* Checkout CTA Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      router.push('/login?redirect=/checkout');
-                      return;
-                    }
-                    router.push('/checkout');
-                  }}
-                  className="w-full py-3 sm:py-3.5 rounded-xl bg-[#68421A] hover:bg-[#543212] text-white text-xs sm:text-sm font-bold tracking-wide shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Lock className="w-4 h-4 text-white" />
-                  <span>Proceed to Checkout</span>
-                </button>
+                {hasOutOfStockItems ? (
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-3 sm:py-3.5 rounded-xl bg-[#ede8e1] text-[#888888] text-xs sm:text-sm font-bold tracking-wide shadow-none flex items-center justify-center gap-2 cursor-not-allowed border border-[#d8d2c8]"
+                    >
+                      <AlertTriangle className="w-4 h-4 text-rose-600" />
+                      <span>Out of Stock</span>
+                    </button>
+                    <p className="text-[11px] text-rose-600 font-semibold text-center leading-snug">
+                      One or more items in your cart are currently out of stock. Please remove them to proceed to checkout.
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        router.push('/login?redirect=/checkout');
+                        return;
+                      }
+                      router.push('/checkout');
+                    }}
+                    className="w-full py-3 sm:py-3.5 rounded-xl bg-[#68421A] hover:bg-[#543212] text-white text-xs sm:text-sm font-bold tracking-wide shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Lock className="w-4 h-4 text-white" />
+                    <span>Proceed to Checkout</span>
+                  </button>
+                )}
 
                 {/* Trust text */}
                 <div className="pt-1 flex items-center justify-center gap-1.5 text-[10px] sm:text-[11px] text-slate-500">

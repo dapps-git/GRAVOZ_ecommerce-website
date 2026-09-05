@@ -82,6 +82,7 @@ export default function ProfilePage() {
   // Real Orders State
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [userReviews, setUserReviews] = useState<any[]>([]);
 
   // Review Modal State
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
@@ -109,9 +110,23 @@ export default function ProfilePage() {
     }
   };
 
+  const fetchUserReviews = async () => {
+    if (!user?.email) return;
+    try {
+      const res = await fetch(`/api/reviews?email=${encodeURIComponent(user.email)}`);
+      const data = await res.json();
+      if (res.ok && data.success && Array.isArray(data.reviews)) {
+        setUserReviews(data.reviews);
+      }
+    } catch (err) {
+      console.error('Failed to fetch user reviews:', err);
+    }
+  };
+
   useEffect(() => {
     if (user?.email) {
       fetchUserOrders();
+      fetchUserReviews();
     }
   }, [user?.email]);
 
@@ -494,47 +509,69 @@ export default function ProfilePage() {
                           </div>
 
                           <div className="space-y-3">
-                            {ord.items?.map((item: any, idx: number) => (
-                              <div key={idx} className="flex items-center justify-between gap-3 sm:gap-4">
-                                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden">
-                                    <Image
-                                      src={item.imageUrl || '/products/placeholder.svg'}
-                                      alt={item.name}
-                                      width={64}
-                                      height={64}
-                                      className="object-contain w-full h-full"
-                                    />
-                                  </div>
-                                  <div className="min-w-0 flex-1 space-y-0.5 font-sansation">
-                                    <h4 className="text-xs sm:text-sm font-semibold text-[#030303] truncate">
-                                      {item.name}
-                                    </h4>
-                                    <p className="text-[11px] text-slate-500">
-                                      Size: {item.size} {item.color ? `| Color: ${item.color}` : ''} | Qty: {item.quantity}
-                                    </p>
-                                    <span className="text-xs font-bold text-[#c25e09]">₹{(item.price * item.quantity).toLocaleString()}</span>
-                                  </div>
-                                </div>
+                            {ord.items?.map((item: any, idx: number) => {
+                              const prodTarget = item.productId || item.product || item.slug || item._id;
+                              const prodHref = prodTarget ? `/products/${prodTarget}` : '#';
+                              const existingReview = userReviews.find(
+                                (r: any) =>
+                                  (r.product && (r.product === item.productId || r.product === item.product || r.product?._id === item.productId)) ||
+                                  (r.orderId && (r.orderId === ord._id || r.orderId?._id === ord._id) && (r.product === item.productId || r.product === item.product))
+                              );
 
-                                {isDelivered && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setReviewOrder(ord);
-                                      setReviewItem(item);
-                                      setReviewRating(5);
-                                      setReviewComment('');
-                                      setReviewMedia([]);
-                                      setReviewModalOpen(true);
-                                    }}
-                                    className="flex-shrink-0 px-3 py-1.5 bg-[#89591C] hover:bg-[#724a17] text-white text-[11px] font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1"
-                                  >
-                                    <Star className="w-3 h-3 fill-white" /> Review
-                                  </button>
-                                )}
-                              </div>
-                            ))}
+                              return (
+                                <div key={idx} className="flex items-center justify-between gap-3 sm:gap-4">
+                                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                    <Link
+                                      href={prodHref}
+                                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block"
+                                    >
+                                      <Image
+                                        src={item.imageUrl || '/products/placeholder.svg'}
+                                        alt={item.name}
+                                        width={64}
+                                        height={64}
+                                        className="object-contain w-full h-full"
+                                      />
+                                    </Link>
+                                    <div className="min-w-0 flex-1 space-y-0.5 font-sansation">
+                                      <Link
+                                        href={prodHref}
+                                        className="text-xs sm:text-sm font-semibold text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block"
+                                      >
+                                        {item.name}
+                                      </Link>
+                                      <p className="text-[11px] text-slate-500">
+                                        Size: {item.size} {item.color ? `| Color: ${item.color}` : ''} | Qty: {item.quantity}
+                                      </p>
+                                      <span className="text-xs font-bold text-[#c25e09]">₹{(item.price * item.quantity).toLocaleString()}</span>
+                                    </div>
+                                  </div>
+
+                                  {isDelivered && (
+                                    existingReview ? (
+                                      <span className="flex-shrink-0 px-2.5 py-1 bg-[#8A5B2A]/10 text-[#8A5B2A] text-[11px] font-bold rounded-lg border border-[#8A5B2A]/25 flex items-center gap-1">
+                                        <Star className="w-3 h-3 fill-[#8A5B2A] text-[#8A5B2A]" /> {existingReview.rating}.0 Reviewed
+                                      </span>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setReviewOrder(ord);
+                                          setReviewItem(item);
+                                          setReviewRating(5);
+                                          setReviewComment('');
+                                          setReviewMedia([]);
+                                          setReviewModalOpen(true);
+                                        }}
+                                        className="flex-shrink-0 px-3 py-1.5 bg-[#89591C] hover:bg-[#724a17] text-white text-[11px] font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1"
+                                      >
+                                        <Star className="w-3 h-3 fill-white" /> Review
+                                      </button>
+                                    )
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       );
@@ -590,41 +627,46 @@ export default function ProfilePage() {
                   <p className="text-xs text-slate-500 py-6 font-sansation">Your wishlist is currently empty.</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {wishlistItems.map((item) => (
-                      <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div className="w-14 h-14 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1]">
-                            <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
+                    {wishlistItems.map((item) => {
+                      const prodHref = `/products/${item.productId || (item as any).slug || (item as any)._id}`;
+                      return (
+                        <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <Link href={prodHref} className="w-14 h-14 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
+                              <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
+                            </Link>
+                            <div className="min-w-0 flex-1 font-sansation space-y-0.5">
+                              <Link href={prodHref} className="text-xs font-semibold text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block">
+                                {item.title}
+                              </Link>
+                              <span className="text-xs font-bold text-[#c25e09]">₹{item.price}</span>
+                            </div>
                           </div>
-                          <div className="min-w-0 flex-1 font-sansation space-y-0.5">
-                            <h4 className="text-xs font-semibold text-[#030303] truncate">{item.title}</h4>
-                            <span className="text-xs font-bold text-[#c25e09]">₹{item.price}</span>
-                          </div>
-                        </div>
 
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            await addToCart({
-                              productId: item.productId,
-                              title: item.title,
-                              price: item.price,
-                              originalPrice: item.originalPrice,
-                              size: item.size || '9',
-                              quantity: 1,
-                              imageUrl: item.imageUrl,
-                              color: item.color,
-                            });
-                            await removeFromWishlist(item.productId);
-                            showToast(`Moved ${item.title} to Cart! Redirecting...`);
-                            router.push('/cart');
-                          }}
-                          className="bg-[#c25e09] hover:bg-[#a04a05] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-full transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-                    ))}
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await addToCart({
+                                productId: item.productId,
+                                title: item.title,
+                                price: item.price,
+                                originalPrice: item.originalPrice,
+                                size: item.size || '9',
+                                quantity: 1,
+                                imageUrl: item.imageUrl,
+                                color: item.color,
+                              });
+                              await removeFromWishlist(item.productId);
+                              showToast(`Moved ${item.title} to Cart! Redirecting...`);
+                              router.push('/cart');
+                            }}
+                            className="bg-[#c25e09] hover:bg-[#a04a05] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-full transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
+                          >
+                            Add to Cart
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -650,20 +692,25 @@ export default function ProfilePage() {
                   <p className="text-xs text-slate-500 py-6 font-sansation">Your cart is empty.</p>
                 ) : (
                   <div className="space-y-3 font-sansation">
-                    {cartItems.map((item) => (
-                      <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between bg-white">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1]">
-                            <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
+                    {cartItems.map((item) => {
+                      const prodHref = `/products/${item.productId || (item as any).slug || (item as any)._id}`;
+                      return (
+                        <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between bg-white">
+                          <div className="flex items-center gap-3">
+                            <Link href={prodHref} className="w-12 h-12 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
+                              <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
+                            </Link>
+                            <div>
+                              <Link href={prodHref} className="text-xs font-semibold text-[#030303] hover:text-[#8A5B2A] transition-colors block">
+                                {item.title}
+                              </Link>
+                              <p className="text-[11px] text-slate-400">Qty: {item.quantity}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-xs font-semibold text-[#030303]">{item.title}</h4>
-                            <p className="text-[11px] text-slate-400">Qty: {item.quantity}</p>
-                          </div>
+                          <span className="text-xs font-bold text-[#c25e09]">₹{item.price * item.quantity}</span>
                         </div>
-                        <span className="text-xs font-bold text-[#c25e09]">₹{item.price * item.quantity}</span>
-                      </div>
-                    ))}
+                      );
+                    })}
                     <div className="pt-3 border-t border-[#e5e5e5] flex items-center justify-between text-sm">
                       <span className="font-semibold text-slate-700">Subtotal:</span>
                       <span className="font-bold text-[#c25e09]">₹{subtotal}</span>
@@ -995,6 +1042,7 @@ export default function ProfilePage() {
                     if (res.ok && data.success) {
                       setReviewModalOpen(false);
                       showToast('Review submitted successfully! Thank you.');
+                      fetchUserReviews();
                     } else {
                       showToast(data.error || 'Failed to submit review.');
                     }

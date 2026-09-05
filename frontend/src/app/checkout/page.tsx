@@ -105,6 +105,36 @@ export default function CheckoutPage() {
     }
   }, [currentStep, placedOrder, router]);
 
+  // Stock State
+  const [productStockMap, setProductStockMap] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (items.length === 0) return;
+    fetch('/api/products?limit=100')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.products && Array.isArray(data.products)) {
+          const map: Record<string, number> = {};
+          data.products.forEach((p: any) => {
+            map[p._id] = p.stock !== undefined ? p.stock : 10;
+            if (p.slug) map[p.slug] = p.stock !== undefined ? p.stock : 10;
+          });
+          setProductStockMap(map);
+        }
+      })
+      .catch(() => {});
+  }, [items]);
+
+  const isItemOutOfStock = (item: any) => {
+    const stock = productStockMap[item.productId];
+    if (stock !== undefined) {
+      return stock <= 0;
+    }
+    return item.stock !== undefined ? item.stock <= 0 : false;
+  };
+
+  const hasOutOfStockItems = items.some((item) => isItemOutOfStock(item));
+
   // Protect route
   useEffect(() => {
     if (!userLoading && !isLoggedIn) {
@@ -528,15 +558,30 @@ export default function CheckoutPage() {
         )}
 
         {/* Action CTA Button */}
-        <button
-          type="button"
-          disabled={isPlacingOrder || (currentStep === 'cart' && items.length === 0)}
-          onClick={onCtaClick}
-          className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 font-poppins"
-        >
-          <span>{ctaButtonText}</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
+        {hasOutOfStockItems ? (
+          <div className="space-y-1.5">
+            <button
+              type="button"
+              disabled
+              className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#ede8e1] text-[#888888] text-xs sm:text-[13px] font-semibold tracking-wider uppercase flex items-center justify-center gap-2 cursor-not-allowed border border-[#d8d2c8] font-poppins"
+            >
+              <span>Out of Stock</span>
+            </button>
+            <p className="text-[10px] text-rose-600 font-semibold text-center leading-tight">
+              Remove out-of-stock items from your cart to proceed.
+            </p>
+          </div>
+        ) : (
+          <button
+            type="button"
+            disabled={isPlacingOrder || (currentStep === 'cart' && items.length === 0)}
+            onClick={onCtaClick}
+            className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 font-poppins"
+          >
+            <span>{ctaButtonText}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* SSL Safe & Secure Card */}
@@ -683,33 +728,36 @@ export default function CheckoutPage() {
               </h3>
 
               <div className="divide-y divide-[#f0ece5]">
-                {placedOrder.items?.map((item: any, idx: number) => (
-                  <div key={idx} className="py-3 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                      <div className="w-14 h-14 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0">
-                        <Image
-                          src={item.imageUrl || '/products/placeholder.svg'}
-                          alt={item.name}
-                          width={56}
-                          height={56}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
+                {placedOrder.items?.map((item: any, idx: number) => {
+                  const prodHref = `/products/${item.productId || item.product || item.slug || item._id}`;
+                  return (
+                    <div key={idx} className="py-3 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                        <Link href={prodHref} className="w-14 h-14 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
+                          <Image
+                            src={item.imageUrl || '/products/placeholder.svg'}
+                            alt={item.name}
+                            width={56}
+                            height={56}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        </Link>
+                        <div className="space-y-0.5 min-w-0">
+                          <Link href={prodHref} className="text-xs sm:text-sm font-medium text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block">
+                            {item.name}
+                          </Link>
+                          <p className="text-[11px] text-slate-500 font-normal">
+                            Size: {item.size} • Qty: {item.quantity}
+                          </p>
+                        </div>
                       </div>
-                      <div className="space-y-0.5 min-w-0">
-                        <h4 className="text-xs sm:text-sm font-medium text-[#030303] truncate">
-                          {item.name}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 font-normal">
-                          Size: {item.size} • Qty: {item.quantity}
-                        </p>
-                      </div>
-                    </div>
 
-                    <span className="text-xs sm:text-sm font-semibold text-[#030303] flex-shrink-0">
-                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                ))}
+                      <span className="text-xs sm:text-sm font-semibold text-[#030303] flex-shrink-0">
+                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="border-t border-[#f0ece5] pt-3 space-y-2 text-xs text-slate-600 font-normal">
@@ -973,35 +1021,38 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="divide-y divide-[#f0ece5]">
-                      {items.map((item, idx) => (
-                        <div key={idx} className="py-3 flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0">
-                              <Image
-                                src={item.imageUrl || '/products/placeholder.svg'}
-                                alt={item.title}
-                                width={64}
-                                height={64}
-                                className="w-full h-full object-cover rounded-lg"
-                              />
+                      {items.map((item, idx) => {
+                        const prodHref = `/products/${item.productId || (item as any).slug || (item as any)._id}`;
+                        return (
+                          <div key={idx} className="py-3 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                              <Link href={prodHref} className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
+                                <Image
+                                  src={item.imageUrl || '/products/placeholder.svg'}
+                                  alt={item.title}
+                                  width={64}
+                                  height={64}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              </Link>
+                              <div className="space-y-1 min-w-0">
+                                <Link href={prodHref} className="text-xs sm:text-sm font-bold text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block">
+                                  {item.title}
+                                </Link>
+                                <p className="text-[11px] text-slate-500 font-medium">
+                                  Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}
+                                </p>
+                              </div>
                             </div>
-                            <div className="space-y-1 min-w-0">
-                              <h4 className="text-xs sm:text-sm font-bold text-[#030303] truncate">
-                                {item.title}
-                              </h4>
-                              <p className="text-[11px] text-slate-500 font-medium">
-                                Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}
-                              </p>
-                            </div>
-                          </div>
 
-                          <div className="text-right flex-shrink-0">
-                            <span className="text-sm font-bold text-[#030303]">
-                              ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                            </span>
+                            <div className="text-right flex-shrink-0">
+                              <span className="text-sm font-bold text-[#030303]">
+                                ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 

@@ -59,6 +59,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required order details' }, { status: 400 });
     }
 
+    // Verify all items are in stock
+    for (const itm of items) {
+      if (itm.productId && mongoose.Types.ObjectId.isValid(itm.productId)) {
+        const prod = await Product.findById(itm.productId).lean();
+        if (!prod || (prod.stock !== undefined && prod.stock <= 0)) {
+          return NextResponse.json(
+            { error: `Item "${itm.name || prod?.name || 'Product'}" is currently out of stock. Please remove it from your cart.` },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     // Generate unique human-readable order number
     const orderNumber =
       'GRV-' + Date.now().toString().slice(-6) + '-' + Math.floor(100 + Math.random() * 900);

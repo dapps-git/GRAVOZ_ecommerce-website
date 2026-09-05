@@ -20,6 +20,7 @@ import {
   FolderTree,
   Package,
 } from 'lucide-react';
+import { getProductRating } from '@/lib/ratingUtils';
 
 interface ProductItem {
   _id: string;
@@ -424,14 +425,14 @@ function ProductsContent() {
     <div className="min-h-screen bg-[#faf8f5] text-[#030303] font-sans flex flex-col justify-between" style={{ fontFamily: 'var(--font-montserrat), Montserrat, sans-serif' }}>
       <Header />
 
-      <main className="flex-1 w-full max-w-[1530px] mx-auto px-3.5 sm:px-6 md:px-8 pt-2 pb-12 space-y-3">
+      <main className="flex-1 w-full max-w-[1530px] mx-auto px-4 sm:px-6 md:px-8 pt-2 pb-14 space-y-3 font-sansation">
 
         {/* ── Breadcrumb Navigation ── */}
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 font-normal py-1 overflow-x-auto">
           <Link href="/" className="hover:text-[#89591C] transition-colors">Home</Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
           <Link href="/products" className="hover:text-[#89591C] transition-colors truncate">
-            {selectedAudience || 'Men'}
+            {selectedAudience ? `${selectedAudience}'s Footwear` : 'Discover Footwear'}
           </Link>
           {selectedCategory && (
             <>
@@ -599,18 +600,18 @@ function ProductsContent() {
         )}
 
         {/* ── Main 2-Column Grid (Desktop Sidebar + Products) ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-7 items-start">
 
           {/* ════════════════════════════════════════════════════════════════ */}
-          {/* LEFT SIDEBAR FILTERS (Desktop) - Aligned to Start of DISCOVER     */}
+          {/* LEFT SIDEBAR FILTERS (Desktop) - Sleek 220px Compact Width        */}
           {/* ════════════════════════════════════════════════════════════════ */}
-          <aside className="hidden lg:block lg:col-span-3 space-y-5 sticky top-24 bg-white -ml-0.5">
+          <aside className="hidden lg:block w-48 xl:w-52 shrink-0 space-y-4 sticky top-24 bg-white">
 
             {/* 1. CATEGORIES */}
             {realCategories.length > 0 && (
-              <div className="space-y-2.5 pb-4 border-b border-[#ece7de]">
+              <div className="space-y-2 pb-3.5 border-b border-[#ece7de]">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#030303]">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#030303]">
                     Categories
                   </h3>
                   {selectedCategory && (
@@ -633,16 +634,14 @@ function ProductsContent() {
                         key={cat.name}
                         type="button"
                         onClick={() => handleCategorySelect(cat.name)}
-                        className={`w-full flex items-center justify-between py-1 px-0 text-xs text-left transition-all cursor-pointer ${isSelected
+                        className={`w-full flex items-center justify-between py-0.5 px-0 text-xs text-left transition-all cursor-pointer ${isSelected
                             ? 'font-bold text-[#89591C]'
                             : 'font-normal text-slate-700 hover:text-[#89591C]'
                           }`}
                       >
-                        <span className="truncate">{cat.name}</span>
-                        {isSelected ? (
-                          <Check className="w-4 h-4 text-[#89591C] flex-shrink-0" />
-                        ) : (
-                          cat.count > 0 && <span className="text-[10px] text-slate-400">({cat.count})</span>
+                        <span className="truncate text-[11.5px] sm:text-xs">{cat.name}</span>
+                        {isSelected && (
+                          <Check className="w-3.5 h-3.5 text-[#89591C] flex-shrink-0" />
                         )}
                       </button>
                     );
@@ -652,9 +651,9 @@ function ProductsContent() {
             )}
 
             {/* 2. FILTER BY SECTIONS */}
-            <div className="space-y-5">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-[#030303]">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#030303]">
                   Filter By
                 </h3>
                 {activeFiltersCount > 0 && (
@@ -687,7 +686,7 @@ function ProductsContent() {
                         return (
                           <label
                             key={b.name}
-                            className="flex items-center justify-between text-xs text-slate-700 cursor-pointer hover:text-[#89591C]"
+                            className="flex items-center text-xs text-slate-700 cursor-pointer hover:text-[#89591C]"
                           >
                             <div className="flex items-center gap-2">
                               <input
@@ -698,7 +697,6 @@ function ProductsContent() {
                               />
                               <span>{b.name}</span>
                             </div>
-                            <span className="text-[11px] text-slate-400 font-normal">({b.count})</span>
                           </label>
                         );
                       })}
@@ -725,7 +723,7 @@ function ProductsContent() {
                       return (
                         <label
                           key={s.size}
-                          className="flex items-center justify-between text-xs text-slate-700 cursor-pointer hover:text-[#89591C]"
+                          className="flex items-center text-xs text-slate-700 cursor-pointer hover:text-[#89591C]"
                         >
                           <div className="flex items-center gap-2">
                             <input
@@ -736,7 +734,6 @@ function ProductsContent() {
                             />
                             <span>{s.size}</span>
                           </div>
-                          <span className="text-[11px] text-slate-400 font-normal">({s.count})</span>
                         </label>
                       );
                     })}
@@ -762,7 +759,7 @@ function ProductsContent() {
                       return (
                         <label
                           key={col.name}
-                          className="flex items-center justify-between text-xs text-slate-700 cursor-pointer hover:text-[#89591C]"
+                          className="flex items-center text-xs text-slate-700 cursor-pointer hover:text-[#89591C]"
                         >
                           <div className="flex items-center gap-2">
                             <input
@@ -777,7 +774,6 @@ function ProductsContent() {
                             />
                             <span>{col.name}</span>
                           </div>
-                          <span className="text-[11px] text-slate-400 font-normal">({col.count})</span>
                         </label>
                       );
                     })}
@@ -820,7 +816,7 @@ function ProductsContent() {
           {/* ════════════════════════════════════════════════════════════════ */}
           {/* RIGHT PRODUCT GRID                                               */}
           {/* ════════════════════════════════════════════════════════════════ */}
-          <section className="lg:col-span-9 space-y-5">
+          <section className="flex-1 min-w-0 space-y-5">
             {/* Desktop Header */}
             <div className="hidden lg:flex items-center justify-between gap-3 border-b border-[#ece7de] pb-4">
               <div>
@@ -850,7 +846,7 @@ function ProductsContent() {
 
             {/* Products Grid */}
             {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4.5">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                   <div
                     key={i}
@@ -876,7 +872,7 @@ function ProductsContent() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 pb-20 lg:pb-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4.5 pb-20 lg:pb-8">
                 {filteredProducts.map((product) => {
                   const isWishlisted = Boolean(wishlist[product._id]);
                   const validImg =
@@ -919,19 +915,19 @@ function ProductsContent() {
                         {/* Out of Stock / Low Stock / Best Seller Badges */}
                         {product.stock !== undefined && product.stock <= 0 ? (
                           <div className="absolute top-2 left-2 z-10">
-                            <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-rose-600 text-white shadow-xs">
+                            <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-rose-600 text-white shadow-xs">
                               OUT OF STOCK
                             </span>
                           </div>
                         ) : product.stock !== undefined && product.stock > 0 && product.stock <= 3 ? (
                           <div className="absolute top-2 left-2 z-10">
-                            <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-amber-600 text-white shadow-xs">
+                            <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-amber-600 text-white shadow-xs">
                               {product.stock === 1 ? '1 LEFT' : `${product.stock} LEFT`}
                             </span>
                           </div>
                         ) : product.isBestSeller ? (
                           <div className="absolute top-2 left-2 z-10">
-                            <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
+                            <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
                               BEST SELLER
                             </span>
                           </div>
@@ -967,13 +963,18 @@ function ProductsContent() {
                         </div>
 
                         {/* Star Rating */}
-                        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
-                          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                          <span className="font-bold text-slate-800">{(product.rating || 5.0).toFixed(1)}</span>
-                          <span className="text-slate-400 font-normal">
-                            ({product.reviewsCount || 120})
-                          </span>
-                        </div>
+                        {(() => {
+                          const { rating, reviewsCount } = getProductRating(product);
+                          return (
+                            <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                              <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                              <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
+                              <span className="text-slate-400 font-normal">
+                                ({reviewsCount})
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </Link>
                   );

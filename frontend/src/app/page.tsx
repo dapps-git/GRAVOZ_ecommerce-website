@@ -10,6 +10,8 @@ import DynamicProductSection from '@/components/DynamicProductSection';
 import CuratedShowcaseSection from '@/components/CuratedShowcaseSection';
 import DuoSpotlightSection from '@/components/DuoSpotlightSection';
 import { ArrowRight, ChevronLeft, ChevronRight, Star, Eye, Truck, ShieldCheck, Leaf, Globe, Heart } from 'lucide-react';
+import { getProductRating } from '@/lib/ratingUtils';
+import { useWishlist } from '@/context/WishlistContext';
 
 // ─── Skeleton shimmer components ─────────────────────────────────────────────
 
@@ -75,6 +77,7 @@ const DEFAULT_CATEGORIES: CategoryCardData[] = [
 // ─── Page Component ───────────────────────────────────────────────────────────
 
 export default function StorefrontHomePage() {
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [banners, setBanners] = useState<Record<string, any>>({});
   const [bannerImageUrl, setBannerImageUrl] = useState<string>('/images/placeholder.svg');
   const [bannerLoading, setBannerLoading] = useState<boolean>(true);
@@ -269,15 +272,36 @@ export default function StorefrontHomePage() {
                 <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#faf8f5]">
                   {/* Best Seller Badge */}
                   <div className="absolute top-2 left-2 z-10">
-                    <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
+                    <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
                       BEST SELLER
                     </span>
                   </div>
 
                   {/* Wishlist Button */}
-                  <div className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center">
-                    <Heart className="w-3.5 h-3.5 text-slate-600" />
-                  </div>
+                  <button
+                    type="button"
+                    aria-label="Wishlist toggle"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleWishlist({
+                        productId: product.id,
+                        title: product.title,
+                        price: product.price,
+                        originalPrice: product.originalPrice,
+                        imageUrl: product.imageUrl,
+                      });
+                    }}
+                    className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
+                  >
+                    <Heart
+                      className={`w-3.5 h-3.5 transition-colors ${
+                        isInWishlist(product.id)
+                          ? 'fill-rose-500 text-rose-500'
+                          : 'text-slate-600 hover:text-rose-500'
+                      }`}
+                    />
+                  </button>
 
                   <Image
                     src={product.imageUrl}
@@ -295,11 +319,16 @@ export default function StorefrontHomePage() {
                   </h3>
 
                   {/* Star Rating */}
-                  <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
-                    <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span className="font-bold text-slate-800">{product.rating.toFixed(1)}</span>
-                    <span className="text-slate-400 font-normal">(120)</span>
-                  </div>
+                  {(() => {
+                    const { rating, reviewsCount } = getProductRating(product);
+                    return (
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                        <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                        <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
+                        <span className="text-slate-400 font-normal">({reviewsCount})</span>
+                      </div>
+                    );
+                  })()}
 
                   {/* Pricing with Discount */}
                   <div className="flex items-baseline gap-1.5 pt-0.5">

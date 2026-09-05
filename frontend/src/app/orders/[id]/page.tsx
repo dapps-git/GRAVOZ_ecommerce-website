@@ -28,6 +28,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 
+import { useUser } from '@/context/UserContext';
+
 const STEP_DEFINITIONS = [
   { key: 'ordered', label: 'Order Placed', defaultDesc: 'Your order has been received', icon: FileCheck2 },
   { key: 'confirmed', label: 'Confirmed', defaultDesc: 'Your order is confirmed and being prepared', icon: CheckCircle2 },
@@ -61,6 +63,7 @@ export default function OrderTrackingPage() {
   const router = useRouter();
   const params = useParams();
   const orderId = params?.id as string;
+  const { user, isLoggedIn } = useUser();
 
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -79,10 +82,22 @@ export default function OrderTrackingPage() {
   const fetchOrder = async () => {
     try {
       setLoading(true);
+      setError('');
       const res = await fetch(`/api/orders/${orderId}`);
       const data = await res.json();
-      if (res.ok && data.success) {
-        setOrder(data.order);
+      if (res.ok && data.success && data.order) {
+        const fetchedOrder = data.order;
+        // User Privacy & Authorization Check:
+        if (isLoggedIn && user?.email) {
+          const ordEmail = (fetchedOrder.customerEmail || '').toLowerCase().trim();
+          const userEmail = (user.email || '').toLowerCase().trim();
+          if (ordEmail && userEmail && ordEmail !== userEmail) {
+            setError('No order found. You can only track orders placed with your account.');
+            setOrder(null);
+            return;
+          }
+        }
+        setOrder(fetchedOrder);
       } else {
         setError(data.error || 'Order not found');
       }
@@ -95,7 +110,7 @@ export default function OrderTrackingPage() {
 
   useEffect(() => {
     if (orderId) fetchOrder();
-  }, [orderId]);
+  }, [orderId, user?.email, isLoggedIn]);
 
   const handleCancel = async () => {
     if (!confirm('Are you sure you want to cancel this order?')) return;
@@ -478,28 +493,39 @@ export default function OrderTrackingPage() {
         <div className="bg-white border border-[#E5E1DC] rounded-2xl p-5 space-y-4 shadow-2xs">
           <h3 className="text-sm font-semibold text-[#111111]">Items in this Order</h3>
           <div className="divide-y divide-[#E5E1DC]/60">
-            {order.items?.map((item: any, idx: number) => (
-              <div key={idx} className="py-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative w-14 h-14 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] flex-shrink-0 overflow-hidden">
-                    <Image
-                      src={item.imageUrl || '/products/placeholder.svg'}
-                      alt={item.name}
-                      fill
-                      sizes="56px"
-                      className="object-contain p-1"
-                    />
+            {order.items?.map((item: any, idx: number) => {
+              const prodHref = `/products/${item.productId || item.product || item.slug || item._id}`;
+              return (
+                <div key={idx} className="py-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Link
+                      href={prodHref}
+                      className="relative w-14 h-14 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] flex-shrink-0 overflow-hidden hover:opacity-85 transition-opacity block"
+                    >
+                      <Image
+                        src={item.imageUrl || '/products/placeholder.svg'}
+                        alt={item.name}
+                        fill
+                        sizes="56px"
+                        className="object-contain p-1"
+                      />
+                    </Link>
+                    <div className="min-w-0">
+                      <Link
+                        href={prodHref}
+                        className="text-xs sm:text-sm font-medium text-[#111111] truncate hover:text-[#8A5B2A] transition-colors block"
+                      >
+                        {item.name}
+                      </Link>
+                      <p className="text-[11px] text-[#555555]">Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}</p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium text-[#111111] truncate">{item.name}</h4>
-                    <p className="text-[11px] text-[#555555]">Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}</p>
-                  </div>
+                  <span className="text-xs sm:text-sm font-semibold text-[#111111] flex-shrink-0">
+                    ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                  </span>
                 </div>
-                <span className="text-xs sm:text-sm font-semibold text-[#111111] flex-shrink-0">
-                  ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="pt-2 border-t border-[#E5E1DC] flex justify-between items-center text-sm font-semibold">

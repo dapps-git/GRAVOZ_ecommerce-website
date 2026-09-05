@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Product } from '@/models/Product';
 
@@ -90,7 +91,9 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    const allExcluded = [...new Set([...recentProductIds, ...excludeIds])];
+    const allExcluded = [...new Set([...recentProductIds, ...excludeIds])]
+      .filter((id) => typeof id === 'string' && mongoose.Types.ObjectId.isValid(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
 
     const conditions: object[] = [];
     if (colors.length > 0) {
@@ -109,10 +112,14 @@ export async function POST(req: NextRequest) {
     }
 
     let dbProducts: any[] = [];
+    const baseQuery: Record<string, any> = { status: 'active' };
+    if (allExcluded.length > 0) {
+      baseQuery._id = { $nin: allExcluded };
+    }
+
     if (conditions.length > 0) {
       dbProducts = await Product.find({
-        status: 'active',
-        _id: { $nin: allExcluded },
+        ...baseQuery,
         $or: conditions,
       })
         .limit(limit * 2)

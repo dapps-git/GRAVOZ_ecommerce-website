@@ -478,7 +478,7 @@ export default function ProductInnerPage() {
                 {/* Product Badge: BEST SELLER */}
                 {(product.badge || product.isBestSeller || product.isTopSeller || product.isLatest || true) && (
                   <div className="absolute top-3 left-3 z-10">
-                    <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#89591C] text-white shadow-xs">
+                    <span className="px-2.5 py-1 rounded-none text-[9px] font-bold uppercase tracking-wider bg-[#89591C] text-white shadow-xs">
                       {product.badge || (product.isBestSeller ? 'BEST SELLER' : product.isTopSeller ? 'TOP SELLER' : product.isLatest ? 'NEW' : 'BEST SELLER')}
                     </span>
                   </div>

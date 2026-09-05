@@ -5,28 +5,44 @@ import { Review } from '@/models/Review';
 import { Product } from '@/models/Product';
 import { Order } from '@/models/Order';
 
-// GET /api/reviews?productId=xxx
+// GET /api/reviews?productId=xxx&email=yyy
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get('productId');
-
-    if (!productId) {
-      return NextResponse.json({ error: 'productId required' }, { status: 400 });
-    }
+    const email = searchParams.get('email');
 
     await connectDB();
 
-    let query: Record<string, any> = { status: 'approved' };
-    if (mongoose.Types.ObjectId.isValid(productId)) {
-      query.product = new mongoose.Types.ObjectId(productId);
+    let query: Record<string, any> = {};
+
+    if (email) {
+      query.customerEmail = email.toLowerCase().trim();
+    } else {
+      query.status = 'approved';
+    }
+
+    if (productId) {
+      if (mongoose.Types.ObjectId.isValid(productId)) {
+        query.product = new mongoose.Types.ObjectId(productId);
+      } else {
+        const p = await Product.findOne({
+          $or: [{ slug: productId }, { sku: productId }],
+        });
+        if (p) {
+          query.product = p._id;
+        } else {
+          // If no product found with that slug, return empty reviews list
+          return NextResponse.json({ success: true, reviews: [], avgRating: 4.8, count: 0 });
+        }
+      }
     }
 
     const reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
 
     const avgRating = reviews.length
-      ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
-      : 5.0;
+      ? Math.round((reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length) * 10) / 10
+      : 4.8;
 
     return NextResponse.json({ success: true, reviews, avgRating, count: reviews.length });
   } catch (err: any) {

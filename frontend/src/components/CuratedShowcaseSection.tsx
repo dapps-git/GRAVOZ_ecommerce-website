@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, Star } from 'lucide-react';
+import { getProductRating } from '@/lib/ratingUtils';
+import { useWishlist } from '@/context/WishlistContext';
 
 export interface ShowcaseCardColor {
   name: string;
@@ -41,6 +43,7 @@ export default function CuratedShowcaseSection({
   fallbackTitle = 'Best Sellers',
   fallbackSubtitle = 'Our most loved handcrafted designs',
 }: CuratedShowcaseSectionProps) {
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [title, setTitle]     = useState(fallbackTitle);
   const [items, setItems]     = useState<ShowcaseCardItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,22 +113,43 @@ export default function CuratedShowcaseSection({
                   {/* Badge (Top Left if Best Seller / Discount) */}
                   {discount > 0 ? (
                     <div className="absolute top-2 left-2 z-10">
-                      <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#22C55E] text-white shadow-xs">
+                      <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#22C55E] text-white shadow-xs">
                         {discount}% OFF
                       </span>
                     </div>
                   ) : sectionKey === 'best_sellers' ? (
                     <div className="absolute top-2 left-2 z-10">
-                      <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
+                      <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
                         BEST SELLER
                       </span>
                     </div>
                   ) : null}
 
                   {/* Wishlist Button */}
-                  <div className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center">
-                    <Heart className="w-3.5 h-3.5 text-slate-600" />
-                  </div>
+                  <button
+                    type="button"
+                    aria-label="Wishlist toggle"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleWishlist({
+                        productId: item.productId || item.id || '',
+                        title: item.title,
+                        price: item.price,
+                        originalPrice: item.originalPrice,
+                        imageUrl: item.imageUrl,
+                      });
+                    }}
+                    className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
+                  >
+                    <Heart
+                      className={`w-3.5 h-3.5 transition-colors ${
+                        isInWishlist(item.productId || item.id || '')
+                          ? 'fill-rose-500 text-rose-500'
+                          : 'text-slate-600 hover:text-rose-500'
+                      }`}
+                    />
+                  </button>
 
                   {/* Product Shoe Image */}
                   <Image
@@ -144,11 +168,18 @@ export default function CuratedShowcaseSection({
                   </h3>
 
                   {/* Star Rating */}
-                  <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
-                    <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span className="font-bold text-slate-800">5.0</span>
-                    <span className="text-slate-400 font-normal">(120)</span>
-                  </div>
+                  {(() => {
+                    const { rating, reviewsCount } = getProductRating(item);
+                    return (
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                        <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                        <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
+                        <span className="text-slate-400 font-normal">
+                          ({reviewsCount})
+                        </span>
+                      </div>
+                    );
+                  })()}
 
                   {/* Pricing with Discount */}
                   <div className="flex items-baseline gap-1.5 pt-0.5">

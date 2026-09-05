@@ -18,6 +18,7 @@ import {
   Headphones,
   Check,
 } from 'lucide-react';
+import { getProductRating } from '@/lib/ratingUtils';
 
 interface RecentProduct {
   _id: string;
@@ -25,6 +26,7 @@ interface RecentProduct {
   slug?: string;
   price: number;
   discountPrice?: number;
+  originalPrice?: number;
   rating?: number;
   reviewsCount?: number;
   isBestSeller?: boolean;
@@ -33,7 +35,7 @@ interface RecentProduct {
 
 export default function WishlistPage() {
   const router = useRouter();
-  const { items, wishlistCount, removeFromWishlist, clearWishlist, isLoading } = useWishlist();
+  const { items, wishlistCount, removeFromWishlist, clearWishlist, isInWishlist, toggleWishlist, isLoading } = useWishlist();
   const { addToCart } = useCart();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [recentProducts, setRecentProducts] = useState<RecentProduct[]>([]);
@@ -152,11 +154,16 @@ export default function WishlistPage() {
                     </Link>
 
                     {/* Star Rating */}
-                    <div className="flex items-center gap-1 text-[11px] text-slate-600">
-                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                      <span className="font-bold text-slate-800">5.0</span>
-                      <span className="text-slate-400 font-normal">(120)</span>
-                    </div>
+                    {(() => {
+                      const { rating, reviewsCount } = getProductRating(item);
+                      return (
+                        <div className="flex items-center gap-1 text-[11px] text-slate-600">
+                          <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                          <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
+                          <span className="text-slate-400 font-normal">({reviewsCount})</span>
+                        </div>
+                      );
+                    })()}
 
                     {/* Price */}
                     <div className="pt-0.5">
@@ -247,16 +254,37 @@ export default function WishlistPage() {
                     {/* Best Seller Pill */}
                     {prod.isBestSeller && (
                       <div className="absolute top-2 left-2 z-10">
-                        <span className="px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
+                        <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
                           BEST SELLER
                         </span>
                       </div>
                     )}
 
                     {/* Wishlist Button */}
-                    <div className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center">
-                      <Heart className="w-3.5 h-3.5 text-slate-600" />
-                    </div>
+                    <button
+                      type="button"
+                      aria-label="Wishlist toggle"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleWishlist({
+                          productId: prod._id,
+                          title: prod.name,
+                          price: prod.price,
+                          originalPrice: prod.originalPrice,
+                          imageUrl: imgUrl,
+                        });
+                      }}
+                      className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
+                    >
+                      <Heart
+                        className={`w-3.5 h-3.5 transition-colors ${
+                          isInWishlist(prod._id)
+                            ? 'fill-rose-500 text-rose-500'
+                            : 'text-slate-600 hover:text-rose-500'
+                        }`}
+                      />
+                    </button>
 
                     <Image
                       src={imgUrl}
@@ -274,15 +302,16 @@ export default function WishlistPage() {
                     </h3>
 
                     {/* Star Rating */}
-                    <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
-                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                      <span className="font-bold text-slate-800">
-                        {(prod.rating || 5.0).toFixed(1)}
-                      </span>
-                      <span className="text-slate-400 font-normal">
-                        ({prod.reviewsCount || 120})
-                      </span>
-                    </div>
+                    {(() => {
+                      const { rating, reviewsCount } = getProductRating(prod);
+                      return (
+                        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                          <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                          <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
+                          <span className="text-slate-400 font-normal">({reviewsCount})</span>
+                        </div>
+                      );
+                    })()}
 
                     {/* Price */}
                     <div className="flex items-baseline gap-1.5 pt-0.5">

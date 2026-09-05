@@ -236,20 +236,20 @@ export default function Header() {
               DISCOVER PRODUCT
             </Link>
             <Link
-              href="/category/men"
+              href="/products?audience=Men"
               className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
             >
               MEN
             </Link>
             <Link
-              href="/category/women"
+              href="/products?audience=Women"
               className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
             >
               WOMEN
             </Link>
             <Link
-              href="/category/kids"
-              className="text-[12px] lg:text-[13px] font-semibold tracking-[0.04em] uppercase text-[#89591C] transition-colors whitespace-nowrap"
+              href="/products?audience=Kids"
+              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
             >
               KIDS
             </Link>
@@ -329,7 +329,7 @@ export default function Header() {
                   </Link>
 
                   <Link
-                    href="/category/men"
+                    href="/products?audience=Men"
                     onClick={closeMobileMenu}
                     className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
                   >
@@ -338,7 +338,7 @@ export default function Header() {
                   </Link>
 
                   <Link
-                    href="/category/women"
+                    href="/products?audience=Women"
                     onClick={closeMobileMenu}
                     className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
                   >
@@ -347,12 +347,12 @@ export default function Header() {
                   </Link>
 
                   <Link
-                    href="/category/kids"
+                    href="/products?audience=Kids"
                     onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-[#89591C] bg-[#faf8f5] rounded-lg transition-colors"
+                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
                   >
                     <span>KIDS & BABY SHOES</span>
-                    <ChevronRight className="w-4 h-4 text-[#89591C]" />
+                    <ChevronRight className="w-4 h-4 text-[#aaa]" />
                   </Link>
 
                   <Link

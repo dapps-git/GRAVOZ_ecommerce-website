@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, Heart } from 'lucide-react';
 import { extractSignals } from '@/lib/userBehavior';
+import { getProductRating } from '@/lib/ratingUtils';
+import { useWishlist } from '@/context/WishlistContext';
 
 interface RecProduct {
   _id: string;
@@ -35,6 +37,7 @@ export default function RecommendationStrip({
   limit = 6,
   contextQuery,
 }: Props) {
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [products, setProducts] = useState<RecProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [reason, setReason] = useState<'personalized' | 'popular'>('personalized');
@@ -102,9 +105,30 @@ export default function RecommendationStrip({
             {/* Product Image Card */}
             <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#faf8f5]">
               {/* Wishlist Button */}
-              <div className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center">
-                <Heart className="w-3.5 h-3.5 text-slate-600" />
-              </div>
+              <button
+                type="button"
+                aria-label="Wishlist toggle"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleWishlist({
+                    productId: product._id,
+                    title: product.name,
+                    price: product.price,
+                    originalPrice: product.originalPrice,
+                    imageUrl: product.images?.[0]?.url || '/products/placeholder.svg',
+                  });
+                }}
+                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
+              >
+                <Heart
+                  className={`w-3.5 h-3.5 transition-colors ${
+                    isInWishlist(product._id)
+                      ? 'fill-rose-500 text-rose-500'
+                      : 'text-slate-600 hover:text-rose-500'
+                  }`}
+                />
+              </button>
 
               <Image
                 src={product.images?.[0]?.url || '/products/placeholder.svg'}
@@ -122,11 +146,18 @@ export default function RecommendationStrip({
               </h3>
 
               {/* Star Rating */}
-              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
-                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                <span className="font-bold text-slate-800">{(product.rating || 5).toFixed(1)}</span>
-                <span className="text-slate-400 font-normal">(120)</span>
-              </div>
+              {(() => {
+                const { rating, reviewsCount } = getProductRating(product);
+                return (
+                  <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                    <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                    <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
+                    <span className="text-slate-400 font-normal">
+                      ({reviewsCount})
+                    </span>
+                  </div>
+                );
+              })()}
 
               {/* Price */}
               <div className="flex items-baseline gap-1.5 pt-0.5">

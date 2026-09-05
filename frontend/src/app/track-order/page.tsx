@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useUser } from '@/context/UserContext';
 import {
   Search,
   Truck,
@@ -36,6 +37,7 @@ function TrackOrderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('id') || '';
+  const { user, isLoggedIn } = useUser();
 
   const [orderQuery, setOrderQuery] = useState(initialQuery);
   const [loading, setLoading] = useState(false);
@@ -45,15 +47,22 @@ function TrackOrderContent() {
 
   // If user has orders in profile, fetch their recent orders
   useEffect(() => {
-    fetch('/api/orders')
+    const fetchUrl = user?.email
+      ? `/api/orders?email=${encodeURIComponent(user.email)}`
+      : '/api/orders';
+    fetch(fetchUrl)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.orders) && data.orders.length > 0) {
-          setRecentOrders(data.orders.slice(0, 3));
+          // Only show user's own orders if logged in
+          const filtered = user?.email
+            ? data.orders.filter((o: any) => (o.customerEmail || '').toLowerCase() === user.email.toLowerCase())
+            : data.orders;
+          setRecentOrders(filtered.slice(0, 3));
         }
       })
       .catch(() => {});
-  }, []);
+  }, [user?.email]);
 
   const handleSearch = async (queryToSearch?: string) => {
     const q = (queryToSearch || orderQuery).trim();
@@ -71,17 +80,32 @@ function TrackOrderContent() {
       const res = await fetch(`/api/orders/${encodeURIComponent(q)}`);
       const data = await res.json();
 
+      let targetOrder = null;
       if (res.ok && data.success && data.order) {
-        setOrder(data.order);
+        targetOrder = data.order;
       } else {
         // Try searching through list endpoint
         const listRes = await fetch(`/api/orders?search=${encodeURIComponent(q)}`);
         const listData = await listRes.json();
         if (listRes.ok && listData.success && listData.orders?.length > 0) {
-          setOrder(listData.orders[0]);
-        } else {
-          setError(data.error || 'Order not found. Please check your Order ID.');
+          targetOrder = listData.orders[0];
         }
+      }
+
+      if (targetOrder) {
+        // Authorization / Privacy Check:
+        if (isLoggedIn && user?.email) {
+          const ordEmail = (targetOrder.customerEmail || '').toLowerCase().trim();
+          const userEmail = (user.email || '').toLowerCase().trim();
+          if (ordEmail && userEmail && ordEmail !== userEmail) {
+            setError('No order found matching this Order ID for your account.');
+            setOrder(null);
+            return;
+          }
+        }
+        setOrder(targetOrder);
+      } else {
+        setError(data.error || 'Order not found. Please check your Order ID.');
       }
     } catch {
       setError('Unable to fetch tracking info. Please check your connection.');
@@ -345,28 +369,33 @@ function TrackOrderContent() {
             <div className="bg-white rounded-2xl border border-[#e8e2d8] p-5 shadow-2xs space-y-3">
               <h3 className="text-sm font-bold text-[#030303]">Ordered Items ({order.items.length})</h3>
               <div className="divide-y divide-[#f0ece5]">
-                {order.items.map((item: any, idx: number) => (
-                  <div key={idx} className="py-3 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-14 h-14 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0">
-                        <Image
-                          src={item.imageUrl || '/products/placeholder.svg'}
-                          alt={item.name}
-                          width={56}
-                          height={56}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
+                {order.items.map((item: any, idx: number) => {
+                  const prodHref = `/products/${item.productId || item.product || item.slug || item._id}`;
+                  return (
+                    <div key={idx} className="py-3 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Link href={prodHref} className="w-14 h-14 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
+                          <Image
+                            src={item.imageUrl || '/products/placeholder.svg'}
+                            alt={item.name}
+                            width={56}
+                            height={56}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        </Link>
+                        <div className="space-y-0.5 min-w-0">
+                          <Link href={prodHref} className="text-xs sm:text-sm font-bold text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block">
+                            {item.name}
+                          </Link>
+                          <p className="text-[11px] text-slate-500">Size: {item.size} • Qty: {item.quantity}</p>
+                        </div>
                       </div>
-                      <div className="space-y-0.5 min-w-0">
-                        <h4 className="text-xs sm:text-sm font-bold text-[#030303] truncate">{item.name}</h4>
-                        <p className="text-[11px] text-slate-500">Size: {item.size} • Qty: {item.quantity}</p>
-                      </div>
+                      <span className="text-xs font-bold text-slate-900">
+                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                      </span>
                     </div>
-                    <span className="text-xs font-bold text-slate-900">
-                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

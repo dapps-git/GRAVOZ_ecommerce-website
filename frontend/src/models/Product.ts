@@ -159,12 +159,8 @@ const ProductSchema = new Schema<IProduct>(
   { timestamps: true }
 );
 
-// Clear cached model in dev mode
-if (mongoose.models && mongoose.models.Product) {
-  delete (mongoose.models as any).Product;
-}
-
-const Product: Model<IProduct> = mongoose.model<IProduct>('Product', ProductSchema);
+const Product: Model<IProduct> =
+  mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
 
 export { Product };
 export default Product;
