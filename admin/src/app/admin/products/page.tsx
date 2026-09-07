@@ -533,7 +533,7 @@ export default function ProductsPage() {
                         <div className="flex items-center justify-center gap-1">
                           {/* View Live on Storefront */}
                           <Link
-                            href={`http://localhost:3000/products/${p.slug || p._id}`}
+                            href={`${process.env.NEXT_PUBLIC_STORE_URL || ''}/products/${p.slug || p._id}`}
                             target="_blank"
                             title="Preview on Store"
                             className="w-8 h-8 rounded-lg border border-slate-200 hover:border-[#89591C] hover:bg-[#faf4ec] text-slate-600 hover:text-[#89591C] flex items-center justify-center transition-colors cursor-pointer"

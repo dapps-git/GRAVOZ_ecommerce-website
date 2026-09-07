@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Admin } from '@/models/Admin';
-import { comparePassword, signAdminToken, setAdminAuthCookie } from '@/lib/auth';
+import { comparePassword, signAdminToken, signAdminRefreshToken, setAdminAuthCookie } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   // 1. Parse body
@@ -39,13 +39,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    const token = signAdminToken({
+    const adminPayload = {
       adminId: admin._id.toString(),
       email: admin.email,
       role: admin.role,
-    });
+    };
 
-    await setAdminAuthCookie(token);
+    const accessToken = signAdminToken(adminPayload);
+    const refreshToken = signAdminRefreshToken(adminPayload);
+
+    await setAdminAuthCookie(accessToken, refreshToken);
 
     return NextResponse.json({
       success: true,

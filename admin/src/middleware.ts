@@ -5,9 +5,9 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Protect all /admin routes except /admin/login
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
-    const adminToken = request.cookies.get('gravoz_admin_token')?.value;
+  const adminToken = request.cookies.get('gravoz_admin_token')?.value || request.cookies.get('gravoz_admin_refresh_token')?.value;
 
+  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     if (!adminToken) {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('callbackUrl', encodeURIComponent(pathname));
@@ -17,7 +17,6 @@ export function middleware(request: NextRequest) {
 
   // If visiting /admin/login while already logged in, redirect to /admin/dashboard
   if (pathname === '/admin/login') {
-    const adminToken = request.cookies.get('gravoz_admin_token')?.value;
     if (adminToken) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
