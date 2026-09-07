@@ -73,11 +73,28 @@ export async function GET(req: NextRequest) {
       ]);
     }
 
-    const formattedProducts = (dbProducts || []).map((p: any) => ({
-      ...p,
-      brand: typeof p.brand === 'object' && p.brand !== null ? (p.brand.name || 'GRAVOZ') : (p.brand || 'GRAVOZ'),
-      brandDetails: typeof p.brand === 'object' ? p.brand : null,
-    }));
+    // Fetch all categories for fallback ID resolution if needed
+    const allCategories = await Category.find({}).select('name slug _id').lean();
+    const catMap = new Map(allCategories.map((c: any) => [String(c._id), c.name]));
+
+    const formattedProducts = (dbProducts || []).map((p: any) => {
+      let catName = 'Footwear';
+      if (typeof p.category === 'object' && p.category !== null && p.category.name) {
+        catName = p.category.name;
+      } else if (p.category) {
+        catName = catMap.get(String(p.category)) || p.subCategory || 'Footwear';
+      } else if (p.subCategory) {
+        catName = p.subCategory;
+      }
+
+      return {
+        ...p,
+        category: catName,
+        categoryDetails: typeof p.category === 'object' ? p.category : null,
+        brand: typeof p.brand === 'object' && p.brand !== null ? (p.brand.name || 'GRAVOZ') : (p.brand || 'GRAVOZ'),
+        brandDetails: typeof p.brand === 'object' ? p.brand : null,
+      };
+    });
 
     return NextResponse.json(
       {

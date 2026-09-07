@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -45,6 +45,7 @@ interface ProductItem {
 
 interface CategoryOption {
   _id: string;
+  key?: string;
   name?: string;
   title?: string;
   slug?: string;
@@ -181,32 +182,60 @@ function ProductsContent() {
     router.push('/products');
   };
 
+  // Helper to resolve category ID or slug to human-friendly name
+  const resolveCategoryName = useCallback((cat: string) => {
+    if (!cat) return '';
+    const clean = cat.trim();
+    const matched = dbCategories.find(
+      (c) =>
+        c._id === clean ||
+        (c.key && c.key.toLowerCase() === clean.toLowerCase()) ||
+        (c.name && c.name.toLowerCase() === clean.toLowerCase()) ||
+        (c.title && c.title.toLowerCase() === clean.toLowerCase()) ||
+        (c.slug && c.slug.toLowerCase() === clean.toLowerCase())
+    );
+    if (matched) return matched.name || matched.title || clean;
+    if (/^[0-9a-fA-F]{24}$/.test(clean)) {
+      return '';
+    }
+    return clean;
+  }, [dbCategories]);
+
+  const displayCategory = useMemo(() => resolveCategoryName(selectedCategory), [selectedCategory, resolveCategoryName]);
+
   // Extract REAL categories from actual products and DB
   const realCategories = useMemo(() => {
     const map = new Map<string, number>();
 
+    // 1. Seed with DB Categories
+    dbCategories.forEach((c) => {
+      const cName = (c?.name || c?.title || '').trim();
+      if (cName && !/^[0-9a-fA-F]{24}$/.test(cName)) {
+        map.set(cName, 0);
+      }
+    });
+
+    // 2. Count from Products
     products.forEach((p) => {
-      const catName =
-        (typeof p.category === 'object' && p.category !== null ? p.category.name : p.category) ||
-        p.subCategory ||
-        '';
-      if (catName && typeof catName === 'string' && catName.trim()) {
+      let catName = '';
+      if (typeof p.category === 'object' && p.category !== null && p.category.name) {
+        catName = p.category.name;
+      } else if (typeof p.category === 'string' && p.category.trim()) {
+        catName = resolveCategoryName(p.category) || p.subCategory || '';
+      } else if (p.subCategory) {
+        catName = p.subCategory;
+      }
+
+      if (catName && typeof catName === 'string' && !/^[0-9a-fA-F]{24}$/.test(catName)) {
         const clean = catName.trim();
         map.set(clean, (map.get(clean) || 0) + 1);
       }
     });
 
-    dbCategories.forEach((c) => {
-      const cName = (c?.name || c?.title || '').trim();
-      if (cName && !map.has(cName)) {
-        map.set(cName, 0);
-      }
-    });
-
     return Array.from(map.entries())
-      .filter(([name]) => Boolean(name && typeof name === 'string' && name.trim()))
+      .filter(([name]) => Boolean(name && typeof name === 'string' && name.trim() && !/^[0-9a-fA-F]{24}$/.test(name)))
       .map(([name, count]) => ({ name, count }));
-  }, [products, dbCategories]);
+  }, [products, dbCategories, resolveCategoryName]);
 
   // Extract REAL brands from actual products
   const realBrands = useMemo(() => {
@@ -413,8 +442,8 @@ function ProductsContent() {
     selectedColors.length +
     (priceRange < 4000 ? 1 : 0);
 
-  const pageTitle = selectedCategory
-    ? selectedCategory.toUpperCase()
+  const pageTitle = (displayCategory || selectedCategory)
+    ? (displayCategory || selectedCategory).toUpperCase()
     : selectedAudience
       ? `${selectedAudience.toUpperCase()}'S FOOTWEAR`
       : qParam
@@ -434,10 +463,10 @@ function ProductsContent() {
           <Link href="/products" className="hover:text-[#89591C] transition-colors truncate">
             {selectedAudience ? `${selectedAudience}'s Footwear` : 'Discover Footwear'}
           </Link>
-          {selectedCategory && (
+          {(displayCategory || selectedCategory) && (
             <>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-              <span className="text-[#89591C] font-semibold truncate">{selectedCategory}</span>
+              <span className="text-[#89591C] font-semibold truncate">{displayCategory || selectedCategory}</span>
             </>
           )}
         </nav>
@@ -445,8 +474,8 @@ function ProductsContent() {
         {/* ── Mobile Title & Product Count (Desktop has heading inside product grid) ── */}
         <div className="lg:hidden pt-1 pb-1">
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#030303]">
-            {selectedCategory
-              ? `${selectedCategory} Footwear`
+            {(displayCategory || selectedCategory)
+              ? `${displayCategory || selectedCategory} Footwear`
               : selectedAudience
                 ? `${selectedAudience}'s Footwear`
                 : 'All Footwear'}
@@ -514,7 +543,8 @@ function ProductsContent() {
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">Categories</h4>
                   <div className="flex flex-wrap gap-2">
                     {realCategories.map((c) => {
-                      const isSelected = (selectedCategory || '').toLowerCase() === (c.name || '').toLowerCase();
+                      const isSelected =
+                        (displayCategory || selectedCategory || '').trim().toLowerCase() === (c.name || '').trim().toLowerCase();
                       return (
                         <button
                           key={c.name}
@@ -628,7 +658,7 @@ function ProductsContent() {
                 <div className="space-y-0.5">
                   {realCategories.map((cat) => {
                     const isSelected =
-                      (selectedCategory || '').trim().toLowerCase() === (cat.name || '').trim().toLowerCase();
+                      (displayCategory || selectedCategory || '').trim().toLowerCase() === (cat.name || '').trim().toLowerCase();
                     return (
                       <button
                         key={cat.name}

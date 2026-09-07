@@ -10,10 +10,12 @@ export async function GET(_req: NextRequest) {
       success: true,
       categories: (categories || []).map((c: any) => ({
         _id: String(c._id),
-        key: c.slug || c._id,
+        key: c.slug || c.name,
+        name: c.name,
         title: c.name,
+        slug: c.slug || c.name.toLowerCase().replace(/\s+/g, '-'),
         targetAudience: c.targetAudience,
-        href: `/products?category=${c.slug || c._id}`,
+        href: `/products?category=${encodeURIComponent(c.name)}`,
         imageUrl: c.image || '/products/placeholder.svg',
       })),
     });
