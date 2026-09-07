@@ -11,9 +11,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
 
     let order = null;
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    if (/^[0-9a-fA-F]{24}$/.test(id)) {
       order = await Order.findById(id).lean();
-    } else {
+    }
+    if (!order) {
       order = await Order.findOne({ orderNumber: id }).lean();
     }
 
@@ -38,9 +39,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     await connectDB();
 
     let order = null;
-    if (mongoose.Types.ObjectId.isValid(id)) {
+    if (/^[0-9a-fA-F]{24}$/.test(id)) {
       order = await Order.findById(id);
-    } else {
+    }
+    if (!order) {
       order = await Order.findOne({ orderNumber: id });
     }
 

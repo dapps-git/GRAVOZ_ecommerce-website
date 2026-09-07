@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
-import { comparePassword, signUserToken, setUserAuthCookie } from '@/lib/auth';
+import { comparePassword, signUserToken, signUserRefreshToken, setUserAuthCookie } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,16 +49,18 @@ export async function POST(req: NextRequest) {
     });
     await customer.save();
 
-    // Sign 2-week JWT token
-    const token = signUserToken({
+    // Sign JWT tokens (2-day access token and 24-day refresh token)
+    const userPayload = {
       userId: customer._id.toString(),
       email: customer.email,
       name: customer.name,
       tier: customer.tier,
-    });
+    };
+    const accessToken = signUserToken(userPayload);
+    const refreshToken = signUserRefreshToken(userPayload);
 
-    // Set 2-week httpOnly cookie
-    await setUserAuthCookie(token);
+    // Set secure httpOnly cookies
+    await setUserAuthCookie(accessToken, refreshToken);
 
     return NextResponse.json({
       success: true,

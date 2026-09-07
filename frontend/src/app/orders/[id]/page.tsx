@@ -26,6 +26,7 @@ import {
   X,
   ChevronRight,
   Sparkles,
+  FileText,
 } from 'lucide-react';
 
 import { useUser } from '@/context/UserContext';
@@ -300,12 +301,21 @@ export default function OrderTrackingPage() {
             </p>
           </div>
 
-          <a
-            href="mailto:gravozcontact@gmail.com"
-            className="text-xs font-medium text-[#8A5B2A] hover:underline flex items-center gap-1 mt-1 cursor-pointer"
-          >
-            <span>Need Help?</span>
-          </a>
+          <div className="flex items-center gap-3 mt-1">
+            <Link
+              href={`/orders/${order._id}/invoice`}
+              target="_blank"
+              className="text-xs font-semibold text-slate-700 hover:text-[#8A5B2A] bg-white border border-[#E5E1DC] px-3 py-1.5 rounded-lg shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5 text-[#8A5B2A]" /> Invoice
+            </Link>
+            <a
+              href="mailto:gravozcontact@gmail.com"
+              className="text-xs font-medium text-[#8A5B2A] hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <span>Need Help?</span>
+            </a>
+          </div>
         </div>
 
         {/* ── STANDARD DELIVERY STEPPER BAR (When Not In Return Flow) ── */}

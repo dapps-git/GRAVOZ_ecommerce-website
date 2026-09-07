@@ -25,6 +25,7 @@ import {
   X,
   Loader2,
   Truck,
+  FileText,
 } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
@@ -93,6 +94,56 @@ export default function ProfilePage() {
   const [reviewMedia, setReviewMedia] = useState<{ url: string; type: string }[]>([]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
+
+  // Security / Password Update State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    if (!currentPassword || !newPassword) {
+      setPasswordError('Please fill in current and new password');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    setUpdatingPassword(true);
+    try {
+      const res = await fetch('/api/auth/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+          confirmPassword: confirmNewPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setPasswordError(data.error || 'Failed to update password');
+      } else {
+        showToast('Password updated successfully!');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+      }
+    } catch {
+      setPasswordError('Network error while updating password');
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
 
   const fetchUserOrders = async () => {
     if (!user?.email) return;
@@ -500,6 +551,14 @@ export default function ProfilePage() {
                                 return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 capitalize">{st.replace(/_/g, ' ')}</span>;
                               })()}
                               <Link
+                                href={`/orders/${ord._id}/invoice`}
+                                target="_blank"
+                                className="px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium rounded-lg border border-[#E5E1DC] transition-colors flex items-center gap-1 cursor-pointer"
+                                title="Download / Print Tax Invoice"
+                              >
+                                <FileText className="w-3 h-3 text-[#8A5B2A]" /> Invoice
+                              </Link>
+                              <Link
                                 href={`/orders/${ord._id}`}
                                 className="px-3 py-1 bg-[#FAF7F3] hover:bg-[#F6E9D7]/50 text-[#8A5B2A] text-[11px] font-medium rounded-lg border border-[#E5E1DC] transition-colors"
                               >
@@ -770,18 +829,48 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-bold text-[#030303] font-sansation">Account Security</h3>
                   <p className="text-xs text-slate-500 font-sansation">Update password and manage security settings</p>
                 </div>
-                <form onSubmit={(e) => { e.preventDefault(); showToast('Password updated!'); }} className="space-y-4 font-sansation">
+                <form onSubmit={handleUpdatePassword} className="space-y-4 font-sansation">
+                  {passwordError && (
+                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
+                      {passwordError}
+                    </div>
+                  )}
                   <div>
-                    <input type="password" placeholder="Current Password" className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]" required />
+                    <input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Current Password"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]"
+                      required
+                    />
                   </div>
                   <div>
-                    <input type="password" placeholder="New Password" className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]" required />
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="New Password (min 6 chars)"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]"
+                      required
+                    />
                   </div>
                   <div>
-                    <input type="password" placeholder="Confirm New Password" className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]" required />
+                    <input
+                      type="password"
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      placeholder="Confirm New Password"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]"
+                      required
+                    />
                   </div>
-                  <button type="submit" className="w-full sm:w-auto bg-black hover:bg-neutral-800 text-white text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full transition-colors text-center">
-                    Update Password
+                  <button
+                    type="submit"
+                    disabled={updatingPassword}
+                    className="w-full sm:w-auto bg-[#030303] hover:bg-[#89591C] disabled:bg-slate-300 text-white text-xs sm:text-sm font-semibold px-6 py-2.5 rounded-full transition-colors text-center cursor-pointer"
+                  >
+                    {updatingPassword ? 'Updating...' : 'Update Password'}
                   </button>
                 </form>
               </div>
