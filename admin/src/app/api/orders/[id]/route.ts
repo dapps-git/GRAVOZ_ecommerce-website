@@ -23,20 +23,30 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     const params = await props.params;
     await connectDB();
     const body = await req.json();
-    const { orderStatus, paymentStatus } = body;
+    const { orderStatus, paymentStatus, location, note } = body;
 
-    const updateFields: Record<string, unknown> = {};
-    if (orderStatus) updateFields.orderStatus = orderStatus;
-    if (paymentStatus) updateFields.paymentStatus = paymentStatus;
-
-    const updatedOrder = await Order.findByIdAndUpdate(params.id, { $set: updateFields }, { new: true });
-
-    if (!updatedOrder) {
+    const existingOrder = await Order.findById(params.id);
+    if (!existingOrder) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
+    if (orderStatus) existingOrder.orderStatus = orderStatus;
+    if (paymentStatus) existingOrder.paymentStatus = paymentStatus;
+    if (location !== undefined && location.trim()) existingOrder.currentLocation = location.trim();
+
+    if (orderStatus) {
+      if (!existingOrder.statusHistory) existingOrder.statusHistory = [];
+      existingOrder.statusHistory.push({
+        status: orderStatus,
+        timestamp: new Date(),
+        location: location ? location.trim() : (existingOrder.currentLocation || ''),
+        note: note ? note.trim() : `Status updated to ${orderStatus}`,
+      });
+    }
+
+    await existingOrder.save();
     await invalidateCache('admin:dashboard:stats');
-    return NextResponse.json({ success: true, order: updatedOrder });
+    return NextResponse.json({ success: true, order: existingOrder });
   } catch (error: unknown) {
     const err = error as Error;
     return NextResponse.json({ error: err.message || 'Failed to update order status' }, { status: 500 });

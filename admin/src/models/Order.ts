@@ -11,6 +11,7 @@ export interface IOrderItem {
   originalPrice?: number;
   imageUrl?: string;
   image?: string;
+  noReturnRefundExchange?: boolean;
 }
 
 export interface IShippingAddress {
@@ -33,12 +34,14 @@ export interface IOrderCustomer {
 export interface IStatusHistory {
   status: string;
   timestamp: Date;
+  location?: string;
   note?: string;
 }
 
 export interface IOrder extends Document {
   orderNumber: string;
   customerId?: string;
+  currentLocation?: string;
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
@@ -113,6 +116,7 @@ const OrderItemSchema = new Schema<IOrderItem>(
     originalPrice: { type: Number },
     imageUrl: { type: String },
     image: { type: String },
+    noReturnRefundExchange: { type: Boolean, default: false },
   },
   { _id: false }
 );
@@ -124,7 +128,7 @@ const ShippingAddressSchema = new Schema<IShippingAddress>(
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    postalCode: { type: String, default: '600040' },
+    postalCode: { type: String, required: true },
     country: { type: String, default: 'India' },
   },
   { _id: false }
@@ -134,6 +138,7 @@ const StatusHistorySchema = new Schema<IStatusHistory>(
   {
     status: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
+    location: { type: String, default: '' },
     note: { type: String, default: '' },
   },
   { _id: false }
@@ -143,6 +148,7 @@ const OrderSchema: Schema<IOrder> = new Schema(
   {
     orderNumber: { type: String, required: true, unique: true, index: true },
     customerId: { type: String, default: '', index: true },
+    currentLocation: { type: String, default: '' },
     customerName: { type: String },
     customerEmail: { type: String, index: true },
     customerPhone: { type: String },

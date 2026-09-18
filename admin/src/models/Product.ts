@@ -69,6 +69,7 @@ export interface IProduct extends Document {
   isFeatured: boolean;
   isLatest?: boolean;
   badge?: string;
+  noReturnRefundExchange?: boolean;
   status: 'active' | 'draft' | 'archived';
   rating?: number;
   reviewsCount?: number;
@@ -160,6 +161,7 @@ const ProductSchema = new Schema<IProduct>(
     isFeatured: { type: Boolean, default: false, index: true },
     isLatest: { type: Boolean, default: false, index: true },
     badge: { type: String, default: '' },
+    noReturnRefundExchange: { type: Boolean, default: false, index: true },
     status: { type: String, default: 'active', enum: ['active', 'draft', 'archived'] },
     rating: { type: Number, default: 5.0 },
     reviewsCount: { type: Number, default: 0 },

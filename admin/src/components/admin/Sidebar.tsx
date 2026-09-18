@@ -21,6 +21,7 @@ import {
   ImageIcon,
   LayoutGrid,
   TicketPercent,
+  PackagePlus,
 } from 'lucide-react';
 
 const menuItems = [
@@ -31,6 +32,7 @@ const menuItems = [
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
   { name: 'Brands', href: '/admin/brands', icon: Tag },
   { name: 'Coupons', href: '/admin/coupons', icon: TicketPercent },
+  { name: 'Add-Ons', href: '/admin/addons', icon: PackagePlus },
   { name: 'Users', href: '/admin/users', icon: UserCheck },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'Stock Control', href: '/admin/stock', icon: Boxes },

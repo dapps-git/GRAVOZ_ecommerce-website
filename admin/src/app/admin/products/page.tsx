@@ -32,6 +32,7 @@ interface ProductItem {
   discountPrice?: number;
   stock: number;
   isBestSeller: boolean;
+  noReturnRefundExchange?: boolean;
   images: Array<{ url: string; alt?: string }>;
   colors?: string[];
   colorVariants?: Array<{ name: string; colorCode?: string }>;
@@ -460,6 +461,13 @@ export default function ProductsPage() {
                             <h4 className="font-bold text-slate-900 text-xs uppercase tracking-tight truncate hover:text-[#89591C] transition-colors">
                               <Link href={`/admin/products/${p._id}/edit`}>{p.name}</Link>
                             </h4>
+                            {p.noReturnRefundExchange && (
+                              <div className="pt-0.5">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wide">
+                                  No Return / Refund
+                                </span>
+                              </div>
+                            )}
                             <p className="text-[11px] text-slate-400 font-normal truncate">
                               {colorNames}
                             </p>

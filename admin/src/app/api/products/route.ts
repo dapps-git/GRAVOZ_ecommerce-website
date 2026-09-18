@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
     const products = await Product.find(query)
       .populate('category', 'name slug targetAudience')
       .populate('brand', 'name')
-      .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured status createdAt')
+      .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured noReturnRefundExchange status createdAt')
       .sort(sortOptions)
       .skip(skip)
       .limit(limit)
@@ -158,6 +158,7 @@ export async function POST(req: NextRequest) {
       isFeatured,
       isLatest,
       badge,
+      noReturnRefundExchange,
       status,
       seo,
     } = body;
@@ -221,6 +222,7 @@ export async function POST(req: NextRequest) {
       isFeatured: Boolean(isFeatured),
       isLatest: Boolean(isLatest),
       badge: badge || '',
+      noReturnRefundExchange: Boolean(noReturnRefundExchange),
       status: status || 'draft',
     });
 

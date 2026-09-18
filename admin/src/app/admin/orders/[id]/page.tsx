@@ -3,8 +3,15 @@
 import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import StatusBadge from '@/components/admin/StatusBadge';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, MapPin, Clock, CheckCircle2, Truck } from 'lucide-react';
 import Link from 'next/link';
+
+export interface StatusHistoryItem {
+  status: string;
+  timestamp: string;
+  location?: string;
+  note?: string;
+}
 
 interface OrderDetail {
   _id: string;
@@ -12,6 +19,8 @@ interface OrderDetail {
   customerName?: string;
   customerEmail?: string;
   customerPhone?: string;
+  currentLocation?: string;
+  statusHistory?: StatusHistoryItem[];
   customer?: {
     name?: string;
     email?: string;
@@ -53,29 +62,51 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
+  // Status & Location inputs
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [locationInput, setLocationInput] = useState('');
+  const [statusNote, setStatusNote] = useState('');
+  const [updateSuccessMsg, setUpdateSuccessMsg] = useState('');
+
   useEffect(() => {
     fetch(`/api/orders/${resolvedParams.id}`)
       .then((res) => res.json())
-      .then((data) => setOrder(data))
+      .then((data) => {
+        if (data) {
+          setOrder(data);
+          setSelectedStatus(data.orderStatus || 'ordered');
+          setLocationInput(data.currentLocation || '');
+        }
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, [resolvedParams.id]);
 
-  const handleUpdateStatus = async (newStatus: string) => {
+  const handleUpdateStatusAndLocation = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!selectedStatus) return;
     setUpdating(true);
+    setUpdateSuccessMsg('');
     try {
       const res = await fetch(`/api/orders/${resolvedParams.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderStatus: newStatus }),
+        body: JSON.stringify({
+          orderStatus: selectedStatus,
+          location: locationInput.trim(),
+          note: statusNote.trim(),
+        }),
       });
 
       const data = await res.json();
       if (res.ok && data.order) {
         setOrder(data.order);
+        setStatusNote('');
+        setUpdateSuccessMsg('Status & Location updated successfully!');
+        setTimeout(() => setUpdateSuccessMsg(''), 4000);
       }
     } catch (err) {
-      console.error('Failed to update status:', err);
+      console.error('Failed to update status & location:', err);
     } finally {
       setUpdating(false);
     }
@@ -134,43 +165,105 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       {/* Header Banner */}
       <div className="bg-white rounded-3xl p-6 border border-[#e8e2d8] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-bold text-slate-900">{order.orderNumber}</h1>
             <StatusBadge status={order.orderStatus} />
             <StatusBadge status={order.paymentStatus} />
+            {order.currentLocation && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-[#FFF9F2] text-[#8B4A12] border border-[#F5C78E] px-2.5 py-1 rounded-full shadow-2xs">
+                <MapPin className="w-3.5 h-3.5 text-[#8B4A12]" />
+                <span>{order.currentLocation}</span>
+              </span>
+            )}
           </div>
           <p className="text-xs text-slate-500 mt-1 font-normal">
             Placed on {new Date(order.createdAt).toLocaleString('en-IN')} via {order.paymentMethod || 'COD'}
           </p>
         </div>
+      </div>
 
-        {/* Status Actions */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-700 font-semibold">Status:</span>
-          <select
-            value={order.orderStatus}
-            disabled={updating}
-            onChange={(e) => handleUpdateStatus(e.target.value)}
-            className="bg-[#faf8f5] border border-[#e8e2d8] rounded-2xl px-3.5 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#89591C]"
-          >
-            <option value="ordered">Ordered</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="out_for_delivery">Out for Delivery</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="return_requested">Return Requested</option>
-            <option value="under_review">Under Review</option>
-            <option value="return_approved">Approved (Return Accepted)</option>
-            <option value="pickup_scheduled">Pickup Scheduled</option>
-            <option value="return_received">Received at Hub</option>
-            <option value="refund_initiated">Refund Initiated</option>
-            <option value="refunded">Refunded</option>
-            <option value="returned">Returned</option>
-            <option value="return_rejected">Return Rejected</option>
-          </select>
+      {/* Dedicated Status & Location Update Manager */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#e8e2d8] shadow-sm space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e8e2d8] pb-3">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-[#89591C]" />
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              Update Order Status &amp; Hub Location
+            </h3>
+          </div>
+          {updateSuccessMsg && (
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 animate-in fade-in">
+              ✓ {updateSuccessMsg}
+            </span>
+          )}
         </div>
+
+        <form onSubmit={handleUpdateStatusAndLocation} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+          <div className="sm:col-span-4 space-y-1">
+            <label className="block text-[11px] font-semibold text-slate-700">Order Status *</label>
+            <select
+              value={selectedStatus}
+              disabled={updating}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#89591C]"
+            >
+              <option value="ordered">Ordered (Placed)</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="out_for_delivery">Out for Delivery</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="return_requested">Return Requested</option>
+              <option value="under_review">Under Review</option>
+              <option value="return_approved">Approved (Return Accepted)</option>
+              <option value="pickup_scheduled">Pickup Scheduled</option>
+              <option value="return_received">Received at Hub</option>
+              <option value="refund_initiated">Refund Initiated</option>
+              <option value="refunded">Refunded</option>
+              <option value="returned">Returned</option>
+              <option value="return_rejected">Return Rejected</option>
+            </select>
+          </div>
+
+          <div className="sm:col-span-4 space-y-1">
+            <label className="block text-[11px] font-semibold text-slate-700">
+              Current Location (Hub / City / Facility)
+            </label>
+            <input
+              type="text"
+              value={locationInput}
+              disabled={updating}
+              onChange={(e) => setLocationInput(e.target.value)}
+              placeholder="e.g. Mumbai Sorting Hub, Kochi Facility"
+              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+            />
+          </div>
+
+          <div className="sm:col-span-3 space-y-1">
+            <label className="block text-[11px] font-semibold text-slate-700">
+              Tracking Remarks (Optional)
+            </label>
+            <input
+              type="text"
+              value={statusNote}
+              disabled={updating}
+              onChange={(e) => setStatusNote(e.target.value)}
+              placeholder="e.g. Dispatched via Bluedart"
+              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+            />
+          </div>
+
+          <div className="sm:col-span-1">
+            <button
+              type="submit"
+              disabled={updating}
+              className="w-full py-2 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-60 flex items-center justify-center gap-1"
+            >
+              {updating ? '...' : 'Save'}
+            </button>
+          </div>
+        </form>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

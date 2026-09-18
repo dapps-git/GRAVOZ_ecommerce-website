@@ -116,6 +116,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [isTopSeller, setIsTopSeller] = useState(false);
   const [isLatest, setIsLatest] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
+  const [noReturnRefundExchange, setNoReturnRefundExchange] = useState(false);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
   const [keywordsStr, setKeywordsStr] = useState('');
@@ -198,6 +199,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           setIsTopSeller(Boolean(p.isTopSeller));
           setIsFeatured(Boolean(p.isFeatured));
           setIsLatest(Boolean(p.isLatest));
+          setNoReturnRefundExchange(Boolean(p.noReturnRefundExchange));
           setStatus(p.status || 'active');
 
           if (Array.isArray(p.sizes) && p.sizes.length > 0) {
@@ -469,6 +471,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           isTopSeller,
           isFeatured,
           isLatest,
+          noReturnRefundExchange,
           status: targetStatus,
           seo: {
             metaTitle: metaTitle || name,
@@ -1228,6 +1231,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     />
                     <div>
                       <span className="text-xs font-medium text-slate-900 block">Featured</span>
+                    </div>
+                  </label>
+
+                  <label className={`p-3 rounded-xl border flex items-center gap-2.5 cursor-pointer ${noReturnRefundExchange ? 'bg-[#fff5f5] border-[#e53e3e]' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
+                    <input
+                      type="checkbox"
+                      checked={noReturnRefundExchange}
+                      onChange={(e) => setNoReturnRefundExchange(e.target.checked)}
+                      className="w-4 h-4 rounded text-[#e53e3e] focus:ring-0"
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-rose-900 block">No Return / Refund / Exchange</span>
+                      <span className="text-[10px] text-rose-600 font-medium">Final Sale / Clearance Old Stock Policy</span>
                     </div>
                   </label>
                 </div>
