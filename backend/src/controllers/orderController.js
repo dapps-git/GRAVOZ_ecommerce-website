@@ -43,14 +43,14 @@ exports.placeOrder = async (req, res) => {
       (shippingAddress.pinCode && String(shippingAddress.pinCode).trim()) ||
       (shippingAddress.pincode && String(shippingAddress.pincode).trim()) ||
       (typeof shippingAddress.street === 'string' && (shippingAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
-      '600040';
+      '';
 
     const sanitizedAddress = {
       name: shippingAddress.name || customerName || 'Customer',
       phone: shippingAddress.phone || customerPhone || '',
-      street: shippingAddress.street || shippingAddress.address || 'Street Address',
-      city: shippingAddress.city || 'Chennai',
-      state: shippingAddress.state || 'Tamil Nadu',
+      street: shippingAddress.street || shippingAddress.address || '',
+      city: shippingAddress.city || '',
+      state: shippingAddress.state || '',
       postalCode: cleanPostalCode,
       country: shippingAddress.country || 'India',
     };
@@ -131,7 +131,7 @@ exports.getOrderById = async (req, res) => {
 // ── PATCH /api/orders/:id/status ─────────────────────────────────────────────
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { status, note, returnReason, returnDescription, returnImages } = req.body;
+    const { status, note, returnReason, returnDescription, returnImages, location } = req.body;
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found' });
 
@@ -146,6 +146,9 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     order.orderStatus = status;
+    if (location !== undefined && location.trim()) {
+      order.currentLocation = location.trim();
+    }
 
     if (status === 'return_requested') {
       order.returnDetails = {
@@ -182,7 +185,12 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     if (!order.statusHistory) order.statusHistory = [];
-    order.statusHistory.push({ status, timestamp: new Date(), note: note || '' });
+    order.statusHistory.push({
+      status,
+      timestamp: new Date(),
+      note: note || '',
+      location: location ? location.trim() : (order.currentLocation || ''),
+    });
     await order.save();
 
     res.json({ success: true, order });

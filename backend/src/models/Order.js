@@ -21,7 +21,7 @@ const AddressSchema = new mongoose.Schema(
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    postalCode: { type: String, default: '600040' },
+    postalCode: { type: String, required: true },
     country: { type: String, default: 'India' },
   },
   { _id: false }
@@ -31,6 +31,7 @@ const StatusHistorySchema = new mongoose.Schema(
   {
     status: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
+    location: { type: String, default: '' },
     note: { type: String, default: '' },
   },
   { _id: false }
@@ -40,6 +41,7 @@ const OrderSchema = new mongoose.Schema(
   {
     orderNumber: { type: String, required: true, unique: true, index: true },
     customerId: { type: String, index: true }, // matches Customer._id string
+    currentLocation: { type: String, default: '' },
     customerEmail: { type: String, required: true, index: true },
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },

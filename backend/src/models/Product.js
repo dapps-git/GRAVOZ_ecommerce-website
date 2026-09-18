@@ -83,6 +83,7 @@ const ProductSchema = new mongoose.Schema(
     isFeatured: { type: Boolean, default: false, index: true },
     isLatest: { type: Boolean, default: false, index: true },
     badge: { type: String, default: '' },
+    noReturnRefundExchange: { type: Boolean, default: false, index: true },
     status: { type: String, default: 'active', enum: ['active', 'draft', 'archived'] },
   },
   { timestamps: true }
