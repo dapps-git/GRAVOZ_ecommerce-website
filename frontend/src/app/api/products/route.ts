@@ -53,8 +53,8 @@ export async function GET(req: NextRequest) {
     try {
       [dbProducts, total] = await Promise.all([
         Product.find(query)
-          .populate({ path: 'category', select: 'name slug targetAudience', strictPopulate: false })
-          .populate({ path: 'brand', select: 'name slug logoUrl', strictPopulate: false })
+          .populate({ path: 'category', select: 'name slug targetAudience', model: Category, strictPopulate: false })
+          .populate({ path: 'brand', select: 'name slug logoUrl', model: Brand, strictPopulate: false })
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)

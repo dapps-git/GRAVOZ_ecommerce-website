@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
+import { Referral } from '@/models/Referral';
 import { signUserToken, setUserAuthCookie, generateReferralCode } from '@/lib/auth';
 
 // Helper to decode JWT payload safely
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { credential, googleId, email, name, avatarUrl } = body;
+    const { credential, googleId, email, name, avatarUrl, referralCode: inputRefCode } = body;
 
     let userEmail = email;
     let userName = name;
@@ -91,6 +92,15 @@ export async function POST(req: NextRequest) {
         attempts++;
       }
 
+      let referrerCustomer: any = null;
+      if (inputRefCode && typeof inputRefCode === 'string') {
+        const cleanRef = inputRefCode.trim().toUpperCase();
+        referrerCustomer = await Customer.findOne({ referralCode: cleanRef, isActive: true });
+        if (referrerCustomer && referrerCustomer.email.toLowerCase().trim() === normalizedEmail) {
+          referrerCustomer = null; // Prevent self-referral
+        }
+      }
+
       customer = await Customer.create({
         name: userName || 'Customer',
         email: normalizedEmail,
@@ -99,17 +109,41 @@ export async function POST(req: NextRequest) {
         authProvider: 'google',
         isEmailVerified: true,
         referralCode,
+        referredBy: referrerCustomer ? referrerCustomer._id.toString() : '',
+        referralCodeUsed: referrerCustomer ? referrerCustomer.referralCode : '',
+        referralDiscountBalance: 0,
+        hasUsedReferralDiscount: false,
         rewardPoints: 50, // 50 Welcome bonus points
         tier: 'Silver',
         activityLogs: [
           {
             action: 'Account Created',
-            details: 'User registered via Google OAuth',
+            details: referrerCustomer
+              ? `User registered with referral code ${referrerCustomer.referralCode} via Google`
+              : 'User registered via Google OAuth',
             timestamp: new Date(),
           },
         ],
         lastLogin: new Date(),
       });
+
+      if (referrerCustomer) {
+        try {
+          await Referral.create({
+            referrer: referrerCustomer._id,
+            referredUser: customer._id,
+            referralCode: referrerCustomer.referralCode,
+            status: 'pending',
+            referredDiscountPercent: 15,
+            referredDiscountUsed: false,
+            referrerDiscountAmount: 100,
+            referrerDiscountAvailable: false,
+            referrerDiscountUsed: false,
+          });
+        } catch (rErr) {
+          console.warn('Google auth referral creation error:', rErr);
+        }
+      }
     }
 
     // Sign 2-week persistent JWT session
@@ -134,6 +168,10 @@ export async function POST(req: NextRequest) {
         avatarUrl: customer.avatarUrl,
         rewardPoints: customer.rewardPoints,
         referralCode: customer.referralCode,
+        referralDiscountBalance: customer.referralDiscountBalance || 0,
+        hasUsedReferralDiscount: customer.hasUsedReferralDiscount || false,
+        referredBy: customer.referredBy || '',
+        referralCodeUsed: customer.referralCodeUsed || '',
         tier: customer.tier,
         authProvider: customer.authProvider,
       },

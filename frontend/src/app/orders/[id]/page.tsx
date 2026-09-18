@@ -284,6 +284,63 @@ export default function OrderTrackingPage() {
   const activeStepIdx = stepIndexMap[orderStatus] ?? 0;
   const currentStepDef = STEP_DEFINITIONS[activeStepIdx] || STEP_DEFINITIONS[0];
 
+  // Helper to extract timestamp and location for each status step
+  const getStepStatusMeta = (stepKey: string, stepIdx: number) => {
+    if (!order) return { dateStr: null, location: null };
+
+    const matchingStatuses: Record<string, string[]> = {
+      ordered: ['ordered'],
+      confirmed: ['confirmed', 'processing'],
+      shipped: ['shipped'],
+      out_for_delivery: ['out_for_delivery'],
+      delivered: ['delivered'],
+    };
+
+    const targets = matchingStatuses[stepKey] || [stepKey];
+    const history: any[] = Array.isArray(order.statusHistory) ? order.statusHistory : [];
+    const entry = [...history].reverse().find((h) => targets.includes(h.status));
+
+    let timestamp = entry?.timestamp;
+    let location = entry?.location || '';
+
+    if (stepKey === 'ordered' && !timestamp && order.createdAt) {
+      timestamp = order.createdAt;
+    }
+
+    if (stepIdx === activeStepIdx && !location && order.currentLocation) {
+      location = order.currentLocation;
+    }
+
+    if (!timestamp && stepIdx <= activeStepIdx) {
+      if (stepIdx === 0 && order.createdAt) {
+        timestamp = order.createdAt;
+      } else if (stepIdx === activeStepIdx && order.updatedAt) {
+        timestamp = order.updatedAt;
+      }
+    }
+
+    if (!timestamp) return { dateStr: null, location: location || null };
+
+    try {
+      const d = new Date(timestamp);
+      if (isNaN(d.getTime())) return { dateStr: null, location: location || null };
+      const dateStr =
+        d.toLocaleDateString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+        }) +
+        ', ' +
+        d.toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+      return { dateStr, location: location || null };
+    } catch {
+      return { dateStr: null, location: location || null };
+    }
+  };
+
   const isPhotoPromptReason = selectedReason === 'Product Damaged' || selectedReason === 'Received Wrong Product';
 
   return (
@@ -335,11 +392,12 @@ export default function OrderTrackingPage() {
                 const isCompleted = i < activeStepIdx;
                 const isActive = i === activeStepIdx;
                 const StepIcon = step.icon || Package;
+                const stepMeta = getStepStatusMeta(step.key, i);
 
                 return (
                   <div
                     key={step.key}
-                    className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[62px] sm:max-w-[100px]"
+                    className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[70px] sm:max-w-[110px]"
                   >
                     <div
                       className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
@@ -367,10 +425,37 @@ export default function OrderTrackingPage() {
                     >
                       {step.label}
                     </span>
+
+                    {/* Status Date in Light Font */}
+                    {stepMeta.dateStr && (
+                      <span className="text-[9px] sm:text-[10px] text-slate-400 font-light mt-0.5 leading-tight tracking-tight">
+                        {stepMeta.dateStr}
+                      </span>
+                    )}
+
+                    {/* Current / Hub Location in Light Font */}
+                    {stepMeta.location && (
+                      <span className="text-[8px] sm:text-[9px] text-slate-400 font-light mt-0.5 leading-tight flex items-center justify-center gap-0.5 max-w-[90px] truncate">
+                        <MapPin className="w-2.5 h-2.5 text-slate-400 shrink-0 inline" />
+                        <span className="truncate">{stepMeta.location}</span>
+                      </span>
+                    )}
                   </div>
                 );
               })}
             </div>
+
+            {/* Current Hub Location Banner if available */}
+            {order.currentLocation && (
+              <div className="mt-4 px-3.5 py-2 bg-white border border-[#E5E1DC] rounded-xl flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5 text-slate-600">
+                  <MapPin className="w-3.5 h-3.5 text-[#8A5B2A]" />
+                  <span>Current Hub Location:</span>
+                  <strong className="text-[#111111] font-medium">{order.currentLocation}</strong>
+                </div>
+                <span className="text-[10px] text-slate-400 font-light">In Transit</span>
+              </div>
+            )}
           </div>
         )}
 
@@ -528,6 +613,13 @@ export default function OrderTrackingPage() {
                         {item.name}
                       </Link>
                       <p className="text-[11px] text-[#555555]">Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}</p>
+                      {item.noReturnRefundExchange && (
+                        <div className="pt-0.5">
+                          <span className="inline-block text-[9px] font-bold text-[#92400E] bg-[#FFF1E0] border border-[#F5C78E] px-1.5 py-0.5 rounded uppercase tracking-wide">
+                            No Return / Refund (Clearance)
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <span className="text-xs sm:text-sm font-semibold text-[#111111] flex-shrink-0">
@@ -574,14 +666,20 @@ export default function OrderTrackingPage() {
             )}
 
             {isDelivered && !isReturnFlow && (
-              <button
-                type="button"
-                onClick={() => setShowReturnModal(true)}
-                className="px-4 py-2 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-lg transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Request Return & Refund
-              </button>
+              order.items && order.items.length > 0 && order.items.every((i: any) => i.noReturnRefundExchange) ? (
+                <span className="px-3 py-2 text-xs font-semibold text-amber-800 bg-[#FFF1E0] border border-[#F5C78E] rounded-lg">
+                  Non-Returnable (Final Sale)
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowReturnModal(true)}
+                  className="px-4 py-2 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-lg transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Request Return & Refund
+                </button>
+              )
             )}
           </div>
         </div>

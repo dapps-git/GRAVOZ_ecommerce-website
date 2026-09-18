@@ -12,6 +12,10 @@ export interface UserProfile {
   avatarUrl?: string | null;
   rewardPoints?: number;
   referralCode?: string;
+  referralDiscountBalance?: number;
+  hasUsedReferralDiscount?: boolean;
+  referredBy?: string;
+  referralCodeUsed?: string;
   tier?: string;
 }
 
@@ -46,6 +50,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
           avatarUrl: res.user.avatarUrl || null,
           rewardPoints: res.user.rewardPoints,
           referralCode: res.user.referralCode,
+          referralDiscountBalance: res.user.referralDiscountBalance || 0,
+          hasUsedReferralDiscount: res.user.hasUsedReferralDiscount || false,
+          referredBy: res.user.referredBy || '',
+          referralCodeUsed: res.user.referralCodeUsed || '',
           tier: res.user.tier,
         };
         setUser(profile);

@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RecommendationStrip from '@/components/RecommendationStrip';
-import { trackEvent } from '@/lib/userBehavior';
+import { trackEvent, recordColorTaste } from '@/lib/userBehavior';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useUser } from '@/context/UserContext';
@@ -26,7 +26,9 @@ import {
   Maximize2,
   AlertCircle,
   Heart,
-  ZoomIn
+  ZoomIn,
+  PackagePlus,
+  Sparkles
 } from 'lucide-react';
 
 interface ProductImage {
@@ -60,6 +62,7 @@ interface ProductDetails {
   reviewsCount: number;
   targetAudience: string;
   subCategory: string;
+  itemType?: string;
   stock: number;
   sizes: string[];
   sizeAvailability?: ProductSizeItem[];
@@ -82,6 +85,7 @@ interface ProductDetails {
   isFeatured?: boolean;
   isLatest?: boolean;
   badge?: string;
+  noReturnRefundExchange?: boolean;
   status?: string;
   seo?: {
     metaTitle?: string;
@@ -121,6 +125,18 @@ const EMPTY_PRODUCT: ProductDetails = {
   shippingAndReturn: {},
 };
 
+// Add-on product interface
+interface AddonItem {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  sku: string;
+  stock: number;
+  applicableCategories: string[];
+}
+
 export default function ProductInnerPage() {
   const params = useParams();
   const router = useRouter();
@@ -132,6 +148,10 @@ export default function ProductInnerPage() {
 
   const [product, setProduct] = useState<ProductDetails>(EMPTY_PRODUCT);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Add-ons state
+  const [addons, setAddons] = useState<AddonItem[]>([]);
+  const [selectedAddonIds, setSelectedAddonIds] = useState<Set<string>>(new Set());
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [selectedSize, setSelectedSize] = useState<string>('9');
   const [selectedColor, setSelectedColor] = useState<string>('Tan');
@@ -193,12 +213,17 @@ export default function ProductInnerPage() {
             setSelectedColor(data.product.colors[0]);
           }
 
-          // ── Track product view for personalized recommendations ──
+          // ── Track product view for personalized recommendations & taste sensing ──
+          const initialColor = Array.isArray(data.product.colorVariants) && data.product.colorVariants.length > 0
+            ? data.product.colorVariants[0].name
+            : (data.product.colors?.[0] || 'Tan');
+
           trackEvent({
             type: 'view',
             productId: data.product._id,
             productName: data.product.name,
-            colors: data.product.colors || [],
+            selectedColor: initialColor,
+            colors: data.product.colors || (initialColor ? [initialColor] : []),
             subCategory: data.product.subCategory || '',
             targetAudience: data.product.targetAudience || '',
             price: data.product.price,
@@ -243,6 +268,35 @@ export default function ProductInnerPage() {
       })
       .catch(() => {});
   }, [productId]);
+
+  // ── Fetch add-ons when product is a shoe ─────────────────────────────────
+  useEffect(() => {
+    if (!product._id) return;
+    // Determine if we should show add-ons (shoe category products)
+    const isShoeProduct =
+      product.itemType?.toLowerCase().includes('shoe') ||
+      product.subCategory?.toLowerCase().includes('shoe') ||
+      product.subCategory?.toLowerCase().includes('formal') ||
+      product.subCategory?.toLowerCase().includes('casual') ||
+      product.subCategory?.toLowerCase().includes('sport') ||
+      product.subCategory?.toLowerCase().includes('boot') ||
+      product.subCategory?.toLowerCase().includes('sandal');
+    if (!isShoeProduct) {
+      setAddons([]);
+      setSelectedAddonIds(new Set());
+      return;
+    }
+    fetch('/api/addons?category=shoes')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.addons)) {
+          setAddons(data.addons);
+        }
+      })
+      .catch(() => {
+        // silent — add-ons are optional
+      });
+  }, [product._id, product.itemType, product.subCategory]);
 
   // ── Dynamically update page title & meta description for SEO ──
   useEffect(() => {
@@ -377,6 +431,16 @@ export default function ProductInnerPage() {
       setActiveColorVariantSizes(null);
     }
 
+    // 3. Immediately sense user taste for this color variant
+    recordColorTaste({
+      productId: product._id,
+      productName: product.name,
+      color: variant.name,
+      subCategory: product.subCategory,
+      targetAudience: product.targetAudience,
+      price: product.price,
+    });
+
     showToast(`Color: ${variant.name}`);
   };
 
@@ -478,7 +542,7 @@ export default function ProductInnerPage() {
                 {/* Product Badge: BEST SELLER */}
                 {(product.badge || product.isBestSeller || product.isTopSeller || product.isLatest || true) && (
                   <div className="absolute top-3 left-3 z-10">
-                    <span className="px-2.5 py-1 rounded-none text-[9px] font-bold uppercase tracking-wider bg-[#89591C] text-white shadow-xs">
+                    <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
                       {product.badge || (product.isBestSeller ? 'BEST SELLER' : product.isTopSeller ? 'TOP SELLER' : product.isLatest ? 'NEW' : 'BEST SELLER')}
                     </span>
                   </div>
@@ -633,9 +697,16 @@ export default function ProductInnerPage() {
 
               {/* Product Title + Star Rating (H4 Medium 20px / 28px) */}
               <div className="space-y-1">
-                <h1 className="text-[20px] sm:text-[22px] font-medium text-[#111111] tracking-[0.02em] uppercase leading-[28px]">
-                  {product.name}
-                </h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-[20px] sm:text-[22px] font-medium text-[#111111] tracking-[0.02em] uppercase leading-[28px]">
+                    {product.name}
+                  </h1>
+                  {product.noReturnRefundExchange && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#FFF1E0] text-[#92400E] border border-[#F5C78E] uppercase tracking-wider shadow-2xs">
+                      No Return / Exchange
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-0.5">
                     {[...Array(5)].map((_, i) => (
@@ -860,8 +931,25 @@ export default function ProductInnerPage() {
                       quantity: quantity,
                       imageUrl: heroPhotoUrl,
                       color: selectedColor,
+                      noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
                     });
-                    showToast(`Added ${quantity} × ${product.name} (${selectedColor} / Size ${selectedSize}) to Bag!`);
+                    // Also add selected add-ons to cart
+                    for (const addonId of selectedAddonIds) {
+                      const addon = addons.find((a) => a._id === addonId);
+                      if (addon) {
+                        await addToCart({
+                          productId: addon._id,
+                          title: addon.name,
+                          price: addon.price,
+                          size: 'One Size',
+                          quantity: 1,
+                          imageUrl: addon.imageUrl || '/products/placeholder.svg',
+                          isAddon: true,
+                        });
+                      }
+                    }
+                    const addonCount = selectedAddonIds.size;
+                    showToast(`Added ${quantity} × ${product.name} (${selectedColor} / Size ${selectedSize})${addonCount > 0 ? ` + ${addonCount} add-on${addonCount > 1 ? 's' : ''}` : ''} to Bag!`);
                   }}
                   className={`w-full h-[46px] sm:h-[48px] px-6 rounded-[10px] text-white text-[13px] sm:text-[14px] font-semibold uppercase tracking-wider shadow-xs transition-all flex items-center justify-center cursor-pointer ${
                     isCurrentSizeAvailable
@@ -898,7 +986,23 @@ export default function ProductInnerPage() {
                       quantity: quantity,
                       imageUrl: displayImages[0]?.url || '/products/placeholder.svg',
                       color: selectedColor || product.colors?.[0] || 'Tan',
+                      noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
                     });
+                    // Also add selected add-ons to cart
+                    for (const addonId of selectedAddonIds) {
+                      const addon = addons.find((a) => a._id === addonId);
+                      if (addon) {
+                        await addToCart({
+                          productId: addon._id,
+                          title: addon.name,
+                          price: addon.price,
+                          size: 'One Size',
+                          quantity: 1,
+                          imageUrl: addon.imageUrl || '/products/placeholder.svg',
+                          isAddon: true,
+                        });
+                      }
+                    }
 
                     if (!isLoggedIn) {
                       showToast('Please sign in to complete your purchase.');
@@ -921,6 +1025,138 @@ export default function ProductInnerPage() {
                     ? 'OUT OF STOCK'
                     : 'BUY NOW'}
                 </button>
+              </div>
+
+              {/* ── Add-Ons Section (Shoe Care Products) ───────────────────────── */}
+              {addons.length > 0 && (
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <PackagePlus className="w-4 h-4 text-[#89591C]" />
+                    <span className="text-[13px] font-semibold text-[#111111]">Complete Your Purchase</span>
+                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 rounded-full">
+                      Optional Add-Ons
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Enhance your shoe care routine with our specially curated accessories:
+                  </p>
+                  <div className="space-y-2">
+                    {addons.map((addon) => {
+                      const isSelected = selectedAddonIds.has(addon._id);
+                      return (
+                        <button
+                          key={addon._id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedAddonIds((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(addon._id)) {
+                                next.delete(addon._id);
+                              } else {
+                                next.add(addon._id);
+                              }
+                              return next;
+                            });
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                            isSelected
+                              ? 'border-[#89591C] bg-[#FDF8F2] shadow-xs'
+                              : 'border-[#e8e2d8] bg-white hover:border-[#c8a47a] hover:bg-[#faf6f0]'
+                          }`}
+                        >
+                          {/* Checkbox circle */}
+                          <div
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                              isSelected
+                                ? 'bg-[#89591C] border-[#89591C]'
+                                : 'bg-white border-[#c8c0b4]'
+                            }`}
+                          >
+                            {isSelected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                          </div>
+
+                          {/* Addon image */}
+                          <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 flex-shrink-0">
+                            {addon.imageUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={addon.imageUrl}
+                                alt={addon.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Sparkles className="w-4 h-4 text-slate-300" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Addon info */}
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[13px] font-semibold leading-tight ${
+                              isSelected ? 'text-[#5C2D0A]' : 'text-slate-800'
+                            }`}>
+                              {addon.name}
+                            </p>
+                            {addon.description && (
+                              <p className="text-[11px] text-slate-500 mt-0.5 truncate">{addon.description}</p>
+                            )}
+                          </div>
+
+                          {/* Price */}
+                          <span className={`text-[13px] font-bold flex-shrink-0 ${
+                            isSelected ? 'text-[#89591C]' : 'text-slate-700'
+                          }`}>
+                            +₹{addon.price.toLocaleString('en-IN')}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedAddonIds.size > 0 && (
+                    <p className="text-[11px] text-[#89591C] font-semibold flex items-center gap-1.5">
+                      <Check className="w-3 h-3" />
+                      {selectedAddonIds.size} add-on{selectedAddonIds.size > 1 ? 's' : ''} selected · will be added to your bag
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Clearance / Old Stock Notice Banner */}
+              {product.noReturnRefundExchange && (
+                <div className="bg-[#FFF9F2] border-2 border-[#F5C78E] rounded-xl p-3 sm:p-3.5 flex items-start gap-3 shadow-2xs animate-in fade-in">
+                  <div className="w-8 h-8 rounded-lg bg-[#FEEAD1] border border-[#F5C78E] flex items-center justify-center flex-shrink-0 text-[#B45309] mt-0.5">
+                    <AlertCircle className="w-4 h-4" strokeWidth={2.2} />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-[#B45309] text-white px-2 py-0.5 rounded-sm">
+                        Old Stock Clearance
+                      </span>
+                      <span className="text-[12px] font-bold text-[#78350F] uppercase tracking-wide">
+                        No Return • No Refund • No Exchange
+                      </span>
+                    </div>
+                    <p className="text-[11px] sm:text-[12px] text-[#92400E] font-medium leading-relaxed">
+                      This item is offered under clearance / old-stock pricing as a final sale. It is sold as-is and is strictly not eligible for return, replacement, or refund.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Free Delivery & Authenticity Perks Banner */}
+              <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-slate-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🚚</span>
+                  <div>
+                    <span className="font-bold text-[#111111]">100% Free Delivery All Over India</span>
+                    <p className="text-[11px] text-slate-500">Fast doorstep dispatch in 1-2 business days</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#89591C] bg-white border border-[#e8e2d8] px-2.5 py-1 rounded-lg shadow-2xs flex-shrink-0">
+                  <span>🇮🇳</span>
+                  <span>Pan-India Shipping</span>
+                </div>
               </div>
 
               {/* Share Row */}
@@ -1193,13 +1429,23 @@ export default function ProductInnerPage() {
                       </div>
                       <p className="text-[13px] text-[#555555]">Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
-                      <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
-                        <RotateCcw className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
-                        <span>7-Day Hassle-Free Returns</span>
+                    {product.noReturnRefundExchange ? (
+                      <div className="p-4 rounded-xl bg-[#FFF9F2] border-2 border-[#F5C78E] space-y-1">
+                        <div className="flex items-center gap-2 text-[#78350F] font-semibold text-[14px]">
+                          <AlertCircle className="w-4 h-4 text-[#B45309]" strokeWidth={2} />
+                          <span>No Return • No Refund • No Exchange</span>
+                        </div>
+                        <p className="text-[13px] text-[#92400E]">Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.</p>
                       </div>
-                      <p className="text-[13px] text-[#555555]">Doorstep pickup and instant exchange if size or fit is not ideal.</p>
-                    </div>
+                    ) : (
+                      <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
+                        <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
+                          <RotateCcw className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
+                          <span>7-Day Hassle-Free Returns</span>
+                        </div>
+                        <p className="text-[13px] text-[#555555]">Doorstep pickup and instant exchange if size or fit is not ideal.</p>
+                      </div>
+                    )}
                     <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
                       <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
                         <ShieldCheck className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
@@ -1223,10 +1469,21 @@ export default function ProductInnerPage() {
 
 
 
-        {/* ── Personalized Recommendation Strip ── */}
+        {/* ── Taste-Sensing "You May Also Like" Recommendation Strip ── */}
         <div className="pt-6 sm:pt-8 border-t border-[#f0ece5]">
           <RecommendationStrip
-            excludeIds={[productId]}
+            title="YOU MAY ALSO LIKE"
+            excludeIds={[productId, product._id].filter(Boolean)}
+            contextProduct={{
+              id: product._id,
+              name: product.name,
+              subCategory: product.subCategory,
+              selectedColor: selectedColor,
+              colors: product.colors || (product.colorVariants?.map((c) => c.name) || []),
+              targetAudience: product.targetAudience,
+              price: product.price,
+              shoeType: product.shoeType,
+            }}
             limit={6}
           />
         </div>

@@ -1,4 +1,12 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+// Fix Node.js DNS SRV resolution timeouts on Windows for MongoDB Atlas
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch {
+  // Ignore in environments where setting DNS servers is not permitted
+}
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gravoz';
 
@@ -31,6 +39,8 @@ export async function connectDB(): Promise<typeof mongoose> {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {

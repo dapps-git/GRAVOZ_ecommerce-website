@@ -26,6 +26,14 @@ import {
   Loader2,
   Truck,
   FileText,
+  Gift,
+  Copy,
+  Share2,
+  Sparkles,
+  ExternalLink,
+  CheckCheck,
+  Users,
+  Award,
 } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
@@ -37,10 +45,11 @@ import {
   saveSavedAddresses,
   formatAddressToString,
   parseAddressFromString,
+  isDummyDefaultAddress,
   SavedAddress,
 } from '@/lib/addresses';
 
-type TabType = 'profile' | 'orders' | 'history' | 'wishlist' | 'cart' | 'returns' | 'notifications' | 'security';
+type TabType = 'profile' | 'orders' | 'referrals' | 'history' | 'wishlist' | 'cart' | 'returns' | 'notifications' | 'security';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -54,7 +63,9 @@ export default function ProfilePage() {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [address, setAddress] = useState(user?.address || '');
+  const [address, setAddress] = useState(
+    user?.address && !isDummyDefaultAddress(user.address) ? user.address : ''
+  );
 
   // Populate form when user or saved addresses load
   useEffect(() => {
@@ -62,13 +73,15 @@ export default function ProfilePage() {
       if (user.name && !name) setName(user.name);
       if (user.email && !email) setEmail(user.email);
       if (user.phone && !phone) setPhone(user.phone);
-      if (user.address) {
+      if (user.address && !isDummyDefaultAddress(user.address)) {
         setAddress(user.address);
       } else {
         const saved = loadSavedAddresses(user);
-        if (saved.length > 0) {
+        if (saved.length > 0 && saved[0].street) {
           const defaultAddr = saved.find((a) => a.isDefault) || saved[0];
           setAddress(formatAddressToString(defaultAddr));
+        } else {
+          setAddress('');
         }
       }
     }
@@ -101,6 +114,48 @@ export default function ProfilePage() {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+
+  // Referral State
+  const [referralData, setReferralData] = useState<{
+    referralCode?: string;
+    referralLink?: string;
+    referralDiscountBalance?: number;
+    availableDiscountRupees?: number;
+    eligibleForFirstOrderDiscount?: boolean;
+    firstOrderDiscountPercent?: number;
+    stats?: {
+      totalReferrals: number;
+      completedReferrals: number;
+      pendingReferrals: number;
+      totalRewardsEarned: number;
+    };
+    history?: Array<{
+      id: string;
+      referredName: string;
+      status: string;
+      date: string;
+      completedAt?: string;
+      rewardEarned: number;
+    }>;
+  } | null>(null);
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const fetchReferralStatus = async () => {
+    setReferralLoading(true);
+    try {
+      const res = await fetch('/api/referrals/status');
+      const data = await res.json();
+      if (data.success) {
+        setReferralData(data);
+      }
+    } catch (err) {
+      console.error('Failed to load referral status', err);
+    } finally {
+      setReferralLoading(false);
+    }
+  };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,8 +233,15 @@ export default function ProfilePage() {
     if (user?.email) {
       fetchUserOrders();
       fetchUserReviews();
+      fetchReferralStatus();
     }
   }, [user?.email]);
+
+  useEffect(() => {
+    if (activeTab === 'referrals' && user?.email) {
+      fetchReferralStatus();
+    }
+  }, [activeTab, user?.email]);
 
   // Wishlist & Cart Context
   const { items: wishlistItems, removeFromWishlist } = useWishlist();
@@ -210,22 +272,22 @@ export default function ProfilePage() {
               state: parsed.state || a.state,
               postalCode: parsed.postalCode || a.postalCode,
               country: parsed.country || a.country,
+              isDefault: true,
             }
           : a
       );
       saveSavedAddresses(updatedList);
-    } else {
+    } else if (address) {
       const newAddr: SavedAddress = {
-        id: 'addr_' + Date.now(),
-        name: name || 'User',
+        id: 'default-' + Date.now(),
+        name: name || 'Default User',
         phone: phone || '',
         street: parsed.street || address,
-        city: parsed.city || 'Chennai',
-        state: parsed.state || 'Tamil Nadu',
-        postalCode: parsed.postalCode || '',
-        country: parsed.country || 'India',
+        city: parsed.city || 'Calicut',
+        state: parsed.state || 'Kerala',
+        postalCode: parsed.postalCode || '673001',
+        country: 'India',
         isDefault: true,
-        label: 'Home',
       };
       saveSavedAddresses([newAddr]);
     }
@@ -245,6 +307,7 @@ export default function ProfilePage() {
   const sidebarItems: { id: TabType; label: string; icon: React.ElementType }[] = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'orders', label: 'My Orders', icon: Package },
+    { id: 'referrals', label: 'Referrals & Rewards', icon: Gift },
     { id: 'history', label: 'History', icon: Clock },
     { id: 'wishlist', label: 'Wishlist', icon: Heart },
     { id: 'cart', label: 'Cart', icon: ShoppingCart },
@@ -450,7 +513,7 @@ export default function ProfilePage() {
                     <textarea
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Address"
+                      placeholder="Enter your delivery address (House/Flat No., Street, City, State, PIN)..."
                       rows={4}
                       className="w-full p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C] focus:ring-1 focus:ring-[#89591C]/20 transition-all font-sansation shadow-2xs resize-none"
                     />
@@ -637,6 +700,282 @@ export default function ProfilePage() {
                     })}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* TAB: REFERRALS & REWARDS */}
+            {activeTab === 'referrals' && (
+              <div className="space-y-6 animate-in fade-in duration-300 font-sansation">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-[#e5e5e5] pb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#030303] font-sansation">Refer &amp; Earn</h3>
+                    <p className="text-xs text-slate-500 font-sansation">
+                      Give friends 15% off their first order and earn ₹100 discount after they complete a purchase.
+                    </p>
+                  </div>
+                  <span className="hidden sm:inline-block text-xs bg-slate-100 border border-[#e5e5e5] px-3 py-1 rounded-full font-medium text-slate-700 font-sansation">
+                    15% Friend Discount • ₹100 Store Reward
+                  </span>
+                </div>
+
+                {/* Top Metrics Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Available Store Discount Card */}
+                  <div className="bg-white border border-[#e5e5e5] rounded-xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Available Discount</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-[#e5e5e5]">
+                          At Checkout
+                        </span>
+                      </div>
+                      <div className="mt-3 flex items-baseline gap-1.5">
+                        <span className="text-2xl sm:text-3xl font-bold text-[#030303]">
+                          ₹{referralData?.availableDiscountRupees ?? user?.referralDiscountBalance ?? 0}
+                        </span>
+                        <span className="text-xs text-slate-500">available</span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#f0ece5] leading-relaxed">
+                      Applied as ₹100 store discount on future footwear orders.
+                    </p>
+                  </div>
+
+                  {/* Friends Joined */}
+                  <div className="bg-white border border-[#e5e5e5] rounded-xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Friends Joined</span>
+                        <Users className="w-4 h-4 text-slate-400" />
+                      </div>
+                      <div className="mt-3">
+                        <span className="text-2xl sm:text-3xl font-bold text-[#030303]">
+                          {referralData?.stats?.totalReferrals ?? 0}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#f0ece5]">
+                      {referralData?.stats?.pendingReferrals ?? 0} pending first purchase
+                    </p>
+                  </div>
+
+                  {/* Orders Completed */}
+                  <div className="bg-white border border-[#e5e5e5] rounded-xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Successful Orders</span>
+                        <Award className="w-4 h-4 text-slate-400" />
+                      </div>
+                      <div className="mt-3">
+                        <span className="text-2xl sm:text-3xl font-bold text-[#030303]">
+                          {referralData?.stats?.completedReferrals ?? 0}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#f0ece5]">
+                      Total ₹{referralData?.stats?.totalRewardsEarned ?? 0} earned to date
+                    </p>
+                  </div>
+                </div>
+
+                {/* Shareable Code & Link Box */}
+                <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 shadow-2xs space-y-5">
+                  <div className="border-b border-[#f0ece5] pb-3">
+                    <h4 className="text-sm sm:text-base font-bold text-[#030303]">Share Your Referral</h4>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Send your link or unique code directly to friends. Your code will be pre-filled automatically.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    {/* Unique Referral Code */}
+                    <div className="lg:col-span-5 space-y-2">
+                      <label className="text-xs font-semibold text-slate-700 block">Your Referral Code</label>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-4 py-2.5 flex items-center justify-center font-mono font-bold text-base text-[#030303] tracking-wider select-all">
+                          {referralData?.referralCode || user?.referralCode || 'AIFA100'}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const code = referralData?.referralCode || user?.referralCode || '';
+                            if (code) {
+                              navigator.clipboard.writeText(code);
+                              setCopiedCode(true);
+                              showToast('Referral code copied to clipboard!');
+                              setTimeout(() => setCopiedCode(false), 2000);
+                            }
+                          }}
+                          className="h-11 px-4 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
+                        >
+                          {copiedCode ? (
+                            <><CheckCheck className="w-4 h-4" /> Copied</>
+                          ) : (
+                            <><Copy className="w-4 h-4" /> Copy Code</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Shareable Referral Link */}
+                    <div className="lg:col-span-7 space-y-2">
+                      <label className="text-xs font-semibold text-slate-700 block">Your Shareable Link</label>
+                      <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                        <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-3.5 py-2.5 text-xs text-slate-700 font-mono truncate select-all flex items-center">
+                          {referralData?.referralLink ||
+                            (typeof window !== 'undefined'
+                              ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
+                              : `https://gravoz.in/register?ref=${referralData?.referralCode || user?.referralCode || ''}`)}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const link =
+                                referralData?.referralLink ||
+                                `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`;
+                              navigator.clipboard.writeText(link);
+                              setCopiedLink(true);
+                              showToast('Referral link copied to clipboard!');
+                              setTimeout(() => setCopiedLink(false), 2000);
+                            }}
+                            className="flex-1 sm:flex-initial h-11 px-3.5 bg-white border border-[#e5e5e5] hover:bg-slate-50 text-slate-800 font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            {copiedLink ? (
+                              <><CheckCheck className="w-4 h-4 text-emerald-600" /> Copied</>
+                            ) : (
+                              <><Copy className="w-4 h-4 text-slate-600" /> Copy Link</>
+                            )}
+                          </button>
+
+                          <a
+                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                              `Hey! Use my referral code ${
+                                referralData?.referralCode || user?.referralCode || ''
+                              } to get 15% OFF on premium footwear at GRAVOZ: ${
+                                referralData?.referralLink ||
+                                `${typeof window !== 'undefined' ? window.location.origin : 'https://gravoz.in'}/register?ref=${
+                                  referralData?.referralCode || user?.referralCode || ''
+                                }`
+                              }`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 sm:flex-initial h-11 px-3.5 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Share2 className="w-4 h-4" /> Share
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3-Step How It Works Guide */}
+                <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 space-y-4">
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    How It Works
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-lg bg-slate-50 border border-[#e5e5e5] space-y-1.5">
+                      <div className="w-6 h-6 rounded-full bg-black text-white font-bold text-xs flex items-center justify-center">
+                        1
+                      </div>
+                      <h5 className="text-xs font-bold text-[#030303]">Share Your Link</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        Send your referral code or link to friends who haven't registered on GRAVOZ yet.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-slate-50 border border-[#e5e5e5] space-y-1.5">
+                      <div className="w-6 h-6 rounded-full bg-black text-white font-bold text-xs flex items-center justify-center">
+                        2
+                      </div>
+                      <h5 className="text-xs font-bold text-[#030303]">Friend Gets 15% OFF</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        Your friend signs up using your link and receives 15% off their first footwear purchase.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-slate-50 border border-[#e5e5e5] space-y-1.5">
+                      <div className="w-6 h-6 rounded-full bg-black text-white font-bold text-xs flex items-center justify-center">
+                        3
+                      </div>
+                      <h5 className="text-xs font-bold text-[#030303]">You Get ₹100 Discount</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        Once their order is completed, you receive a ₹100 store discount applied at checkout.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Referral Activity / History */}
+                <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#f0ece5] pb-3">
+                    <div>
+                      <h4 className="text-sm sm:text-base font-bold text-[#030303]">Referral Activity</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">Friends who registered using your referral code</p>
+                    </div>
+                    {referralLoading && <Loader2 className="w-4 h-4 animate-spin text-slate-600" />}
+                  </div>
+
+                  {referralData?.history && referralData.history.length > 0 ? (
+                    <div className="divide-y divide-[#f0ece5]">
+                      {referralData.history.map((item) => {
+                        const isCompleted = item.status === 'completed';
+                        const isCancelled = item.status === 'cancelled';
+                        return (
+                          <div key={item.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-slate-100 border border-[#e5e5e5] flex items-center justify-center font-bold text-slate-700 text-xs">
+                                {item.referredName.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-slate-900">{item.referredName}</p>
+                                <p className="text-[11px] text-slate-400">
+                                  Joined {new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              {isCompleted ? (
+                                <span className="px-2.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-[#e5e5e5]">
+                                  Completed &amp; Rewarded
+                                </span>
+                              ) : isCancelled ? (
+                                <span className="px-2.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500 border border-[#e5e5e5]">
+                                  Cancelled
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-[#e5e5e5]">
+                                  Pending Purchase
+                                </span>
+                              )}
+
+                              <span className="font-semibold text-xs text-slate-800">
+                                {isCompleted ? '+₹100 Discount' : 'Pending'}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-10 space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 border border-[#e5e5e5] flex items-center justify-center mx-auto text-slate-600">
+                        <Gift className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-semibold text-slate-700">No referrals yet</p>
+                      <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                        Share your referral link with friends. When they complete their first order, your rewards will appear here.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
               </div>
             )}
 

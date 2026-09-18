@@ -12,6 +12,10 @@ export interface AuthUser {
   avatarUrl?: string;
   rewardPoints: number;
   referralCode: string;
+  referralDiscountBalance?: number;
+  hasUsedReferralDiscount?: boolean;
+  referredBy?: string;
+  referralCodeUsed?: string;
   tier: string;
   authProvider: string;
   totalOrders?: number;
@@ -33,6 +37,7 @@ export interface RegisterPayload {
   email: string;
   password: string;
   phone?: string;
+  referralCode?: string;
   referredBy?: string;
 }
 
@@ -47,6 +52,7 @@ export interface GoogleAuthPayload {
   email?: string;
   name?: string;
   avatarUrl?: string;
+  referralCode?: string;
 }
 
 export interface ResetPasswordPayload {

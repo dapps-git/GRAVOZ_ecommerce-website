@@ -67,6 +67,10 @@ async function buildItemsFromProducts(flagField: string, limit = 10) {
         }));
       }
 
+      const allImages: string[] = Array.isArray(p.images) && p.images.length > 0
+        ? p.images.map((im: any) => (typeof im === 'string' ? im : im.url)).filter(Boolean)
+        : [mainImg];
+
       return {
         id:             String(p._id),
         title:          p.name,
@@ -75,6 +79,7 @@ async function buildItemsFromProducts(flagField: string, limit = 10) {
         originalPrice:  origPrice,
         imageUrl:       mainImg,
         insetImageUrl:  insetImg,
+        images:         allImages,
         sizes,
         colors,
         linkUrl:        `/products/${p._id}`,

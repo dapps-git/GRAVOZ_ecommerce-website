@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Star, Heart } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
+import { error } from 'console';
 
 interface RecentlyViewedItem {
   _id: string;
@@ -52,19 +53,19 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
       </div>
 
       {/* Product Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
         {items.map((product, idx) => (
           <Link
             key={`${product._id}-${idx}`}
             href={`/products/${product._id}`}
-            className="group bg-white rounded-2xl border border-[#e8e2d8] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+            className="group bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
           >
             {/* Product Image Card */}
-            <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#faf8f5]">
-              {/* Best Seller Badge */}
+            <div className="relative aspect-square w-full rounded-none overflow-hidden bg-[#faf8f5]">
+              {/* Best Seller Badge (top most left) */}
               {product.badge && (
-                <div className="absolute top-2 left-2 z-10">
-                  <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
+                <div className="absolute top-0 left-0 z-10">
+                  <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
                     {product.badge}
                   </span>
                 </div>
@@ -88,11 +89,10 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
                 className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
               >
                 <Heart
-                  className={`w-3.5 h-3.5 transition-colors ${
-                    isInWishlist(product._id)
+                  className={`w-3.5 h-3.5 transition-colors ${isInWishlist(product._id)
                       ? 'fill-rose-500 text-rose-500'
                       : 'text-slate-600 hover:text-rose-500'
-                  }`}
+                    }`}
                 />
               </button>
 
@@ -107,8 +107,8 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
             </div>
 
             {/* Card Meta (Title, Rating, Discount Price) */}
-            <div className="mt-2 space-y-1">
-              <h3 className="text-[11px] sm:text-xs font-bold text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+            <div className="mt-2.5 space-y-1">
+              <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
                 {product.name}
               </h3>
 
@@ -116,10 +116,10 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
               {(() => {
                 const { rating, reviewsCount } = getProductRating(product);
                 return (
-                  <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                  <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 font-normal">
                     <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
-                    <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
-                    <span className="text-slate-400 font-normal">
+                    <span className="font-normal text-slate-700">{rating.toFixed(1)}</span>
+                    <span className="text-slate-400 font-light">
                       ({reviewsCount})
                     </span>
                   </div>
@@ -128,11 +128,11 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
 
               {/* Pricing with Discount */}
               <div className="flex items-baseline gap-1.5 pt-0.5">
-                <span className="text-xs sm:text-sm font-bold text-[#89591C]">
+                <span className="text-xs sm:text-sm font-medium text-[#89591C]">
                   ₹{product.price}
                 </span>
                 {product.originalPrice && product.originalPrice > product.price && (
-                  <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 line-through font-light">
                     ₹{product.originalPrice}
                   </span>
                 )}
@@ -144,3 +144,5 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
     </section>
   );
 }
+
+

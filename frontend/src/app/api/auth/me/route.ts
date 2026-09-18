@@ -19,6 +19,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
 
+    // Auto-ensure referralCode exists
+    if (!customer.referralCode) {
+      const { generateReferralCode } = await import('@/lib/auth');
+      let code = generateReferralCode(customer.name);
+      while (await Customer.findOne({ referralCode: code })) {
+        code = generateReferralCode(customer.name);
+      }
+      customer.referralCode = code;
+      await customer.save();
+    }
+
     return NextResponse.json({
       authenticated: true,
       user: {
@@ -30,6 +41,10 @@ export async function GET(req: NextRequest) {
         addresses: customer.addresses,
         rewardPoints: customer.rewardPoints,
         referralCode: customer.referralCode,
+        referralDiscountBalance: customer.referralDiscountBalance || 0,
+        hasUsedReferralDiscount: customer.hasUsedReferralDiscount || false,
+        referredBy: customer.referredBy || '',
+        referralCodeUsed: customer.referralCodeUsed || '',
         tier: customer.tier,
         authProvider: customer.authProvider,
         totalOrders: customer.totalOrders,

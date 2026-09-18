@@ -33,9 +33,10 @@ export function generateRandomToken(bytes: number = 32): string {
 }
 
 export function generateReferralCode(name: string): string {
-  const cleanName = (name || 'USER').replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 4) || 'GRV';
-  const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
-  return `${cleanName}-${randomSuffix}`;
+  const cleanName = (name || 'USER').replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 4) || 'GRVZ';
+  const prefix = cleanName.padEnd(4, 'X');
+  const num = Math.floor(100 + Math.random() * 900);
+  return `${prefix}${num}`;
 }
 
 export function signUserToken(payload: UserJwtPayload): string {

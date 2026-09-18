@@ -14,11 +14,38 @@ export interface SavedAddress {
 export const ADDRESSES_STORAGE_KEY = 'gravoz_saved_addresses';
 
 /**
+ * Check if an address string is a legacy placeholder or dummy default address
+ */
+export function isDummyDefaultAddress(addrStr?: string): boolean {
+  if (!addrStr) return false;
+  const clean = addrStr.trim().toLowerCase();
+  if (
+    clean === 'chennai - 600040\ntamil nadu, india' ||
+    clean === 'chennai - 600040, tamil nadu, india' ||
+    clean === 'chennai - 600040' ||
+    clean === 'tamil nadu, india' ||
+    (clean.includes('chennai - 600040') &&
+      !clean.includes('street') &&
+      !clean.includes('road') &&
+      !clean.includes('flat') &&
+      !clean.includes('house') &&
+      !clean.includes('nagar'))
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Format a structured address into a clean multi-line display string
  */
 export function formatAddressToString(addr: Partial<SavedAddress>): string {
+  if (!addr) return '';
+  // If there is no street address, don't format an incomplete or orphan city line
+  if (!addr.street || !addr.street.trim()) return '';
+
   const parts = [
-    addr.street,
+    addr.street.trim(),
     addr.city ? (addr.postalCode ? `${addr.city} - ${addr.postalCode}` : addr.city) : '',
     addr.state ? (addr.country ? `${addr.state}, ${addr.country}` : addr.state) : (addr.country || 'India'),
   ].filter(Boolean);
@@ -26,21 +53,21 @@ export function formatAddressToString(addr: Partial<SavedAddress>): string {
 }
 
 /**
- * Parse an address string into structured parts
+ * Parse an address string into structured parts without injecting fake default locations
  */
 export function parseAddressFromString(
   str: string,
   defaultName = '',
   defaultPhone = ''
 ): Partial<SavedAddress> {
-  if (!str || !str.trim()) {
+  if (!str || !str.trim() || isDummyDefaultAddress(str)) {
     return {
       name: defaultName,
       phone: defaultPhone,
       street: '',
-      city: 'Chennai',
-      state: 'Tamil Nadu',
-      postalCode: '600040',
+      city: '',
+      state: '',
+      postalCode: '',
       country: 'India',
     };
   }
@@ -60,21 +87,21 @@ export function parseAddressFromString(
         )
       ) ||
       lines[1] ||
-      'Chennai',
+      '',
     state:
       lines.find((l) =>
         ['tamil nadu', 'kerala', 'karnataka', 'maharashtra', 'delhi', 'telangana', 'andhra'].some((st) =>
           l.toLowerCase().includes(st)
         )
-      ) || 'Tamil Nadu',
-    postalCode: postalCode || (lines.find((l) => /^\d{6}$/.test(l)) || '600040'),
+      ) || '',
+    postalCode: postalCode || (lines.find((l) => /^\d{6}$/.test(l)) || ''),
     country: 'India',
   };
 }
 
 /**
- * Load saved addresses from localStorage or construct from user profile.
- * Filters out any legacy dummy placeholders.
+ * Load saved addresses from localStorage or construct from real user profile.
+ * Completely filters out legacy dummy placeholders and dummy defaults.
  */
 export function loadSavedAddresses(
   user?: { name?: string; phone?: string; address?: string } | null
@@ -86,13 +113,19 @@ export function loadSavedAddresses(
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Filter out legacy dummy entries (Sarah Johnson / John Doe)
+        // Filter out legacy dummy entries (Sarah Johnson / John Doe) and placeholder default addresses
         const cleanAddresses = parsed.filter(
           (a) =>
+            a &&
+            typeof a === 'object' &&
             a.name !== 'Sarah Johnson' &&
             a.name !== 'John Doe' &&
             a.phone !== '+91 98765 43210' &&
-            a.phone !== '+91 91234 56789'
+            a.phone !== '+91 91234 56789' &&
+            a.street &&
+            a.street.trim() &&
+            !isDummyDefaultAddress(a.street) &&
+            !(a.city === 'Chennai' && a.postalCode === '600040' && (!a.street || a.street.length < 3))
         );
 
         if (cleanAddresses.length > 0) {
@@ -100,9 +133,12 @@ export function loadSavedAddresses(
             ...a,
             name: a.name || user?.name || '',
             phone: a.phone || user?.phone || '',
-            postalCode: a.postalCode || (a.street && (a.street.match(/\b\d{6}\b/) || [])[0]) || '600040',
+            postalCode: a.postalCode || (a.street && (a.street.match(/\b\d{6}\b/) || [])[0]) || '',
             isDefault: idx === 0 ? (a.isDefault ?? true) : Boolean(a.isDefault),
           }));
+        } else {
+          // If all entries were dummy, clear out localStorage
+          localStorage.removeItem(ADDRESSES_STORAGE_KEY);
         }
       }
     }
@@ -110,27 +146,29 @@ export function loadSavedAddresses(
     console.error('Failed to load saved addresses:', err);
   }
 
-  // Fallback: If user has profile address or name/phone, initialize a real saved address
-  if (user && (user.name || user.address || user.phone)) {
-    const parsed = parseAddressFromString(user.address || '', user.name || '', user.phone || '');
-    const initial: SavedAddress = {
-      id: 'addr_' + Date.now(),
-      name: user.name || '',
-      phone: user.phone || '',
-      street: parsed.street || user.address || '',
-      city: parsed.city || 'Chennai',
-      state: parsed.state || 'Tamil Nadu',
-      postalCode: parsed.postalCode || '600040',
-      country: parsed.country || 'India',
-      isDefault: true,
-      label: 'Home',
-    };
+  // Fallback: ONLY initialize if user has a real, non-dummy profile address with street info
+  if (user && user.address && user.address.trim() && !isDummyDefaultAddress(user.address)) {
+    const parsed = parseAddressFromString(user.address, user.name || '', user.phone || '');
+    if (parsed.street && parsed.street.trim()) {
+      const initial: SavedAddress = {
+        id: 'addr_' + Date.now(),
+        name: user.name || '',
+        phone: user.phone || '',
+        street: parsed.street,
+        city: parsed.city || '',
+        state: parsed.state || '',
+        postalCode: parsed.postalCode || '',
+        country: parsed.country || 'India',
+        isDefault: true,
+        label: 'Home',
+      };
 
-    try {
-      localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify([initial]));
-    } catch {}
+      try {
+        localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify([initial]));
+      } catch {}
 
-    return [initial];
+      return [initial];
+    }
   }
 
   return [];
@@ -142,7 +180,15 @@ export function loadSavedAddresses(
 export function saveSavedAddresses(addresses: SavedAddress[]): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify(addresses));
+    const valid = addresses.filter(
+      (a) =>
+        a &&
+        a.street &&
+        a.street.trim() &&
+        !isDummyDefaultAddress(a.street) &&
+        !(a.city === 'Chennai' && a.postalCode === '600040' && (!a.street || a.street.length < 3))
+    );
+    localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify(valid));
   } catch (err) {
     console.error('Failed to save addresses:', err);
   }

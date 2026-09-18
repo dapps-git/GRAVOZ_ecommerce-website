@@ -9,6 +9,7 @@ export interface IOrderItem {
   size?: string;
   color?: string;
   imageUrl?: string;
+  noReturnRefundExchange?: boolean;
 }
 
 export interface IShippingAddress {
@@ -24,12 +25,14 @@ export interface IShippingAddress {
 export interface IStatusHistory {
   status: string;
   timestamp: Date;
+  location?: string;
   note?: string;
 }
 
 export interface IOrder extends Document {
   orderNumber: string;
   customerId?: string;
+  currentLocation?: string;
   customerEmail: string;
   customerName: string;
   customerPhone: string;
@@ -37,6 +40,9 @@ export interface IOrder extends Document {
   items: IOrderItem[];
   subtotal: number;
   discountAmount: number;
+  referralDiscountAmount?: number;
+  referralDiscountType?: 'referred_first_order_15' | 'referrer_reward_100';
+  referralCodeUsed?: string;
   couponCode?: string;
   shippingFee: number;
   totalAmount: number;
@@ -84,6 +90,12 @@ export interface IOrder extends Document {
   statusHistory: IStatusHistory[];
   estimatedDelivery?: Date;
   notes?: string;
+  repurchaseEmailSent?: boolean;
+  repurchaseEmailSentAt?: Date;
+  threeMonthEmailSent?: boolean;
+  threeMonthEmailSentAt?: Date;
+  fourMonthEmailSent?: boolean;
+  fourMonthEmailSentAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -98,6 +110,7 @@ const OrderItemSchema = new Schema<IOrderItem>(
     size: { type: String, default: '' },
     color: { type: String, default: '' },
     imageUrl: { type: String, default: '' },
+    noReturnRefundExchange: { type: Boolean, default: false },
   },
   { _id: false }
 );
@@ -109,7 +122,7 @@ const ShippingAddressSchema = new Schema<IShippingAddress>(
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    postalCode: { type: String, default: '600040' },
+    postalCode: { type: String, required: true },
     country: { type: String, default: 'India' },
   },
   { _id: false }
@@ -119,6 +132,7 @@ const StatusHistorySchema = new Schema<IStatusHistory>(
   {
     status: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
+    location: { type: String, default: '' },
     note: { type: String, default: '' },
   },
   { _id: false }
@@ -128,6 +142,7 @@ const OrderSchema = new Schema<IOrder>(
   {
     orderNumber: { type: String, required: true, unique: true, index: true },
     customerId: { type: String, default: '', index: true },
+    currentLocation: { type: String, default: '' },
     customerEmail: { type: String, required: true, lowercase: true, trim: true, index: true },
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },
@@ -135,6 +150,9 @@ const OrderSchema = new Schema<IOrder>(
     items: { type: [OrderItemSchema], required: true },
     subtotal: { type: Number, required: true },
     discountAmount: { type: Number, default: 0 },
+    referralDiscountAmount: { type: Number, default: 0 },
+    referralDiscountType: { type: String, default: null },
+    referralCodeUsed: { type: String, default: '' },
     couponCode: { type: String, default: '' },
     shippingFee: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
@@ -205,6 +223,12 @@ const OrderSchema = new Schema<IOrder>(
     statusHistory: { type: [StatusHistorySchema], default: [] },
     estimatedDelivery: { type: Date },
     notes: { type: String, default: '' },
+    repurchaseEmailSent: { type: Boolean, default: false, index: true },
+    repurchaseEmailSentAt: { type: Date },
+    threeMonthEmailSent: { type: Boolean, default: false, index: true },
+    threeMonthEmailSentAt: { type: Date },
+    fourMonthEmailSent: { type: Boolean, default: false, index: true },
+    fourMonthEmailSentAt: { type: Date },
   },
   { timestamps: true }
 );

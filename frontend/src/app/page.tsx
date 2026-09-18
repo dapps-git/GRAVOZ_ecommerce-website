@@ -17,12 +17,12 @@ import { useWishlist } from '@/context/WishlistContext';
 
 function SkeletonProductCard() {
   return (
-    <div className="flex flex-col animate-pulse bg-white rounded-2xl border border-[#e8e2d8] p-2.5">
-      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#faf8f5]" />
-      <div className="mt-2 space-y-1.5">
-        <div className="h-3 w-3/4 rounded bg-[#ede9e2]" />
-        <div className="h-3 w-1/3 rounded bg-[#ede9e2]" />
-        <div className="h-3.5 w-1/2 rounded bg-[#ede9e2]" />
+    <div className="flex flex-col animate-pulse bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5">
+      <div className="relative w-full aspect-square rounded-none overflow-hidden bg-[#faf8f5]" />
+      <div className="mt-3 space-y-2">
+        <div className="h-3.5 w-3/4 rounded-none bg-[#ede9e2]" />
+        <div className="h-3 w-1/3 rounded-none bg-[#ede9e2]" />
+        <div className="h-4 w-1/2 rounded-none bg-[#ede9e2]" />
       </div>
     </div>
   );
@@ -36,7 +36,7 @@ function SkeletonBannerHero() {
 
 function SkeletonCategoryCard() {
   return (
-    <div className="flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e2d8] bg-[#ede9e2] animate-pulse">
+    <div className="flex flex-col rounded-none overflow-hidden border border-[#e8e2d8] bg-[#ede9e2] animate-pulse">
       <div className="aspect-[3/4] sm:aspect-[4/5] w-full bg-[#ddd8cf]" />
       <div className="px-2.5 sm:px-4 py-2 sm:py-3 flex items-center justify-between bg-[#ede9e2]">
         <div className="h-3 w-12 rounded bg-[#c9c3bc]" />
@@ -63,7 +63,136 @@ interface ProductItem {
   originalPrice: number;
   rating: number;
   imageUrl: string;
+  images: string[];
   href: string;
+  noReturnRefundExchange?: boolean;
+}
+
+// ─── Animated Product Card with 3s Sub-Image Transition ────────────────────────
+
+function AnimatedProductCard({
+  product,
+  isInWishlist,
+  toggleWishlist,
+}: {
+  product: ProductItem;
+  isInWishlist: (id: string) => boolean;
+  toggleWishlist: (item: any) => void;
+}) {
+  const images = product.images && product.images.length > 0 ? product.images : [product.imageUrl];
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  // Auto-cycle through sub-images every 3 seconds
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentIdx((prev) => (prev + 1) % images.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  return (
+    <Link
+      href={product.href || `/products/${product.id}`}
+      className="group bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+    >
+      {/* Product Image Card - aspect-square gives taller, more substantial size, rounded-none */}
+      <div className="relative aspect-square w-full rounded-none overflow-hidden bg-[#faf8f5]">
+        {/* Badge: FINAL SALE or BEST SELLER (top most left) */}
+        {product.noReturnRefundExchange ? (
+          <div className="absolute top-0 left-0 z-20">
+            <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+              FINAL SALE
+            </span>
+          </div>
+        ) : (
+          <div className="absolute top-0 left-0 z-20">
+            <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+              BEST SELLER
+            </span>
+          </div>
+        )}
+
+        {/* Wishlist Button */}
+        <button
+          type="button"
+          aria-label="Wishlist toggle"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist({
+              productId: product.id,
+              title: product.title,
+              price: product.price,
+              originalPrice: product.originalPrice,
+              imageUrl: product.imageUrl,
+            });
+          }}
+          className="absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
+        >
+          <Heart
+            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${
+              isInWishlist(product.id)
+                ? 'fill-rose-500 text-rose-500'
+                : 'text-slate-600 hover:text-rose-500'
+            }`}
+          />
+        </button>
+
+        {/* Sub-images layer with smooth 3-second animated transition */}
+        {images.map((imgUrl, idx) => (
+          <div
+            key={`${imgUrl}-${idx}`}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              idx === currentIdx
+                ? 'opacity-100 z-10 pointer-events-auto'
+                : 'opacity-0 z-0 pointer-events-none'
+            }`}
+          >
+            <Image
+              src={imgUrl}
+              alt={`${product.title} - photo ${idx + 1}`}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Card Meta (Title, Rating, Discount Price) */}
+      <div className="mt-2.5 space-y-1">
+        <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+          {product.title}
+        </h3>
+
+        {/* Star Rating */}
+        {(() => {
+          const { rating, reviewsCount } = getProductRating(product);
+          return (
+            <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 font-normal">
+              <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+              <span className="font-normal text-slate-700">{rating.toFixed(1)}</span>
+              <span className="text-slate-400 font-light">({reviewsCount})</span>
+            </div>
+          );
+        })()}
+
+        {/* Pricing with Discount */}
+        <div className="flex items-baseline gap-1.5 pt-0.5">
+          <span className="text-xs sm:text-sm font-medium text-[#89591C]">
+            ₹{product.price}
+          </span>
+          {product.originalPrice > product.price && (
+            <span className="text-[10px] sm:text-[11px] text-slate-400 line-through font-light">
+              ₹{product.originalPrice}
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
 }
 
 // ─── Fallback data ─────────────────────────────────────────────────────────
@@ -87,6 +216,7 @@ export default function StorefrontHomePage() {
 
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [productsLoading, setProductsLoading] = useState<boolean>(true);
+  const [carouselPage, setCarouselPage] = useState<number>(0);
 
   const [shoeCategories, setShoeCategories] = useState<any[]>([
     { id: 'c1', label: 'Casual Leather', href: '/products?category=Casual+Leather', imageUrl: '/products/placeholder.svg' },
@@ -138,21 +268,33 @@ export default function StorefrontHomePage() {
       })
       .catch(() => {});
 
-    // 3. Products API (suggested for you — first 4)
-    fetch('/api/products?limit=4&section=suggested', { cache: 'no-store' })
+    // 3. Products API (suggested for you — fetch up to 12 for carousel)
+    fetch('/api/products?limit=12&section=suggested', { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data?.products) && data.products.length > 0) {
-          const mapped: ProductItem[] = data.products.map((p: any, idx: number) => ({
-            id:            p._id || `p${idx + 1}`,
-            brand:         typeof p.brand === 'object' && p.brand !== null ? p.brand.name : (p.brand || 'Gravoz'),
-            title:         p.name || p.title || '',
-            price:         p.discountPrice || p.price || 0,
-            originalPrice: p.price || p.originalPrice || 0,
-            rating:        p.rating ?? 5.0,
-            imageUrl:      p.images?.[0]?.url || (typeof p.images?.[0] === 'string' ? p.images[0] : '/products/placeholder.svg'),
-            href:          `/products/${p.slug || p._id}`,
-          }));
+          const mapped: ProductItem[] = data.products.map((p: any, idx: number) => {
+            const rawImgs = Array.isArray(p.images) ? p.images : [];
+            const imgs: string[] = rawImgs
+              .map((img: any) => (typeof img === 'string' ? img : img?.url))
+              .filter(Boolean);
+            const mainImg = imgs[0] || (typeof p.imageUrl === 'string' ? p.imageUrl : '/products/placeholder.svg');
+            if (imgs.length === 0 && mainImg) {
+              imgs.push(mainImg);
+            }
+            return {
+              id:            p._id || `p${idx + 1}`,
+              brand:         typeof p.brand === 'object' && p.brand !== null ? p.brand.name : (p.brand || 'Gravoz'),
+              title:         p.name || p.title || '',
+              price:         p.discountPrice || p.price || 0,
+              originalPrice: p.price || p.originalPrice || 0,
+              rating:        p.rating ?? 5.0,
+              imageUrl:      mainImg,
+              images:        imgs,
+              href:          `/products/${p.slug || p._id}`,
+              noReturnRefundExchange: Boolean(p.noReturnRefundExchange),
+            };
+          });
           setProducts(mapped);
         } else {
           setProducts([]);
@@ -244,14 +386,22 @@ export default function StorefrontHomePage() {
               <button
                 type="button"
                 aria-label="Previous Product"
-                className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs"
+                onClick={() => {
+                  const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
+                  setCarouselPage((p) => (p > 0 ? p - 1 : maxP));
+                }}
+                className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
               >
                 <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
               </button>
               <button
                 type="button"
                 aria-label="Next Product"
-                className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs"
+                onClick={() => {
+                  const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
+                  setCarouselPage((p) => (p < maxP ? p + 1 : 0));
+                }}
+                className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
               >
                 <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
               </button>
@@ -259,94 +409,28 @@ export default function StorefrontHomePage() {
           </div>
 
           {/* Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
             {productsLoading
               ? [0, 1, 2, 3].map((i) => <SkeletonProductCard key={i} />)
-              : products.map((product) => (
-              <Link
-                key={product.id}
-                href={product.href || `/products/${product.id}`}
-                className="group bg-white rounded-2xl border border-[#e8e2d8] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
-              >
-                {/* Product Image Card */}
-                <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#faf8f5]">
-                  {/* Best Seller Badge */}
-                  <div className="absolute top-2 left-2 z-10">
-                    <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
-                      BEST SELLER
-                    </span>
-                  </div>
-
-                  {/* Wishlist Button */}
-                  <button
-                    type="button"
-                    aria-label="Wishlist toggle"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleWishlist({
-                        productId: product.id,
-                        title: product.title,
-                        price: product.price,
-                        originalPrice: product.originalPrice,
-                        imageUrl: product.imageUrl,
-                      });
-                    }}
-                    className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
-                  >
-                    <Heart
-                      className={`w-3.5 h-3.5 transition-colors ${
-                        isInWishlist(product.id)
-                          ? 'fill-rose-500 text-rose-500'
-                          : 'text-slate-600 hover:text-rose-500'
-                      }`}
-                    />
-                  </button>
-
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.title}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+              : (products.length > 4
+                  ? products.slice(carouselPage * 4, carouselPage * 4 + 4)
+                  : products
+                ).map((product) => (
+                  <AnimatedProductCard
+                    key={product.id}
+                    product={product}
+                    isInWishlist={isInWishlist}
+                    toggleWishlist={toggleWishlist}
                   />
-                </div>
-
-                {/* Card Meta (Title, Rating, Discount Price) */}
-                <div className="mt-2 space-y-1">
-                  <h3 className="text-[11px] sm:text-xs font-bold text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
-                    {product.title}
-                  </h3>
-
-                  {/* Star Rating */}
-                  {(() => {
-                    const { rating, reviewsCount } = getProductRating(product);
-                    return (
-                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
-                        <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
-                        <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
-                        <span className="text-slate-400 font-normal">({reviewsCount})</span>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Pricing with Discount */}
-                  <div className="flex items-baseline gap-1.5 pt-0.5">
-                    <span className="text-xs sm:text-sm font-bold text-[#89591C]">
-                      ₹{product.price}
-                    </span>
-                    {product.originalPrice > product.price && (
-                      <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
-                        ₹{product.originalPrice}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
+                ))}
           </div>
         </section>
         )}
+
+        {/* Dynamic Behavioral Recommendation Strip (You May Also Like) */}
+        <section className="pt-2">
+          <RecommendationStrip limit={6} />
+        </section>
 
         {/* Recently Viewed Products Strip */}
         <RecentlyViewedStrip limit={4} />
@@ -508,14 +592,6 @@ export default function StorefrontHomePage() {
           </div>
         </section>
 
-        {/* M. Top Selling — Dynamic from Admin (2 per row on laptop) */}
-        <DynamicProductSection
-          heading="Top Selling"
-          filter="isTopSeller"
-          limit={6}
-          layout="list"
-        />
-
         {/* N. Featured Products — Dynamic from Admin */}
         <DynamicProductSection
           heading="Featured Products"
@@ -532,11 +608,6 @@ export default function StorefrontHomePage() {
             sizes="100vw"
             className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
           />
-        </section>
-
-        {/* Dynamic Behavioral Recommendation Strip (You May Also Like) */}
-        <section className="pt-4">
-          <RecommendationStrip limit={6} />
         </section>
 
 

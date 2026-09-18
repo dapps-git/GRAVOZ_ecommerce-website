@@ -20,10 +20,10 @@ export default function Footer() {
             </div>
             <div>
               <h4 className="font-sansation font-bold text-xs sm:text-[13px] text-[#030303] leading-snug">
-                Delivery & Shipping
+                Free All-India Delivery
               </h4>
               <p className="font-sansation text-[10px] sm:text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                Your shoes will be dispatched within 1-2 business days
+                100% Free Shipping across all pincodes in India • Dispatched in 1-2 days
               </p>
             </div>
           </div>

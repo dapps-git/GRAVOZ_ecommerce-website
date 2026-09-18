@@ -79,7 +79,7 @@ export default function OrderInvoicePage() {
   }
 
   const subtotal = order.items?.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || order.totalAmount;
-  const shippingFee = order.shippingFee || (order.totalAmount > 1299 ? 0 : 99);
+  const shippingFee = 0; // 100% Free Delivery All Over India
   const discount = order.discountAmount || 0;
   const grandTotal = order.totalAmount;
   const orderDate = new Date(order.createdAt).toLocaleDateString('en-IN', {

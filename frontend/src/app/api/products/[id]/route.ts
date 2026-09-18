@@ -26,8 +26,8 @@ export async function GET(
 
     if (mongoose.Types.ObjectId.isValid(id)) {
       product = await Product.findById(id)
-        .populate({ path: 'category', select: 'name slug targetAudience', strictPopulate: false })
-        .populate({ path: 'brand', select: 'name slug logoUrl', strictPopulate: false })
+        .populate({ path: 'category', model: Category, select: 'name slug targetAudience', strictPopulate: false })
+        .populate({ path: 'brand', model: Brand, select: 'name slug logoUrl', strictPopulate: false })
         .lean();
     }
 
@@ -41,8 +41,8 @@ export async function GET(
           { name: new RegExp(`^${id.replace(/-/g, ' ')}$`, 'i') },
         ],
       })
-        .populate({ path: 'category', select: 'name slug targetAudience', strictPopulate: false })
-        .populate({ path: 'brand', select: 'name slug logoUrl', strictPopulate: false })
+        .populate({ path: 'category', model: Category, select: 'name slug targetAudience', strictPopulate: false })
+        .populate({ path: 'brand', model: Brand, select: 'name slug logoUrl', strictPopulate: false })
         .lean();
     }
 
@@ -186,13 +186,18 @@ export async function GET(
       reviewsCount: product.reviewsCount || 0,
       images: collectedImages,
       features: formattedFeatures,
-      additionalInfo: product.additionalInfo || additionalInfoObj,
-      shippingAndReturn: product.shippingAndReturn || {
+      noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
+      shippingAndReturn: product.shippingAndReturn || (product.noReturnRefundExchange ? {
+        'Free Delivery': 'Complimentary express shipping across India on all prepaid & COD orders.',
+        'Estimated Delivery': '2 to 4 business days to metro cities; 4 to 6 days to rest of India.',
+        'Return Policy': 'No Return • No Refund • No Exchange (Clearance Old Stock)',
+        'Warranty': '6-month comprehensive manufacturing warranty covering stitching & sole adhesion.',
+      } : {
         'Free Delivery': 'Complimentary express shipping across India on all prepaid & COD orders.',
         'Estimated Delivery': '2 to 4 business days to metro cities; 4 to 6 days to rest of India.',
         'Easy Returns & Exchanges': '7-day hassle-free return and exchange policy with doorstep pickup.',
         'Warranty': '6-month comprehensive manufacturing warranty covering stitching & sole adhesion.',
-      },
+      }),
     };
 
     return NextResponse.json(

@@ -251,10 +251,10 @@ export default function WishlistPage() {
                 >
                   {/* Card Image */}
                   <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#faf8f5]">
-                    {/* Best Seller Pill */}
+                    {/* Best Seller Pill (top most left) */}
                     {prod.isBestSeller && (
-                      <div className="absolute top-2 left-2 z-10">
-                        <span className="px-2 py-0.5 rounded-none text-[8px] sm:text-[9px] font-bold uppercase tracking-wider bg-[#68421A] text-white shadow-xs">
+                      <div className="absolute top-0 left-0 z-10">
+                        <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
                           BEST SELLER
                         </span>
                       </div>
@@ -296,8 +296,8 @@ export default function WishlistPage() {
                   </div>
 
                   {/* Card Meta */}
-                  <div className="mt-2 space-y-1">
-                    <h3 className="text-[11px] sm:text-xs font-bold text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+                  <div className="mt-2.5 space-y-1">
+                    <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
                       {prod.name}
                     </h3>
 
@@ -305,17 +305,17 @@ export default function WishlistPage() {
                     {(() => {
                       const { rating, reviewsCount } = getProductRating(prod);
                       return (
-                        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-600">
+                        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 font-normal">
                           <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
-                          <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
-                          <span className="text-slate-400 font-normal">({reviewsCount})</span>
+                          <span className="font-normal text-slate-700">{rating.toFixed(1)}</span>
+                          <span className="text-slate-400 font-light">({reviewsCount})</span>
                         </div>
                       );
                     })()}
 
                     {/* Price */}
                     <div className="flex items-baseline gap-1.5 pt-0.5">
-                      <span className="text-xs sm:text-sm font-bold text-[#111111]">
+                      <span className="text-xs sm:text-sm font-medium text-[#89591C]">
                         ₹{prod.discountPrice || prod.price}
                       </span>
                     </div>

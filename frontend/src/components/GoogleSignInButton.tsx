@@ -10,6 +10,7 @@ interface Props {
   isSubmitting?: boolean;
   setIsSubmitting?: (val: boolean) => void;
   text?: string;
+  referralCode?: string;
 }
 
 declare global {
@@ -24,6 +25,7 @@ export default function GoogleSignInButton({
   isSubmitting,
   setIsSubmitting,
   text = 'Continue with Google',
+  referralCode,
 }: Props) {
   const [isGsiLoaded, setIsGsiLoaded] = useState(false);
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
@@ -60,7 +62,7 @@ export default function GoogleSignInButton({
         throw new Error('No Google credential returned');
       }
 
-      const res = await loginWithGoogle({ credential: response.credential });
+      const res = await loginWithGoogle({ credential: response.credential, referralCode });
       if (res.success && res.user) {
         playSuccessSound();
         onSuccess(res.user);
@@ -87,6 +89,7 @@ export default function GoogleSignInButton({
           email: demoEmail.trim(),
           name: demoEmail.split('@')[0],
           googleId: 'demo-google-' + Date.now(),
+          referralCode,
         }).then((res) => {
           if (res.success && res.user) {
             playSuccessSound();

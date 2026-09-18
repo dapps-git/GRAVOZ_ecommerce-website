@@ -33,6 +33,9 @@ export interface ICustomer extends Document {
   rewardPoints: number;
   referralCode: string;
   referredBy?: string;
+  referralCodeUsed?: string;
+  referralDiscountBalance: number;
+  hasUsedReferralDiscount: boolean;
   activityLogs: ICustomerActivityLog[];
   totalOrders: number;
   totalSpent: number;
@@ -76,7 +79,10 @@ const CustomerSchema = new Schema<ICustomer>(
     addresses: [AddressSchema],
     rewardPoints: { type: Number, default: 0 },
     referralCode: { type: String, required: true, unique: true, index: true },
-    referredBy: { type: String, default: '' },
+    referredBy: { type: String, default: '', index: true },
+    referralCodeUsed: { type: String, default: '' },
+    referralDiscountBalance: { type: Number, default: 0, min: 0 },
+    hasUsedReferralDiscount: { type: Boolean, default: false },
     activityLogs: [ActivityLogSchema],
     totalOrders: { type: Number, default: 0 },
     totalSpent: { type: Number, default: 0 },

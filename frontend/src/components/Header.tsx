@@ -33,13 +33,13 @@ export default function Header() {
       <div className="bg-[#89591C] text-white text-[10px] sm:text-[11px] font-medium py-1.5 px-4 overflow-hidden tracking-[0.04em] uppercase">
         {/* Mobile View Announcement: Single clean line */}
         <div className="md:hidden flex items-center justify-center text-center truncate">
-          <span className="truncate">🚚 FREE DELIVERY ON ORDERS ABOVE ₹1299 • SALE IS LIVE</span>
+          <span className="truncate">🚚 100% FREE SHIPPING ALL OVER INDIA • SALE IS LIVE</span>
         </div>
 
         {/* Desktop View Announcement */}
         <div className="hidden md:flex items-center justify-around whitespace-nowrap gap-8">
           <div className="flex items-center gap-2">
-            <span>FREE DELIVERY FOR ORDERS ABOVE ₹1299 🚚</span>
+            <span>100% FREE SHIPPING ALL OVER INDIA 🚚</span>
           </div>
           <div className="flex items-center gap-2">
             <span>% WELCOME SALE IS LIVE NOW 🎉</span>

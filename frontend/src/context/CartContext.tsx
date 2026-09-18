@@ -13,6 +13,8 @@ export interface CartItem {
   quantity: number;
   imageUrl: string;
   color?: string;
+  noReturnRefundExchange?: boolean;
+  isAddon?: boolean;
 }
 
 interface CartContextType {

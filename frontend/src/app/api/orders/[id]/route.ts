@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Order } from '@/models/Order';
+import { Customer } from '@/models/Customer';
+import { Referral } from '@/models/Referral';
 import { ReturnRefund } from '@/models/ReturnRefund';
 
 // GET /api/orders/[id]
@@ -34,7 +36,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const { id } = await params;
     const body = await req.json();
-    const { status, note, returnReason, returnDescription, returnImages } = body;
+    const { status: inputStatus, action, note, location, returnReason, returnDescription, returnImages } = body;
+    const status = inputStatus || (action === 'cancel' ? 'cancelled' : undefined);
+
+    if (!status) {
+      return NextResponse.json({ error: 'Status is required' }, { status: 400 });
+    }
 
     await connectDB();
 
@@ -61,6 +68,56 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
 
     order.orderStatus = status;
+
+    // Handle referral discount restoration or reward revocation on cancellation/refund
+    if (status === 'cancelled' || status === 'refunded') {
+      try {
+        const customerLookup =
+          order.customerId && mongoose.Types.ObjectId.isValid(order.customerId)
+            ? { _id: order.customerId }
+            : { email: order.customerEmail.toLowerCase().trim() };
+
+        // 1. If customer used ₹100 referral discount on this order, restore their balance
+        if (order.referralDiscountType === 'referrer_reward_100') {
+          await Customer.findOneAndUpdate(customerLookup, {
+            $inc: { referralDiscountBalance: 100 },
+          });
+          await Referral.findOneAndUpdate(
+            { referrerOrderId: order._id },
+            { referrerDiscountUsed: false, referrerOrderId: null }
+          );
+        }
+
+        // 2. If customer used 15% first order discount, restore eligibility
+        if (order.referralDiscountType === 'referred_first_order_15') {
+          await Customer.findOneAndUpdate(customerLookup, {
+            hasUsedReferralDiscount: false,
+          });
+          await Referral.findOneAndUpdate(
+            { referredOrderId: order._id },
+            { referredDiscountUsed: false, referredOrderId: null }
+          );
+        }
+
+        // 3. If this order generated a ₹100 reward for the referrer and referrer hasn't used it yet, revoke it
+        const pendingOrCompletedRef = await Referral.findOne({
+          referredOrderId: order._id,
+          referrerDiscountAvailable: true,
+          referrerDiscountUsed: false,
+        });
+
+        if (pendingOrCompletedRef) {
+          await Customer.findByIdAndUpdate(pendingOrCompletedRef.referrer, {
+            $inc: { referralDiscountBalance: -100 },
+          });
+          pendingOrCompletedRef.referrerDiscountAvailable = false;
+          pendingOrCompletedRef.status = 'cancelled';
+          await pendingOrCompletedRef.save();
+        }
+      } catch (revErr) {
+        console.warn('Referral discount reversal warning:', revErr);
+      }
+    }
 
     if (status === 'return_requested') {
       order.returnDetails = {
@@ -96,10 +153,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     }
 
+    if (location !== undefined && location.trim()) {
+      order.currentLocation = location.trim();
+    }
+
     if (!order.statusHistory) order.statusHistory = [];
     order.statusHistory.push({
       status,
       timestamp: new Date(),
+      location: location ? location.trim() : (order.currentLocation || ''),
       note: note || returnReason || `Status updated to ${status}`,
     });
 

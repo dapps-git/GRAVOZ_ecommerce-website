@@ -32,6 +32,7 @@ import {
   Calendar,
   Headphones,
   Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 
 import {
@@ -72,6 +73,18 @@ export default function CheckoutPage() {
     label: 'Home',
   });
   const [formError, setFormError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Helper to strip leading 91/0 and extract clean 10-digit mobile
+  const sanitizeIndianPhone = (val: string) => {
+    let digits = (val || '').replace(/\D/g, '');
+    if (digits.startsWith('91') && digits.length > 10) {
+      digits = digits.slice(2);
+    } else if (digits.startsWith('0') && digits.length > 10) {
+      digits = digits.slice(1);
+    }
+    return digits.slice(0, 10);
+  };
 
   // Load real saved addresses when component mounts or user updates
   useEffect(() => {
@@ -85,6 +98,35 @@ export default function CheckoutPage() {
 
   // Coupon State
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; description: string } | null>(null);
+
+  // Referral Discount State
+  const [referralStatus, setReferralStatus] = useState<{
+    isFirstOrderEligible: boolean;
+    availableDiscount: number;
+    hasUsedReferralDiscount?: boolean;
+    referralCode?: string;
+  } | null>(null);
+  const [appliedReferralType, setAppliedReferralType] = useState<'referred_first_order_15' | 'referrer_reward_100' | null>(null);
+
+  // Load referral discount eligibility for current user
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetch('/api/referrals/status')
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && data.success) {
+            setReferralStatus(data);
+            // If referred user on first order and never used discount, automatically apply 15% discount
+            if (data.isFirstOrderEligible && !data.hasUsedReferralDiscount) {
+              setAppliedReferralType('referred_first_order_15');
+            } else {
+              setAppliedReferralType((prev) => (prev === 'referred_first_order_15' ? null : prev));
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isLoggedIn]);
 
   // Payment State
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('UPI');
@@ -259,89 +301,143 @@ export default function CheckoutPage() {
   }
 
   // Active address object
-  const activeAddress: SavedAddress =
+  const activeAddress: SavedAddress | null =
     savedAddresses.find((a) => a.id === selectedAddressId) ||
-    savedAddresses[0] || {
-      id: 'addr_temp',
-      name: user?.name || '',
-      phone: user?.phone || '',
-      street: user?.address || '',
-      city: 'Chennai',
-      state: 'Tamil Nadu',
-      postalCode: '',
-      country: 'India',
-      isDefault: true,
-      label: 'Home',
-    };
+    savedAddresses[0] ||
+    null;
 
   // Pricing Calculations
   const calculatedDiscount = appliedCoupon ? appliedCoupon.discount : 0;
+  let calculatedReferralDiscount = 0;
+
+  if (appliedReferralType === 'referred_first_order_15') {
+    calculatedReferralDiscount = Math.round(subtotal * 0.15);
+  } else if (appliedReferralType === 'referrer_reward_100') {
+    calculatedReferralDiscount = Math.min(100, Math.max(0, subtotal - calculatedDiscount));
+  }
+
   const shippingFee = 0; // Free
   const totalItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const finalTotal = Math.max(0, subtotal - calculatedDiscount + shippingFee);
+  const finalTotal = Math.max(0, subtotal - calculatedDiscount - calculatedReferralDiscount + shippingFee);
 
   // Address Handlers
   const handleOpenAddAddress = () => {
     setEditingAddressId(null);
     setAddressFormData({
       name: user?.name || '',
-      phone: user?.phone || '',
+      phone: sanitizeIndianPhone(user?.phone || ''),
       street: '',
-      city: 'Chennai',
-      state: 'Tamil Nadu',
+      city: '',
+      state: '',
       postalCode: '',
       country: 'India',
       isDefault: savedAddresses.length === 0,
       label: 'Home',
     });
     setFormError('');
+    setFieldErrors({});
     setIsAddressModalOpen(true);
   };
 
   const handleOpenEditAddress = (addr: SavedAddress) => {
     setEditingAddressId(addr.id);
     setAddressFormData({
-      name: addr.name,
-      phone: addr.phone,
-      street: addr.street,
-      city: addr.city,
-      state: addr.state,
-      postalCode: addr.postalCode,
-      country: addr.country,
+      name: addr.name || '',
+      phone: sanitizeIndianPhone(addr.phone || ''),
+      street: addr.street || '',
+      city: addr.city || '',
+      state: addr.state || '',
+      postalCode: addr.postalCode || '',
+      country: addr.country || 'India',
       isDefault: addr.isDefault || false,
       label: addr.label || 'Home',
     });
     setFormError('');
+    setFieldErrors({});
     setIsAddressModalOpen(true);
   };
 
   const handleSaveAddress = (e: React.FormEvent) => {
     e.preventDefault();
-    const { name, phone, street, city, state, postalCode } = addressFormData;
-    if (!name || !phone || !street || !city || !state || !postalCode) {
-      setFormError('Please fill out all required fields.');
+    const errors: Record<string, string> = {};
+    const { name, phone, street, city, state, postalCode, country, isDefault, label } = addressFormData;
+
+    const trimmedName = (name || '').trim();
+    if (!trimmedName) {
+      errors.name = 'Full name is required.';
+    } else if (trimmedName.length < 2) {
+      errors.name = 'Full name must be at least 2 characters.';
+    }
+
+    const digitsPhone = sanitizeIndianPhone(phone);
+    if (!digitsPhone) {
+      errors.phone = 'Mobile number is required.';
+    } else if (digitsPhone.length !== 10) {
+      errors.phone = `Mobile number must be exactly 10 digits (currently ${digitsPhone.length}).`;
+    } else if (!/^[6-9]\d{9}$/.test(digitsPhone)) {
+      errors.phone = 'Enter a valid 10-digit Indian mobile number (must start with 6, 7, 8, or 9).';
+    }
+
+    const trimmedStreet = (street || '').trim();
+    if (!trimmedStreet) {
+      errors.street = 'Street address / house details are required.';
+    } else if (trimmedStreet.length < 5) {
+      errors.street = 'Please provide full house/building/street address (min 5 characters).';
+    }
+
+    const trimmedCity = (city || '').trim();
+    if (!trimmedCity) {
+      errors.city = 'City / Town is required.';
+    }
+
+    const trimmedState = (state || '').trim();
+    if (!trimmedState) {
+      errors.state = 'State is required.';
+    }
+
+    const digitsPostal = (postalCode || '').replace(/\D/g, '').slice(0, 6);
+    if (!digitsPostal) {
+      errors.postalCode = 'PIN Code is required.';
+    } else if (!/^\d{6}$/.test(digitsPostal)) {
+      errors.postalCode = 'PIN Code must be exactly 6 digits.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setFormError('Please correct the highlighted fields before saving.');
       return;
     }
-    if (!/^\d{6}$/.test(postalCode)) {
-      setFormError('Please enter a valid 6-digit PIN Code.');
-      return;
-    }
+
+    setFieldErrors({});
+    setFormError('');
+
+    const formattedAddress: Omit<SavedAddress, 'id'> = {
+      name: trimmedName,
+      phone: `+91 ${digitsPhone}`,
+      street: trimmedStreet,
+      city: trimmedCity,
+      state: trimmedState,
+      postalCode: digitsPostal,
+      country: (country || 'India').trim(),
+      isDefault: Boolean(isDefault),
+      label: label || 'Home',
+    };
 
     let updated: SavedAddress[];
     let targetId = editingAddressId;
 
     if (editingAddressId) {
       updated = savedAddresses.map((a) =>
-        a.id === editingAddressId ? { ...addressFormData, id: editingAddressId } : a
+        a.id === editingAddressId ? { ...formattedAddress, id: editingAddressId } : a
       );
     } else {
       const newId = 'addr_' + Date.now();
       targetId = newId;
       const isFirst = savedAddresses.length === 0;
       const newAddr: SavedAddress = {
-        ...addressFormData,
+        ...formattedAddress,
         id: newId,
-        isDefault: isFirst || addressFormData.isDefault,
+        isDefault: isFirst || formattedAddress.isDefault,
       };
       updated = isFirst ? [newAddr] : [...savedAddresses, newAddr];
       setSelectedAddressId(newId);
@@ -365,6 +461,13 @@ export default function CheckoutPage() {
 
   // Place Order Handler with simulated transition loading
   const handlePlaceOrder = async () => {
+    if (!activeAddress || !activeAddress.street || !activeAddress.postalCode) {
+      setOrderError('Please add and select a valid delivery address before placing your order.');
+      setCurrentStep('address');
+      setIsAddressModalOpen(true);
+      return;
+    }
+
     setIsPlacingOrder(true);
     setOrderError('');
 
@@ -376,7 +479,7 @@ export default function CheckoutPage() {
           const cleanPin =
             (activeAddress.postalCode && activeAddress.postalCode.trim()) ||
             (activeAddress.street && (activeAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
-            '600040';
+            '';
 
           const payload = {
             customerId: (user as any)?._id || '',
@@ -386,9 +489,9 @@ export default function CheckoutPage() {
             shippingAddress: {
               name: activeAddress.name || user?.name || 'Customer',
               phone: activeAddress.phone || user?.phone || '',
-              street: activeAddress.street || user?.address || 'Street Address',
-              city: activeAddress.city || 'Chennai',
-              state: activeAddress.state || 'Tamil Nadu',
+              street: activeAddress.street,
+              city: activeAddress.city || '',
+              state: activeAddress.state || '',
               postalCode: cleanPin,
               country: activeAddress.country || 'India',
             },
@@ -401,9 +504,12 @@ export default function CheckoutPage() {
               size: itm.size,
               color: itm.color,
               imageUrl: itm.imageUrl,
+              noReturnRefundExchange: Boolean(itm.noReturnRefundExchange),
             })),
             subtotal,
             discountAmount: calculatedDiscount,
+            referralDiscountType: appliedReferralType || undefined,
+            referralDiscountAmount: calculatedReferralDiscount,
             couponCode: appliedCoupon?.code || '',
             shippingFee,
             totalAmount: finalTotal,
@@ -536,6 +642,17 @@ export default function CheckoutPage() {
             </div>
           )}
 
+          {calculatedReferralDiscount > 0 && (
+            <div className="flex justify-between py-2 text-[#16A34A]">
+              <span>
+                {appliedReferralType === 'referred_first_order_15'
+                  ? 'Referral Discount (15% First Order)'
+                  : 'Referral Discount'}
+              </span>
+              <span className="font-semibold">- ₹{calculatedReferralDiscount.toLocaleString('en-IN')}</span>
+            </div>
+          )}
+
           <div className="flex justify-between pt-3 pb-1 text-[15px] sm:text-[17px] font-bold text-[#171717]">
             <div>
               <span>Total Amount</span>
@@ -549,11 +666,105 @@ export default function CheckoutPage() {
           </div>
         </div>
 
+        {items.some((i) => i.noReturnRefundExchange) && (
+          <div className="bg-[#FFF9F2] border border-[#F5C78E] rounded-[11px] p-2.5 flex items-start gap-2 text-[11px] text-[#92400E]">
+            <AlertCircle className="w-4 h-4 text-[#B45309] flex-shrink-0 mt-0.5" />
+            <span>Order contains clearance item(s) sold as-is: <strong>No Return • No Refund • No Exchange</strong>.</span>
+          </div>
+        )}
+
+        {/* ── Referral Discount Controls ── */}
+        {referralStatus?.isFirstOrderEligible && !referralStatus?.hasUsedReferralDiscount && (
+          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-[11px] p-3 text-xs space-y-1.5 font-poppins">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Gift className="w-4 h-4 text-[#8B4A12]" />
+                <span className="font-semibold text-[#171717]">Referral Welcome Discount (15%)</span>
+              </div>
+              <span className="text-[11px] font-bold text-emerald-700">
+                -₹{Math.round(subtotal * 0.15).toLocaleString('en-IN')}
+              </span>
+            </div>
+            <p className="text-[10px] text-[#667085]">
+              Exclusive 15% discount for your first purchase through referral!
+            </p>
+            <div className="flex items-center justify-between pt-1 border-t border-[#f0ece5]">
+              <span className="text-[10px] text-slate-500">
+                Status: {appliedReferralType === 'referred_first_order_15' ? (
+                  <span className="text-emerald-700 font-semibold">Applied</span>
+                ) : (
+                  <span className="text-slate-600">Available</span>
+                )}
+              </span>
+              {appliedReferralType === 'referred_first_order_15' ? (
+                <button
+                  type="button"
+                  onClick={() => setAppliedReferralType(null)}
+                  className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                >
+                  Remove
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setAppliedReferralType('referred_first_order_15')}
+                  className="text-[11px] font-bold text-[#8B4A12] hover:underline cursor-pointer"
+                >
+                  Apply 15%
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {(referralStatus?.availableDiscount || 0) >= 100 && (
+          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-[11px] p-3 text-xs space-y-1.5 font-poppins">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Gift className="w-4 h-4 text-[#8B4A12]" />
+                <span className="font-semibold text-[#171717]">Referral Discount</span>
+              </div>
+              <span className="text-[11px] font-bold text-[#8B4A12]">
+                ₹{referralStatus?.availableDiscount} Available
+              </span>
+            </div>
+            <p className="text-[10px] text-[#667085]">
+              Earned from referred friends. Apply ₹100 discount to this purchase.
+            </p>
+            <div className="flex items-center justify-between pt-1 border-t border-[#f0ece5]">
+              <span className="text-[10px] text-slate-500">
+                {appliedReferralType === 'referrer_reward_100' ? (
+                  <span className="text-emerald-700 font-semibold">₹100 Applied</span>
+                ) : (
+                  <span>Not applied</span>
+                )}
+              </span>
+              {appliedReferralType === 'referrer_reward_100' ? (
+                <button
+                  type="button"
+                  onClick={() => setAppliedReferralType(null)}
+                  className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                >
+                  Remove
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setAppliedReferralType('referrer_reward_100')}
+                  className="text-[11px] font-bold text-[#8B4A12] hover:underline cursor-pointer"
+                >
+                  Apply ₹100
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* You will save banner */}
-        {calculatedDiscount > 0 && (
+        {(calculatedDiscount + calculatedReferralDiscount) > 0 && (
           <div className="bg-[#F0F8EC] border border-[#D2EAC3] rounded-[10px] p-2.5 flex items-center gap-2 text-[11px] font-semibold text-[#16A34A]">
             <CheckCircle2 className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
-            <span>You will save ₹{calculatedDiscount.toLocaleString('en-IN')} on this order</span>
+            <span>You will save ₹{(calculatedDiscount + calculatedReferralDiscount).toLocaleString('en-IN')} on this order</span>
           </div>
         )}
 
@@ -1157,6 +1368,14 @@ export default function CheckoutPage() {
                   );
                 })}
 
+                {savedAddresses.length === 0 && (
+                  <div className="p-6 text-center bg-white border border-[#E8E1D9] rounded-[12px] space-y-1.5">
+                    <MapPin className="w-7 h-7 text-[#8B4A12]/50 mx-auto" />
+                    <p className="text-sm font-semibold text-[#171717]">No Delivery Address Added</p>
+                    <p className="text-xs text-[#667085]">Please add your delivery address to proceed with your order.</p>
+                  </div>
+                )}
+
                 <button
                   type="button"
                   onClick={handleOpenAddAddress}
@@ -1170,7 +1389,7 @@ export default function CheckoutPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (savedAddresses.length === 0 || !activeAddress.street) {
+                  if (savedAddresses.length === 0 || !activeAddress?.street) {
                     handleOpenAddAddress();
                     return;
                   }
@@ -1436,86 +1655,165 @@ export default function CheckoutPage() {
               Enter the exact shipping address where you wish to receive your items.
             </p>
 
-            <form onSubmit={handleSaveAddress} className="mt-4 space-y-3">
+            <form onSubmit={handleSaveAddress} className="mt-4 space-y-3.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">Full Name *</label>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    Full Name <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
                     value={addressFormData.name}
-                    onChange={(e) => setAddressFormData({ ...addressFormData, name: e.target.value })}
+                    onChange={(e) => {
+                      setAddressFormData({ ...addressFormData, name: e.target.value });
+                      if (fieldErrors.name) setFieldErrors({ ...fieldErrors, name: '' });
+                    }}
                     placeholder="Recipient's Name"
-                    className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C]"
-                    required
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                      fieldErrors.name
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                        : 'border-[#e8e2d8] focus:border-[#89591C]'
+                    }`}
                   />
+                  {fieldErrors.name && (
+                    <p className="text-[10px] text-rose-600 font-medium mt-1">{fieldErrors.name}</p>
+                  )}
                 </div>
+
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">Mobile Number *</label>
-                  <input
-                    type="tel"
-                    value={addressFormData.phone}
-                    onChange={(e) => setAddressFormData({ ...addressFormData, phone: e.target.value })}
-                    placeholder="+91 00000 00000"
-                    className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C]"
-                    required
-                  />
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    Mobile Number <span className="text-rose-500">*</span>
+                  </label>
+                  <div
+                    className={`flex items-center rounded-xl bg-[#faf8f5] border transition-colors overflow-hidden ${
+                      fieldErrors.phone
+                        ? 'border-rose-400 bg-rose-50/20'
+                        : 'border-[#e8e2d8] focus-within:border-[#89591C]'
+                    }`}
+                  >
+                    <span className="px-2.5 py-2 text-xs font-semibold text-slate-600 bg-slate-100/90 border-r border-[#e8e2d8] select-none">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      value={addressFormData.phone}
+                      onChange={(e) => {
+                        const digits = sanitizeIndianPhone(e.target.value);
+                        setAddressFormData({ ...addressFormData, phone: digits });
+                        if (fieldErrors.phone) setFieldErrors({ ...fieldErrors, phone: '' });
+                      }}
+                      placeholder="9876543210"
+                      className="w-full px-3 py-2 text-xs bg-transparent focus:outline-none font-medium tracking-wide text-slate-800"
+                    />
+                  </div>
+                  {fieldErrors.phone ? (
+                    <p className="text-[10px] text-rose-600 font-medium mt-1">{fieldErrors.phone}</p>
+                  ) : (
+                    <p className="text-[10px] text-slate-400 font-light mt-0.5">10 digits without prefix</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-1">Street Address *</label>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  Street Address <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={addressFormData.street}
-                  onChange={(e) => setAddressFormData({ ...addressFormData, street: e.target.value })}
+                  onChange={(e) => {
+                    setAddressFormData({ ...addressFormData, street: e.target.value });
+                    if (fieldErrors.street) setFieldErrors({ ...fieldErrors, street: '' });
+                  }}
                   placeholder="House / Flat No., Building, Street, Area"
-                  className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C]"
-                  required
+                  className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                    fieldErrors.street
+                      ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                      : 'border-[#e8e2d8] focus:border-[#89591C]'
+                  }`}
                 />
+                {fieldErrors.street && (
+                  <p className="text-[10px] text-rose-600 font-medium mt-1">{fieldErrors.street}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">City / Town *</label>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    City / Town <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
                     value={addressFormData.city}
-                    onChange={(e) => setAddressFormData({ ...addressFormData, city: e.target.value })}
+                    onChange={(e) => {
+                      setAddressFormData({ ...addressFormData, city: e.target.value });
+                      if (fieldErrors.city) setFieldErrors({ ...fieldErrors, city: '' });
+                    }}
                     placeholder="City"
-                    className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C]"
-                    required
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                      fieldErrors.city
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                        : 'border-[#e8e2d8] focus:border-[#89591C]'
+                    }`}
                   />
+                  {fieldErrors.city && (
+                    <p className="text-[10px] text-rose-600 font-medium mt-1">{fieldErrors.city}</p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">State *</label>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    State <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
                     value={addressFormData.state}
-                    onChange={(e) => setAddressFormData({ ...addressFormData, state: e.target.value })}
+                    onChange={(e) => {
+                      setAddressFormData({ ...addressFormData, state: e.target.value });
+                      if (fieldErrors.state) setFieldErrors({ ...fieldErrors, state: '' });
+                    }}
                     placeholder="State"
-                    className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C]"
-                    required
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                      fieldErrors.state
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                        : 'border-[#e8e2d8] focus:border-[#89591C]'
+                    }`}
                   />
+                  {fieldErrors.state && (
+                    <p className="text-[10px] text-rose-600 font-medium mt-1">{fieldErrors.state}</p>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">PIN Code *</label>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                    PIN Code <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
-                    value={addressFormData.postalCode}
+                    inputMode="numeric"
                     maxLength={6}
-                    onChange={(e) =>
+                    value={addressFormData.postalCode}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '').slice(0, 6);
                       setAddressFormData({
                         ...addressFormData,
-                        postalCode: e.target.value.replace(/\D/g, ''),
-                      })
-                    }
+                        postalCode: val,
+                      });
+                      if (fieldErrors.postalCode) setFieldErrors({ ...fieldErrors, postalCode: '' });
+                    }}
                     placeholder="6-Digit PIN Code"
-                    className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C]"
-                    required
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none font-mono transition-colors ${
+                      fieldErrors.postalCode
+                        ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                        : 'border-[#e8e2d8] focus:border-[#89591C]'
+                    }`}
                   />
+                  {fieldErrors.postalCode && (
+                    <p className="text-[10px] text-rose-600 font-medium mt-1">{fieldErrors.postalCode}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-700 mb-1">Country</label>
@@ -1529,7 +1827,10 @@ export default function CheckoutPage() {
               </div>
 
               {formError && (
-                <p className="text-xs text-rose-600 font-semibold">{formError}</p>
+                <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600 font-semibold flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span>{formError}</span>
+                </div>
               )}
 
               <div className="pt-2 flex justify-end gap-2">

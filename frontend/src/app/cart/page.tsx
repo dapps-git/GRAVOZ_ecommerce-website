@@ -235,6 +235,12 @@ export default function CartPage() {
                               Size: {item.size}
                             </span>
                           )}
+                          {item.noReturnRefundExchange && (
+                            <span className="inline-flex items-center gap-1 bg-[#FFF1E0] border border-[#F5C78E] text-[#92400E] text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase tracking-wider">
+                              <AlertTriangle className="w-3 h-3 text-[#B45309]" />
+                              <span>No Return / Refund</span>
+                            </span>
+                          )}
                           {isItemOutOfStock(item) && (
                             <span className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider animate-pulse">
                               <AlertTriangle className="w-3 h-3 text-rose-600" />
@@ -477,6 +483,13 @@ export default function CartPage() {
                     </span>
                   </div>
                 </div>
+
+                {items.some((i) => i.noReturnRefundExchange) && (
+                  <div className="bg-[#FFF9F2] border border-[#F5C78E] rounded-xl p-2.5 flex items-start gap-2 text-[11px] text-[#92400E]">
+                    <AlertTriangle className="w-4 h-4 text-[#B45309] flex-shrink-0 mt-0.5" />
+                    <span>Contains clearance item(s) subject to <strong>No Return • No Refund • No Exchange</strong>.</span>
+                  </div>
+                )}
 
                 {/* Checkout CTA Button */}
                 {hasOutOfStockItems ? (
