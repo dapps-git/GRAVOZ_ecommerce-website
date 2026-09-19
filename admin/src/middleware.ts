@@ -4,9 +4,11 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Protect all /admin routes except /admin/login
-  const adminToken = request.cookies.get('gravoz_admin_token')?.value || request.cookies.get('gravoz_admin_refresh_token')?.value;
+  const adminToken =
+    request.cookies.get('gravoz_admin_token')?.value ||
+    request.cookies.get('gravoz_admin_refresh_token')?.value;
 
+  // 1. Protect Admin UI Routes (e.g. /admin/dashboard, /admin/products)
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
     if (!adminToken) {
       const loginUrl = new URL('/admin/login', request.url);
@@ -15,10 +17,25 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // If visiting /admin/login while already logged in, redirect to /admin/dashboard
+  // 2. Redirect logged-in admin away from /admin/login
   if (pathname === '/admin/login') {
     if (adminToken) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+  }
+
+  // 3. Protect Admin API Routes (e.g. /api/products, /api/coupons, /api/orders, /api/customers)
+  // Public exceptions: /api/admin/auth/login and /api/health
+  if (
+    pathname.startsWith('/api/') &&
+    !pathname.startsWith('/api/admin/auth/login') &&
+    !pathname.startsWith('/api/health')
+  ) {
+    if (!adminToken) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Admin session required.' },
+        { status: 401 }
+      );
     }
   }
 
@@ -26,5 +43,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/api/:path*'],
 };

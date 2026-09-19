@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Coupon } from '@/models/Coupon';
+import { requireAdmin } from '@/lib/api-guard';
 
 // PUT /api/coupons/[id]
 export async function PUT(
@@ -8,6 +9,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin();
+    if ('error' in auth) return auth.error;
+
     const { id } = await params;
     await connectDB();
     const body = await req.json();
@@ -42,6 +46,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireAdmin();
+    if ('error' in auth) return auth.error;
+
     const { id } = await params;
     await connectDB();
     const deleted = await Coupon.findByIdAndDelete(id);

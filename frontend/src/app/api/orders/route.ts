@@ -7,25 +7,38 @@ import { Cart } from '@/models/Cart';
 import { Product } from '@/models/Product';
 import { Referral } from '@/models/Referral';
 import { Coupon } from '@/models/Coupon';
+import { getUserSession } from '@/lib/auth';
 
-// GET /api/orders?email=xxx
+// GET /api/orders - Securely fetch orders for authenticated customer
 export async function GET(req: NextRequest) {
   try {
+    const session = await getUserSession();
     const { searchParams } = new URL(req.url);
-    const email = searchParams.get('email');
-    const customerId = searchParams.get('customerId');
-
-    if (!email && !customerId) {
-      return NextResponse.json({ error: 'email or customerId required' }, { status: 400 });
-    }
+    const emailParam = searchParams.get('email');
+    const customerIdParam = searchParams.get('customerId');
 
     await connectDB();
 
-    const query: Record<string, any> = {};
-    if (email) {
-      query.customerEmail = email.toLowerCase().trim();
-    } else if (customerId && mongoose.Types.ObjectId.isValid(customerId)) {
-      query.customerId = customerId;
+    // Enforce authorization: if logged in, enforce matching session user; otherwise require email/customerId query
+    let query: Record<string, any> = {};
+
+    if (session) {
+      // Logged-in user: only allow viewing their own orders
+      query = {
+        $or: [
+          { customerId: session.userId },
+          { customerEmail: session.email.toLowerCase().trim() },
+        ],
+      };
+    } else if (emailParam) {
+      query.customerEmail = emailParam.toLowerCase().trim();
+    } else if (customerIdParam && mongoose.Types.ObjectId.isValid(customerIdParam)) {
+      query.customerId = customerIdParam;
+    } else {
+      return NextResponse.json(
+        { error: 'Authentication required to view orders' },
+        { status: 401 }
+      );
     }
 
     const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
@@ -40,11 +53,12 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
+    const session = await getUserSession();
     const body = await req.json();
 
     const {
       customerId,
-      customerEmail,
+      customerEmail: rawEmail,
       customerName,
       customerPhone,
       shippingAddress,
@@ -56,49 +70,51 @@ export async function POST(req: NextRequest) {
       totalAmount,
       paymentMethod,
       referralDiscountType,
-      referralDiscountAmount: clientReferralDiscountAmount,
     } = body;
+
+    // Determine secure customer email and ID (prefer verified session if present)
+    const customerEmail = (session?.email || rawEmail || '').toLowerCase().trim();
+    const verifiedCustomerId = session?.userId || (customerId && mongoose.Types.ObjectId.isValid(customerId) ? customerId : undefined);
 
     if (!customerEmail || !items || !Array.isArray(items) || items.length === 0 || !shippingAddress) {
       return NextResponse.json({ error: 'Missing required order details' }, { status: 400 });
     }
 
-    // Verify all items are in stock
+    // Verify all items exist and are in stock
     for (const itm of items) {
       if (itm.productId && mongoose.Types.ObjectId.isValid(itm.productId)) {
         const prod = await Product.findById(itm.productId).lean();
         if (!prod || (prod.stock !== undefined && prod.stock <= 0)) {
           return NextResponse.json(
-            { error: `Item "${itm.name || prod?.name || 'Product'}" is currently out of stock. Please remove it from your cart.` },
+            { error: `Item "${itm.name || prod?.name || 'Product'}" is currently out of stock.` },
             { status: 400 }
           );
         }
       }
     }
 
-    const cleanCustomerId = customerId && mongoose.Types.ObjectId.isValid(customerId) ? customerId : undefined;
-    const customerQuery = cleanCustomerId
-      ? { _id: cleanCustomerId }
-      : { email: customerEmail.toLowerCase().trim() };
+    const customerQuery = verifiedCustomerId
+      ? { _id: verifiedCustomerId }
+      : { email: customerEmail };
 
     let orderingCustomer = await Customer.findOne(customerQuery);
 
-    // ── Backend Validation of Coupon Discount ──
-    let verifiedCouponDiscount = Number(discountAmount) || 0;
+    // ── Backend Validation of Coupon Discount (Server Source of Truth) ──
+    let verifiedCouponDiscount = 0;
+    const numSubtotal = Number(subtotal) || 0;
+
     if (couponCode) {
       const cleanCoupon = couponCode.toUpperCase().trim();
       if (cleanCoupon === 'FIRSTSTEP') {
-        const queryOr: any[] = [
-          { customerEmail: customerEmail.toLowerCase().trim() },
-        ];
+        const queryOr: any[] = [{ customerEmail }];
         if (customerPhone) {
           const digitsOnly = customerPhone.replace(/\D/g, '').slice(-10);
           if (digitsOnly) {
             queryOr.push({ customerPhone: { $regex: digitsOnly + '$' } });
           }
         }
-        if (cleanCustomerId) {
-          queryOr.push({ customerId: cleanCustomerId });
+        if (verifiedCustomerId) {
+          queryOr.push({ customerId: verifiedCustomerId });
         }
 
         const alreadyUsed = await Order.findOne({
@@ -113,14 +129,36 @@ export async function POST(req: NextRequest) {
             { status: 400 }
           );
         }
+
+        const dbCoupon = await Coupon.findOne({ code: 'FIRSTSTEP', isActive: true });
+        const val = dbCoupon ? dbCoupon.value : 250;
+        const minReq = dbCoupon ? dbCoupon.minPurchaseAmount : 0;
+        if (numSubtotal >= minReq) {
+          verifiedCouponDiscount = Math.min(val, numSubtotal);
+        }
+      } else if (cleanCoupon === 'STYLE20') {
+        verifiedCouponDiscount = Math.round(numSubtotal * 0.2);
+      } else {
+        const dbCoupon = await Coupon.findOne({
+          code: cleanCoupon,
+          isActive: true,
+          expiryDate: { $gte: new Date() },
+        });
+        if (dbCoupon && dbCoupon.usedCount < dbCoupon.totalUsageLimit && numSubtotal >= dbCoupon.minPurchaseAmount) {
+          if (dbCoupon.type === 'percentage') {
+            let disc = Math.round((numSubtotal * dbCoupon.value) / 100);
+            if (dbCoupon.maxDiscountAmount) disc = Math.min(disc, dbCoupon.maxDiscountAmount);
+            verifiedCouponDiscount = disc;
+          } else {
+            verifiedCouponDiscount = Math.min(dbCoupon.value, numSubtotal);
+          }
+        }
       }
     }
 
     // ── Backend Validation of Referral Discount ──
     let verifiedReferralDiscount = 0;
     let verifiedReferralType: string | null = null;
-    const numSubtotal = Number(subtotal) || 0;
-    const numCouponDiscount = verifiedCouponDiscount;
     const numShippingFee = Number(shippingFee) || 0;
 
     if (referralDiscountType === 'referred_first_order_15') {
@@ -134,7 +172,7 @@ export async function POST(req: NextRequest) {
         const priorOrdersCount = await Order.countDocuments({
           $or: [
             { customerId: orderingCustomer._id.toString() },
-            { customerEmail: customerEmail.toLowerCase().trim() },
+            { customerEmail },
           ],
           orderStatus: { $ne: 'cancelled' },
         });
@@ -152,8 +190,7 @@ export async function POST(req: NextRequest) {
       }
     } else if (referralDiscountType === 'referrer_reward_100') {
       if (orderingCustomer && (orderingCustomer.referralDiscountBalance || 0) >= 100) {
-        // Can deduct ₹100, capped at remaining subtotal after coupon
-        const maxApplicable = Math.max(0, numSubtotal - numCouponDiscount);
+        const maxApplicable = Math.max(0, numSubtotal - verifiedCouponDiscount);
         verifiedReferralDiscount = Math.min(100, maxApplicable);
         verifiedReferralType = 'referrer_reward_100';
       }
@@ -162,14 +199,13 @@ export async function POST(req: NextRequest) {
     // Backend Source of Truth calculation of final total
     const verifiedTotalAmount = Math.max(
       0,
-      numSubtotal - numCouponDiscount - verifiedReferralDiscount + numShippingFee
+      numSubtotal - verifiedCouponDiscount - verifiedReferralDiscount + numShippingFee
     );
 
     // Generate unique human-readable order number
     const orderNumber =
       'GRV-' + Date.now().toString().slice(-6) + '-' + Math.floor(100 + Math.random() * 900);
 
-    // Estimated delivery (5 days out)
     const estimatedDelivery = new Date();
     estimatedDelivery.setDate(estimatedDelivery.getDate() + 5);
 
@@ -194,14 +230,14 @@ export async function POST(req: NextRequest) {
 
     const newOrder = await Order.create({
       orderNumber,
-      customerId: cleanCustomerId || (orderingCustomer ? orderingCustomer._id.toString() : ''),
-      customerEmail: customerEmail.toLowerCase().trim(),
+      customerId: verifiedCustomerId || (orderingCustomer ? orderingCustomer._id.toString() : ''),
+      customerEmail,
       customerName: customerName || sanitizedAddress.name,
       customerPhone: customerPhone || sanitizedAddress.phone,
       shippingAddress: sanitizedAddress,
       items,
       subtotal: numSubtotal,
-      discountAmount: numCouponDiscount,
+      discountAmount: verifiedCouponDiscount,
       referralDiscountAmount: verifiedReferralDiscount,
       referralDiscountType: verifiedReferralType,
       referralCodeUsed: orderingCustomer?.referralCodeUsed || '',
@@ -226,12 +262,10 @@ export async function POST(req: NextRequest) {
       if (orderingCustomer) {
         if (verifiedReferralType === 'referred_first_order_15') {
           orderingCustomer.hasUsedReferralDiscount = true;
-          // Atomic update on customer to persist single-use state immediately
           await Customer.updateOne(
             { _id: orderingCustomer._id },
             { $set: { hasUsedReferralDiscount: true } }
           );
-          // Update corresponding Referral document
           await Referral.findOneAndUpdate(
             { referredUser: orderingCustomer._id },
             {
@@ -248,7 +282,6 @@ export async function POST(req: NextRequest) {
             { _id: orderingCustomer._id },
             { $inc: { referralDiscountBalance: -100 } }
           );
-          // Mark one active referral discount as used
           await Referral.findOneAndUpdate(
             {
               referrer: orderingCustomer._id,
@@ -278,14 +311,12 @@ export async function POST(req: NextRequest) {
     // ── Reward Original Referrer with ₹100 Discount on Completed First Purchase ──
     try {
       if (orderingCustomer) {
-        // Find pending referral record for this customer
         const pendingReferral = await Referral.findOne({
           referredUser: orderingCustomer._id,
           referrerDiscountAvailable: false,
         });
 
         if (pendingReferral) {
-          // Award referrer ₹100 referral discount
           const referrerCust = await Customer.findById(pendingReferral.referrer);
           if (referrerCust) {
             referrerCust.referralDiscountBalance = (referrerCust.referralDiscountBalance || 0) + 100;
@@ -317,14 +348,14 @@ export async function POST(req: NextRequest) {
       }
     } catch {}
 
-    // Attempt to clear cart for this user
+    // Clear cart for this user
     try {
       const guestIdCookie = req.cookies.get('gravoz_guest_id')?.value;
       if (guestIdCookie) {
         await Cart.deleteOne({ guestId: guestIdCookie });
       }
-      if (cleanCustomerId) {
-        await Cart.deleteOne({ userId: cleanCustomerId });
+      if (verifiedCustomerId) {
+        await Cart.deleteOne({ userId: verifiedCustomerId });
       }
     } catch (e) {
       console.warn('Cart clear warning:', e);

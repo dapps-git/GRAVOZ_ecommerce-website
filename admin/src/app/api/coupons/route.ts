@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Coupon } from '@/models/Coupon';
+import { requireAdmin } from '@/lib/api-guard';
 
 // GET /api/coupons
 export async function GET() {
   try {
+    const auth = await requireAdmin();
+    if ('error' in auth) return auth.error;
+
     await connectDB();
     const coupons = await Coupon.find().sort({ createdAt: -1 }).lean();
     return NextResponse.json({ success: true, coupons });
@@ -17,6 +21,9 @@ export async function GET() {
 // POST /api/coupons
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdmin();
+    if ('error' in auth) return auth.error;
+
     await connectDB();
     const body = await req.json();
 

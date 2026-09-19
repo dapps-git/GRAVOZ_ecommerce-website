@@ -5,6 +5,7 @@ import { Order } from '@/models/Order';
 import { Customer } from '@/models/Customer';
 import { Referral } from '@/models/Referral';
 import { ReturnRefund } from '@/models/ReturnRefund';
+import { getUserSession } from '@/lib/auth';
 
 // GET /api/orders/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -35,8 +36,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const session = await getUserSession();
     const body = await req.json();
-    const { status: inputStatus, action, note, location, returnReason, returnDescription, returnImages } = body;
+    const { status: inputStatus, action, note, location, returnReason, returnDescription, returnImages, customerEmail: rawEmail } = body;
     const status = inputStatus || (action === 'cancel' ? 'cancelled' : undefined);
 
     if (!status) {
@@ -55,6 +57,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    // Security check: verify caller ownership
+    if (session) {
+      const isOwner =
+        (order.customerId && order.customerId.toString() === session.userId) ||
+        (order.customerEmail && order.customerEmail.toLowerCase().trim() === session.email.toLowerCase().trim());
+      if (!isOwner) {
+        return NextResponse.json(
+          { error: 'You are not authorized to modify this order.' },
+          { status: 403 }
+        );
+      }
+    } else if (rawEmail) {
+      if (order.customerEmail.toLowerCase().trim() !== rawEmail.toLowerCase().trim()) {
+        return NextResponse.json(
+          { error: 'Customer verification failed for this order.' },
+          { status: 403 }
+        );
+      }
     }
 
     const cancellableStatuses = ['ordered', 'confirmed', 'processing'];
@@ -128,7 +150,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         requestedAt: new Date(),
       };
 
-      // Also upsert into ReturnRefund collection for Admin Return Management
       try {
         await ReturnRefund.findOneAndUpdate(
           { order: order._id },

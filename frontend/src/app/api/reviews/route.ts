@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db';
 import { Review } from '@/models/Review';
 import { Product } from '@/models/Product';
 import { Order } from '@/models/Order';
+import { getUserSession } from '@/lib/auth';
 
 // GET /api/reviews?productId=xxx&email=yyy
 export async function GET(req: NextRequest) {
@@ -32,7 +33,6 @@ export async function GET(req: NextRequest) {
         if (p) {
           query.product = p._id;
         } else {
-          // If no product found with that slug, return empty reviews list
           return NextResponse.json({ success: true, reviews: [], avgRating: 4.8, count: 0 });
         }
       }
@@ -55,21 +55,25 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
+    const session = await getUserSession();
     const body = await req.json();
 
     const {
       productId,
       orderId,
-      customerName,
-      customerEmail,
+      customerName: inputName,
+      customerEmail: inputEmail,
       rating,
       comment,
       images,
       videos,
     } = body;
 
+    const customerEmail = (session?.email || inputEmail || '').toLowerCase().trim();
+    const customerName = session?.name || inputName || 'Verified Customer';
+
     if (!customerEmail || !rating) {
-      return NextResponse.json({ error: 'customerEmail and rating are required' }, { status: 400 });
+      return NextResponse.json({ error: 'Customer email and rating are required' }, { status: 400 });
     }
 
     let validProductId = null;
@@ -84,16 +88,15 @@ export async function POST(req: NextRequest) {
     }
 
     if (!validProductId) {
-      // fallback to first active product
       const firstP = await Product.findOne({ status: 'active' });
       if (firstP) validProductId = firstP._id;
     }
 
-    // Check duplicate review
+    // Check duplicate review from same customer for this product
     if (validProductId) {
       const existing = await Review.findOne({
         product: validProductId,
-        customerEmail: customerEmail.toLowerCase().trim(),
+        customerEmail,
       });
       if (existing) {
         return NextResponse.json(
@@ -111,12 +114,12 @@ export async function POST(req: NextRequest) {
     const newReview = await Review.create({
       product: validProductId,
       orderId: validOrderId,
-      customerName: customerName || 'Verified Customer',
-      customerEmail: customerEmail.toLowerCase().trim(),
+      customerName,
+      customerEmail,
       rating: Math.min(5, Math.max(1, Number(rating))),
       comment: comment || '',
-      images: images || [],
-      videos: videos || [],
+      images: Array.isArray(images) ? images : [],
+      videos: Array.isArray(videos) ? videos : [],
       isVerifiedPurchase: !!validOrderId,
       status: 'approved',
     });
