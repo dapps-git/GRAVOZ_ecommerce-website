@@ -26,16 +26,16 @@ class BackgroundQueue {
     try {
       switch (job.type) {
         case 'SEND_INVOICE_EMAIL':
-          console.log(`[JobQueue] Sent invoice email to ${job.payload.email} for order ${job.payload.orderNumber}`);
+          // Processed invoice email
           break;
         case 'PROCESS_REFUND':
-          console.log(`[JobQueue] Processed background refund $${job.payload.amount} for order ${job.payload.orderNumber}`);
+          // Processed background refund
           break;
         case 'STOCK_SYNC':
-          console.log(`[JobQueue] Synchronized stock counts across channels`);
+          // Synchronized stock counts
           break;
         default:
-          console.log(`[JobQueue] Processed generic job`, job);
+          break;
       }
     } catch (err) {
       console.error(`[JobQueue] Error processing job ${job.type}:`, err);

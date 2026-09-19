@@ -237,14 +237,6 @@ export async function sendRepurchaseEmail(payload: RepurchaseEmailPayload): Prom
     : `How are your shoes treating you, ${payload.customerName}? (It's been 3 months!)`;
 
   if (!smtpEmail || !smtpPassword) {
-    console.log(`\n======================================================`);
-    console.log(`📬 [DEMO EMAIL TRIGGERED - NO SMTP CONFIGURED]`);
-    console.log(`To: ${payload.toEmail}`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Type: ${payload.type || '3_months'}`);
-    console.log(`Product: ${payload.productName} (₹${payload.productPrice})`);
-    console.log(`======================================================\n`);
-
     return {
       success: true,
       message: `Demo email generated for ${payload.toEmail} (${payload.type || '3_months'}). Preview is ready!`,
