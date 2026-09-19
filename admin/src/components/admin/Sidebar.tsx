@@ -22,11 +22,13 @@ import {
   LayoutGrid,
   TicketPercent,
   PackagePlus,
+  Star,
 } from 'lucide-react';
 
 const menuItems = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Products', href: '/admin/products', icon: ShoppingBag },
+  { name: 'Product Reviews', href: '/admin/reviews', icon: Star },
   { name: 'Home Content', href: '/admin/home-content', icon: LayoutGrid },
   { name: 'Banners', href: '/admin/banners', icon: ImageIcon },
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },

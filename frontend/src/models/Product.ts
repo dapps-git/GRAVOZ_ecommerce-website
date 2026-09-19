@@ -75,6 +75,13 @@ export interface IProduct extends Document {
   status: 'active' | 'draft' | 'archived';
   rating?: number;
   reviewsCount?: number;
+  spotlightSlot?: 'duo_product_1' | 'duo_product_2' | 'none' | '';
+  featureInDuoSlot?: string;
+  spotlightMockups?: {
+    mainUrl?: string;
+    thumbnailUrl?: string;
+    lifestyleUrl?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -159,6 +166,13 @@ const ProductSchema = new Schema<IProduct>(
     status: { type: String, default: 'active', enum: ['active', 'draft', 'archived'], index: true },
     rating: { type: Number, default: 5.0 },
     reviewsCount: { type: Number, default: 0 },
+    spotlightSlot: { type: String, default: 'none' },
+    featureInDuoSlot: { type: String, default: '' },
+    spotlightMockups: {
+      mainUrl: { type: String, default: '' },
+      thumbnailUrl: { type: String, default: '' },
+      lifestyleUrl: { type: String, default: '' },
+    },
   },
   { timestamps: true }
 );

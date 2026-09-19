@@ -201,16 +201,36 @@ export default function Header() {
               aria-label="User Account"
               title={isLoggedIn && user?.name ? `Profile (${user.name})` : 'Log In'}
             >
-              {isLoggedIn && user?.avatarUrl ? (
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden border border-[#89591C]/50 shadow-2xs">
+              {isLoggedIn ? (
+                user?.avatarUrl ? (
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden border border-[#89591C]/50 shadow-2xs bg-[#faf8f5]">
+                    {/* Use standard img with onError fallback for base64 / blob / external URLs */}
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name || 'User Avatar'}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                        const parent = (e.currentTarget as HTMLElement).parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<span class="w-full h-full flex items-center justify-center text-[10px] font-bold text-white bg-[#89591C]">${(user?.name || 'U').charAt(0).toUpperCase()}</span>`;
+                        }
+                      }}
+                    />
+                  </div>
+                ) : user?.name ? (
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#89591C] text-white text-[10px] sm:text-[11px] font-bold flex items-center justify-center shadow-2xs">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                ) : (
                   <Image
-                    src={user.avatarUrl}
-                    alt={user.name || 'User Avatar'}
-                    width={24}
-                    height={24}
-                    className="w-full h-full object-cover"
+                    src="/icons/profile.webp"
+                    alt="Profile"
+                    width={20}
+                    height={20}
+                    className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
                   />
-                </div>
+                )
               ) : (
                 <Image
                   src="/icons/profile.webp"

@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import { Product } from '@/models/Product';
 import { Category } from '@/models/Category';
 import { Brand } from '@/models/Brand';
+import { Banner } from '@/models/Banner';
 import { invalidateCache } from '@/lib/redis';
 
 
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
     const products = await Product.find(query)
       .populate('category', 'name slug targetAudience')
       .populate('brand', 'name')
-      .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured noReturnRefundExchange status createdAt')
+      .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured noReturnRefundExchange status spotlightMockups createdAt')
       .sort(sortOptions)
       .skip(skip)
       .limit(limit)
@@ -179,7 +180,11 @@ export async function POST(req: NextRequest) {
       : [{ url: '/products/placeholder.svg', alt: `${name} photo` }];
 
     const generatedSlug = (seo?.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')) + '-' + Date.now().toString().slice(-4);
-    const finalSku = inputSku || ('GRV-' + Math.random().toString(36).substring(2, 8).toUpperCase());
+    let finalSku = (inputSku && inputSku.trim()) ? inputSku.trim() : ('GRV-' + Math.random().toString(36).substring(2, 8).toUpperCase());
+    const existingProductWithSku = await Product.findOne({ sku: finalSku });
+    if (existingProductWithSku) {
+      finalSku = `${finalSku}-${Date.now().toString().slice(-4)}`;
+    }
 
     const product = await Product.create({
       name,
@@ -224,7 +229,44 @@ export async function POST(req: NextRequest) {
       badge: badge || '',
       noReturnRefundExchange: Boolean(noReturnRefundExchange),
       status: status || 'draft',
+      spotlightSlot: body.featureInDuoSlot === 'duo_product_1' || body.featureInDuoSlot === 'duo_product_2' ? body.featureInDuoSlot : (body.spotlightSlot || 'none'),
+      featureInDuoSlot: body.featureInDuoSlot || '',
+      spotlightMockups: body.spotlightMockups || { mainUrl: '', thumbnailUrl: '', lifestyleUrl: '' },
     });
+
+    // If user chose to feature this product on Homepage Duo Spotlight
+    const activeSlot = product.spotlightSlot;
+    if (activeSlot === 'duo_product_1' || activeSlot === 'duo_product_2') {
+      // Clear this slot from other products
+      await Product.updateMany(
+        { _id: { $ne: product._id }, spotlightSlot: activeSlot },
+        { $set: { spotlightSlot: 'none', featureInDuoSlot: '' } }
+      );
+
+      const mockups = body.spotlightMockups;
+      const p1 = mockups?.mainUrl || validImages[0]?.url || '';
+      const p2 = mockups?.thumbnailUrl || (validImages[1]?.url || p1);
+      const p3 = mockups?.lifestyleUrl || (validImages[2]?.url || p1);
+
+      await Banner.findOneAndUpdate(
+        { slot: activeSlot },
+        {
+          $set: {
+            productId: product._id.toString(),
+            title: product.name,
+            price: product.discountPrice || product.price,
+            originalPrice: product.price,
+            linkUrl: `/products/${product.slug || product._id}`,
+            imageUrl: p1,
+            thumbnailUrl: p2,
+            lifestyleUrl: p3,
+            sizes: product.sizes || ['6', '7', '8', '9', '10', '11'],
+            isActive: true,
+          },
+        },
+        { upsert: true }
+      );
+    }
 
     // Invalidate product & dashboard cache
     await invalidateCache('admin:dashboard:stats');

@@ -187,17 +187,18 @@ export async function GET(
       images: collectedImages,
       features: formattedFeatures,
       noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
-      shippingAndReturn: product.shippingAndReturn || (product.noReturnRefundExchange ? {
-        'Free Delivery': 'Complimentary express shipping across India on all prepaid & COD orders.',
-        'Estimated Delivery': '2 to 4 business days to metro cities; 4 to 6 days to rest of India.',
-        'Return Policy': 'No Return • No Refund • No Exchange (Clearance Old Stock)',
-        'Warranty': '6-month comprehensive manufacturing warranty covering stitching & sole adhesion.',
-      } : {
-        'Free Delivery': 'Complimentary express shipping across India on all prepaid & COD orders.',
-        'Estimated Delivery': '2 to 4 business days to metro cities; 4 to 6 days to rest of India.',
-        'Easy Returns & Exchanges': '7-day hassle-free return and exchange policy with doorstep pickup.',
-        'Warranty': '6-month comprehensive manufacturing warranty covering stitching & sole adhesion.',
-      }),
+      shippingAndReturn: product.shippingAndReturn || {
+        shippingTitle: 'Complimentary Express Shipping',
+        shippingDesc: 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.',
+        returnTitle: product.noReturnRefundExchange ? 'No Return • No Refund • No Exchange' : '7-Day Hassle-Free Returns',
+        returnDesc: product.noReturnRefundExchange
+          ? 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.'
+          : 'Doorstep pickup and instant exchange if size or fit is not ideal.',
+        warrantyTitle: '6-Month Manufacturing Warranty',
+        warrantyDesc: 'Covers sole adhesion, stitching, and artisan leather construction.',
+        paymentTitle: 'COD & Secure Prepaid',
+        paymentDesc: 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.',
+      },
     };
 
     return NextResponse.json(

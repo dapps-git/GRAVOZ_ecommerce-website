@@ -6,6 +6,17 @@ export interface IProductImage {
   publicId?: string;
 }
 
+export interface IShippingAndReturn {
+  shippingTitle?: string;
+  shippingDesc?: string;
+  returnTitle?: string;
+  returnDesc?: string;
+  warrantyTitle?: string;
+  warrantyDesc?: string;
+  paymentTitle?: string;
+  paymentDesc?: string;
+}
+
 export interface IProductSEO {
   metaTitle?: string;
   metaDescription?: string;
@@ -64,6 +75,7 @@ export interface IProduct extends Document {
   packingWidth?: number;
   packingHeight?: number;
   seo?: IProductSEO;
+  shippingAndReturn?: IShippingAndReturn;
   isBestSeller: boolean;
   isTopSeller?: boolean;
   isFeatured: boolean;
@@ -73,6 +85,13 @@ export interface IProduct extends Document {
   status: 'active' | 'draft' | 'archived';
   rating?: number;
   reviewsCount?: number;
+  spotlightSlot?: 'duo_product_1' | 'duo_product_2' | 'none' | '';
+  featureInDuoSlot?: string;
+  spotlightMockups?: {
+    mainUrl?: string;
+    thumbnailUrl?: string;
+    lifestyleUrl?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -156,6 +175,16 @@ const ProductSchema = new Schema<IProduct>(
     packingWidth: { type: Number, default: 0 },
     packingHeight: { type: Number, default: 0 },
     seo: { type: ProductSEOSchema, default: () => ({}) },
+    shippingAndReturn: {
+      shippingTitle: { type: String, default: 'Complimentary Express Shipping' },
+      shippingDesc: { type: String, default: 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.' },
+      returnTitle: { type: String, default: '7-Day Hassle-Free Returns' },
+      returnDesc: { type: String, default: 'Doorstep pickup and instant exchange if size or fit is not ideal.' },
+      warrantyTitle: { type: String, default: '6-Month Manufacturing Warranty' },
+      warrantyDesc: { type: String, default: 'Covers sole adhesion, stitching, and artisan leather construction.' },
+      paymentTitle: { type: String, default: 'COD & Secure Prepaid' },
+      paymentDesc: { type: String, default: 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.' },
+    },
     isBestSeller: { type: Boolean, default: false, index: true },
     isTopSeller: { type: Boolean, default: false, index: true },
     isFeatured: { type: Boolean, default: false, index: true },
@@ -165,6 +194,13 @@ const ProductSchema = new Schema<IProduct>(
     status: { type: String, default: 'active', enum: ['active', 'draft', 'archived'] },
     rating: { type: Number, default: 5.0 },
     reviewsCount: { type: Number, default: 0 },
+    spotlightSlot: { type: String, default: 'none' },
+    featureInDuoSlot: { type: String, default: '' },
+    spotlightMockups: {
+      mainUrl: { type: String, default: '' },
+      thumbnailUrl: { type: String, default: '' },
+      lifestyleUrl: { type: String, default: '' },
+    },
   },
   { timestamps: true }
 );

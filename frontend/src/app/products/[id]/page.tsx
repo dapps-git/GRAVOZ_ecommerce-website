@@ -164,13 +164,19 @@ export default function ProductInnerPage() {
     additionalInfo: false,
     shippingAndReturn: false,
   });
-  const [activeTab, setActiveTab] = useState<'description' | 'features' | 'details' | 'reviews' | 'qa' | 'shipping'>('description');
+  const [activeTab, setActiveTab] = useState<'description' | 'features' | 'details' | 'reviews' | 'shipping'>('description');
   const [isSizeChartOpen, setIsSizeChartOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Reviews State
+  // Reviews State (100% dynamic from DB)
   const [reviews, setReviews] = useState<any[]>([]);
   const [avgRating, setAvgRating] = useState<number>(5.0);
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState<boolean>(false);
+  const [reviewName, setReviewName] = useState<string>('');
+  const [reviewEmail, setReviewEmail] = useState<string>('');
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState<string>('');
+  const [submittingReview, setSubmittingReview] = useState<boolean>(false);
 
   // Zoom feature states
   const [isZooming, setIsZooming] = useState<boolean>(false);
@@ -178,8 +184,60 @@ export default function ProductInnerPage() {
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
   const mainImageRef = useRef<HTMLDivElement>(null);
 
+  const fetchReviews = (id: string) => {
+    fetch(`/api/reviews?productId=${encodeURIComponent(id)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.reviews && Array.isArray(data.reviews)) {
+          const sorted = [...data.reviews].sort((a: any, b: any) => {
+            if (b.rating !== a.rating) return b.rating - a.rating;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
+          setReviews(sorted);
+          if (data.avgRating) setAvgRating(data.avgRating);
+        }
+      })
+      .catch(() => {});
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewEmail || !reviewRating) {
+      showToast('Please provide your email and a star rating');
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product._id || productId,
+          customerName: reviewName || 'Verified Customer',
+          customerEmail: reviewEmail,
+          rating: reviewRating,
+          comment: reviewComment,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Thank you! Your review has been submitted.');
+        setReviewComment('');
+        setIsReviewFormOpen(false);
+        fetchReviews(product._id || productId);
+      } else {
+        showToast(data.error || 'Failed to submit review');
+      }
+    } catch {
+      showToast('Failed to submit review. Please try again.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
+    fetchReviews(productId);
     fetch(`/api/products/${encodeURIComponent(productId)}`)
       .then((res) => res.json())
       .then((data) => {
@@ -562,11 +620,11 @@ export default function ProductInnerPage() {
                     showToast(isInWishlist(product._id) ? 'Removed from Wishlist' : 'Added to Wishlist!');
                   }}
                   title="Save to Wishlist"
-                  className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-xs transition-all cursor-pointer ${
+                  className={`absolute top-3 right-3 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/95 hover:bg-white backdrop-blur-xs border border-white/80 flex items-center justify-center shadow-xs transition-all duration-200 active:scale-90 cursor-pointer ${
                     isInWishlist(product._id) ? 'text-rose-500' : 'text-slate-700 hover:text-rose-500'
                   }`}
                 >
-                  <Heart className={`w-4 h-4 ${isInWishlist(product._id) ? 'fill-rose-500' : ''}`} />
+                  <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isInWishlist(product._id) ? 'fill-rose-500 text-rose-500' : ''}`} />
                 </button>
 
                 {/* Previous Image Arrow */}
@@ -1144,58 +1202,6 @@ export default function ProductInnerPage() {
                 </div>
               )}
 
-              {/* Free Delivery & Authenticity Perks Banner */}
-              <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-slate-700">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🚚</span>
-                  <div>
-                    <span className="font-bold text-[#111111]">100% Free Delivery All Over India</span>
-                    <p className="text-[11px] text-slate-500">Fast doorstep dispatch in 1-2 business days</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#89591C] bg-white border border-[#e8e2d8] px-2.5 py-1 rounded-lg shadow-2xs flex-shrink-0">
-                  <span>🇮🇳</span>
-                  <span>Pan-India Shipping</span>
-                </div>
-              </div>
-
-              {/* Share Row */}
-              <div className="flex items-center gap-2.5 pt-1">
-                <span className="text-[13px] font-medium text-[#555555]">Share:</span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleShare('facebook')}
-                    aria-label="Share on Facebook"
-                    className="w-6 h-6 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer shadow-2xs"
-                  >
-                    <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleShare('instagram')}
-                    aria-label="Share on Instagram"
-                    className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer shadow-2xs"
-                  >
-                    <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleShare('whatsapp')}
-                    aria-label="Share on WhatsApp"
-                    className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer shadow-2xs"
-                  >
-                    <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
             </div>
 
           </div>
@@ -1251,19 +1257,7 @@ export default function ProductInnerPage() {
                     : 'border-transparent text-[#555555] font-normal hover:text-[#111111]'
                 }`}
               >
-                Reviews ({reviews.length || 128})
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('qa')}
-                className={`pb-3 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                  activeTab === 'qa'
-                    ? 'border-[#8A5B2A] text-[#8A5B2A] font-medium'
-                    : 'border-transparent text-[#555555] font-normal hover:text-[#111111]'
-                }`}
-              >
-                Q&amp;A (58)
+                Reviews ({reviews.length})
               </button>
 
               <button
@@ -1366,99 +1360,201 @@ export default function ProductInnerPage() {
               {/* 4. Reviews Tab */}
               {activeTab === 'reviews' && (
                 <div className="space-y-6 max-w-4xl">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E1DC]">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < Math.round(Number(avgRating) || 5)
+                                ? 'text-[#8A5B2A] fill-[#8A5B2A]'
+                                : 'text-slate-200'
+                            }`}
+                            strokeWidth={1.5}
+                          />
+                        ))}
+                      </div>
+                      <span className="font-medium text-[#111111] text-[16px]">
+                        {reviews.length > 0 ? `${avgRating} out of 5` : 'No ratings yet'}
+                      </span>
+                      <span className="text-[13px] text-[#888888]">
+                        ({reviews.length} {reviews.length === 1 ? 'verified review' : 'verified customer reviews'})
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
+                      className="px-4 py-2 bg-[#8A5B2A] hover:bg-[#6e461e] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer self-start sm:self-auto"
+                    >
+                      {isReviewFormOpen ? 'Cancel' : 'Write a Review'}
+                    </button>
+                  </div>
+
+                  {/* Review Form */}
+                  {isReviewFormOpen && (
+                    <form onSubmit={handleSubmitReview} className="p-4 sm:p-5 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-4">
+                      <h4 className="font-semibold text-sm text-[#111111]">Write a Product Review</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-700 mb-1">Your Name *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. John Doe"
+                            value={reviewName}
+                            onChange={(e) => setReviewName(e.target.value)}
+                            className="w-full bg-white border border-[#E5E1DC] rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#8A5B2A]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-700 mb-1">Your Email *</label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="john@example.com"
+                            value={reviewEmail}
+                            onChange={(e) => setReviewEmail(e.target.value)}
+                            className="w-full bg-white border border-[#E5E1DC] rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#8A5B2A]"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">Your Rating *</label>
+                        <div className="flex items-center gap-1.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setReviewRating(star)}
+                              className="p-1 cursor-pointer transition-transform hover:scale-110"
+                            >
+                              <Star
+                                className={`w-5 h-5 ${
+                                  star <= reviewRating
+                                    ? 'text-[#8A5B2A] fill-[#8A5B2A]'
+                                    : 'text-slate-300'
+                                }`}
+                              />
+                            </button>
+                          ))}
+                          <span className="text-xs text-slate-600 ml-2 font-medium">{reviewRating} of 5 Stars</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 mb-1">Your Review / Feedback *</label>
+                        <textarea
+                          rows={3}
+                          required
+                          placeholder="Share your experience with the fit, quality, and comfort..."
+                          value={reviewComment}
+                          onChange={(e) => setReviewComment(e.target.value)}
+                          className="w-full bg-white border border-[#E5E1DC] rounded-lg p-3 text-xs text-slate-800 focus:outline-none focus:border-[#8A5B2A]"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={submittingReview}
+                        className="px-5 py-2.5 bg-[#8A5B2A] hover:bg-[#6e461e] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        {submittingReview ? 'Submitting...' : 'Submit Review'}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* Reviews cards */}
+                  {reviews.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {reviews.map((r: any, idx: number) => (
+                        <div key={idx} className="p-4 rounded-xl bg-white border border-[#E5E1DC] space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-[14px] text-[#111111]">{r.customerName}</span>
+                            <div className="flex items-center gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-3.5 h-3.5 ${
+                                    i < r.rating
+                                      ? 'text-[#8A5B2A] fill-[#8A5B2A]'
+                                      : 'text-slate-200'
+                                  }`}
+                                  strokeWidth={1.5}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          {r.comment && <p className="text-[13px] text-[#555555] italic">“{r.comment}”</p>}
+                        </div>
                       ))}
                     </div>
-                    <span className="font-medium text-[#111111] text-[16px]">{avgRating} out of 5</span>
-                    <span className="text-[13px] text-[#888888]">({reviews.length || 128} verified customer ratings)</span>
-                  </div>
-                  {/* Reviews cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {(reviews.length > 0 ? reviews : [
-                      { customerName: 'Hashim', comment: 'The quality is exceptional, and the shoes feel incredibly comfortable from the first wear. The craftsmanship and finish are truly impressive.', rating: 5 },
-                      { customerName: 'Lakshmi', comment: 'Gravoz has the perfect balance of premium style and comfort. The leather feels luxurious, and the fit is excellent.', rating: 5 },
-                    ]).map((r: any, idx: number) => (
-                      <div key={idx} className="p-4 rounded-xl bg-white border border-[#E5E1DC] space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-[14px] text-[#111111]">{r.customerName}</span>
-                          <div className="flex items-center gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-[13px] text-[#555555] italic">“{r.comment}”</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 5. Q&A Tab */}
-              {activeTab === 'qa' && (
-                <div className="space-y-3.5 max-w-4xl">
-                  {[
-                    { q: 'Is this shoe made of 100% genuine leather?', a: 'Yes, crafted from premium authentic full-grain leather that molds comfortably to your feet over time.' },
-                    { q: 'What is the return policy if the size does not fit?', a: 'We offer a 7-day hassle-free doorstep replacement or refund policy. Free pickup from your address.' },
-                    { q: 'Are these shoes suitable for everyday walking?', a: 'Absolutely. Engineered with an orthopedic dual-density footbed and flexible anti-skid TPR sole for all-day comfort.' },
-                    { q: 'How should I clean and maintain the leather?', a: 'Simply wipe down with a soft, clean dry or slightly damp cloth. Use neutral leather cream periodically.' },
-                  ].map((item, idx) => (
-                    <div key={idx} className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
-                      <h4 className="font-medium text-[14px] text-[#111111] flex items-center gap-1.5">
-                        <span className="text-[#8A5B2A] font-semibold">Q:</span> {item.q}
-                      </h4>
-                      <p className="text-[13px] text-[#555555] pl-4">
-                        <span className="font-medium text-[#22C55E]">A:</span> {item.a}
-                      </p>
+                  ) : (
+                    <div className="text-center py-8 bg-[#FAF7F3] rounded-xl border border-dashed border-[#E5E1DC] space-y-2">
+                      <p className="text-sm font-medium text-slate-700">No customer reviews yet</p>
+                      <p className="text-xs text-slate-500">Be the first to share your experience with this pair!</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
 
-              {/* 6. Shipping & Returns Tab */}
+              {/* 5. Shipping & Returns Tab */}
               {activeTab === 'shipping' && (
                 <div className="space-y-3 max-w-4xl">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Card 1: Express Shipping */}
                     <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
                       <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
                         <Truck className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
-                        <span>Complimentary Express Shipping</span>
+                        <span>{product.shippingAndReturn?.shippingTitle || 'Complimentary Express Shipping'}</span>
                       </div>
-                      <p className="text-[13px] text-[#555555]">Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.</p>
+                      <p className="text-[13px] text-[#555555]">
+                        {product.shippingAndReturn?.shippingDesc || 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.'}
+                      </p>
                     </div>
-                    {product.noReturnRefundExchange ? (
+
+                    {/* Card 2: Return Policy (Changes dynamically for clearance or customized policy) */}
+                    {product.noReturnRefundExchange || (product.shippingAndReturn?.returnTitle && product.shippingAndReturn.returnTitle.toLowerCase().includes('no return')) ? (
                       <div className="p-4 rounded-xl bg-[#FFF9F2] border-2 border-[#F5C78E] space-y-1">
                         <div className="flex items-center gap-2 text-[#78350F] font-semibold text-[14px]">
                           <AlertCircle className="w-4 h-4 text-[#B45309]" strokeWidth={2} />
-                          <span>No Return • No Refund • No Exchange</span>
+                          <span>{product.shippingAndReturn?.returnTitle || 'No Return • No Refund • No Exchange'}</span>
                         </div>
-                        <p className="text-[13px] text-[#92400E]">Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.</p>
+                        <p className="text-[13px] text-[#92400E]">
+                          {product.shippingAndReturn?.returnDesc || 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.'}
+                        </p>
                       </div>
                     ) : (
                       <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
                         <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
                           <RotateCcw className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
-                          <span>7-Day Hassle-Free Returns</span>
+                          <span>{product.shippingAndReturn?.returnTitle || '7-Day Hassle-Free Returns'}</span>
                         </div>
-                        <p className="text-[13px] text-[#555555]">Doorstep pickup and instant exchange if size or fit is not ideal.</p>
+                        <p className="text-[13px] text-[#555555]">
+                          {product.shippingAndReturn?.returnDesc || 'Doorstep pickup and instant exchange if size or fit is not ideal.'}
+                        </p>
                       </div>
                     )}
+
+                    {/* Card 3: Manufacturing Warranty */}
                     <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
                       <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
                         <ShieldCheck className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
-                        <span>6-Month Manufacturing Warranty</span>
+                        <span>{product.shippingAndReturn?.warrantyTitle || '6-Month Manufacturing Warranty'}</span>
                       </div>
-                      <p className="text-[13px] text-[#555555]">Covers sole adhesion, stitching, and artisan leather construction.</p>
+                      <p className="text-[13px] text-[#555555]">
+                        {product.shippingAndReturn?.warrantyDesc || 'Covers sole adhesion, stitching, and artisan leather construction.'}
+                      </p>
                     </div>
+
+                    {/* Card 4: Payment Terms */}
                     <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
                       <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
                         <Check className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
-                        <span>COD &amp; Secure Prepaid</span>
+                        <span>{product.shippingAndReturn?.paymentTitle || 'COD & Secure Prepaid'}</span>
                       </div>
-                      <p className="text-[13px] text-[#555555]">Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.</p>
+                      <p className="text-[13px] text-[#555555]">
+                        {product.shippingAndReturn?.paymentDesc || 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1492,18 +1588,18 @@ export default function ProductInnerPage() {
 
 
         {/* ── Customer Reviews & Testimonials ── */}
-        <section className="space-y-6 pt-4 pb-2">
-          {/* Header Title & Subtitle */}
-          <div className="text-center space-y-1">
-            <h2 className="font-sansation font-bold text-2xl sm:text-3xl text-[#030303] tracking-tight">
-              Customer Reviews & Feedback
-            </h2>
-            <p className="font-sansation font-normal text-xs sm:text-sm text-slate-600 tracking-[0.1em]">
-              {reviews.length > 0 ? `${reviews.length} Verified Reviews (${avgRating} / 5.0)` : 'Verified Customer Testimonials'}
-            </p>
-          </div>
+        {reviews.length > 0 && (
+          <section className="space-y-6 pt-4 pb-2">
+            {/* Header Title & Subtitle */}
+            <div className="text-center space-y-1">
+              <h2 className="font-sansation font-bold text-2xl sm:text-3xl text-[#030303] tracking-tight">
+                Customer Reviews &amp; Feedback
+              </h2>
+              <p className="font-sansation font-normal text-xs sm:text-sm text-slate-600 tracking-[0.1em]">
+                {reviews.length} Verified {reviews.length === 1 ? 'Review' : 'Reviews'} ({avgRating} / 5.0)
+              </p>
+            </div>
 
-          {reviews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-5xl mx-auto">
               {reviews.map((rev) => (
                 <div key={rev._id} className="bg-white border border-[#e8e2d8] rounded-2xl p-5 sm:p-6 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between space-y-3.5">
@@ -1571,76 +1667,8 @@ export default function ProductInnerPage() {
                 </div>
               ))}
             </div>
-          ) : (
-            /* Fallback Curated Testimonials */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-5xl mx-auto">
-              {/* Card 1 — Hashim */}
-              <div className="bg-white border border-[#e8e2d8] rounded-2xl p-5 sm:p-6 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between space-y-3.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-red-500 p-0.5 flex-shrink-0 flex items-center justify-center shadow-xs">
-                      <div className="w-full h-full rounded-full bg-[#fceddc] flex items-center justify-center text-base">
-                        🧑‍💼
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-sansation font-bold text-sm text-[#030303]">
-                        Hashim
-                      </h4>
-                      <span className="font-sansation text-[11px] text-slate-400 block font-normal">
-                        Verified User
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
-                    ))}
-                  </div>
-                </div>
-                <p className="font-sansation text-xs sm:text-[13px] leading-relaxed text-slate-700">
-                  “The quality is exceptional, and the shoes feel incredibly comfortable from the first wear. The craftsmanship and finish are truly impressive.”
-                </p>
-              </div>
-
-              {/* Card 2 — lakshmi */}
-              <div className="bg-white border border-[#e8e2d8] rounded-2xl p-5 sm:p-6 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between space-y-3.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full overflow-hidden bg-gradient-to-br from-amber-300 to-yellow-500 p-0.5 flex-shrink-0 flex items-center justify-center shadow-xs">
-                      <div className="w-full h-full rounded-full bg-[#fef7ee] flex items-center justify-center text-base">
-                        👩‍💼
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-sansation font-bold text-sm text-[#030303]">
-                        lakshmi
-                      </h4>
-                      <span className="font-sansation text-[11px] text-slate-400 block font-normal">
-                        Verified User
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 text-[#C19968] fill-[#C19968]" />
-                    ))}
-                  </div>
-                </div>
-                <p className="font-sansation text-xs sm:text-[13px] leading-relaxed text-slate-700">
-                  “Gravoz has the perfect balance of premium style and comfort. The leather feels luxurious, and the fit is excellent.”
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Dots Indicator */}
-          <div className="flex items-center justify-center gap-1.5 pt-1">
-            <span className="w-5 h-1.5 rounded-full bg-slate-600"></span>
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-          </div>
-        </section>
+          </section>
+        )}
 
       </main>
       )}

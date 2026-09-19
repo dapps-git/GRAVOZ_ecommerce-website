@@ -86,10 +86,10 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
                     imageUrl: product.imageUrl,
                   });
                 }}
-                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
+                className="absolute top-2.5 right-2.5 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
               >
                 <Heart
-                  className={`w-3.5 h-3.5 transition-colors ${isInWishlist(product._id)
+                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isInWishlist(product._id)
                       ? 'fill-rose-500 text-rose-500'
                       : 'text-slate-600 hover:text-rose-500'
                     }`}

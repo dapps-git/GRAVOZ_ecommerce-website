@@ -5,7 +5,7 @@ import { Banner } from '@/models/Banner';
 const DEFAULT_BANNER_LIST = [
   {
     slot: 'hero',
-    name: 'Top Hero Banner (Banner 1)',
+    name: 'Top Hero Slider - Slide 1',
     category: 'home_banner',
     imageUrl: '/images/banner.webp',
     title: 'Step Better. Feel the Comfort.',
@@ -14,6 +14,42 @@ const DEFAULT_BANNER_LIST = [
     aspectRatio: '1816/866',
     isActive: true,
     displayOrder: 1,
+  },
+  {
+    slot: 'hero_slide_2',
+    name: 'Top Hero Slider - Slide 2',
+    category: 'home_banner',
+    imageUrl: '/images/banner3.webp',
+    title: 'Ultra Comfort Everyday Sandal',
+    subtitle: 'Ergonomic footbed with shock absorption',
+    linkUrl: '/products',
+    aspectRatio: '1816/866',
+    isActive: true,
+    displayOrder: 2,
+  },
+  {
+    slot: 'hero_slide_3',
+    name: 'Top Hero Slider - Slide 3',
+    category: 'home_banner',
+    imageUrl: '/images/banner4.webp',
+    title: 'Seasonal Showcase',
+    subtitle: 'New Season New Styles',
+    linkUrl: '/products',
+    aspectRatio: '1816/866',
+    isActive: true,
+    displayOrder: 3,
+  },
+  {
+    slot: 'hero_slide_4',
+    name: 'Top Hero Slider - Slide 4',
+    category: 'home_banner',
+    imageUrl: '/images/banner5.webp',
+    title: 'Daily Collection',
+    subtitle: 'Everyday elegance crafted for you',
+    linkUrl: '/products',
+    aspectRatio: '1816/866',
+    isActive: true,
+    displayOrder: 4,
   },
   {
     slot: 'secondary',
@@ -25,7 +61,7 @@ const DEFAULT_BANNER_LIST = [
     linkUrl: '/category/men',
     aspectRatio: '2001/786',
     isActive: true,
-    displayOrder: 2,
+    displayOrder: 5,
   },
   {
     slot: 'comfort_sandal',
@@ -37,7 +73,7 @@ const DEFAULT_BANNER_LIST = [
     linkUrl: '/category/women',
     aspectRatio: '3076/1208',
     isActive: true,
-    displayOrder: 3,
+    displayOrder: 6,
   },
   {
     slot: 'promo_strip',
@@ -49,7 +85,7 @@ const DEFAULT_BANNER_LIST = [
     linkUrl: '/products',
     aspectRatio: '3200/1034',
     isActive: true,
-    displayOrder: 4,
+    displayOrder: 7,
   },
   {
     slot: 'daily_collection',
@@ -61,7 +97,7 @@ const DEFAULT_BANNER_LIST = [
     linkUrl: '/products',
     aspectRatio: '3172/1230',
     isActive: true,
-    displayOrder: 5,
+    displayOrder: 8,
   },
   {
     slot: 'category_women',
@@ -99,59 +135,40 @@ const DEFAULT_BANNER_LIST = [
     isActive: true,
     displayOrder: 8,
   },
-  {
-    slot: 'duo_product_1',
-    name: 'Duo Spotlight Product 1 (Below Best Sellers)',
-    category: 'duo_showcase',
-    imageUrl: '',
-    thumbnailUrl: '',
-    lifestyleUrl: '',
-    title: "Men's Casual Comfort Sandals",
-    subtitle: '',
-    price: 1399,
-    originalPrice: 1429,
-    productId: '',
-    linkUrl: '/products',
-    aspectRatio: '4/3',
-    isActive: true,
-    displayOrder: 9,
-  },
-  {
-    slot: 'duo_product_2',
-    name: 'Duo Spotlight Product 2 (Below Best Sellers)',
-    category: 'duo_showcase',
-    imageUrl: '',
-    thumbnailUrl: '',
-    lifestyleUrl: '',
-    title: "Women's Casual Comfort Sandals",
-    subtitle: '',
-    price: 1399,
-    originalPrice: 1429,
-    productId: '',
-    linkUrl: '/products',
-    aspectRatio: '4/3',
-    isActive: true,
-    displayOrder: 10,
-  },
 ];
 
 // GET /api/banners
 export async function GET() {
   try {
     await connectDB();
+    // Clean up any legacy duo showcase banner records
+    await Banner.deleteMany({
+      $or: [
+        { slot: { $in: ['duo_product_1', 'duo_product_2'] } },
+        { category: 'duo_showcase' },
+      ],
+    });
+
     let banners = await Banner.find().sort({ displayOrder: 1 }).lean();
 
-    // Auto-seed defaults if collection is empty or missing duo showcase slots
+    // Auto-seed defaults if collection is empty
     if (!banners || banners.length === 0) {
       await Banner.insertMany(DEFAULT_BANNER_LIST);
       banners = await Banner.find().sort({ displayOrder: 1 }).lean();
     } else {
-      // Ensure duo slots exist
-      const hasDuo1 = banners.some((b) => b.slot === 'duo_product_1');
-      const hasDuo2 = banners.some((b) => b.slot === 'duo_product_2');
-      if (!hasDuo1 || !hasDuo2) {
-        if (!hasDuo1) await Banner.create(DEFAULT_BANNER_LIST.find((b) => b.slot === 'duo_product_1'));
-        if (!hasDuo2) await Banner.create(DEFAULT_BANNER_LIST.find((b) => b.slot === 'duo_product_2'));
+      // Ensure hero slides exist
+      const requiredSlots = ['hero_slide_2', 'hero_slide_3', 'hero_slide_4'];
+      let changed = false;
+      for (const slotName of requiredSlots) {
+        if (!banners.some((b) => b.slot === slotName)) {
+          const defaultItem = DEFAULT_BANNER_LIST.find((b) => b.slot === slotName);
+          if (defaultItem) {
+            await Banner.create(defaultItem);
+            changed = true;
+          }
+        }
+      }
+      if (changed) {
         banners = await Banner.find().sort({ displayOrder: 1 }).lean();
       }
     }

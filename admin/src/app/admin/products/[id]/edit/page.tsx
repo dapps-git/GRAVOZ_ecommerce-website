@@ -18,6 +18,11 @@ import {
   TrendingUp,
   Zap,
   Sparkles,
+  Upload,
+  ImageIcon,
+  ShoppingCart,
+  LayoutGrid,
+  RotateCcw,
 } from 'lucide-react';
 
 interface CategoryItem {
@@ -122,6 +127,56 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [keywordsStr, setKeywordsStr] = useState('');
   const [slug, setSlug] = useState('');
 
+  // Shipping & Returns Policy (Pre-filled suggested defaults)
+  const [shippingTitle, setShippingTitle] = useState('Complimentary Express Shipping');
+  const [shippingDesc, setShippingDesc] = useState('Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.');
+  const [returnTitle, setReturnTitle] = useState('7-Day Hassle-Free Returns');
+  const [returnDesc, setReturnDesc] = useState('Doorstep pickup and instant exchange if size or fit is not ideal.');
+  const [warrantyTitle, setWarrantyTitle] = useState('6-Month Manufacturing Warranty');
+  const [warrantyDesc, setWarrantyDesc] = useState('Covers sole adhesion, stitching, and artisan leather construction.');
+  const [paymentTitle, setPaymentTitle] = useState('COD & Secure Prepaid');
+  const [paymentDesc, setPaymentDesc] = useState('Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.');
+
+  const handleToggleNoReturn = (checked: boolean) => {
+    setNoReturnRefundExchange(checked);
+    if (checked) {
+      setReturnTitle('No Return • No Refund • No Exchange');
+      setReturnDesc('Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.');
+    } else {
+      setReturnTitle('7-Day Hassle-Free Returns');
+      setReturnDesc('Doorstep pickup and instant exchange if size or fit is not ideal.');
+    }
+  };
+
+  const applyReturnPreset = (preset: 'standard' | 'clearance' | 'extended') => {
+    if (preset === 'standard') {
+      setNoReturnRefundExchange(false);
+      setReturnTitle('7-Day Hassle-Free Returns');
+      setReturnDesc('Doorstep pickup and instant exchange if size or fit is not ideal.');
+    } else if (preset === 'clearance') {
+      setNoReturnRefundExchange(true);
+      setReturnTitle('No Return • No Refund • No Exchange');
+      setReturnDesc('Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.');
+    } else if (preset === 'extended') {
+      setNoReturnRefundExchange(false);
+      setReturnTitle('15-Day Doorstep Replacement');
+      setReturnDesc('Easy 15-day exchange window with free reverse courier pickup.');
+    }
+  };
+
+  // Spotlight Mockup Photos (for Homepage Duo Spotlight)
+  const [spotlightMockups, setSpotlightMockups] = useState<{
+    mainUrl: string;
+    thumbnailUrl: string;
+    lifestyleUrl: string;
+  }>({
+    mainUrl: '',
+    thumbnailUrl: '',
+    lifestyleUrl: '',
+  });
+  const [uploadingMockup, setUploadingMockup] = useState<'mainUrl' | 'thumbnailUrl' | 'lifestyleUrl' | null>(null);
+  const [featureInDuoSlot, setFeatureInDuoSlot] = useState<'' | 'duo_product_1' | 'duo_product_2'>('');
+
   // Pricing calculations
   const handleRegularPriceChange = (val: string) => {
     setPrice(val);
@@ -202,6 +257,20 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           setNoReturnRefundExchange(Boolean(p.noReturnRefundExchange));
           setStatus(p.status || 'active');
 
+          if (p.shippingAndReturn) {
+            setShippingTitle(p.shippingAndReturn.shippingTitle || 'Complimentary Express Shipping');
+            setShippingDesc(p.shippingAndReturn.shippingDesc || 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.');
+            setReturnTitle(p.shippingAndReturn.returnTitle || (p.noReturnRefundExchange ? 'No Return • No Refund • No Exchange' : '7-Day Hassle-Free Returns'));
+            setReturnDesc(p.shippingAndReturn.returnDesc || (p.noReturnRefundExchange ? 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.' : 'Doorstep pickup and instant exchange if size or fit is not ideal.'));
+            setWarrantyTitle(p.shippingAndReturn.warrantyTitle || '6-Month Manufacturing Warranty');
+            setWarrantyDesc(p.shippingAndReturn.warrantyDesc || 'Covers sole adhesion, stitching, and artisan leather construction.');
+            setPaymentTitle(p.shippingAndReturn.paymentTitle || 'COD & Secure Prepaid');
+            setPaymentDesc(p.shippingAndReturn.paymentDesc || 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.');
+          } else if (p.noReturnRefundExchange) {
+            setReturnTitle('No Return • No Refund • No Exchange');
+            setReturnDesc('Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.');
+          }
+
           if (Array.isArray(p.sizes) && p.sizes.length > 0) {
             setSelectedSizes(p.sizes);
           }
@@ -226,6 +295,22 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             if (Array.isArray(p.seo.keywords)) {
               setKeywordsStr(p.seo.keywords.join(', '));
             }
+          }
+
+          if (p.spotlightMockups) {
+            setSpotlightMockups({
+              mainUrl: p.spotlightMockups.mainUrl || '',
+              thumbnailUrl: p.spotlightMockups.thumbnailUrl || '',
+              lifestyleUrl: p.spotlightMockups.lifestyleUrl || '',
+            });
+          }
+
+          if (p.spotlightSlot && p.spotlightSlot !== 'none') {
+            setFeatureInDuoSlot(p.spotlightSlot);
+          } else if (p.featuredInDuoSlot && p.featuredInDuoSlot !== 'none') {
+            setFeatureInDuoSlot(p.featuredInDuoSlot);
+          } else {
+            setFeatureInDuoSlot('');
           }
 
           // Variants
@@ -352,6 +437,27 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     );
   };
 
+  const handleMockupUpload = async (field: 'mainUrl' | 'thumbnailUrl' | 'lifestyleUrl', file: File) => {
+    try {
+      setUploadingMockup(field);
+      const optimized = await compressImage(file, { maxWidth: 1600, maxHeight: 1600, quality: 0.85 });
+      const fd = new FormData();
+      fd.append('file', optimized);
+      fd.append('folder', 'gravoz/mockups');
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.url) {
+        setSpotlightMockups((prev) => ({ ...prev, [field]: data.url }));
+      } else {
+        alert(data.error || 'Upload failed');
+      }
+    } catch {
+      alert('Upload failed. Check network or server.');
+    } finally {
+      setUploadingMockup(null);
+    }
+  };
+
   const toggleSizeSelection = (size: string) => {
     const nextSizes = selectedSizes.includes(size)
       ? selectedSizes.filter((s) => s !== size)
@@ -456,6 +562,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             isAvailable: true,
           })),
           images: allVariantImages,
+          spotlightMockups,
+          featureInDuoSlot: featureInDuoSlot || 'none',
           material,
           ageRange,
           occasion,
@@ -473,6 +581,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           isLatest,
           noReturnRefundExchange,
           status: targetStatus,
+          shippingAndReturn: {
+            shippingTitle: shippingTitle || 'Complimentary Express Shipping',
+            shippingDesc: shippingDesc || 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.',
+            returnTitle: returnTitle || (noReturnRefundExchange ? 'No Return • No Refund • No Exchange' : '7-Day Hassle-Free Returns'),
+            returnDesc: returnDesc || (noReturnRefundExchange ? 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.' : 'Doorstep pickup and instant exchange if size or fit is not ideal.'),
+            warrantyTitle: warrantyTitle || '6-Month Manufacturing Warranty',
+            warrantyDesc: warrantyDesc || 'Covers sole adhesion, stitching, and artisan leather construction.',
+            paymentTitle: paymentTitle || 'COD & Secure Prepaid',
+            paymentDesc: paymentDesc || 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.',
+          },
           seo: {
             metaTitle: metaTitle || name,
             metaDescription: metaDescription || description,
@@ -494,6 +612,36 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     }
   };
 
+  const handleAutoFillMockups = () => {
+    const allImgs: string[] = [];
+    for (const v of colorVariants) {
+      if (Array.isArray(v.images)) {
+        for (const img of v.images) {
+          if (img.url && !img.url.includes('placeholder.svg')) {
+            allImgs.push(img.url);
+          }
+        }
+      }
+    }
+    if (allImgs.length === 0) {
+      alert('Please add regular product photos in Tab 3 first!');
+      return;
+    }
+    setSpotlightMockups({
+      mainUrl: allImgs[0] || '',
+      thumbnailUrl: allImgs[1] || allImgs[0] || '',
+      lifestyleUrl: allImgs[2] || allImgs[1] || allImgs[0] || '',
+    });
+  };
+
+  const handleClearMockups = () => {
+    setSpotlightMockups({
+      mainUrl: '',
+      thumbnailUrl: '',
+      lifestyleUrl: '',
+    });
+  };
+
   const tabsList = [
     { id: 1, label: 'Basic Information' },
     { id: 2, label: 'Pricing & Inventory' },
@@ -503,6 +651,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     { id: 6, label: 'Features' },
     { id: 7, label: 'Specifications & Attributes' },
     { id: 8, label: 'SEO & Status' },
+    { id: 9, label: 'Homepage Duo Mockups', badge: 'Optional' },
   ];
 
   if (fetching) {
@@ -580,7 +729,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 >
                   {t.id}
                 </span>
-                <span className="truncate">{t.label}</span>
+                <span className="truncate flex-1">{t.label}</span>
+                {t.badge && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#89591C]/10 text-[#89591C] uppercase tracking-wider flex-shrink-0">
+                    {t.badge}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -917,6 +1071,36 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   </div>
                 );
               })}
+
+              {/* ── Optional: Homepage Duo Spotlight Mockup Photos ── */}
+              <div className="mt-6 pt-5 border-t border-[#f0eae1]">
+                <div className="p-4 bg-[#faf4ec] border border-[#e8d7c2] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="w-5 h-5 text-[#89591C] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs font-bold text-[#89591C]">
+                          Homepage Duo Spotlight Mockup Images (3 Photos)
+                        </h4>
+                        <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-white text-[#89591C] border border-[#e8d7c2] uppercase tracking-wider">
+                          Optional
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                        Want to display 3 custom promotional mockups in the Homepage Duo Showcase? Configure and preview the live Duo card layout in Tab 9.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab(9)}
+                    className="px-3.5 py-2 rounded-lg bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer flex-shrink-0 self-start sm:self-auto"
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                    <span>Open Mockups Layout (Tab 9) →</span>
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1234,18 +1418,183 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     </div>
                   </label>
 
-                  <label className={`p-3 rounded-xl border flex items-center gap-2.5 cursor-pointer ${noReturnRefundExchange ? 'bg-[#fff5f5] border-[#e53e3e]' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
+                  <label className={`p-3 rounded-xl border flex items-center gap-2.5 cursor-pointer transition-all ${noReturnRefundExchange ? 'bg-[#fff5f5] border-[#e53e3e] shadow-2xs' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
                     <input
                       type="checkbox"
                       checked={noReturnRefundExchange}
-                      onChange={(e) => setNoReturnRefundExchange(e.target.checked)}
-                      className="w-4 h-4 rounded text-[#e53e3e] focus:ring-0"
+                      onChange={(e) => handleToggleNoReturn(e.target.checked)}
+                      className="w-4 h-4 rounded text-[#e53e3e] focus:ring-0 cursor-pointer"
                     />
                     <div>
                       <span className="text-xs font-semibold text-rose-900 block">No Return / Refund / Exchange</span>
                       <span className="text-[10px] text-rose-600 font-medium">Final Sale / Clearance Old Stock Policy</span>
                     </div>
                   </label>
+                </div>
+              </div>
+
+              {/* ── Shipping & Returns Policy Configuration (Editable with Suggested Defaults) ── */}
+              <div className="space-y-4 pt-2 border-t border-[#e8e2d8]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                      <RotateCcw className="w-4 h-4 text-[#89591C]" />
+                      <span>Shipping &amp; Returns Policy Content</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-500 font-normal">
+                      Default suggestions are pre-filled below. Customize any card for clearance or special policies.
+                    </p>
+                  </div>
+
+                  {/* Preset Quick Actions */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => applyReturnPreset('standard')}
+                      className={`px-2.5 py-1 text-[11px] font-semibold rounded-md border transition-all cursor-pointer ${
+                        !noReturnRefundExchange
+                          ? 'bg-[#89591C] text-white border-[#89591C]'
+                          : 'bg-white text-slate-700 border-[#e8e2d8] hover:bg-slate-50'
+                      }`}
+                    >
+                      Standard 7-Day
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyReturnPreset('clearance')}
+                      className={`px-2.5 py-1 text-[11px] font-semibold rounded-md border transition-all cursor-pointer ${
+                        noReturnRefundExchange
+                          ? 'bg-[#e53e3e] text-white border-[#e53e3e]'
+                          : 'bg-white text-rose-700 border-rose-200 hover:bg-rose-50'
+                      }`}
+                    >
+                      No Return / Clearance
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyReturnPreset('extended')}
+                      className="px-2.5 py-1 text-[11px] font-semibold rounded-md border bg-white text-slate-700 border-[#e8e2d8] hover:bg-slate-50 cursor-pointer"
+                    >
+                      15-Day Exchange
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Card 1: Express Shipping */}
+                  <div className="p-3.5 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#89591C] uppercase tracking-wider block">Card 1: Shipping Details</span>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Shipping Heading</label>
+                      <input
+                        type="text"
+                        value={shippingTitle}
+                        onChange={(e) => setShippingTitle(e.target.value)}
+                        placeholder="Complimentary Express Shipping"
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Shipping Description</label>
+                      <textarea
+                        rows={2}
+                        value={shippingDesc}
+                        onChange={(e) => setShippingDesc(e.target.value)}
+                        placeholder="Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days."
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card 2: Return Policy */}
+                  <div className={`p-3.5 rounded-xl border space-y-2 ${
+                    noReturnRefundExchange
+                      ? 'bg-[#FFF9F2] border-2 border-[#F5C78E]'
+                      : 'bg-[#FAF7F3] border-[#E5E1DC]'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[11px] font-bold uppercase tracking-wider block ${
+                        noReturnRefundExchange ? 'text-[#B45309]' : 'text-[#89591C]'
+                      }`}>
+                        Card 2: Return &amp; Exchange Policy
+                      </span>
+                      {noReturnRefundExchange && (
+                        <span className="text-[10px] font-bold bg-[#B45309] text-white px-1.5 py-0.5 rounded-xs">
+                          Clearance Policy
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Return Heading</label>
+                      <input
+                        type="text"
+                        value={returnTitle}
+                        onChange={(e) => setReturnTitle(e.target.value)}
+                        placeholder="7-Day Hassle-Free Returns"
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Return Description</label>
+                      <textarea
+                        rows={2}
+                        value={returnDesc}
+                        onChange={(e) => setReturnDesc(e.target.value)}
+                        placeholder="Doorstep pickup and instant exchange if size or fit is not ideal."
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card 3: Manufacturing Warranty */}
+                  <div className="p-3.5 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#89591C] uppercase tracking-wider block">Card 3: Warranty Coverage</span>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Warranty Heading</label>
+                      <input
+                        type="text"
+                        value={warrantyTitle}
+                        onChange={(e) => setWarrantyTitle(e.target.value)}
+                        placeholder="6-Month Manufacturing Warranty"
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Warranty Description</label>
+                      <textarea
+                        rows={2}
+                        value={warrantyDesc}
+                        onChange={(e) => setWarrantyDesc(e.target.value)}
+                        placeholder="Covers sole adhesion, stitching, and artisan leather construction."
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card 4: Payment & COD */}
+                  <div className="p-3.5 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#89591C] uppercase tracking-wider block">Card 4: Payment Terms</span>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Payment Heading</label>
+                      <input
+                        type="text"
+                        value={paymentTitle}
+                        onChange={(e) => setPaymentTitle(e.target.value)}
+                        placeholder="COD & Secure Prepaid"
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Payment Description</label>
+                      <textarea
+                        rows={2}
+                        value={paymentDesc}
+                        onChange={(e) => setPaymentDesc(e.target.value)}
+                        placeholder="Pay securely via UPI, Cards, Net Banking, or Cash on Delivery."
+                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1293,6 +1642,328 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
 
+          {/* ── TAB 9: Homepage Duo Spotlight Mockups ── */}
+          {activeTab === 9 && (
+            <div className="bg-white rounded-2xl border border-[#e8e2d8] p-5 sm:p-7 space-y-6 shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#f0eae1]">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-900 tracking-tight">
+                      Homepage Duo Spotlight Mockups
+                    </h2>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#faf4ec] text-[#89591C] border border-[#e8d7c2] uppercase tracking-wider">
+                      Optional
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAutoFillMockups}
+                    className="px-3 py-1.5 rounded-lg bg-[#faf4ec] border border-[#e8d7c2] hover:bg-[#f3e6d3] text-[#89591C] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Copy first 3 images from Tab 3"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Auto-fill from Gallery</span>
+                  </button>
+                  {(spotlightMockups.mainUrl || spotlightMockups.thumbnailUrl || spotlightMockups.lifestyleUrl) && (
+                    <button
+                      type="button"
+                      onClick={handleClearMockups}
+                      className="px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-600 text-xs font-medium transition-colors cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Homepage Slot Selector */}
+              <div className="p-3.5 sm:p-4 bg-[#faf4ec] border border-[#e8d7c2] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#89591C]" />
+                    <span className="text-xs font-bold text-[#89591C]">
+                      Feature this product in Homepage Duo Spotlight
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 mt-0.5">
+                    Select which homepage card slot to showcase this product with these 3 mockups:
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {[
+                    { id: '', label: 'Do Not Feature' },
+                    { id: 'duo_product_1', label: 'Slot 1 (Left Card)' },
+                    { id: 'duo_product_2', label: 'Slot 2 (Right Card)' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setFeatureInDuoSlot(opt.id as any)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                        featureInDuoSlot === opt.id
+                          ? 'bg-[#89591C] text-white border-[#89591C] shadow-xs'
+                          : 'bg-white text-slate-700 border-[#e8e2d8] hover:bg-[#f5ecdf]'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── LIVE DUO CARD LAYOUT (1:1 Homepage Preview) ── */}
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                {/* Left: The Exact Duo Cards Layout */}
+                <div className="xl:col-span-6 bg-[#faf8f5] border border-[#e8e2d8] rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <LayoutGrid className="w-4 h-4 text-[#89591C]" />
+                      Live Duo Spotlight Preview
+                    </span>
+                  </div>
+
+                  {/* 2 Portrait Cards Grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Card 1: Photo 1 (Main Mockup) + Floating Inset Badge Photo 2 */}
+                    <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[22px] overflow-hidden bg-[#f0ede8] border border-[#e8e2d8] shadow-sm group">
+                      {spotlightMockups.mainUrl ? (
+                        <Image
+                          src={spotlightMockups.mainUrl}
+                          alt="Main Mockup"
+                          fill
+                          className="object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                          sizes="240px"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-1.5 p-3 text-center">
+                          <ImageIcon className="w-7 h-7 stroke-1 text-slate-400" />
+                          <span className="text-[11px] font-semibold text-slate-700">Photo 1</span>
+                          <span className="text-[9px] text-slate-400">Main Mockup</span>
+                        </div>
+                      )}
+
+                      {/* Photo 1 Upload Overlay */}
+                      <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer text-white text-xs font-semibold gap-1.5">
+                        <Upload className="w-4 h-4" />
+                        <span>{spotlightMockups.mainUrl ? 'Change Photo 1' : 'Upload Photo 1'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleMockupUpload('mainUrl', f);
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {/* Floating Inset Badge: Photo 2 (Inset Close-up) */}
+                      <div className="absolute bottom-2.5 left-2.5 w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] rounded-[12px] sm:rounded-[14px] bg-white border-2 border-white shadow-lg overflow-hidden z-20 group/inset">
+                        {spotlightMockups.thumbnailUrl ? (
+                          <div className="relative w-full h-full rounded-[10px] overflow-hidden">
+                            <Image
+                              src={spotlightMockups.thumbnailUrl}
+                              alt="Inset Mockup"
+                              fill
+                              className="object-cover object-center"
+                              sizes="60px"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-[#f8f5f0] text-[8px] font-bold text-center leading-tight">
+                            <span>Photo 2</span>
+                            <span className="text-[7px] text-slate-400">Inset</span>
+                          </div>
+                        )}
+
+                        {/* Photo 2 Upload Overlay */}
+                        <label className="absolute inset-0 bg-black/50 opacity-0 group-hover/inset:opacity-100 transition-opacity flex items-center justify-center cursor-pointer text-white text-[8px] font-semibold">
+                          <Upload className="w-3.5 h-3.5" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleMockupUpload('thumbnailUrl', f);
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Card 2: Photo 3 (Lifestyle / Second Angle Photo) */}
+                    <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[22px] overflow-hidden bg-[#f0ede8] border border-[#e8e2d8] shadow-sm group">
+                      {spotlightMockups.lifestyleUrl ? (
+                        <Image
+                          src={spotlightMockups.lifestyleUrl}
+                          alt="Lifestyle Mockup"
+                          fill
+                          className="object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                          sizes="240px"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-1.5 p-3 text-center">
+                          <ImageIcon className="w-7 h-7 stroke-1 text-slate-400" />
+                          <span className="text-[11px] font-semibold text-slate-700">Photo 3</span>
+                          <span className="text-[9px] text-slate-400">Lifestyle / Angle</span>
+                        </div>
+                      )}
+
+                      {/* Photo 3 Upload Overlay */}
+                      <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer text-white text-xs font-semibold gap-1.5">
+                        <Upload className="w-4 h-4" />
+                        <span>{spotlightMockups.lifestyleUrl ? 'Change Photo 3' : 'Upload Photo 3'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleMockupUpload('lifestyleUrl', f);
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Product Title & Price Preview */}
+                  <div className="pt-1.5 space-y-2">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-xs font-semibold text-slate-900 truncate">
+                        {name || 'Product Title'}
+                      </p>
+                      <div className="flex items-baseline gap-1.5 flex-shrink-0">
+                        <span className="text-xs font-bold text-[#89591C]">
+                          ₹{discountPrice || price || 0}
+                        </span>
+                        {discountPrice && Number(discountPrice) < Number(price) && (
+                          <span className="text-[10px] text-slate-400 line-through">₹{price}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="w-full py-2.5 rounded-xl bg-[#111111] text-white flex items-center justify-center gap-2 text-xs font-semibold shadow-2xs">
+                      <ShoppingCart className="w-3.5 h-3.5" />
+                      <span>Add to Cart</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Explicit Photo Upload & URL Inputs */}
+                <div className="xl:col-span-6 space-y-3.5">
+                  {/* Photo 1: Main Mockup Image */}
+                  <div className="p-4 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[10px] flex items-center justify-center font-bold">1</span>
+                        Photo 1: Main Mockup (Full Card 1)
+                      </label>
+                      {uploadingMockup === 'mainUrl' && (
+                        <span className="text-[10px] text-[#89591C] font-semibold animate-pulse">Uploading...</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="https://res.cloudinary.com/... or paste image URL"
+                        value={spotlightMockups.mainUrl}
+                        onChange={(e) => setSpotlightMockups((prev) => ({ ...prev, mainUrl: e.target.value }))}
+                        className="flex-1 bg-white border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                      <label className="px-3 py-2 rounded-lg bg-white border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleMockupUpload('mainUrl', f);
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Photo 2: Inset Thumbnail Mockup */}
+                  <div className="p-4 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[10px] flex items-center justify-center font-bold">2</span>
+                        Photo 2: Inset Thumbnail (Floating Badge on Card 1)
+                      </label>
+                      {uploadingMockup === 'thumbnailUrl' && (
+                        <span className="text-[10px] text-[#89591C] font-semibold animate-pulse">Uploading...</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="https://res.cloudinary.com/... or paste image URL"
+                        value={spotlightMockups.thumbnailUrl}
+                        onChange={(e) => setSpotlightMockups((prev) => ({ ...prev, thumbnailUrl: e.target.value }))}
+                        className="flex-1 bg-white border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                      <label className="px-3 py-2 rounded-lg bg-white border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleMockupUpload('thumbnailUrl', f);
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Photo 3: Lifestyle / Angle Mockup */}
+                  <div className="p-4 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[10px] flex items-center justify-center font-bold">3</span>
+                        Photo 3: Lifestyle / Angle (Full Card 2)
+                      </label>
+                      {uploadingMockup === 'lifestyleUrl' && (
+                        <span className="text-[10px] text-[#89591C] font-semibold animate-pulse">Uploading...</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="https://res.cloudinary.com/... or paste image URL"
+                        value={spotlightMockups.lifestyleUrl}
+                        onChange={(e) => setSpotlightMockups((prev) => ({ ...prev, lifestyleUrl: e.target.value }))}
+                        className="flex-1 bg-white border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                      />
+                      <label className="px-3 py-2 rounded-lg bg-white border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleMockupUpload('lifestyleUrl', f);
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Stepper Navigation */}
           <div className="flex items-center justify-between pt-2">
             <button
@@ -1304,10 +1975,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               ← Previous Step
             </button>
 
-            {activeTab < 8 ? (
+            {activeTab < 9 ? (
               <button
                 type="button"
-                onClick={() => setActiveTab((t) => Math.min(8, t + 1))}
+                onClick={() => setActiveTab((t) => Math.min(9, t + 1))}
                 className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-all shadow-2xs cursor-pointer"
               >
                 Next Step →

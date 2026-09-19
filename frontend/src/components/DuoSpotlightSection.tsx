@@ -65,9 +65,11 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
     const thumbImg = product.thumbnailUrl || product.imageUrl || '/products/placeholder.svg';
     const lifeImg = product.lifestyleUrl || product.imageUrl || '/products/placeholder.svg';
     const href =
-      product.linkUrl && product.linkUrl !== '/products'
+      product.linkUrl && product.linkUrl !== '/products' && !product.linkUrl.includes('undefined')
         ? product.linkUrl
-        : `/products/${product.slot}`;
+        : product.productId
+        ? `/products/${product.productId}`
+        : `/products`;
     const isAdding = addingSlot === product.slot;
 
     return (

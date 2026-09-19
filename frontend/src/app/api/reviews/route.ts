@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const reviews = await Review.find(query).sort({ createdAt: -1 }).lean();
+    const reviews = await Review.find(query).sort({ rating: -1, createdAt: -1 }).lean();
 
     const avgRating = reviews.length
       ? Math.round((reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length) * 10) / 10

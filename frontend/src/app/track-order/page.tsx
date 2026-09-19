@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProductImage from '@/components/ProductImage';
 import { useUser } from '@/context/UserContext';
 import {
   Search,
@@ -440,7 +441,7 @@ function TrackOrderContent() {
 
           {/* Ordered Items */}
           {order.items && order.items.length > 0 && (
-            <div className="bg-white rounded-2xl border border-[#e8e2d8] p-5 shadow-2xs space-y-3">
+            <div className="bg-white rounded-none border border-[#e8e2d8] p-5 shadow-2xs space-y-3">
               <h3 className="text-sm font-bold text-[#030303]">Ordered Items ({order.items.length})</h3>
               <div className="divide-y divide-[#f0ece5]">
                 {order.items.map((item: any, idx: number) => {
@@ -448,13 +449,13 @@ function TrackOrderContent() {
                   return (
                     <div key={idx} className="py-3 flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3 min-w-0">
-                        <Link href={prodHref} className="w-14 h-14 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
-                          <Image
-                            src={item.imageUrl || '/products/placeholder.svg'}
+                        <Link href={prodHref} className="w-14 h-14 rounded-none bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
+                          <ProductImage
+                            src={item.imageUrl}
                             alt={item.name}
                             width={56}
                             height={56}
-                            className="w-full h-full object-cover rounded-lg"
+                            className="w-full h-full object-contain rounded-none"
                           />
                         </Link>
                         <div className="space-y-0.5 min-w-0">

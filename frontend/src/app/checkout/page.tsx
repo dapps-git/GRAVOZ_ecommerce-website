@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProductImage from '@/components/ProductImage';
 import { useCart } from '@/context/CartContext';
 import { useUser } from '@/context/UserContext';
 import {
@@ -33,6 +34,8 @@ import {
   Headphones,
   Sparkles,
   AlertCircle,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 import {
@@ -98,6 +101,73 @@ export default function CheckoutPage() {
 
   // Coupon State
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; description: string } | null>(null);
+  const [availableCoupons, setAvailableCoupons] = useState<any[]>([]);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+  const [showCoupons, setShowCoupons] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Fetch available real coupons from DB on mount
+  useEffect(() => {
+    fetch('/api/coupons')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.coupons)) {
+          setAvailableCoupons(data.coupons);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleApplyCoupon = async (codeToApply?: string) => {
+    const target = (codeToApply || couponInput).trim().toUpperCase();
+    if (!target) return;
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: target,
+          cartTotal: subtotal,
+          email: user?.email,
+          phone: user?.phone,
+          customerId: user?.id,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAppliedCoupon({
+          code: data.coupon.code,
+          discount: data.discountAmount || 0,
+          description: data.coupon.description || `${data.discountAmount} OFF`,
+        });
+        setCouponInput('');
+        setShowCoupons(false);
+        showToast(`Coupon ${target} applied! You saved ₹${(data.discountAmount || 0).toLocaleString('en-IN')}`);
+      } else {
+        setCouponError(data.error || 'Invalid or ineligible coupon code.');
+      }
+    } catch {
+      setCouponError('Network error. Please try again.');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
+    showToast('Coupon removed.');
+  };
 
   // Referral Discount State
   const [referralStatus, setReferralStatus] = useState<{
@@ -482,8 +552,8 @@ export default function CheckoutPage() {
             '';
 
           const payload = {
-            customerId: (user as any)?._id || '',
-            customerEmail: user?.email || 'customer@gravoz.com',
+            customerId: (user as any)?._id || user?.id || '',
+            customerEmail: user?.email || (activeAddress as any)?.email || 'customer@gravoz.com',
             customerName: activeAddress.name || user?.name || 'Customer',
             customerPhone: activeAddress.phone || user?.phone || '',
             shippingAddress: {
@@ -585,7 +655,7 @@ export default function CheckoutPage() {
             return (
               <div key={step.id} className="flex flex-col items-center relative z-10 flex-1 text-center">
                 <div
-                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-none flex items-center justify-center transition-all ${
                     state === 'completed'
                       ? 'bg-[#4F7D45] text-white shadow-xs'
                       : state === 'active'
@@ -621,7 +691,7 @@ export default function CheckoutPage() {
   // ── Order Summary Sidebar Component ──
   const renderOrderSummary = (ctaButtonText: string, onCtaClick: () => void) => (
     <div className="space-y-4 font-poppins">
-      <div className="bg-white rounded-[14px] border border-[#E8E1D9] p-4 sm:p-5 shadow-gravoz space-y-4">
+      <div className="bg-white rounded-none border border-[#E8E1D9] p-4 sm:p-5 shadow-gravoz space-y-4">
         <h3 className="text-[15px] sm:text-[17px] font-semibold text-[#171717]">ORDER SUMMARY</h3>
 
         <div className="space-y-2.5 text-[11px] divide-y divide-[#F0ECE5] pt-1">
@@ -667,15 +737,120 @@ export default function CheckoutPage() {
         </div>
 
         {items.some((i) => i.noReturnRefundExchange) && (
-          <div className="bg-[#FFF9F2] border border-[#F5C78E] rounded-[11px] p-2.5 flex items-start gap-2 text-[11px] text-[#92400E]">
+          <div className="bg-[#FFF9F2] border border-[#F5C78E] rounded-none p-2.5 flex items-start gap-2 text-[11px] text-[#92400E]">
             <AlertCircle className="w-4 h-4 text-[#B45309] flex-shrink-0 mt-0.5" />
             <span>Order contains clearance item(s) sold as-is: <strong>No Return • No Refund • No Exchange</strong>.</span>
           </div>
         )}
 
+        {/* ── Coupon / Promo Code Card (Matching Cart & FIRSTSTEP Welcome Offer) ── */}
+        <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 space-y-2.5 font-poppins">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Tag className="w-4 h-4 text-[#8B4A12]" />
+              <span className="font-semibold text-xs text-[#171717]">Apply Coupon</span>
+            </div>
+            {availableCoupons.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowCoupons((prev) => !prev)}
+                className="text-[11px] font-semibold text-[#8B4A12] hover:underline flex items-center gap-0.5 cursor-pointer"
+              >
+                <span>{showCoupons ? 'Hide Offers' : 'View Offers'}</span>
+                {showCoupons ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+            )}
+          </div>
+
+          {/* Applied Coupon Display */}
+          {appliedCoupon ? (
+            <div className="flex items-center justify-between bg-white border border-[#E8E1D9] px-2.5 py-1.5">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold tracking-wider">
+                  {appliedCoupon.code}
+                </span>
+                <span className="text-[11px] text-emerald-700 font-semibold">
+                  -₹{appliedCoupon.discount.toLocaleString('en-IN')} Applied
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRemoveCoupon}
+                className="text-[11px] text-rose-600 hover:underline font-medium cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleApplyCoupon();
+              }}
+              className="flex gap-1.5"
+            >
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => {
+                  setCouponInput(e.target.value.toUpperCase());
+                  setCouponError('');
+                }}
+                placeholder="ENTER COUPON CODE"
+                className="flex-1 px-2.5 py-1.5 text-xs bg-white border border-[#E8E1D9] rounded-none focus:outline-none focus:border-[#8B4A12] uppercase tracking-wider font-sans"
+              />
+              <button
+                type="submit"
+                disabled={couponLoading || !couponInput.trim()}
+                className="px-3.5 py-1.5 bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs font-bold rounded-none transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {couponLoading ? '...' : 'APPLY'}
+              </button>
+            </form>
+          )}
+
+          {couponError && (
+            <p className="text-[10px] text-rose-600 font-medium">{couponError}</p>
+          )}
+
+          {/* Collapsible Available Coupons List (Highlights FIRSTSTEP Welcome Offer) */}
+          {showCoupons && availableCoupons.length > 0 && (
+            <div className="space-y-1.5 pt-1 max-h-48 overflow-y-auto pr-1">
+              {availableCoupons.map((c) => (
+                <div
+                  key={c.code}
+                  className="flex items-center justify-between gap-2 border border-dashed border-[#c9a46e] px-2.5 py-2 bg-white hover:bg-[#FAF4EC] transition-colors"
+                >
+                  <div className="min-w-0 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold flex-shrink-0">
+                      {c.code}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold text-[#171717] truncate">{c.description}</p>
+                      <p className="text-[9px] text-[#667085]">
+                        {c.code === 'FIRSTSTEP'
+                          ? 'Welcome Offer • Valid on 1st Order'
+                          : `Min order ₹${(c.minPurchaseAmount || 0).toLocaleString('en-IN')}`}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyCoupon(c.code)}
+                    disabled={couponLoading || appliedCoupon?.code === c.code}
+                    className="px-2.5 py-1 border border-[#8B4A12] text-[#8B4A12] text-[10px] font-bold hover:bg-[#8B4A12] hover:text-white transition-colors cursor-pointer flex-shrink-0 disabled:opacity-50"
+                  >
+                    {appliedCoupon?.code === c.code ? 'Applied' : 'Apply'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* ── Referral Discount Controls ── */}
         {referralStatus?.isFirstOrderEligible && !referralStatus?.hasUsedReferralDiscount && (
-          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-[11px] p-3 text-xs space-y-1.5 font-poppins">
+          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 text-xs space-y-1.5 font-poppins">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Gift className="w-4 h-4 text-[#8B4A12]" />
@@ -718,7 +893,7 @@ export default function CheckoutPage() {
         )}
 
         {(referralStatus?.availableDiscount || 0) >= 100 && (
-          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-[11px] p-3 text-xs space-y-1.5 font-poppins">
+          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 text-xs space-y-1.5 font-poppins">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Gift className="w-4 h-4 text-[#8B4A12]" />
@@ -762,7 +937,7 @@ export default function CheckoutPage() {
 
         {/* You will save banner */}
         {(calculatedDiscount + calculatedReferralDiscount) > 0 && (
-          <div className="bg-[#F0F8EC] border border-[#D2EAC3] rounded-[10px] p-2.5 flex items-center gap-2 text-[11px] font-semibold text-[#16A34A]">
+          <div className="bg-[#F0F8EC] border border-[#D2EAC3] rounded-none p-2.5 flex items-center gap-2 text-[11px] font-semibold text-[#16A34A]">
             <CheckCircle2 className="w-4 h-4 text-[#16A34A] flex-shrink-0" />
             <span>You will save ₹{(calculatedDiscount + calculatedReferralDiscount).toLocaleString('en-IN')} on this order</span>
           </div>
@@ -774,7 +949,7 @@ export default function CheckoutPage() {
             <button
               type="button"
               disabled
-              className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#ede8e1] text-[#888888] text-xs sm:text-[13px] font-semibold tracking-wider uppercase flex items-center justify-center gap-2 cursor-not-allowed border border-[#d8d2c8] font-poppins"
+              className="w-full h-[42px] sm:h-[46px] rounded-none bg-[#ede8e1] text-[#888888] text-xs sm:text-[13px] font-semibold tracking-wider uppercase flex items-center justify-center gap-2 cursor-not-allowed border border-[#d8d2c8] font-poppins"
             >
               <span>Out of Stock</span>
             </button>
@@ -787,7 +962,7 @@ export default function CheckoutPage() {
             type="button"
             disabled={isPlacingOrder || (currentStep === 'cart' && items.length === 0)}
             onClick={onCtaClick}
-            className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 font-poppins"
+            className="w-full h-[42px] sm:h-[46px] rounded-none bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 font-poppins"
           >
             <span>{ctaButtonText}</span>
             <ArrowRight className="w-4 h-4" />
@@ -797,7 +972,7 @@ export default function CheckoutPage() {
 
       {/* SSL Safe & Secure Card */}
       {currentStep === 'payment' && (
-        <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-[14px] p-3.5 flex items-start gap-2.5 text-xs font-poppins shadow-gravoz">
+        <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3.5 flex items-start gap-2.5 text-xs font-poppins shadow-gravoz">
           <ShieldCheck className="w-4 h-4 text-[#8B4A12] flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="font-semibold text-[12px] text-[#171717]">Safe & Secure Payments</h4>
@@ -812,9 +987,9 @@ export default function CheckoutPage() {
 
   // ── Bottom 3 Trust Badges (Matching Screenshot) ──
   const renderBottomTrustBadges = () => (
-    <div className="bg-[#FAF8F5] rounded-[14px] border border-[#E8E1D9] p-3.5 sm:p-4 grid grid-cols-3 gap-2 text-left shadow-gravoz mt-6 font-poppins">
+    <div className="bg-[#FAF8F5] rounded-none border border-[#E8E1D9] p-3.5 sm:p-4 grid grid-cols-3 gap-2 text-left shadow-gravoz mt-6 font-poppins">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-2.5 text-center sm:text-left">
-        <div className="w-8 h-8 rounded-full bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
+        <div className="w-8 h-8 rounded-none bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
           <ShieldCheck className="w-4 h-4" />
         </div>
         <div>
@@ -824,7 +999,7 @@ export default function CheckoutPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-2.5 text-center sm:text-left border-x border-[#E8E1D9] px-1.5 sm:px-3">
-        <div className="w-8 h-8 rounded-full bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
+        <div className="w-8 h-8 rounded-none bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
           <span className="font-bold text-xs text-[#8B4A12]">₹</span>
         </div>
         <div>
@@ -834,7 +1009,7 @@ export default function CheckoutPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-2.5 text-center sm:text-left">
-        <div className="w-8 h-8 rounded-full bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
+        <div className="w-8 h-8 rounded-none bg-white border border-[#E8E1D9] flex items-center justify-center text-[#8B4A12] shadow-xs flex-shrink-0">
           <Headphones className="w-4 h-4" />
         </div>
         <div>
@@ -944,13 +1119,13 @@ export default function CheckoutPage() {
                   return (
                     <div key={idx} className="py-3 flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <Link href={prodHref} className="w-14 h-14 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
-                          <Image
-                            src={item.imageUrl || '/products/placeholder.svg'}
+                        <Link href={prodHref} className="w-14 h-14 rounded-none bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
+                          <ProductImage
+                            src={item.imageUrl}
                             alt={item.name}
                             width={56}
                             height={56}
-                            className="w-full h-full object-cover rounded-lg"
+                            className="w-full h-full object-cover rounded-none"
                           />
                         </Link>
                         <div className="space-y-0.5 min-w-0">
@@ -1166,7 +1341,7 @@ export default function CheckoutPage() {
                 <div className="lg:col-span-7 xl:col-span-8 space-y-5">
                   
                   {/* Delivery Address Card */}
-                  <div className="bg-white rounded-2xl border border-[#e8e2d8] p-4 sm:p-6 shadow-2xs font-sansation space-y-3">
+                  <div className="bg-white rounded-none border border-[#e8e2d8] p-4 sm:p-6 shadow-2xs font-sansation space-y-3">
                     <div className="flex items-center justify-between border-b border-[#f0ece5] pb-2.5">
                       <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-800">Delivery Address</h3>
                       {savedAddresses.length > 0 && activeAddress.street && (
@@ -1182,7 +1357,7 @@ export default function CheckoutPage() {
 
                     {savedAddresses.length > 0 && activeAddress.street ? (
                       <div className="flex items-start gap-3 pt-1">
-                        <div className="w-8 h-8 rounded-full bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-8 h-8 rounded-none bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0 mt-0.5">
                           <MapPin className="w-4 h-4" />
                         </div>
                         <div className="space-y-1 text-xs text-slate-600">
@@ -1198,7 +1373,7 @@ export default function CheckoutPage() {
                     ) : (
                       <div className="flex items-center justify-between py-2">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0">
+                          <div className="w-8 h-8 rounded-none bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0">
                             <MapPin className="w-4 h-4" />
                           </div>
                           <div>
@@ -1209,7 +1384,7 @@ export default function CheckoutPage() {
                         <button
                           type="button"
                           onClick={handleOpenAddAddress}
-                          className="px-3.5 py-1.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold rounded-lg shadow-xs cursor-pointer"
+                          className="px-3.5 py-1.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold rounded-none shadow-xs cursor-pointer"
                         >
                           + Add Address
                         </button>
@@ -1218,7 +1393,7 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Items in Cart Card */}
-                  <div className="bg-white rounded-2xl border border-[#e8e2d8] p-4 sm:p-6 shadow-2xs font-sansation space-y-3">
+                  <div className="bg-white rounded-none border border-[#e8e2d8] p-4 sm:p-6 shadow-2xs font-sansation space-y-3">
                     <div className="flex items-center justify-between border-b border-[#f0ece5] pb-2.5">
                       <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-800">
                         Items in Cart ({totalItemCount})
@@ -1237,13 +1412,13 @@ export default function CheckoutPage() {
                         return (
                           <div key={idx} className="py-3 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                              <Link href={prodHref} className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
-                                <Image
-                                  src={item.imageUrl || '/products/placeholder.svg'}
+                              <Link href={prodHref} className="w-14 h-14 sm:w-16 sm:h-16 rounded-none bg-[#faf8f5] p-1 border border-[#e8e2d8] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
+                                <ProductImage
+                                  src={item.imageUrl}
                                   alt={item.title}
                                   width={64}
                                   height={64}
-                                  className="w-full h-full object-cover rounded-lg"
+                                  className="w-full h-full object-cover rounded-none"
                                 />
                               </Link>
                               <div className="space-y-1 min-w-0">
@@ -1316,7 +1491,7 @@ export default function CheckoutPage() {
                           address: formatAddressToString(addr),
                         });
                       }}
-                      className={`rounded-[12px] p-4 sm:p-5 transition-all cursor-pointer ${
+                      className={`rounded-none p-4 sm:p-5 transition-all cursor-pointer ${
                         isSelected
                           ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
                           : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
@@ -1325,20 +1500,20 @@ export default function CheckoutPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3 min-w-0">
                           <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            className={`w-5 h-5 rounded-none border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
                               isSelected
                                 ? 'border-[#8B4A12] bg-[#8B4A12]'
                                 : 'border-[#D9D1C8] bg-white'
                             }`}
                           >
-                            {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                            {isSelected && <div className="w-2 h-2 bg-white" />}
                           </div>
 
                           <div className="space-y-1 text-xs text-[#667085]">
                             <div className="flex items-center gap-2">
                               <span className="font-semibold text-[13px] text-[#171717]">{addr.name}</span>
                               {addr.isDefault && (
-                                <span className="text-[9px] font-semibold bg-[#F2E7DA] text-[#8B4A12] px-[6px] py-[3px] rounded-[5px]">
+                                <span className="text-[9px] font-semibold bg-[#F2E7DA] text-[#8B4A12] px-[6px] py-[3px] rounded-none">
                                   Default
                                 </span>
                               )}
@@ -1359,7 +1534,7 @@ export default function CheckoutPage() {
                             e.stopPropagation();
                             handleOpenEditAddress(addr);
                           }}
-                          className="text-xs font-semibold text-[#8B4A12] hover:underline flex-shrink-0"
+                          className="text-xs font-semibold text-[#8B4A12] hover:underline flex-shrink-0 cursor-pointer"
                         >
                           Edit
                         </button>
@@ -1369,7 +1544,7 @@ export default function CheckoutPage() {
                 })}
 
                 {savedAddresses.length === 0 && (
-                  <div className="p-6 text-center bg-white border border-[#E8E1D9] rounded-[12px] space-y-1.5">
+                  <div className="p-6 text-center bg-white border border-[#E8E1D9] rounded-none space-y-1.5">
                     <MapPin className="w-7 h-7 text-[#8B4A12]/50 mx-auto" />
                     <p className="text-sm font-semibold text-[#171717]">No Delivery Address Added</p>
                     <p className="text-xs text-[#667085]">Please add your delivery address to proceed with your order.</p>
@@ -1379,7 +1554,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={handleOpenAddAddress}
-                  className="w-full h-[46px] rounded-[12px] border border-dashed border-[#D9D1C8] bg-white hover:bg-[#FAF8F5] text-xs font-semibold text-[#171717] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
+                  className="w-full h-[46px] rounded-none border border-dashed border-[#D9D1C8] bg-white hover:bg-[#FAF8F5] text-xs font-semibold text-[#171717] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
                 >
                   <Plus className="w-4 h-4 text-[#8B4A12]" />
                   <span>Add New Address</span>
@@ -1395,7 +1570,7 @@ export default function CheckoutPage() {
                   }
                   setCurrentStep('payment');
                 }}
-                className="w-full h-[42px] sm:h-[46px] rounded-[10px] bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-4"
+                className="w-full h-[42px] sm:h-[46px] rounded-none bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer mt-4"
               >
                 <span>CONTINUE TO PAYMENT →</span>
               </button>
@@ -1425,7 +1600,7 @@ export default function CheckoutPage() {
                     {/* UPI (Selected) */}
                     <div
                       onClick={() => setPaymentMethod('UPI')}
-                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-none p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'UPI'
                           ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
                           : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
@@ -1433,14 +1608,14 @@ export default function CheckoutPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          className={`w-5 h-5 rounded-none border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'UPI'
                               ? 'border-[#8B4A12] bg-white'
                               : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
                           {paymentMethod === 'UPI' && (
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                            <div className="w-2.5 h-2.5 bg-[#8B4A12]" />
                           )}
                         </div>
 
@@ -1457,7 +1632,7 @@ export default function CheckoutPage() {
                         </div>
                       </div>
 
-                      <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-bold text-[11px] rounded-lg border border-[#C4E8BC]">
+                      <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-bold text-[11px] rounded-none border border-[#C4E8BC]">
                         SAVE ₹35
                       </span>
                     </div>
@@ -1465,7 +1640,7 @@ export default function CheckoutPage() {
                     {/* Credit / Debit Card */}
                     <div
                       onClick={() => setPaymentMethod('Card')}
-                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-none p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'Card'
                           ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
                           : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
@@ -1473,14 +1648,14 @@ export default function CheckoutPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          className={`w-5 h-5 rounded-none border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'Card'
                               ? 'border-[#8B4A12] bg-white'
                               : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
                           {paymentMethod === 'Card' && (
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                            <div className="w-2.5 h-2.5 bg-[#8B4A12]" />
                           )}
                         </div>
                         <div>
@@ -1494,12 +1669,12 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 bg-[#1a1f71] text-white font-extrabold text-[10px] rounded italic shadow-2xs">
+                        <span className="px-2 py-0.5 bg-[#1a1f71] text-white font-extrabold text-[10px] rounded-none italic shadow-2xs">
                           VISA
                         </span>
                         <div className="flex -space-x-1.5 items-center">
-                          <div className="w-4 h-4 rounded-full bg-[#eb001b]" />
-                          <div className="w-4 h-4 rounded-full bg-[#f79e1b] opacity-80" />
+                          <div className="w-4 h-4 rounded-none bg-[#eb001b]" />
+                          <div className="w-4 h-4 rounded-none bg-[#f79e1b] opacity-80" />
                         </div>
                       </div>
                     </div>
@@ -1507,7 +1682,7 @@ export default function CheckoutPage() {
                     {/* Net Banking */}
                     <div
                       onClick={() => setPaymentMethod('NetBanking')}
-                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-none p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'NetBanking'
                           ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
                           : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
@@ -1515,14 +1690,14 @@ export default function CheckoutPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          className={`w-5 h-5 rounded-none border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'NetBanking'
                               ? 'border-[#8B4A12] bg-white'
                               : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
                           {paymentMethod === 'NetBanking' && (
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                            <div className="w-2.5 h-2.5 bg-[#8B4A12]" />
                           )}
                         </div>
                         <div>
@@ -1541,7 +1716,7 @@ export default function CheckoutPage() {
                     {/* Wallets */}
                     <div
                       onClick={() => setPaymentMethod('Wallet')}
-                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-none p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'Wallet'
                           ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
                           : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
@@ -1549,14 +1724,14 @@ export default function CheckoutPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          className={`w-5 h-5 rounded-none border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'Wallet'
                               ? 'border-[#8B4A12] bg-white'
                               : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
                           {paymentMethod === 'Wallet' && (
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                            <div className="w-2.5 h-2.5 bg-[#8B4A12]" />
                           )}
                         </div>
                         <div>
@@ -1578,7 +1753,7 @@ export default function CheckoutPage() {
                     {/* Cash on Delivery */}
                     <div
                       onClick={() => setPaymentMethod('COD')}
-                      className={`min-h-[60px] rounded-[11px] p-3 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`min-h-[60px] rounded-none p-3 transition-all cursor-pointer flex items-center justify-between ${
                         paymentMethod === 'COD'
                           ? 'border-[1.5px] border-[#8B4A12] bg-[#FCF8F3] shadow-xs'
                           : 'border border-[#E8E1D9] bg-white hover:border-[#D9D1C8]'
@@ -1586,14 +1761,14 @@ export default function CheckoutPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          className={`w-5 h-5 rounded-none border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === 'COD'
                               ? 'border-[#8B4A12] bg-white'
                               : 'border-[#D9D1C8] bg-white'
                           }`}
                         >
                           {paymentMethod === 'COD' && (
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A12]" />
+                            <div className="w-2.5 h-2.5 bg-[#8B4A12]" />
                           )}
                         </div>
                         <div>
@@ -1606,14 +1781,14 @@ export default function CheckoutPage() {
                         </div>
                       </div>
 
-                      <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-semibold text-[11px] rounded-lg border border-[#C4E8BC]">
+                      <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-semibold text-[11px] rounded-none border border-[#C4E8BC]">
                         Available
                       </span>
                     </div>
                   </div>
 
                   {orderError && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-700">
+                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-none text-xs font-semibold text-rose-700">
                       {orderError}
                     </div>
                   )}
@@ -1639,11 +1814,11 @@ export default function CheckoutPage() {
       {/* ── ADD / EDIT ADDRESS MODAL ── */}
       {isAddressModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 font-sansation">
-          <div className="bg-white w-full max-w-lg rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-white w-full max-w-lg rounded-none p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setIsAddressModalOpen(false)}
-              className="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+              className="absolute top-4 right-4 w-7 h-7 rounded-none bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1669,7 +1844,7 @@ export default function CheckoutPage() {
                       if (fieldErrors.name) setFieldErrors({ ...fieldErrors, name: '' });
                     }}
                     placeholder="Recipient's Name"
-                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-none focus:outline-none transition-colors ${
                       fieldErrors.name
                         ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
                         : 'border-[#e8e2d8] focus:border-[#89591C]'
@@ -1685,7 +1860,7 @@ export default function CheckoutPage() {
                     Mobile Number <span className="text-rose-500">*</span>
                   </label>
                   <div
-                    className={`flex items-center rounded-xl bg-[#faf8f5] border transition-colors overflow-hidden ${
+                    className={`flex items-center rounded-none bg-[#faf8f5] border transition-colors overflow-hidden ${
                       fieldErrors.phone
                         ? 'border-rose-400 bg-rose-50/20'
                         : 'border-[#e8e2d8] focus-within:border-[#89591C]'
@@ -1728,7 +1903,7 @@ export default function CheckoutPage() {
                     if (fieldErrors.street) setFieldErrors({ ...fieldErrors, street: '' });
                   }}
                   placeholder="House / Flat No., Building, Street, Area"
-                  className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                  className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-none focus:outline-none transition-colors ${
                     fieldErrors.street
                       ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
                       : 'border-[#e8e2d8] focus:border-[#89591C]'
@@ -1752,7 +1927,7 @@ export default function CheckoutPage() {
                       if (fieldErrors.city) setFieldErrors({ ...fieldErrors, city: '' });
                     }}
                     placeholder="City"
-                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-none focus:outline-none transition-colors ${
                       fieldErrors.city
                         ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
                         : 'border-[#e8e2d8] focus:border-[#89591C]'
@@ -1774,7 +1949,7 @@ export default function CheckoutPage() {
                       if (fieldErrors.state) setFieldErrors({ ...fieldErrors, state: '' });
                     }}
                     placeholder="State"
-                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none transition-colors ${
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-none focus:outline-none transition-colors ${
                       fieldErrors.state
                         ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
                         : 'border-[#e8e2d8] focus:border-[#89591C]'
@@ -1805,7 +1980,7 @@ export default function CheckoutPage() {
                       if (fieldErrors.postalCode) setFieldErrors({ ...fieldErrors, postalCode: '' });
                     }}
                     placeholder="6-Digit PIN Code"
-                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-xl focus:outline-none font-mono transition-colors ${
+                    className={`w-full px-3 py-2 text-xs bg-[#faf8f5] border rounded-none focus:outline-none font-mono transition-colors ${
                       fieldErrors.postalCode
                         ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
                         : 'border-[#e8e2d8] focus:border-[#89591C]'
@@ -1821,13 +1996,13 @@ export default function CheckoutPage() {
                     type="text"
                     value={addressFormData.country}
                     onChange={(e) => setAddressFormData({ ...addressFormData, country: e.target.value })}
-                    className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C]"
+                    className="w-full px-3 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-none focus:outline-none focus:border-[#89591C]"
                   />
                 </div>
               </div>
 
               {formError && (
-                <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600 font-semibold flex items-center gap-2">
+                <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-none text-xs text-rose-600 font-semibold flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
@@ -1837,19 +2012,27 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setIsAddressModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
+                  className="px-4 py-2 rounded-none text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-[#89591C] hover:bg-[#724816] shadow-sm"
+                  className="px-5 py-2 rounded-none text-xs font-bold text-white bg-[#89591C] hover:bg-[#724816] shadow-sm cursor-pointer"
                 >
                   Save Address
                 </button>
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#171717] text-white px-4 py-2.5 rounded-none shadow-lg text-xs font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <span>{toastMessage}</span>
         </div>
       )}
 

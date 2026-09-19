@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -214,6 +214,74 @@ export default function StorefrontHomePage() {
   const [categoryCards, setCategoryCards] = useState<CategoryCardData[]>(DEFAULT_CATEGORIES);
   const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
 
+  const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
+
+  // ── Top Hero Multi-Slide List (4 slides in carousel) ────────────────────────
+  const heroSlides = useMemo(() => {
+    const list: Array<{ id: string; imageUrl: string; title?: string; subtitle?: string; linkUrl: string }> = [];
+    const heroSlots = ['hero', 'hero_slide_2', 'hero_slide_3', 'hero_slide_4'];
+
+    for (const slotKey of heroSlots) {
+      const b = banners[slotKey];
+      if (b && b.isActive !== false && b.imageUrl) {
+        list.push({
+          id: slotKey,
+          imageUrl: b.imageUrl,
+          title: b.title || '',
+          subtitle: b.subtitle || '',
+          linkUrl: b.linkUrl || '/products',
+        });
+      }
+    }
+
+    // Default slides fallback
+    if (list.length === 0) {
+      list.push(
+        {
+          id: 'hero_1',
+          imageUrl: bannerImageUrl && bannerImageUrl !== '/images/placeholder.svg' ? bannerImageUrl : '/images/banner.webp',
+          title: 'Step Better. Feel the Comfort.',
+          subtitle: 'Quality Sandals for Every Family Moment',
+          linkUrl: '/products',
+        },
+        {
+          id: 'hero_2',
+          imageUrl: '/images/banner3.webp',
+          title: 'Ultra Comfort Everyday Sandal',
+          subtitle: 'Ergonomic footbed with shock absorption',
+          linkUrl: '/products',
+        },
+        {
+          id: 'hero_3',
+          imageUrl: '/images/banner4.webp',
+          title: 'Seasonal Showcase',
+          subtitle: 'New Season New Styles',
+          linkUrl: '/products',
+        },
+        {
+          id: 'hero_4',
+          imageUrl: '/images/banner5.webp',
+          title: 'Daily Collection',
+          subtitle: 'Everyday elegance crafted for you',
+          linkUrl: '/products',
+        }
+      );
+    }
+
+    return list;
+  }, [banners, bannerImageUrl]);
+
+  // Auto-slide every 2 seconds continuous without ending (loops infinitely)
+  useEffect(() => {
+    if (heroSlides.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 2000);
+
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
+
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [productsLoading, setProductsLoading] = useState<boolean>(true);
   const [carouselPage, setCarouselPage] = useState<number>(0);
@@ -312,35 +380,36 @@ export default function StorefrontHomePage() {
       {/* 2. Main Body Content (Overall Pure White Background & Wide Container) */}
       <main className="flex-1 max-w-[1530px] w-full mx-auto px-4 sm:px-8 md:px-20 lg:px-28 pt-0 pb-6 md:pb-10 space-y-6 sm:space-y-10 bg-white">
         
-        {/* A. Top Hero Banner Card */}
+        {/* A. Top Hero Banner Card — 2s Continuous Seamless Crossfade */}
         {bannerLoading ? (
           <SkeletonBannerHero />
         ) : (
-        <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[1816/866] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
-          <Image
-            src={bannerImageUrl}
-            alt="GRAVOZ Step Better. Feel the Comfort. Quality Sandals for Every Family Moment."
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
-          />
-
-          {/* Subtle Carousel Arrow Controls */}
-          <button
-            type="button"
-            aria-label="Previous Slide"
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/60 backdrop-blur-xs text-slate-700 hover:bg-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-xs"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            aria-label="Next Slide"
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/60 backdrop-blur-xs text-slate-700 hover:bg-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-xs"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+        <section
+          className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[1816/866] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white"
+        >
+          {heroSlides.map((slide, idx) => {
+            const isActive = idx === currentHeroSlide;
+            return (
+              <Link
+                key={slide.id}
+                href={slide.linkUrl}
+                tabIndex={isActive ? 0 : -1}
+                aria-hidden={!isActive}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                  isActive ? 'opacity-100 pointer-events-auto z-10' : 'opacity-0 pointer-events-none z-0'
+                }`}
+              >
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.title || 'GRAVOZ Footwear Banner'}
+                  fill
+                  priority={idx === 0}
+                  sizes="100vw"
+                  className="object-cover object-center group-hover:scale-[1.015] transition-transform duration-700"
+                />
+              </Link>
+            );
+          })}
         </section>
         )}
 
@@ -437,13 +506,15 @@ export default function StorefrontHomePage() {
 
         {/* D. Promotional Secondary Banner Section (banner1.webp) */}
         <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[2001/786] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
-          <Image
-            src={banners.secondary?.imageUrl || '/images/banner1.webp'}
-            alt="GRAVOZ Luxury Leather Shoes Banner"
-            fill
-            sizes="100vw"
-            className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
-          />
+          <Link href="/products" className="block w-full h-full cursor-pointer">
+            <Image
+              src={banners.secondary?.imageUrl || '/images/banner1.webp'}
+              alt="GRAVOZ Luxury Leather Shoes Banner"
+              fill
+              sizes="100vw"
+              className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
+            />
+          </Link>
         </section>
 
         {/* E. "Category" Products Section (product5–8) */}
@@ -502,13 +573,15 @@ export default function StorefrontHomePage() {
         {/* F. Promotional Banner (Comfort Sandal) — dynamic from admin */}
         {(banners.comfort_sandal?.imageUrl) && (
         <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3076/1208] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
-          <Image
-            src={banners.comfort_sandal.imageUrl}
-            alt="GRAVOZ Comfort Sandal Banner"
-            fill
-            sizes="100vw"
-            className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
-          />
+          <Link href="/products" className="block w-full h-full cursor-pointer">
+            <Image
+              src={banners.comfort_sandal.imageUrl}
+              alt="GRAVOZ Comfort Sandal Banner"
+              fill
+              sizes="100vw"
+              className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
+            />
+          </Link>
         </section>
         )}
 
@@ -534,13 +607,15 @@ export default function StorefrontHomePage() {
 
         {/* I. Promotional Banner */}
         <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3200/1034] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
-          <Image
-            src={banners.promo_strip?.imageUrl || '/images/placeholder.svg'}
-            alt="GRAVOZ Promotional Banner"
-            fill
-            sizes="100vw"
-            className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
-          />
+          <Link href="/products" className="block w-full h-full cursor-pointer">
+            <Image
+              src={banners.promo_strip?.imageUrl || '/images/placeholder.svg'}
+              alt="GRAVOZ Promotional Banner"
+              fill
+              sizes="100vw"
+              className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
+            />
+          </Link>
         </section>
 
         {/* J. Latest Arrivals Showcase */}

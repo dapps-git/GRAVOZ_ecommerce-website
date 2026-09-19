@@ -69,19 +69,9 @@ function ListingProductCard({
   isWishlisted: boolean;
   onToggleWishlist: (e: React.MouseEvent) => void;
 }) {
-  const images = (product.images && product.images.length > 0)
-    ? product.images.map((img) => (typeof img === 'string' ? img : img?.url)).filter(Boolean) as string[]
-    : ['/products/placeholder.svg'];
-
-  const [currentIdx, setCurrentIdx] = useState(0);
-
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const timer = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [images.length]);
+  const primaryImg = (product.images && product.images.length > 0)
+    ? (typeof product.images[0] === 'string' ? product.images[0] : product.images[0]?.url) || '/products/placeholder.svg'
+    : '/products/placeholder.svg';
 
   const salePrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
   const regPrice = product.price;
@@ -135,25 +125,16 @@ function ListingProductCard({
           </div>
         ) : null}
 
-        {/* Sub-images layer with 3-second animated transition */}
-        {images.map((imgUrl, idx) => (
-          <div
-            key={`${imgUrl}-${idx}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              idx === currentIdx ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-            }`}
-          >
-            <Image
-              src={imgUrl}
-              alt={`${product.name || 'Footwear'} - photo ${idx + 1}`}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className={`object-cover object-center group-hover:scale-105 transition-transform duration-500 ${
-                product.stock !== undefined && product.stock <= 0 ? 'grayscale-[20%] opacity-85' : ''
-              }`}
-            />
-          </div>
-        ))}
+        {/* Primary image with smooth hover scale */}
+        <Image
+          src={primaryImg}
+          alt={product.name || 'Footwear'}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className={`object-cover object-center group-hover:scale-105 transition-transform duration-500 ${
+            product.stock !== undefined && product.stock <= 0 ? 'grayscale-[20%] opacity-85' : ''
+          }`}
+        />
       </div>
 
       {/* Product Info - Lightweight Typography */}

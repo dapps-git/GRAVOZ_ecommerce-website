@@ -39,6 +39,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async (): Promise<boolean> => {
     try {
+      const stored = typeof window !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_KEY) : null;
+      let cachedAvatar: string | null = null;
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.avatarUrl) cachedAvatar = parsed.avatarUrl;
+        } catch {}
+      }
+
       const res = await getCurrentUser();
       if (res.authenticated && res.user) {
         const profile: UserProfile = {
@@ -47,7 +56,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           email: res.user.email,
           phone: res.user.phone || '',
           address: res.user.address || '',
-          avatarUrl: res.user.avatarUrl || null,
+          avatarUrl: res.user.avatarUrl || cachedAvatar || null,
           rewardPoints: res.user.rewardPoints,
           referralCode: res.user.referralCode,
           referralDiscountBalance: res.user.referralDiscountBalance || 0,
@@ -63,7 +72,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         return true;
       } else {
         // Fallback check localStorage
-        const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
@@ -103,6 +111,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
       } catch {}
       return updated;
     });
+
+    // Sync updates to database in background
+    try {
+      fetch('/api/auth/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).catch(() => {});
+    } catch {}
   };
 
   const updateAvatar = (avatarUrl: string) => {

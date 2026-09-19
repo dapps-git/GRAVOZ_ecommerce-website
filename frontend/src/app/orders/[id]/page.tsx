@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProductImage from '@/components/ProductImage';
 import {
   Check,
   Truck,
@@ -362,7 +363,7 @@ export default function OrderTrackingPage() {
             <Link
               href={`/orders/${order._id}/invoice`}
               target="_blank"
-              className="text-xs font-semibold text-slate-700 hover:text-[#8A5B2A] bg-white border border-[#E5E1DC] px-3 py-1.5 rounded-lg shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="text-xs font-semibold text-slate-700 hover:text-[#8A5B2A] bg-white border border-[#E5E1DC] px-3 py-1.5 rounded-none shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5 text-[#8A5B2A]" /> Invoice
             </Link>
@@ -400,11 +401,11 @@ export default function OrderTrackingPage() {
                     className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[70px] sm:max-w-[110px]"
                   >
                     <div
-                      className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
+                      className={`w-7 h-7 sm:w-9 sm:h-9 rounded-none flex items-center justify-center transition-all ${
                         isCompleted
                           ? 'bg-[#8A5B2A] text-white shadow-xs border border-[#8A5B2A]'
                           : isActive
-                          ? 'bg-[#111111] text-white shadow-xs ring-3 sm:ring-4 ring-[#8A5B2A]/20 border border-[#111111]'
+                          ? 'bg-[#111111] text-white shadow-xs ring-2 sm:ring-3 ring-[#8A5B2A]/20 border border-[#111111]'
                           : 'bg-white border border-[#E5E1DC] text-[#888888]'
                       }`}
                     >
@@ -447,7 +448,7 @@ export default function OrderTrackingPage() {
 
             {/* Current Hub Location Banner if available */}
             {order.currentLocation && (
-              <div className="mt-4 px-3.5 py-2 bg-white border border-[#E5E1DC] rounded-xl flex items-center justify-between text-xs">
+              <div className="mt-4 px-3.5 py-2 bg-white border border-[#E5E1DC] rounded-none flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5 text-slate-600">
                   <MapPin className="w-3.5 h-3.5 text-[#8A5B2A]" />
                   <span>Current Hub Location:</span>
@@ -461,7 +462,7 @@ export default function OrderTrackingPage() {
 
         {/* ── RETURN LIFECYCLE STEPPER (When in Return Flow) ── */}
         {isReturnFlow && !isReturnRejected && (
-          <div className="w-full p-5 bg-white border border-[#E5E1DC] rounded-2xl shadow-2xs space-y-4">
+          <div className="w-full p-5 bg-white border border-[#E5E1DC] rounded-none shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <RotateCcw className="w-4 h-4 text-[#8A5B2A]" />
@@ -469,7 +470,7 @@ export default function OrderTrackingPage() {
                   Return & Refund Progress
                 </span>
               </div>
-              <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
+              <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-none ${
                 activeReturnStepIdx >= 2 ? 'bg-[#E8F8EE] text-[#22C55E]' : 'bg-[#FAF7F3] text-[#8A5B2A] border border-[#E5E1DC]'
               }`}>
                 {RETURN_STEP_DEFINITIONS[activeReturnStepIdx]?.label}
@@ -494,7 +495,7 @@ export default function OrderTrackingPage() {
                 return (
                   <div key={step.key} className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[45px] sm:max-w-[75px]">
                     <div
-                      className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] font-medium transition-all ${
+                      className={`w-6 h-6 sm:w-7 sm:h-7 rounded-none flex items-center justify-center text-[10px] font-medium transition-all ${
                         isCompleted
                           ? 'bg-[#8A5B2A] text-white'
                           : isActive
@@ -518,10 +519,10 @@ export default function OrderTrackingPage() {
 
         {/* ── RETURN STATUS BANNER / ACCEPTANCE CALLOUT ── */}
         {isReturnFlow && (
-          <div className="p-4 sm:p-5 rounded-2xl border shadow-2xs space-y-3 bg-white border-[#E5E1DC]">
+          <div className="p-4 sm:p-5 rounded-none border shadow-2xs space-y-3 bg-white border-[#E5E1DC]">
             {activeReturnStepIdx === 2 || returnStatus === 'approved' || orderStatus === 'return_approved' ? (
               /* SPECIFIC USER REQUIREMENT: Show return request accepted */
-              <div className="flex items-start gap-3 text-emerald-800 bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl">
+              <div className="flex items-start gap-3 text-emerald-800 bg-emerald-50 border border-emerald-200 p-3.5 rounded-none">
                 <CheckCircle2 className="w-5 h-5 text-[#22C55E] flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="text-sm font-semibold text-emerald-900">Return Request Accepted</h3>
@@ -531,7 +532,7 @@ export default function OrderTrackingPage() {
                 </div>
               </div>
             ) : isReturnRejected ? (
-              <div className="flex items-start gap-3 text-rose-800 bg-rose-50 border border-rose-200 p-3.5 rounded-xl">
+              <div className="flex items-start gap-3 text-rose-800 bg-rose-50 border border-rose-200 p-3.5 rounded-none">
                 <XCircle className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="text-sm font-semibold text-rose-900">Return Request Declined</h3>
@@ -541,7 +542,7 @@ export default function OrderTrackingPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-start gap-3 text-amber-800 bg-[#FAF7F3] border border-[#E5E1DC] p-3.5 rounded-xl">
+              <div className="flex items-start gap-3 text-amber-800 bg-[#FAF7F3] border border-[#E5E1DC] p-3.5 rounded-none">
                 <RotateCcw className="w-5 h-5 text-[#8A5B2A] flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="text-sm font-semibold text-[#111111]">{RETURN_STEP_DEFINITIONS[activeReturnStepIdx]?.label}</h3>
@@ -557,7 +558,7 @@ export default function OrderTrackingPage() {
               <div className="pt-2 text-xs space-y-1.5 border-t border-[#E5E1DC]/60">
                 <div className="flex items-center gap-2">
                   <span className="text-[#888888]">Reason for return:</span>
-                  <span className="font-semibold text-[#111111] bg-[#FAF7F3] px-2 py-0.5 rounded border border-[#E5E1DC]">
+                  <span className="font-semibold text-[#111111] bg-[#FAF7F3] px-2 py-0.5 rounded-none border border-[#E5E1DC]">
                     {order.returnDetails.reason}
                   </span>
                 </div>
@@ -572,7 +573,7 @@ export default function OrderTrackingPage() {
                     <span className="text-[#888888] block mb-1">Evidence Photos:</span>
                     <div className="flex items-center gap-2">
                       {order.returnDetails.images.map((img: string, idx: number) => (
-                        <div key={idx} className="relative w-14 h-14 rounded-lg overflow-hidden border border-[#E5E1DC] bg-[#FAF7F3]">
+                        <div key={idx} className="relative w-14 h-14 rounded-none overflow-hidden border border-[#E5E1DC] bg-[#FAF7F3]">
                           <img src={img} alt="Return evidence" className="w-full h-full object-cover" />
                         </div>
                       ))}
@@ -585,7 +586,7 @@ export default function OrderTrackingPage() {
         )}
 
         {/* ── ORDER SUMMARY CARD ── */}
-        <div className="bg-white border border-[#E5E1DC] rounded-2xl p-5 space-y-4 shadow-2xs">
+        <div className="bg-white border border-[#E5E1DC] rounded-none p-5 space-y-4 shadow-2xs">
           <h3 className="text-sm font-semibold text-[#111111]">Items in this Order</h3>
           <div className="divide-y divide-[#E5E1DC]/60">
             {order.items?.map((item: any, idx: number) => {
@@ -595,14 +596,14 @@ export default function OrderTrackingPage() {
                   <div className="flex items-center gap-3 min-w-0">
                     <Link
                       href={prodHref}
-                      className="relative w-14 h-14 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] flex-shrink-0 overflow-hidden hover:opacity-85 transition-opacity block"
+                      className="relative w-14 h-14 rounded-none bg-[#FAF7F3] border border-[#E5E1DC] flex-shrink-0 overflow-hidden hover:opacity-85 transition-opacity block p-1"
                     >
-                      <Image
-                        src={item.imageUrl || '/products/placeholder.svg'}
+                      <ProductImage
+                        src={item.imageUrl}
                         alt={item.name}
                         fill
                         sizes="56px"
-                        className="object-contain p-1"
+                        className="object-contain"
                       />
                     </Link>
                     <div className="min-w-0">
@@ -615,7 +616,7 @@ export default function OrderTrackingPage() {
                       <p className="text-[11px] text-[#555555]">Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}</p>
                       {item.noReturnRefundExchange && (
                         <div className="pt-0.5">
-                          <span className="inline-block text-[9px] font-bold text-[#92400E] bg-[#FFF1E0] border border-[#F5C78E] px-1.5 py-0.5 rounded uppercase tracking-wide">
+                          <span className="inline-block text-[9px] font-bold text-[#92400E] bg-[#FFF1E0] border border-[#F5C78E] px-1.5 py-0.5 rounded-none uppercase tracking-wide">
                             No Return / Refund (Clearance)
                           </span>
                         </div>
@@ -638,7 +639,7 @@ export default function OrderTrackingPage() {
 
         {/* Action feedback message */}
         {actionMsg && (
-          <div className="p-3.5 bg-[#FAF7F3] border border-[#8A5B2A]/30 rounded-xl text-xs font-medium text-[#8A5B2A] text-center">
+          <div className="p-3.5 bg-[#FAF7F3] border border-[#8A5B2A]/30 rounded-none text-xs font-medium text-[#8A5B2A] text-center">
             {actionMsg}
           </div>
         )}
@@ -659,7 +660,7 @@ export default function OrderTrackingPage() {
                 type="button"
                 onClick={handleCancel}
                 disabled={cancelling}
-                className="px-4 py-2 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors cursor-pointer disabled:opacity-60"
+                className="px-4 py-2 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-none transition-colors cursor-pointer disabled:opacity-60"
               >
                 {cancelling ? 'Cancelling...' : 'Cancel Order'}
               </button>
@@ -667,14 +668,14 @@ export default function OrderTrackingPage() {
 
             {isDelivered && !isReturnFlow && (
               order.items && order.items.length > 0 && order.items.every((i: any) => i.noReturnRefundExchange) ? (
-                <span className="px-3 py-2 text-xs font-semibold text-amber-800 bg-[#FFF1E0] border border-[#F5C78E] rounded-lg">
+                <span className="px-3 py-2 text-xs font-semibold text-amber-800 bg-[#FFF1E0] border border-[#F5C78E] rounded-none">
                   Non-Returnable (Final Sale)
                 </span>
               ) : (
                 <button
                   type="button"
                   onClick={() => setShowReturnModal(true)}
-                  className="px-4 py-2 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-lg transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-none transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Request Return & Refund
@@ -689,7 +690,7 @@ export default function OrderTrackingPage() {
       {/* ── RETURN & REFUND REQUEST MODAL ── */}
       {showReturnModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white border border-[#E5E1DC] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-xl space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-[#E5E1DC] rounded-none max-w-lg w-full p-5 sm:p-6 shadow-xl space-y-5 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-start justify-between border-b border-[#E5E1DC] pb-3">
               <div>
@@ -716,7 +717,7 @@ export default function OrderTrackingPage() {
                   {RETURN_REASONS.map((reason) => (
                     <label
                       key={reason}
-                      className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                      className={`flex items-center gap-3 p-3 rounded-none border cursor-pointer transition-all ${
                         selectedReason === reason
                           ? 'border-[#8A5B2A] bg-[#FAF7F3] text-[#111111] font-medium'
                           : 'border-[#E5E1DC] bg-white text-[#555555] hover:border-[#8A5B2A]/40'
@@ -751,7 +752,7 @@ export default function OrderTrackingPage() {
                     placeholder="Please tell us more about your reason..."
                     rows={3}
                     required
-                    className="w-full p-3 rounded-xl border border-[#E5E1DC] bg-[#FAF7F3] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#8A5B2A] focus:ring-1 focus:ring-[#8A5B2A]/20 transition-all resize-none"
+                    className="w-full p-3 rounded-none border border-[#E5E1DC] bg-[#FAF7F3] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#8A5B2A] focus:ring-1 focus:ring-[#8A5B2A]/20 transition-all resize-none"
                   />
                 </div>
               ) : (
@@ -764,7 +765,7 @@ export default function OrderTrackingPage() {
                     onChange={(e) => setReturnDescription(e.target.value)}
                     placeholder="Provide additional details if any..."
                     rows={2}
-                    className="w-full p-3 rounded-xl border border-[#E5E1DC] bg-[#FAF7F3] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#8A5B2A] focus:ring-1 focus:ring-[#8A5B2A]/20 transition-all resize-none"
+                    className="w-full p-3 rounded-none border border-[#E5E1DC] bg-[#FAF7F3] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#8A5B2A] focus:ring-1 focus:ring-[#8A5B2A]/20 transition-all resize-none"
                   />
                 </div>
               )}
@@ -782,12 +783,12 @@ export default function OrderTrackingPage() {
                 {returnImages.length > 0 && (
                   <div className="flex items-center gap-2.5">
                     {returnImages.map((img, idx) => (
-                      <div key={idx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#E5E1DC] group">
+                      <div key={idx} className="relative w-16 h-16 rounded-none overflow-hidden border border-[#E5E1DC] group">
                         <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
                         <button
                           type="button"
                           onClick={() => removePhoto(idx)}
-                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-rose-600 transition-colors"
+                          className="absolute top-1 right-1 w-5 h-5 rounded-none bg-black/70 text-white flex items-center justify-center hover:bg-rose-600 transition-colors"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -797,7 +798,7 @@ export default function OrderTrackingPage() {
                 )}
 
                 {returnImages.length < 3 && (
-                  <label className="flex flex-col items-center justify-center p-4 rounded-xl border border-dashed border-[#E5E1DC] hover:border-[#8A5B2A] bg-[#FAF7F3] cursor-pointer transition-colors text-center">
+                  <label className="flex flex-col items-center justify-center p-4 rounded-none border border-dashed border-[#E5E1DC] hover:border-[#8A5B2A] bg-[#FAF7F3] cursor-pointer transition-colors text-center">
                     <Upload className="w-5 h-5 text-[#8A5B2A] mb-1" />
                     <span className="text-xs font-medium text-[#111111]">Click to attach photos</span>
                     <span className="text-[10px] text-[#888888]">PNG, JPG up to 5MB</span>
@@ -828,7 +829,7 @@ export default function OrderTrackingPage() {
                 <button
                   type="submit"
                   disabled={submittingReturn}
-                  className="px-5 py-2.5 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-lg transition-colors cursor-pointer disabled:opacity-60 flex items-center gap-1.5 shadow-2xs"
+                  className="px-5 py-2.5 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-none transition-colors cursor-pointer disabled:opacity-60 flex items-center gap-1.5 shadow-2xs"
                 >
                   {submittingReturn && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Submit Return Request</span>

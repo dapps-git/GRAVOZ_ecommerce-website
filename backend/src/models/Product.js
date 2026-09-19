@@ -78,6 +78,16 @@ const ProductSchema = new mongoose.Schema(
     packingWidth: { type: Number, default: 0 },
     packingHeight: { type: Number, default: 0 },
     seo: { type: ProductSEOSchema, default: () => ({}) },
+    shippingAndReturn: {
+      shippingTitle: { type: String, default: 'Complimentary Express Shipping' },
+      shippingDesc: { type: String, default: 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.' },
+      returnTitle: { type: String, default: '7-Day Hassle-Free Returns' },
+      returnDesc: { type: String, default: 'Doorstep pickup and instant exchange if size or fit is not ideal.' },
+      warrantyTitle: { type: String, default: '6-Month Manufacturing Warranty' },
+      warrantyDesc: { type: String, default: 'Covers sole adhesion, stitching, and artisan leather construction.' },
+      paymentTitle: { type: String, default: 'COD & Secure Prepaid' },
+      paymentDesc: { type: String, default: 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.' },
+    },
     isBestSeller: { type: Boolean, default: false, index: true },
     isTopSeller: { type: Boolean, default: false, index: true },
     isFeatured: { type: Boolean, default: false, index: true },
@@ -85,6 +95,13 @@ const ProductSchema = new mongoose.Schema(
     badge: { type: String, default: '' },
     noReturnRefundExchange: { type: Boolean, default: false, index: true },
     status: { type: String, default: 'active', enum: ['active', 'draft', 'archived'] },
+    spotlightSlot: { type: String, default: 'none' },
+    featureInDuoSlot: { type: String, default: '' },
+    spotlightMockups: {
+      mainUrl: { type: String, default: '' },
+      thumbnailUrl: { type: String, default: '' },
+      lifestyleUrl: { type: String, default: '' },
+    },
   },
   { timestamps: true }
 );

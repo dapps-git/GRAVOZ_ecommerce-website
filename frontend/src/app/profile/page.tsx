@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProductImage from '@/components/ProductImage';
 import {
   User,
   Package,
@@ -298,9 +299,26 @@ export default function ProfilePage() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      updateAvatar(url);
-      showToast('Profile photo updated everywhere!');
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Url = event.target?.result as string;
+        if (base64Url) {
+          updateAvatar(base64Url);
+          showToast('Profile photo updated everywhere!');
+
+          // Background upload to permanent cloud if configured
+          try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('/api/reviews/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (res.ok && data.url) {
+              updateAvatar(data.url);
+            }
+          } catch {}
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -424,12 +442,13 @@ export default function ProfilePage() {
                   <div className="relative group">
                     <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f89530] flex items-center justify-center text-white overflow-hidden shadow-sm border-2 border-white ring-4 ring-[#faf9f6]">
                       {user?.avatarUrl ? (
-                        <Image
+                        <img
                           src={user.avatarUrl}
                           alt="User Avatar"
-                          width={112}
-                          height={112}
                           className="object-cover w-full h-full"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.display = 'none';
+                          }}
                         />
                       ) : (
                         /* Default Vector Avatar illustration matching reference image */
@@ -540,7 +559,7 @@ export default function ProfilePage() {
                     <h3 className="text-lg font-bold text-[#030303] font-sansation">My Orders</h3>
                     <p className="text-xs text-slate-500 font-sansation">Track and manage your footwear orders</p>
                   </div>
-                  <span className="text-xs bg-[#faf8f5] border border-[#e8e2d8] px-3 py-1 rounded-full font-medium text-[#89591C] font-sansation">
+                  <span className="text-xs bg-[#faf8f5] border border-[#e8e2d8] px-3 py-1 rounded-none font-medium text-[#89591C] font-sansation">
                     {orders.length} {orders.length === 1 ? 'Order' : 'Orders'}
                   </span>
                 </div>
@@ -550,12 +569,12 @@ export default function ProfilePage() {
                     <Loader2 className="w-6 h-6 animate-spin text-[#89591C]" />
                   </div>
                 ) : orders.length === 0 ? (
-                  <div className="py-12 text-center space-y-3 bg-[#faf8f5] rounded-2xl border border-[#e8e2d8]">
+                  <div className="py-12 text-center space-y-3 bg-[#faf8f5] rounded-none border border-[#e8e2d8]">
                     <Package className="w-10 h-10 text-slate-400 mx-auto" />
                     <p className="text-sm font-semibold text-slate-700">No orders placed yet</p>
                     <Link
                       href="/"
-                      className="inline-block px-5 py-2 bg-[#89591C] text-white text-xs font-bold rounded-xl"
+                      className="inline-block px-5 py-2 bg-[#89591C] text-white text-xs font-bold rounded-none"
                     >
                       Start Shopping
                     </Link>
@@ -566,67 +585,74 @@ export default function ProfilePage() {
                       const isDelivered = ord.orderStatus === 'delivered';
                       const isCancelled = ord.orderStatus === 'cancelled';
                       return (
-                        <div key={ord._id} className="border border-[#e5e5e5] rounded-2xl p-4 sm:p-5 space-y-4 shadow-2xs bg-white">
-                          <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-sansation border-b border-[#f0ece5] pb-3">
-                            <div>
-                              <span className="text-slate-400">Order ID: </span>
-                              <span className="font-bold text-[#030303]">#{ord.orderNumber}</span>
+                        <div key={ord._id} className="border border-[#e5e5e5] rounded-none p-4 sm:p-5 space-y-4 shadow-2xs bg-white">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs font-sansation border-b border-[#f0ece5] pb-3">
+                            <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 sm:gap-3 min-w-0">
+                              <div>
+                                <span className="text-slate-400 text-[11px]">Order ID: </span>
+                                <span className="font-bold text-[#030303] text-xs sm:text-sm">#{ord.orderNumber}</span>
+                              </div>
+                              <span className="text-slate-300 hidden sm:inline">•</span>
+                              <div className="text-[11px] text-slate-500">
+                                <span className="text-slate-400">Placed on: </span>
+                                <span className="font-medium text-slate-700">
+                                  {new Date(ord.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </span>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-slate-400">Placed on: </span>
-                              <span className="font-medium text-slate-700">
-                                {new Date(ord.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
+
+                            <div className="flex items-center justify-between sm:justify-end gap-2 flex-wrap pt-1 sm:pt-0 border-t sm:border-t-0 border-[#f5f2ed]">
                               {(() => {
                                 const st = ord.orderStatus;
                                 if (st === 'cancelled') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>;
                                 }
                                 if (st === 'return_approved') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#E8F8EE] text-[#22C55E] border border-[#22C55E]/30">Return Accepted</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-[#E8F8EE] text-[#22C55E] border border-[#22C55E]/30">Return Accepted</span>;
                                 }
                                 if (st === 'return_requested') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Return Requested</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Return Requested</span>;
                                 }
                                 if (st === 'under_review') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-50 text-blue-800 border border-blue-200">Under Review</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-blue-50 text-blue-800 border border-blue-200">Under Review</span>;
                                 }
                                 if (st === 'pickup_scheduled') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">Pickup Scheduled</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">Pickup Scheduled</span>;
                                 }
                                 if (st === 'return_received') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">Return Received</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">Return Received</span>;
                                 }
                                 if (st === 'refund_initiated') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-teal-50 text-teal-800 border border-teal-200">Refund Initiated</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-teal-50 text-teal-800 border border-teal-200">Refund Initiated</span>;
                                 }
                                 if (st === 'refunded') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">Refunded</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">Refunded</span>;
                                 }
                                 if (st === 'return_rejected') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Return Declined</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Return Declined</span>;
                                 }
                                 if (st === 'delivered') {
-                                  return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>;
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>;
                                 }
-                                return <span className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 capitalize">{st.replace(/_/g, ' ')}</span>;
+                                return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 capitalize">{st.replace(/_/g, ' ')}</span>;
                               })()}
-                              <Link
-                                href={`/orders/${ord._id}/invoice`}
-                                target="_blank"
-                                className="px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium rounded-lg border border-[#E5E1DC] transition-colors flex items-center gap-1 cursor-pointer"
-                                title="Download / Print Tax Invoice"
-                              >
-                                <FileText className="w-3 h-3 text-[#8A5B2A]" /> Invoice
-                              </Link>
-                              <Link
-                                href={`/orders/${ord._id}`}
-                                className="px-3 py-1 bg-[#FAF7F3] hover:bg-[#F6E9D7]/50 text-[#8A5B2A] text-[11px] font-medium rounded-lg border border-[#E5E1DC] transition-colors"
-                              >
-                                Track / Manage
-                              </Link>
+
+                              <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+                                <Link
+                                  href={`/orders/${ord._id}/invoice`}
+                                  target="_blank"
+                                  className="px-2.5 sm:px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium rounded-none border border-[#E5E1DC] transition-colors flex items-center gap-1 cursor-pointer"
+                                  title="Download / Print Tax Invoice"
+                                >
+                                  <FileText className="w-3 h-3 text-[#8A5B2A]" /> Invoice
+                                </Link>
+                                <Link
+                                  href={`/orders/${ord._id}`}
+                                  className="px-2.5 sm:px-3 py-1 bg-[#FAF7F3] hover:bg-[#F6E9D7]/50 text-[#8A5B2A] text-[11px] font-semibold rounded-none border border-[#E5E1DC] transition-colors"
+                                >
+                                  Track / Manage
+                                </Link>
+                              </div>
                             </div>
                           </div>
 
@@ -645,14 +671,14 @@ export default function ProfilePage() {
                                   <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                                     <Link
                                       href={prodHref}
-                                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block"
+                                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-none bg-[#faf8f5] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block"
                                     >
-                                      <Image
-                                        src={item.imageUrl || '/products/placeholder.svg'}
+                                      <ProductImage
+                                        src={item.imageUrl}
                                         alt={item.name}
                                         width={64}
                                         height={64}
-                                        className="object-contain w-full h-full"
+                                        className="object-contain w-full h-full rounded-none"
                                       />
                                     </Link>
                                     <div className="min-w-0 flex-1 space-y-0.5 font-sansation">
@@ -663,15 +689,15 @@ export default function ProfilePage() {
                                         {item.name}
                                       </Link>
                                       <p className="text-[11px] text-slate-500">
-                                        Size: {item.size} {item.color ? `| Color: ${item.color}` : ''} | Qty: {item.quantity}
+                                        Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}
                                       </p>
-                                      <span className="text-xs font-bold text-[#c25e09]">₹{(item.price * item.quantity).toLocaleString()}</span>
+                                      <span className="text-xs font-bold text-[#89591C]">₹{(item.price * item.quantity).toLocaleString()}</span>
                                     </div>
                                   </div>
 
                                   {isDelivered && (
                                     existingReview ? (
-                                      <span className="flex-shrink-0 px-2.5 py-1 bg-[#8A5B2A]/10 text-[#8A5B2A] text-[11px] font-bold rounded-lg border border-[#8A5B2A]/25 flex items-center gap-1">
+                                      <span className="flex-shrink-0 px-2.5 py-1 bg-[#8A5B2A]/10 text-[#8A5B2A] text-[11px] font-bold rounded-none border border-[#8A5B2A]/25 flex items-center gap-1">
                                         <Star className="w-3 h-3 fill-[#8A5B2A] text-[#8A5B2A]" /> {existingReview.rating}.0 Reviewed
                                       </span>
                                     ) : (
@@ -685,7 +711,7 @@ export default function ProfilePage() {
                                           setReviewMedia([]);
                                           setReviewModalOpen(true);
                                         }}
-                                        className="flex-shrink-0 px-3 py-1.5 bg-[#89591C] hover:bg-[#724a17] text-white text-[11px] font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1"
+                                        className="flex-shrink-0 px-3 py-1.5 bg-[#89591C] hover:bg-[#724a17] text-white text-[11px] font-bold rounded-none transition-colors cursor-pointer flex items-center gap-1"
                                       >
                                         <Star className="w-3 h-3 fill-white" /> Review
                                       </button>
@@ -1028,10 +1054,10 @@ export default function ProfilePage() {
                     {wishlistItems.map((item) => {
                       const prodHref = `/products/${item.productId || (item as any).slug || (item as any)._id}`;
                       return (
-                        <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
+                        <div key={item.productId} className="p-3.5 rounded-none border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
                           <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <Link href={prodHref} className="w-14 h-14 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
-                              <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
+                            <Link href={prodHref} className="w-14 h-14 rounded-none bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
+                              <ProductImage src={item.imageUrl} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
                             </Link>
                             <div className="min-w-0 flex-1 font-sansation space-y-0.5">
                               <Link href={prodHref} className="text-xs font-semibold text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block">
@@ -1058,7 +1084,7 @@ export default function ProfilePage() {
                               showToast(`Moved ${item.title} to Cart! Redirecting...`);
                               router.push('/cart');
                             }}
-                            className="bg-[#c25e09] hover:bg-[#a04a05] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-full transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
+                            className="bg-[#c25e09] hover:bg-[#a04a05] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-none transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
                           >
                             Add to Cart
                           </button>
@@ -1093,10 +1119,10 @@ export default function ProfilePage() {
                     {cartItems.map((item) => {
                       const prodHref = `/products/${item.productId || (item as any).slug || (item as any)._id}`;
                       return (
-                        <div key={item.productId} className="p-3.5 rounded-2xl border border-[#e5e5e5] flex items-center justify-between bg-white">
+                        <div key={item.productId} className="p-3.5 rounded-none border border-[#e5e5e5] flex items-center justify-between bg-white">
                           <div className="flex items-center gap-3">
-                            <Link href={prodHref} className="w-12 h-12 rounded-xl bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
-                              <Image src={item.imageUrl || '/products/placeholder.svg'} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
+                            <Link href={prodHref} className="w-12 h-12 rounded-none bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
+                              <ProductImage src={item.imageUrl} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
                             </Link>
                             <div>
                               <Link href={prodHref} className="text-xs font-semibold text-[#030303] hover:text-[#8A5B2A] transition-colors block">
@@ -1307,11 +1333,11 @@ export default function ProfilePage() {
       {/* ── WRITE REVIEW MODAL ── */}
       {reviewModalOpen && reviewItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto font-sansation">
+          <div className="bg-white w-full max-w-md rounded-none p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto font-sansation">
             <button
               type="button"
               onClick={() => setReviewModalOpen(false)}
-              className="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+              className="absolute top-4 right-4 w-7 h-7 rounded-none bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1320,14 +1346,14 @@ export default function ProfilePage() {
             <p className="text-xs text-slate-500 mt-0.5">{reviewItem.name}</p>
 
             {/* Product thumbnail */}
-            <div className="mt-3 flex items-center gap-3 p-2.5 bg-[#faf8f5] rounded-xl border border-[#e8e2d8]">
-              <div className="w-12 h-12 rounded-lg bg-white border border-[#e8e2d8] overflow-hidden flex-shrink-0">
-                <Image
-                  src={reviewItem.imageUrl || '/products/placeholder.svg'}
+            <div className="mt-3 flex items-center gap-3 p-2.5 bg-[#faf8f5] rounded-none border border-[#e8e2d8]">
+              <div className="w-12 h-12 rounded-none bg-white border border-[#e8e2d8] overflow-hidden flex-shrink-0">
+                <ProductImage
+                  src={reviewItem.imageUrl}
                   alt={reviewItem.name}
                   width={48}
                   height={48}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-none"
                 />
               </div>
               <div className="text-xs">
@@ -1372,7 +1398,7 @@ export default function ProfilePage() {
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="How was the fit, leather quality, and comfort?"
                 rows={3}
-                className="w-full p-3 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl focus:outline-none focus:border-[#89591C] resize-none"
+                className="w-full p-3 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-none focus:outline-none focus:border-[#89591C] resize-none"
               />
             </div>
 
@@ -1383,7 +1409,7 @@ export default function ProfilePage() {
               </label>
               <div className="flex flex-wrap gap-2 items-center">
                 {reviewMedia.map((m, idx) => (
-                  <div key={idx} className="relative w-14 h-14 rounded-lg overflow-hidden border border-[#e8e2d8] bg-black">
+                  <div key={idx} className="relative w-14 h-14 rounded-none overflow-hidden border border-[#e8e2d8] bg-black">
                     {m.type === 'video' ? (
                       <video src={m.url} className="w-full h-full object-cover" />
                     ) : (
@@ -1392,15 +1418,15 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={() => setReviewMedia(reviewMedia.filter((_, i) => i !== idx))}
-                      className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/70 text-white flex items-center justify-center text-[10px]"
+                      className="absolute top-0.5 right-0.5 w-4 h-4 rounded-none bg-black/70 text-white flex items-center justify-center text-[10px]"
                     >
-                      ├ù
+                      ×
                     </button>
                   </div>
                 ))}
 
                 {reviewMedia.length < 4 && (
-                  <label className="w-14 h-14 rounded-lg border-2 border-dashed border-[#d8cebe] hover:border-[#89591C] bg-[#faf8f5] flex flex-col items-center justify-center text-slate-400 hover:text-[#89591C] cursor-pointer transition-colors">
+                  <label className="w-14 h-14 rounded-none border-2 border-dashed border-[#d8cebe] hover:border-[#89591C] bg-[#faf8f5] flex flex-col items-center justify-center text-slate-400 hover:text-[#89591C] cursor-pointer transition-colors">
                     {uploadingMedia ? (
                       <Loader2 className="w-4 h-4 animate-spin text-[#89591C]" />
                     ) : (
@@ -1480,7 +1506,7 @@ export default function ProfilePage() {
                     setSubmittingReview(false);
                   }
                 }}
-                className="w-full py-3 bg-[#89591C] hover:bg-[#724a17] disabled:opacity-60 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#89591C] hover:bg-[#724a17] disabled:opacity-60 text-white text-xs font-bold rounded-none transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
                 {submittingReview ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
@@ -1495,8 +1521,8 @@ export default function ProfilePage() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#030303] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-bottom-5 duration-300">
-          <div className="w-5 h-5 rounded-full bg-[#89591C] flex items-center justify-center flex-shrink-0">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#030303] text-white px-4 py-2.5 rounded-none shadow-xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-bottom-5 duration-300">
+          <div className="w-5 h-5 rounded-none bg-[#89591C] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>
           <span className="text-xs font-medium font-sansation">{toastMessage}</span>

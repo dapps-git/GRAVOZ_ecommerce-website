@@ -6,6 +6,7 @@ import { Customer } from '@/models/Customer';
 import { Cart } from '@/models/Cart';
 import { Product } from '@/models/Product';
 import { Referral } from '@/models/Referral';
+import { Coupon } from '@/models/Coupon';
 
 // GET /api/orders?email=xxx
 export async function GET(req: NextRequest) {
@@ -82,11 +83,44 @@ export async function POST(req: NextRequest) {
 
     let orderingCustomer = await Customer.findOne(customerQuery);
 
+    // ── Backend Validation of Coupon Discount ──
+    let verifiedCouponDiscount = Number(discountAmount) || 0;
+    if (couponCode) {
+      const cleanCoupon = couponCode.toUpperCase().trim();
+      if (cleanCoupon === 'FIRSTSTEP') {
+        const queryOr: any[] = [
+          { customerEmail: customerEmail.toLowerCase().trim() },
+        ];
+        if (customerPhone) {
+          const digitsOnly = customerPhone.replace(/\D/g, '').slice(-10);
+          if (digitsOnly) {
+            queryOr.push({ customerPhone: { $regex: digitsOnly + '$' } });
+          }
+        }
+        if (cleanCustomerId) {
+          queryOr.push({ customerId: cleanCustomerId });
+        }
+
+        const alreadyUsed = await Order.findOne({
+          $or: queryOr,
+          couponCode: { $regex: /^FIRSTSTEP$/i },
+          orderStatus: { $ne: 'cancelled' },
+        });
+
+        if (alreadyUsed) {
+          return NextResponse.json(
+            { error: 'The FIRSTSTEP welcome coupon has already been redeemed by this account.' },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     // ── Backend Validation of Referral Discount ──
     let verifiedReferralDiscount = 0;
     let verifiedReferralType: string | null = null;
     const numSubtotal = Number(subtotal) || 0;
-    const numCouponDiscount = Number(discountAmount) || 0;
+    const numCouponDiscount = verifiedCouponDiscount;
     const numShippingFee = Number(shippingFee) || 0;
 
     if (referralDiscountType === 'referred_first_order_15') {
@@ -272,6 +306,16 @@ export async function POST(req: NextRequest) {
     } catch (refRewardErr) {
       console.warn('Referral reward credit warning:', refRewardErr);
     }
+
+    // Increment coupon usage count if coupon was applied
+    try {
+      if (couponCode) {
+        await Coupon.updateOne(
+          { code: couponCode.toUpperCase().trim() },
+          { $inc: { usedCount: 1 } }
+        );
+      }
+    } catch {}
 
     // Attempt to clear cart for this user
     try {
