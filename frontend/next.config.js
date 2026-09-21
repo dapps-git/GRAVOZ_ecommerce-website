@@ -1,5 +1,8 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: path.join(__dirname, '../'),
   // ── Image Optimization & Caching ──────────────────────────────────────────
   images: {
     // Cache optimized images for 1 year (31536000s) in the browser

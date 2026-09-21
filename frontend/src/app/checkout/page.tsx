@@ -175,6 +175,8 @@ export default function CheckoutPage() {
     availableDiscount: number;
     hasUsedReferralDiscount?: boolean;
     referralCode?: string;
+    referredBy?: string;
+    referralCodeUsed?: string;
   } | null>(null);
   const [appliedReferralType, setAppliedReferralType] = useState<'referred_first_order_15' | 'referrer_reward_100' | null>(null);
 

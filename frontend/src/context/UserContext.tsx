@@ -17,6 +17,8 @@ export interface UserProfile {
   referredBy?: string;
   referralCodeUsed?: string;
   tier?: string;
+  totalOrders?: number;
+  totalSpent?: number;
 }
 
 interface UserContextType {
@@ -64,6 +66,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
           referredBy: res.user.referredBy || '',
           referralCodeUsed: res.user.referralCodeUsed || '',
           tier: res.user.tier,
+          totalOrders: res.user.totalOrders || 0,
+          totalSpent: res.user.totalSpent || 0,
         };
         setUser(profile);
         try {
