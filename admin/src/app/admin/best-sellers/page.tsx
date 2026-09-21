@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import DataTable, { Column } from '@/components/admin/DataTable';
 import Image from 'next/image';
-import { Award, Star } from 'lucide-react';
+import { Award, ChartBarStackedIcon, Star } from 'lucide-react';
 
 interface BestSellerProduct {
   _id: string;
@@ -85,11 +85,10 @@ export default function BestSellersPage() {
         <button
           type="button"
           onClick={() => toggleBestSeller(row._id, row.isBestSeller)}
-          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 border ${
-            row.isBestSeller
+          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 border ${row.isBestSeller
               ? 'bg-[#89591C] text-white border-[#89591C] shadow-xs'
               : 'bg-white text-slate-600 border-[#e8e2d8] hover:text-[#89591C]'
-          }`}
+            }`}
         >
           <Star className={`w-3.5 h-3.5 ${row.isBestSeller ? 'fill-white text-white' : 'text-slate-400'}`} />
           {row.isBestSeller ? 'Best Seller Pinned' : 'Normal Catalog'}
@@ -111,3 +110,5 @@ export default function BestSellersPage() {
     </div>
   );
 }
+
+

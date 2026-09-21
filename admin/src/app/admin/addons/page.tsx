@@ -310,11 +310,10 @@ export default function AddonsPage() {
               key={f}
               type="button"
               onClick={() => setFilterActive(f)}
-              className={`px-3 py-2 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
-                filterActive === f
+              className={`px-3 py-2 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${filterActive === f
                   ? 'bg-[#89591C] text-white'
                   : 'bg-white border border-slate-200 text-slate-600 hover:border-[#89591C] hover:text-[#89591C]'
-              }`}
+                }`}
             >
               {f}
             </button>
@@ -519,6 +518,8 @@ export default function AddonsPage() {
                     className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
                   />
                 </div>
+
+
               </div>
 
               {/* Description */}
@@ -550,11 +551,10 @@ export default function AddonsPage() {
 
                 {/* Main Upload Dropzone & Button */}
                 <label
-                  className={`w-full rounded-xl border-2 border-dashed transition-all p-4 flex flex-col items-center justify-center cursor-pointer text-center ${
-                    uploadingImage
+                  className={`w-full rounded-xl border-2 border-dashed transition-all p-4 flex flex-col items-center justify-center cursor-pointer text-center ${uploadingImage
                       ? 'border-[#89591C] bg-[#89591C]/5 pointer-events-none'
                       : 'border-[#e8e2d8] hover:border-[#89591C] bg-[#faf8f5] hover:bg-[#f4efe8]'
-                  }`}
+                    }`}
                 >
                   {uploadingImage ? (
                     <div className="flex flex-col items-center gap-1.5 py-2">
@@ -602,8 +602,8 @@ export default function AddonsPage() {
                         {form.imageUrl.startsWith('/uploads/')
                           ? 'Uploaded File'
                           : form.imageUrl.includes('cloudinary')
-                          ? 'Cloudinary Asset'
-                          : 'Linked Image'}
+                            ? 'Cloudinary Asset'
+                            : 'Linked Image'}
                       </p>
                       <p className="text-[10px] text-slate-400 truncate mt-0.5 font-mono">
                         {form.imageUrl}
@@ -678,11 +678,10 @@ export default function AddonsPage() {
                         key={value}
                         type="button"
                         onClick={() => toggleCategory(value)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-                          isSelected
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${isSelected
                             ? 'bg-[#89591C] text-white border-[#89591C]'
                             : 'bg-white text-slate-600 border-slate-200 hover:border-[#89591C] hover:text-[#89591C]'
-                        }`}
+                          }`}
                       >
                         {isSelected && <Check className="w-3 h-3 inline mr-1" />}
                         {label}
