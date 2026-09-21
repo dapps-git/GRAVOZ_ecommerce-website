@@ -116,8 +116,30 @@ async function testAll() {
   const userBCookie = regBRes.headers.get('set-cookie') || '';
   console.log(`✔ User B registered with referral code ${refCodeA}.`);
 
-  // Step 2.5: Check User A's referral status (Should show 1 friend joined, 0 successful orders, ₹0 available)
-  console.log('\n[Step 2.5] Checking User A dashboard status before friend order...');
+  // Step 2.5: Verify Referral user cannot apply FIRSTSTEP welcome coupon
+  console.log('\n[Step 2.5] Verifying referral user is blocked from using FIRSTSTEP welcome coupon...');
+  const refFirststepRes = await fetch(`${BASE_URL}/api/coupons/validate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Cookie: userBCookie,
+    },
+    body: JSON.stringify({
+      code: 'FIRSTSTEP',
+      cartTotal: 2000,
+      customerId: regBData.user.id,
+      email: userBEmail,
+    }),
+  });
+  const refFirststepData = await refFirststepRes.json();
+  console.log('FIRSTSTEP validation for referral account response:', refFirststepData);
+  if (refFirststepData.success) {
+    throw new Error('Referral account was incorrectly allowed to use FIRSTSTEP welcome coupon!');
+  }
+  console.log('✔ Referral user correctly blocked from using FIRSTSTEP welcome coupon.');
+
+  // Step 2.5b: Check User A dashboard status before friend order
+  console.log('\n[Step 2.5b] Checking User A dashboard status before friend order...');
   const statusA1Res = await fetch(`${BASE_URL}/api/referrals/status`, {
     headers: { Cookie: userACookie },
   });

@@ -106,6 +106,30 @@ export async function POST(req: NextRequest) {
     if (couponCode) {
       const cleanCoupon = couponCode.toUpperCase().trim();
       if (cleanCoupon === 'FIRSTSTEP') {
+        // Disallow FIRSTSTEP for referral customers (they receive 15% referral discount instead)
+        if (orderingCustomer) {
+          if (orderingCustomer.referredBy || orderingCustomer.referralCodeUsed) {
+            return NextResponse.json(
+              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
+              { status: 400 }
+            );
+          }
+          if ((orderingCustomer.totalOrders || 0) > 0) {
+            return NextResponse.json(
+              { error: 'The FIRSTSTEP welcome coupon is only valid on your first order.' },
+              { status: 400 }
+            );
+          }
+
+          const existingRef = await Referral.findOne({ referredUser: orderingCustomer._id });
+          if (existingRef) {
+            return NextResponse.json(
+              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
+              { status: 400 }
+            );
+          }
+        }
+
         const queryOr: any[] = [{ customerEmail }];
         if (customerPhone) {
           const digitsOnly = customerPhone.replace(/\D/g, '').slice(-10);
@@ -186,6 +210,8 @@ export async function POST(req: NextRequest) {
           // Exactly 15% discount on subtotal
           verifiedReferralDiscount = Math.round(numSubtotal * 0.15);
           verifiedReferralType = 'referred_first_order_15';
+          // On first referral order, the 15% referral discount is exclusive
+          verifiedCouponDiscount = 0;
         }
       }
     } else if (referralDiscountType === 'referrer_reward_100') {

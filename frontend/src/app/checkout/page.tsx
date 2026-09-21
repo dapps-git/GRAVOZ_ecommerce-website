@@ -743,152 +743,143 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        {/* ── Coupon / Promo Code Card (Matching Cart & FIRSTSTEP Welcome Offer) ── */}
-        <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 space-y-2.5 font-poppins">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Tag className="w-4 h-4 text-[#8B4A12]" />
-              <span className="font-semibold text-xs text-[#171717]">Apply Coupon</span>
-            </div>
-            {availableCoupons.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowCoupons((prev) => !prev)}
-                className="text-[11px] font-semibold text-[#8B4A12] hover:underline flex items-center gap-0.5 cursor-pointer"
-              >
-                <span>{showCoupons ? 'Hide Offers' : 'View Offers'}</span>
-                {showCoupons ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              </button>
-            )}
-          </div>
-
-          {/* Applied Coupon Display */}
-          {appliedCoupon ? (
-            <div className="flex items-center justify-between bg-white border border-[#E8E1D9] px-2.5 py-1.5">
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold tracking-wider">
-                  {appliedCoupon.code}
-                </span>
-                <span className="text-[11px] text-emerald-700 font-semibold">
-                  -₹{appliedCoupon.discount.toLocaleString('en-IN')} Applied
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleRemoveCoupon}
-                className="text-[11px] text-rose-600 hover:underline font-medium cursor-pointer"
-              >
-                Remove
-              </button>
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleApplyCoupon();
-              }}
-              className="flex gap-1.5"
-            >
-              <input
-                type="text"
-                value={couponInput}
-                onChange={(e) => {
-                  setCouponInput(e.target.value.toUpperCase());
-                  setCouponError('');
-                }}
-                placeholder="ENTER COUPON CODE"
-                className="flex-1 px-2.5 py-1.5 text-xs bg-white border border-[#E8E1D9] rounded-none focus:outline-none focus:border-[#8B4A12] uppercase tracking-wider font-sans"
-              />
-              <button
-                type="submit"
-                disabled={couponLoading || !couponInput.trim()}
-                className="px-3.5 py-1.5 bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs font-bold rounded-none transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {couponLoading ? '...' : 'APPLY'}
-              </button>
-            </form>
-          )}
-
-          {couponError && (
-            <p className="text-[10px] text-rose-600 font-medium">{couponError}</p>
-          )}
-
-          {/* Collapsible Available Coupons List (Highlights FIRSTSTEP Welcome Offer) */}
-          {showCoupons && availableCoupons.length > 0 && (
-            <div className="space-y-1.5 pt-1 max-h-48 overflow-y-auto pr-1">
-              {availableCoupons.map((c) => (
-                <div
-                  key={c.code}
-                  className="flex items-center justify-between gap-2 border border-dashed border-[#c9a46e] px-2.5 py-2 bg-white hover:bg-[#FAF4EC] transition-colors"
-                >
-                  <div className="min-w-0 flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold flex-shrink-0">
-                      {c.code}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-[#171717] truncate">{c.description}</p>
-                      <p className="text-[9px] text-[#667085]">
-                        {c.code === 'FIRSTSTEP'
-                          ? 'Welcome Offer • Valid on 1st Order'
-                          : `Min order ₹${(c.minPurchaseAmount || 0).toLocaleString('en-IN')}`}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleApplyCoupon(c.code)}
-                    disabled={couponLoading || appliedCoupon?.code === c.code}
-                    className="px-2.5 py-1 border border-[#8B4A12] text-[#8B4A12] text-[10px] font-bold hover:bg-[#8B4A12] hover:text-white transition-colors cursor-pointer flex-shrink-0 disabled:opacity-50"
-                  >
-                    {appliedCoupon?.code === c.code ? 'Applied' : 'Apply'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* ── Referral Discount Controls ── */}
-        {referralStatus?.isFirstOrderEligible && !referralStatus?.hasUsedReferralDiscount && (
-          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 text-xs space-y-1.5 font-poppins">
+        {/* ── Referral Welcome First Order (Exclusive 15% discount, coupons hidden) ── */}
+        {referralStatus?.isFirstOrderEligible && !referralStatus?.hasUsedReferralDiscount ? (
+          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3.5 space-y-2 font-poppins">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <Gift className="w-4 h-4 text-[#8B4A12]" />
-                <span className="font-semibold text-[#171717]">Referral Welcome Discount (15%)</span>
+                <span className="font-semibold text-xs text-[#171717]">Referral Welcome Discount (15% OFF)</span>
               </div>
-              <span className="text-[11px] font-bold text-emerald-700">
+              <span className="text-xs font-bold text-emerald-700">
                 -₹{Math.round(subtotal * 0.15).toLocaleString('en-IN')}
               </span>
             </div>
-            <p className="text-[10px] text-[#667085]">
-              Exclusive 15% discount for your first purchase through referral!
+            <p className="text-[11px] text-[#667085]">
+              Exclusive 15% discount automatically applied to your first order via referral link.
             </p>
             <div className="flex items-center justify-between pt-1 border-t border-[#f0ece5]">
-              <span className="text-[10px] text-slate-500">
-                Status: {appliedReferralType === 'referred_first_order_15' ? (
-                  <span className="text-emerald-700 font-semibold">Applied</span>
-                ) : (
-                  <span className="text-slate-600">Available</span>
-                )}
+              <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-emerald-600" /> Applied automatically on this order
               </span>
-              {appliedReferralType === 'referred_first_order_15' ? (
+            </div>
+          </div>
+        ) : (
+          /* ── Coupon / Promo Code Card (For standard orders & returning customers) ── */
+          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 space-y-2.5 font-poppins">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Tag className="w-4 h-4 text-[#8B4A12]" />
+                <span className="font-semibold text-xs text-[#171717]">Apply Coupon</span>
+              </div>
+              {availableCoupons.filter((c) => {
+                const isRefUser = Boolean(user?.referredBy || user?.referralCodeUsed || referralStatus?.referredBy || referralStatus?.hasUsedReferralDiscount);
+                const isRetUser = Boolean((user?.totalOrders || 0) > 0);
+                if (c.code === 'FIRSTSTEP' && (isRefUser || isRetUser)) return false;
+                return true;
+              }).length > 0 && (
                 <button
                   type="button"
-                  onClick={() => setAppliedReferralType(null)}
-                  className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                  onClick={() => setShowCoupons((prev) => !prev)}
+                  className="text-[11px] font-semibold text-[#8B4A12] hover:underline flex items-center gap-0.5 cursor-pointer"
                 >
-                  Remove
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setAppliedReferralType('referred_first_order_15')}
-                  className="text-[11px] font-bold text-[#8B4A12] hover:underline cursor-pointer"
-                >
-                  Apply 15%
+                  <span>{showCoupons ? 'Hide Offers' : 'View Offers'}</span>
+                  {showCoupons ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                 </button>
               )}
             </div>
+
+            {/* Applied Coupon Display */}
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between bg-white border border-[#E8E1D9] px-2.5 py-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold tracking-wider">
+                    {appliedCoupon.code}
+                  </span>
+                  <span className="text-[11px] text-emerald-700 font-semibold">
+                    -₹{appliedCoupon.discount.toLocaleString('en-IN')} Applied
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveCoupon}
+                  className="text-[11px] text-rose-600 hover:underline font-medium cursor-pointer"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleApplyCoupon();
+                }}
+                className="flex gap-1.5"
+              >
+                <input
+                  type="text"
+                  value={couponInput}
+                  onChange={(e) => {
+                    setCouponInput(e.target.value.toUpperCase());
+                    setCouponError('');
+                  }}
+                  placeholder="ENTER COUPON CODE"
+                  className="flex-1 px-2.5 py-1.5 text-xs bg-white border border-[#E8E1D9] rounded-none focus:outline-none focus:border-[#8B4A12] uppercase tracking-wider font-sans"
+                />
+                <button
+                  type="submit"
+                  disabled={couponLoading || !couponInput.trim()}
+                  className="px-3.5 py-1.5 bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs font-bold rounded-none transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {couponLoading ? '...' : 'APPLY'}
+                </button>
+              </form>
+            )}
+
+            {couponError && (
+              <p className="text-[10px] text-rose-600 font-medium">{couponError}</p>
+            )}
+
+            {/* Collapsible Available Coupons List (Filtered) */}
+            {showCoupons && (
+              <div className="space-y-1.5 pt-1 max-h-48 overflow-y-auto pr-1">
+                {availableCoupons
+                  .filter((c) => {
+                    const isRefUser = Boolean(user?.referredBy || user?.referralCodeUsed || referralStatus?.referredBy || referralStatus?.hasUsedReferralDiscount);
+                    const isRetUser = Boolean((user?.totalOrders || 0) > 0);
+                    if (c.code === 'FIRSTSTEP' && (isRefUser || isRetUser)) return false;
+                    return true;
+                  })
+                  .map((c) => (
+                    <div
+                      key={c.code}
+                      className="flex items-center justify-between gap-2 border border-dashed border-[#c9a46e] px-2.5 py-2 bg-white hover:bg-[#FAF4EC] transition-colors"
+                    >
+                      <div className="min-w-0 flex items-center gap-2">
+                        <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold flex-shrink-0">
+                          {c.code}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-bold text-[#171717] truncate">{c.description}</p>
+                          <p className="text-[9px] text-[#667085]">
+                            {c.code === 'FIRSTSTEP'
+                              ? 'Welcome Offer • Valid on 1st Order'
+                              : `Min order ₹${(c.minPurchaseAmount || 0).toLocaleString('en-IN')}`}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleApplyCoupon(c.code)}
+                        disabled={couponLoading || appliedCoupon?.code === c.code}
+                        className="px-2.5 py-1 border border-[#8B4A12] text-[#8B4A12] text-[10px] font-bold hover:bg-[#8B4A12] hover:text-white transition-colors cursor-pointer flex-shrink-0 disabled:opacity-50"
+                      >
+                        {appliedCoupon?.code === c.code ? 'Applied' : 'Apply'}
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         )}
 

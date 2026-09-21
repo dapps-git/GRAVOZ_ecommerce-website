@@ -20,9 +20,50 @@ export async function POST(req: NextRequest) {
 
     // ── 1. 1-Time Welcome Offer Rule for FIRSTSTEP (₹250 OFF) ──
     if (cleanCode === 'FIRSTSTEP') {
+      const { getUserSession } = await import('@/lib/auth');
+      const { Customer } = await import('@/models/Customer');
+      const { Referral } = await import('@/models/Referral');
+
+      const session = await getUserSession();
+      const effCustomerId = session?.userId || customerId;
+      const effEmail = (session?.email || email || '').toLowerCase().trim();
+
+      // Disallow FIRSTSTEP for referral accounts (they receive 15% referral discount instead)
+      if (effCustomerId || effEmail) {
+        const custQuery = effCustomerId && mongoose.Types.ObjectId.isValid(effCustomerId)
+          ? { _id: effCustomerId }
+          : { email: effEmail };
+        const foundCustomer = await Customer.findOne(custQuery);
+
+        if (foundCustomer) {
+          if (foundCustomer.referredBy || foundCustomer.referralCodeUsed) {
+            return NextResponse.json(
+              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
+              { status: 400 }
+            );
+          }
+          if ((foundCustomer.totalOrders || 0) > 0) {
+            return NextResponse.json(
+              { error: 'The FIRSTSTEP welcome offer is only valid on your first order.' },
+              { status: 400 }
+            );
+          }
+        }
+
+        if (effCustomerId && mongoose.Types.ObjectId.isValid(effCustomerId)) {
+          const existingRef = await Referral.findOne({ referredUser: effCustomerId });
+          if (existingRef) {
+            return NextResponse.json(
+              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
+              { status: 400 }
+            );
+          }
+        }
+      }
+
       const queryOr: any[] = [];
-      if (email && typeof email === 'string' && email.trim()) {
-        queryOr.push({ customerEmail: email.toLowerCase().trim() });
+      if (effEmail) {
+        queryOr.push({ customerEmail: effEmail });
       }
       if (phone && typeof phone === 'string' && phone.trim()) {
         const digitsOnly = phone.replace(/\D/g, '').slice(-10);
@@ -30,8 +71,8 @@ export async function POST(req: NextRequest) {
           queryOr.push({ customerPhone: { $regex: digitsOnly + '$' } });
         }
       }
-      if (customerId && mongoose.Types.ObjectId.isValid(customerId)) {
-        queryOr.push({ customerId: customerId });
+      if (effCustomerId && mongoose.Types.ObjectId.isValid(effCustomerId)) {
+        queryOr.push({ customerId: effCustomerId });
       }
 
       if (queryOr.length > 0) {

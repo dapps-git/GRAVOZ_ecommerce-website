@@ -425,33 +425,56 @@ export default function CartPage() {
                       <p className="text-[11px] text-rose-500 font-medium">{couponError}</p>
                     )}
 
+                    {/* Referral Notice for first order */}
+                    {(user?.referredBy || user?.referralCodeUsed) && (user?.totalOrders || 0) === 0 && (
+                      <div className="p-2.5 bg-[#faf4ec] border border-[#e8dacb] text-[11px] text-[#89591C]">
+                        🎁 <strong>15% Referral Discount</strong> will be automatically applied at checkout on your first order!
+                      </div>
+                    )}
+
                     {/* List of Coupons */}
-                    {availableCoupons.length > 0 && (
+                    {availableCoupons.filter((c) => {
+                      const isRefUser = Boolean(user?.referredBy || user?.referralCodeUsed);
+                      const isRetUser = Boolean((user?.totalOrders || 0) > 0);
+                      if (c.code === 'FIRSTSTEP' && (isRefUser || isRetUser)) return false;
+                      return true;
+                    }).length > 0 && (
                       <div className="space-y-2 pt-1 max-h-60 overflow-y-auto pr-1">
-                        {availableCoupons.map((c) => (
-                          <div
-                            key={c.code}
-                            className="flex items-center justify-between gap-3 border border-dashed border-[#c9a46e] rounded-none px-3 py-2.5 bg-white hover:bg-[#faf4ec] transition-colors"
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <span className="px-2.5 py-1.5 bg-[#89591C] text-white text-[11px] font-bold rounded-none tracking-wide flex-shrink-0">
-                                {c.code}
-                              </span>
-                              <div className="min-w-0">
-                                <p className="text-xs font-bold text-[#111111] truncate">{c.description}</p>
-                                <p className="text-[10px] text-slate-500">Min. order ₹{c.minPurchaseAmount.toLocaleString('en-IN')}</p>
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleApplyCoupon(c.code)}
-                              disabled={couponLoading}
-                              className="px-3 py-1.5 border border-[#89591C] text-[#89591C] text-[11px] font-bold rounded-none hover:bg-[#89591C] hover:text-white transition-colors cursor-pointer flex-shrink-0 disabled:opacity-60"
+                        {availableCoupons
+                          .filter((c) => {
+                            const isRefUser = Boolean(user?.referredBy || user?.referralCodeUsed);
+                            const isRetUser = Boolean((user?.totalOrders || 0) > 0);
+                            if (c.code === 'FIRSTSTEP' && (isRefUser || isRetUser)) return false;
+                            return true;
+                          })
+                          .map((c) => (
+                            <div
+                              key={c.code}
+                              className="flex items-center justify-between gap-3 border border-dashed border-[#c9a46e] rounded-none px-3 py-2.5 bg-white hover:bg-[#faf4ec] transition-colors"
                             >
-                              APPLY
-                            </button>
-                          </div>
-                        ))}
+                              <div className="flex items-center gap-3 min-w-0">
+                                <span className="px-2.5 py-1.5 bg-[#89591C] text-white text-[11px] font-bold rounded-none tracking-wide flex-shrink-0">
+                                  {c.code}
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="text-xs font-bold text-[#111111] truncate">{c.description}</p>
+                                  <p className="text-[10px] text-slate-500">
+                                    {c.code === 'FIRSTSTEP'
+                                      ? 'Welcome Offer • Valid on 1st Order'
+                                      : `Min. order ₹${c.minPurchaseAmount.toLocaleString('en-IN')}`}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleApplyCoupon(c.code)}
+                                disabled={couponLoading}
+                                className="px-3 py-1.5 border border-[#89591C] text-[#89591C] text-[11px] font-bold rounded-none hover:bg-[#89591C] hover:text-white transition-colors cursor-pointer flex-shrink-0 disabled:opacity-60"
+                              >
+                                APPLY
+                              </button>
+                            </div>
+                          ))}
                       </div>
                     )}
                   </div>
