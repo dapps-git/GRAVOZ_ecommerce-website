@@ -22,6 +22,34 @@ export async function GET(req: NextRequest) {
       query.applicableCategories = { $in: [category.toLowerCase(), 'all'] };
     }
 
+    const count = await Addon.countDocuments();
+    if (count === 0) {
+      await Addon.create([
+        {
+          name: 'Extra Laces',
+          description: 'Durable & stylish laces',
+          price: 22,
+          imageUrl: '/images/addons/extra-laces.jpg',
+          sku: 'ADDON-LACES-01',
+          stock: 500,
+          applicableCategories: ['all'],
+          isActive: true,
+          displayOrder: 1,
+        },
+        {
+          name: 'Shoe Polish Kit',
+          description: 'Keep your shoes fresh & shiny',
+          price: 100,
+          imageUrl: '/images/addons/shoe-polish-kit.jpg',
+          sku: 'ADDON-POLISH-01',
+          stock: 500,
+          applicableCategories: ['all'],
+          isActive: true,
+          displayOrder: 2,
+        },
+      ]);
+    }
+
     const addons = await Addon.find(query)
       .sort({ displayOrder: 1, createdAt: -1 })
       .select('_id name description price imageUrl sku stock applicableCategories displayOrder')

@@ -35,6 +35,7 @@ import {
   CheckCheck,
   Users,
   Award,
+  AlertCircle,
 } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
@@ -929,10 +930,18 @@ export default function ProfilePage() {
                       <div className="w-6 h-6 rounded-full bg-black text-white font-bold text-xs flex items-center justify-center">
                         3
                       </div>
-                      <h5 className="text-xs font-bold text-[#030303]">You Get ₹100 Discount</h5>
+                      <h5 className="text-xs font-bold text-[#030303]">You Get ₹100 Cashback</h5>
                       <p className="text-[11px] text-slate-500 leading-relaxed">
-                        Once their order is completed, you receive a ₹100 store discount applied at checkout.
+                        Once their order is completed, you receive a ₹100 reward cashback balance to apply at checkout.
                       </p>
+                    </div>
+                  </div>
+
+                  {/* Reward Policy Notice */}
+                  <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-lg p-3 text-[11px] text-slate-600 flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-[#89591C] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-slate-800">Cashback Policy:</span> Referral ₹100 cashback is redeemable at checkout on all standard returnable footwear. It cannot be applied to clearance items marked with <em>No Return • No Refund</em>.
                     </div>
                   </div>
                 </div>
@@ -1521,7 +1530,7 @@ export default function ProfilePage() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#030303] text-white px-4 py-2.5 rounded-none shadow-xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-none shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
           <div className="w-5 h-5 rounded-none bg-[#89591C] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>

@@ -102,6 +102,7 @@ const ProductSchema = new mongoose.Schema(
       thumbnailUrl: { type: String, default: '' },
       lifestyleUrl: { type: String, default: '' },
     },
+    addons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Addon' }],
   },
   { timestamps: true }
 );

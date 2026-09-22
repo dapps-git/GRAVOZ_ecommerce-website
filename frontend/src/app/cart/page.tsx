@@ -518,7 +518,7 @@ export default function CartPage() {
                 {items.some((i) => i.noReturnRefundExchange) && (
                   <div className="bg-[#FFF9F2] border border-[#F5C78E] rounded-none p-2.5 flex items-start gap-2 text-[11px] text-[#92400E]">
                     <AlertTriangle className="w-4 h-4 text-[#B45309] flex-shrink-0 mt-0.5" />
-                    <span>Contains clearance item(s) subject to <strong>No Return • No Refund • No Exchange</strong>.</span>
+                    <span>Contains clearance item(s) subject to <strong>No Return • No Refund • Ineligible for Referral Cashback</strong>.</span>
                   </div>
                 )}
 
@@ -575,7 +575,7 @@ export default function CartPage() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-20 right-4 sm:right-6 z-50 bg-[#030303] text-white px-4 py-2.5 rounded-none shadow-xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-20 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-none shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
           <div className="w-5 h-5 rounded-none bg-[#89591C] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>

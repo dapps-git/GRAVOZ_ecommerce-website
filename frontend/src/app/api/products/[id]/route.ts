@@ -5,6 +5,7 @@ import { Product } from '@/models/Product';
 import { Category } from '@/models/Category';
 import { Brand } from '@/models/Brand';
 import { Banner } from '@/models/Banner';
+import { Addon } from '@/models/Addon';
 
 export async function GET(
   _req: NextRequest,
@@ -21,6 +22,7 @@ export async function GET(
     // Ensure models are registered to avoid strictPopulate error
     void Brand;
     void Category;
+    void Addon;
 
     let product: any = null;
 
@@ -28,6 +30,7 @@ export async function GET(
       product = await Product.findById(id)
         .populate({ path: 'category', model: Category, select: 'name slug targetAudience', strictPopulate: false })
         .populate({ path: 'brand', model: Brand, select: 'name slug logoUrl', strictPopulate: false })
+        .populate({ path: 'addons', model: Addon, select: '_id name description price imageUrl sku stock isActive displayOrder', strictPopulate: false })
         .lean();
     }
 
@@ -43,6 +46,7 @@ export async function GET(
       })
         .populate({ path: 'category', model: Category, select: 'name slug targetAudience', strictPopulate: false })
         .populate({ path: 'brand', model: Brand, select: 'name slug logoUrl', strictPopulate: false })
+        .populate({ path: 'addons', model: Addon, select: '_id name description price imageUrl sku stock isActive displayOrder', strictPopulate: false })
         .lean();
     }
 

@@ -216,9 +216,20 @@ export async function POST(req: NextRequest) {
       }
     } else if (referralDiscountType === 'referrer_reward_100') {
       if (orderingCustomer && (orderingCustomer.referralDiscountBalance || 0) >= 100) {
-        const maxApplicable = Math.max(0, numSubtotal - verifiedCouponDiscount);
-        verifiedReferralDiscount = Math.min(100, maxApplicable);
-        verifiedReferralType = 'referrer_reward_100';
+        // Exclude products marked as No Return • No Refund • No Exchange from referral cashback eligibility
+        const eligibleReturnableItems = items.filter((itm: any) => !itm.noReturnRefundExchange);
+        const eligibleSubtotal = eligibleReturnableItems.reduce(
+          (acc: number, itm: any) => acc + (Number(itm.price) || 0) * (Number(itm.quantity) || 1),
+          0
+        );
+
+        if (eligibleSubtotal > 0) {
+          const maxApplicable = Math.max(0, eligibleSubtotal - verifiedCouponDiscount);
+          verifiedReferralDiscount = Math.min(100, maxApplicable);
+          if (verifiedReferralDiscount > 0) {
+            verifiedReferralType = 'referrer_reward_100';
+          }
+        }
       }
     }
 

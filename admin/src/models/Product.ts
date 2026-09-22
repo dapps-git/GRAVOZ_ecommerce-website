@@ -92,6 +92,7 @@ export interface IProduct extends Document {
     thumbnailUrl?: string;
     lifestyleUrl?: string;
   };
+  addons?: (mongoose.Types.ObjectId | string)[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -201,6 +202,7 @@ const ProductSchema = new Schema<IProduct>(
       thumbnailUrl: { type: String, default: '' },
       lifestyleUrl: { type: String, default: '' },
     },
+    addons: [{ type: Schema.Types.ObjectId, ref: 'Addon' }],
   },
   { timestamps: true }
 );

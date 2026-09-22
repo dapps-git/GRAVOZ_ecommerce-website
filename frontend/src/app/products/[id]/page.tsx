@@ -93,6 +93,7 @@ interface ProductDetails {
     keywords?: string[];
     slug?: string;
   };
+  addons?: any[];
 }
 
 const EMPTY_PRODUCT: ProductDetails = {
@@ -327,24 +328,20 @@ export default function ProductInnerPage() {
       .catch(() => {});
   }, [productId]);
 
-  // ── Fetch add-ons when product is a shoe ─────────────────────────────────
+  // ── Fetch or assign add-ons for this specific product ─────────────────────
   useEffect(() => {
     if (!product._id) return;
-    // Determine if we should show add-ons (shoe category products)
-    const isShoeProduct =
-      product.itemType?.toLowerCase().includes('shoe') ||
-      product.subCategory?.toLowerCase().includes('shoe') ||
-      product.subCategory?.toLowerCase().includes('formal') ||
-      product.subCategory?.toLowerCase().includes('casual') ||
-      product.subCategory?.toLowerCase().includes('sport') ||
-      product.subCategory?.toLowerCase().includes('boot') ||
-      product.subCategory?.toLowerCase().includes('sandal');
-    if (!isShoeProduct) {
-      setAddons([]);
-      setSelectedAddonIds(new Set());
-      return;
+    // If product has specific addons ticked by admin, use those!
+    if (Array.isArray(product.addons) && product.addons.length > 0) {
+      const validAddons = product.addons.filter((a: any) => typeof a === 'object' && a !== null && a._id && a.isActive !== false);
+      if (validAddons.length > 0) {
+        setAddons(validAddons);
+        return;
+      }
     }
-    fetch('/api/addons?category=shoes')
+
+    // Otherwise fallback to active master addons
+    fetch('/api/addons?category=all')
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.addons)) {
@@ -354,7 +351,7 @@ export default function ProductInnerPage() {
       .catch(() => {
         // silent — add-ons are optional
       });
-  }, [product._id, product.itemType, product.subCategory]);
+  }, [product._id, product.addons]);
 
   // ── Dynamically update page title & meta description for SEO ──
   useEffect(() => {
@@ -385,6 +382,10 @@ export default function ProductInnerPage() {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!mainImageRef.current) return;
+    // Only track zoom on pointer devices supporting hover
+    if (typeof window !== 'undefined' && window.matchMedia && !window.matchMedia('(hover: hover)').matches) {
+      return;
+    }
     const { left, top, width, height } = mainImageRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(100, ((e.clientX - left) / width) * 100));
     const y = Math.max(0, Math.min(100, ((e.clientY - top) / height) * 100));
@@ -591,7 +592,11 @@ export default function ProductInnerPage() {
               {/* 1. Main Product Image Box with Interactive Zoom Lens & Overlays */}
               <div
                 ref={mainImageRef}
-                onMouseEnter={() => setIsZooming(true)}
+                onMouseEnter={() => {
+                  if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(hover: hover)').matches) {
+                    setIsZooming(true);
+                  }
+                }}
                 onMouseLeave={() => setIsZooming(false)}
                 onMouseMove={handleMouseMove}
                 onClick={() => setIsLightboxOpen(true)}
@@ -609,8 +614,13 @@ export default function ProductInnerPage() {
                 {/* Heart Wishlist Button at Top-Right */}
                 <button
                   type="button"
+                  onMouseEnter={(e) => {
+                    e.stopPropagation();
+                    setIsZooming(false);
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
+                    setIsZooming(false);
                     toggleWishlist({
                       productId: product._id,
                       title: product.name,
@@ -630,8 +640,13 @@ export default function ProductInnerPage() {
                 {/* Previous Image Arrow */}
                 <button
                   type="button"
+                  onMouseEnter={(e) => {
+                    e.stopPropagation();
+                    setIsZooming(false);
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
+                    setIsZooming(false);
                     setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : displayImages.length - 1));
                     setActiveHeroImage(null);
                   }}
@@ -644,8 +659,13 @@ export default function ProductInnerPage() {
                 {/* Next Image Arrow */}
                 <button
                   type="button"
+                  onMouseEnter={(e) => {
+                    e.stopPropagation();
+                    setIsZooming(false);
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
+                    setIsZooming(false);
                     setSelectedImageIndex((prev) => (prev < displayImages.length - 1 ? prev + 1 : 0));
                     setActiveHeroImage(null);
                   }}
@@ -695,6 +715,7 @@ export default function ProductInnerPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    setIsZooming(false);
                     setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : displayImages.length - 1));
                     setActiveHeroImage(null);
                   }}
@@ -712,6 +733,7 @@ export default function ProductInnerPage() {
                         key={idx}
                         type="button"
                         onClick={() => {
+                          setIsZooming(false);
                           setSelectedImageIndex(idx);
                           setActiveHeroImage(null);
                         }}
@@ -1085,26 +1107,32 @@ export default function ProductInnerPage() {
                 </button>
               </div>
 
-              {/* ── Add-Ons Section (Shoe Care Products) ───────────────────────── */}
+              {/* ── Add-Ons Section ("Complete the look") ───────────────────────── */}
               {addons.length > 0 && (
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-2">
-                    <PackagePlus className="w-4 h-4 text-[#89591C]" />
-                    <span className="text-[13px] font-semibold text-[#111111]">Complete Your Purchase</span>
-                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 rounded-full">
-                      Optional Add-Ons
-                    </span>
+                <div className="bg-[#FAF7F2] border border-[#EDE6DC] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-2xs font-poppins">
+                  {/* Header */}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#8A5828] fill-[#8A5828] flex-shrink-0" />
+                      <h4 className="text-[15px] sm:text-[16px] font-bold text-[#1E293B] tracking-tight">
+                        Complete the look
+                      </h4>
+                      <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#F3E7D7] text-[#8C5424] rounded-full">
+                        OPTIONAL ADD-ONS
+                      </span>
+                    </div>
+                    <p className="text-[12px] sm:text-[12.5px] text-[#71717A] mt-1 leading-snug">
+                      Add these essentials to keep your shoes looking great for longer.
+                    </p>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Enhance your shoe care routine with our specially curated accessories:
-                  </p>
-                  <div className="space-y-2">
+
+                  {/* Add-On Items */}
+                  <div className="space-y-2.5 pt-0.5">
                     {addons.map((addon) => {
                       const isSelected = selectedAddonIds.has(addon._id);
                       return (
-                        <button
+                        <div
                           key={addon._id}
-                          type="button"
                           onClick={() => {
                             setSelectedAddonIds((prev) => {
                               const next = new Set(prev);
@@ -1116,64 +1144,64 @@ export default function ProductInnerPage() {
                               return next;
                             });
                           }}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                          className={`w-full flex items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer select-none bg-white ${
                             isSelected
-                              ? 'border-[#89591C] bg-[#FDF8F2] shadow-xs'
-                              : 'border-[#e8e2d8] bg-white hover:border-[#c8a47a] hover:bg-[#faf6f0]'
+                              ? 'border-[#8A5828] ring-1 ring-[#8A5828] shadow-2xs'
+                              : 'border-[#EDE8E1] hover:border-[#D8CEBF] shadow-2xs'
                           }`}
                         >
-                          {/* Checkbox circle */}
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                              isSelected
-                                ? 'bg-[#89591C] border-[#89591C]'
-                                : 'bg-white border-[#c8c0b4]'
-                            }`}
-                          >
-                            {isSelected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                          {/* Left: Thumbnail & Info */}
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#F8F6F2] border border-[#EDE6DC] overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
+                              {addon.imageUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={addon.imageUrl}
+                                  alt={addon.name}
+                                  className="w-full h-full object-contain"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Sparkles className="w-5 h-5 text-slate-300" />
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[13.5px] sm:text-[14px] font-bold text-[#18181B] leading-tight truncate">
+                                {addon.name}
+                              </p>
+                              {addon.description && (
+                                <p className="text-[11.5px] sm:text-[12px] text-[#71717A] mt-0.5 line-clamp-1">
+                                  {addon.description}
+                                </p>
+                              )}
+                            </div>
                           </div>
 
-                          {/* Addon image */}
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 flex-shrink-0">
-                            {addon.imageUrl ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={addon.imageUrl}
-                                alt={addon.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-slate-300" />
-                              </div>
-                            )}
+                          {/* Right: Price & Checkbox */}
+                          <div className="flex items-center gap-3 flex-shrink-0 pl-2">
+                            <span className="text-[13.5px] sm:text-[14px] font-bold text-[#18181B] whitespace-nowrap">
+                              +₹{addon.price.toLocaleString('en-IN')}
+                            </span>
+                            <div
+                              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition-all ${
+                                isSelected
+                                  ? 'bg-[#8A5828] border-[#8A5828] text-white shadow-2xs'
+                                  : 'bg-white border-[#D4C7B5]'
+                              }`}
+                            >
+                              {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                            </div>
                           </div>
-
-                          {/* Addon info */}
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[13px] font-semibold leading-tight ${
-                              isSelected ? 'text-[#5C2D0A]' : 'text-slate-800'
-                            }`}>
-                              {addon.name}
-                            </p>
-                            {addon.description && (
-                              <p className="text-[11px] text-slate-500 mt-0.5 truncate">{addon.description}</p>
-                            )}
-                          </div>
-
-                          {/* Price */}
-                          <span className={`text-[13px] font-bold flex-shrink-0 ${
-                            isSelected ? 'text-[#89591C]' : 'text-slate-700'
-                          }`}>
-                            +₹{addon.price.toLocaleString('en-IN')}
-                          </span>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
+
                   {selectedAddonIds.size > 0 && (
-                    <p className="text-[11px] text-[#89591C] font-semibold flex items-center gap-1.5">
-                      <Check className="w-3 h-3" />
+                    <p className="text-[11.5px] text-[#8A5828] font-semibold flex items-center gap-1.5 pt-0.5">
+                      <Check className="w-3.5 h-3.5" />
                       {selectedAddonIds.size} add-on{selectedAddonIds.size > 1 ? 's' : ''} selected · will be added to your bag
                     </p>
                   )}
@@ -1520,7 +1548,7 @@ export default function ProductInnerPage() {
                           <span>{product.shippingAndReturn?.returnTitle || 'No Return • No Refund • No Exchange'}</span>
                         </div>
                         <p className="text-[13px] text-[#92400E]">
-                          {product.shippingAndReturn?.returnDesc || 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.'}
+                          {product.shippingAndReturn?.returnDesc || 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, refund, or referral cashback redemption.'}
                         </p>
                       </div>
                     ) : (
@@ -1789,7 +1817,7 @@ export default function ProductInnerPage() {
 
       {/* ── TOAST NOTIFICATION ── */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#030303] text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
           <div className="w-5 h-5 rounded-full bg-[#89591C] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>

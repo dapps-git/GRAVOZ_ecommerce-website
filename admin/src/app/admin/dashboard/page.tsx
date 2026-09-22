@@ -16,6 +16,11 @@ import {
   Calendar,
   TrendingUp,
   PieChart as PieChartIcon,
+  Gift,
+  Users,
+  CheckCircle2,
+  Clock,
+  Sparkles,
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -58,6 +63,29 @@ interface DashboardStats {
     price: number;
     targetAudience: string;
   }>;
+  referralStats?: {
+    totalReferrals: number;
+    completedReferrals: number;
+    pendingReferrals: number;
+    totalReferrerRewardsGiven: number;
+    standardReferredDiscountPercent: number;
+    standardReferrerRewardRupees: number;
+    recentReferrals: Array<{
+      id: string;
+      referrerName: string;
+      referrerEmail: string;
+      referrerCode: string;
+      referrerRewardAmount: number;
+      referrerRewardStatus: string;
+      referredUserName: string;
+      referredUserEmail: string;
+      referredDiscountPercent: number;
+      referredDiscountBenefit: string;
+      referredDiscountUsed: boolean;
+      status: string;
+      createdAt: string;
+    }>;
+  };
 }
 
 export default function DashboardPage() {
@@ -500,6 +528,162 @@ export default function DashboardPage() {
               ))
             )}
           </div>
+        </div>
+      </div>
+
+      {/* ── REFERRAL PROGRAM & REWARDS TRACKING SECTION ── */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#e8e2d8] shadow-2xs space-y-4">
+        {/* Header with Stats Summary Chips */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#f0eae1] pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Gift className="w-5 h-5 text-[#89591C]" />
+              <h3 className="text-base font-bold text-slate-900">Referral Program &amp; Rewards Activity</h3>
+              <span className="px-2 py-0.5 text-[10px] font-bold bg-[#FAF4EC] text-[#89591C] border border-[#EBDCC9] rounded-full uppercase tracking-wider">
+                Live Rewards Feed
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 font-normal mt-0.5">
+              Track who shared their referral code, who got referred, and the reward amounts credited to each user
+            </p>
+          </div>
+
+          {/* Quick Stat Chips */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] flex items-center gap-2">
+              <Users className="w-4 h-4 text-[#89591C]" />
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold uppercase block">Total Referrals</span>
+                <span className="text-xs font-bold text-slate-900">
+                  {stats?.referralStats?.totalReferrals || 0}
+                </span>
+              </div>
+            </div>
+
+            <div className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] flex items-center gap-2">
+              <IndianRupee className="w-4 h-4 text-emerald-600" />
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold uppercase block">Referrer Rewards</span>
+                <span className="text-xs font-bold text-emerald-700">
+                  ₹{(stats?.referralStats?.totalReferrerRewardsGiven || 0).toLocaleString('en-IN')} Earned
+                </span>
+              </div>
+            </div>
+
+            <div className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600" />
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold uppercase block">Friend Benefit</span>
+                <span className="text-xs font-bold text-amber-700">15% OFF 1st Order</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Referrals Detailed Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-700">
+            <thead className="text-slate-600 font-semibold uppercase tracking-wider border-b border-[#e8e2d8] bg-[#faf8f5]">
+              <tr>
+                <th className="py-2.5 px-3">Referrer User (Shared By)</th>
+                <th className="py-2.5 px-3">Referrer Amount Got</th>
+                <th className="py-2.5 px-3">Referred User (Friend)</th>
+                <th className="py-2.5 px-3">Referred User Benefit</th>
+                <th className="py-2.5 px-3">Status</th>
+                <th className="py-2.5 px-3 text-right">Date</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#f0ebd9]">
+              {!stats?.referralStats?.recentReferrals || stats.referralStats.recentReferrals.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-slate-400 font-normal">
+                    <Gift className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-xs text-slate-600 font-semibold">No referral activities recorded yet</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      When registered customers share their unique referral code, you will see both parties and their reward amounts here.
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                stats.referralStats.recentReferrals.map((ref) => (
+                  <tr key={ref.id} className="hover:bg-[#faf4ec]/60 transition-colors">
+                    {/* Referrer Column */}
+                    <td className="py-3 px-3">
+                      <div className="font-bold text-slate-900">{ref.referrerName}</div>
+                      <div className="text-[11px] text-slate-400">{ref.referrerEmail}</div>
+                      {ref.referrerCode && (
+                        <span className="inline-block mt-0.5 font-mono text-[10px] font-semibold px-1.5 py-0.2 bg-[#FAF4EC] text-[#89591C] border border-[#EBDCC9] rounded">
+                          Code: {ref.referrerCode}
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Referrer Amount Got */}
+                    <td className="py-3 px-3">
+                      <div className="font-bold text-emerald-700 text-sm">
+                        +₹{ref.referrerRewardAmount || 100}
+                      </div>
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 ${
+                        ref.status === 'completed'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}>
+                        {ref.status === 'completed' ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3" /> Credited to Balance
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-3 h-3" /> Pending 1st Order
+                          </>
+                        )}
+                      </span>
+                    </td>
+
+                    {/* Referred User (Friend) */}
+                    <td className="py-3 px-3">
+                      <div className="font-semibold text-slate-900">{ref.referredUserName}</div>
+                      <div className="text-[11px] text-slate-400">{ref.referredUserEmail}</div>
+                    </td>
+
+                    {/* Referred User Benefit Got */}
+                    <td className="py-3 px-3">
+                      <div className="font-bold text-[#89591C]">
+                        {ref.referredDiscountBenefit || '15% OFF First Order'}
+                      </div>
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 ${
+                        ref.referredDiscountUsed
+                          ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                          : 'bg-blue-50 text-blue-700 border border-blue-200'
+                      }`}>
+                        {ref.referredDiscountUsed ? '● Discount Redeemed' : '○ Discount Available'}
+                      </span>
+                    </td>
+
+                    {/* Overall Status */}
+                    <td className="py-3 px-3">
+                      <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg ${
+                        ref.status === 'completed'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {ref.status === 'completed' ? 'Completed' : 'Pending First Order'}
+                      </span>
+                    </td>
+
+                    {/* Date */}
+                    <td className="py-3 px-3 text-right text-slate-500 font-medium whitespace-nowrap">
+                      {new Date(ref.createdAt).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -382,10 +382,16 @@ export default function CheckoutPage() {
   const calculatedDiscount = appliedCoupon ? appliedCoupon.discount : 0;
   let calculatedReferralDiscount = 0;
 
+  const returnableItems = items.filter((i) => !i.noReturnRefundExchange);
+  const eligibleSubtotalForReferral = returnableItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+  const hasNoReturnItems = items.some((i) => i.noReturnRefundExchange);
+  const isAllNoReturn = items.length > 0 && items.every((i) => i.noReturnRefundExchange);
+
   if (appliedReferralType === 'referred_first_order_15') {
     calculatedReferralDiscount = Math.round(subtotal * 0.15);
   } else if (appliedReferralType === 'referrer_reward_100') {
-    calculatedReferralDiscount = Math.min(100, Math.max(0, subtotal - calculatedDiscount));
+    // ₹100 referral cashback can only be applied against eligible returnable products
+    calculatedReferralDiscount = Math.min(100, Math.max(0, eligibleSubtotalForReferral - calculatedDiscount));
   }
 
   const shippingFee = 0; // Free
@@ -741,7 +747,7 @@ export default function CheckoutPage() {
         {items.some((i) => i.noReturnRefundExchange) && (
           <div className="bg-[#FFF9F2] border border-[#F5C78E] rounded-none p-2.5 flex items-start gap-2 text-[11px] text-[#92400E]">
             <AlertCircle className="w-4 h-4 text-[#B45309] flex-shrink-0 mt-0.5" />
-            <span>Order contains clearance item(s) sold as-is: <strong>No Return • No Refund • No Exchange</strong>.</span>
+            <span>Order contains clearance item(s) sold as-is: <strong>No Return • No Refund • Ineligible for Referral Cashback</strong>.</span>
           </div>
         )}
 
@@ -886,23 +892,38 @@ export default function CheckoutPage() {
         )}
 
         {(referralStatus?.availableDiscount || 0) >= 100 && (
-          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 text-xs space-y-1.5 font-poppins">
+          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 text-xs space-y-2 font-poppins">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Gift className="w-4 h-4 text-[#8B4A12]" />
-                <span className="font-semibold text-[#171717]">Referral Discount</span>
+                <span className="font-semibold text-[#171717]">Referral Cashback</span>
               </div>
               <span className="text-[11px] font-bold text-[#8B4A12]">
                 ₹{referralStatus?.availableDiscount} Available
               </span>
             </div>
             <p className="text-[10px] text-[#667085]">
-              Earned from referred friends. Apply ₹100 discount to this purchase.
+              Earned from referred friends. Apply ₹100 cashback to this purchase.
             </p>
+
+            {isAllNoReturn ? (
+              <div className="bg-[#FFF9F2] border border-[#F5C78E] p-2 text-[10px] text-[#92400E] flex items-start gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 text-[#B45309] flex-shrink-0 mt-0.5" />
+                <span>Notice: Referral ₹100 cashback cannot be used on items marked <strong>No Return &amp; No Refund</strong>.</span>
+              </div>
+            ) : hasNoReturnItems ? (
+              <div className="bg-[#FFF9F2] border border-[#F5C78E] p-1.5 text-[10px] text-[#92400E] flex items-start gap-1">
+                <AlertCircle className="w-3 h-3 text-[#B45309] flex-shrink-0 mt-0.5" />
+                <span>Note: ₹100 Cashback applies only towards returnable items in your cart.</span>
+              </div>
+            ) : null}
+
             <div className="flex items-center justify-between pt-1 border-t border-[#f0ece5]">
               <span className="text-[10px] text-slate-500">
                 {appliedReferralType === 'referrer_reward_100' ? (
-                  <span className="text-emerald-700 font-semibold">₹100 Applied</span>
+                  <span className="text-emerald-700 font-semibold">₹100 Cashback Applied</span>
+                ) : isAllNoReturn ? (
+                  <span className="text-amber-700 font-medium">Ineligible on No Return items</span>
                 ) : (
                   <span>Not applied</span>
                 )}
@@ -914,6 +935,15 @@ export default function CheckoutPage() {
                   className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
                 >
                   Remove
+                </button>
+              ) : isAllNoReturn ? (
+                <button
+                  type="button"
+                  disabled
+                  title="Cannot be applied to No Return & No Refund items"
+                  className="text-[11px] font-semibold text-slate-400 cursor-not-allowed"
+                >
+                  Not Applicable
                 </button>
               ) : (
                 <button
@@ -2023,7 +2053,7 @@ export default function CheckoutPage() {
 
       {/* Floating Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#171717] text-white px-4 py-2.5 rounded-none shadow-lg text-xs font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#171717] text-white px-4 py-2.5 rounded-none shadow-2xl text-xs font-semibold flex items-center gap-2 border border-white/10 animate-in fade-in slide-in-from-top-4 sm:slide-in-from-bottom-2 duration-300 max-w-[90vw] sm:max-w-md">
           <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
           <span>{toastMessage}</span>
         </div>

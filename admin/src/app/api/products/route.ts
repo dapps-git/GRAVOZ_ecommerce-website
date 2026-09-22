@@ -232,6 +232,7 @@ export async function POST(req: NextRequest) {
       spotlightSlot: body.featureInDuoSlot === 'duo_product_1' || body.featureInDuoSlot === 'duo_product_2' ? body.featureInDuoSlot : (body.spotlightSlot || 'none'),
       featureInDuoSlot: body.featureInDuoSlot || '',
       spotlightMockups: body.spotlightMockups || { mainUrl: '', thumbnailUrl: '', lifestyleUrl: '' },
+      addons: Array.isArray(body.addons) ? body.addons : [],
     });
 
     // If user chose to feature this product on Homepage Duo Spotlight

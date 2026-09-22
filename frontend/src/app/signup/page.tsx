@@ -417,7 +417,7 @@ function SignupContent() {
 
       {/* Toast */}
       {toastMessage && (
-        <div className="fixed bottom-4 right-4 z-50 bg-[#030303] text-white px-3.5 py-2 shadow-xl flex items-center gap-2 border border-white/10 animate-in slide-in-from-bottom-3 duration-300 font-sansation rounded-none text-[10.5px]">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-4 sm:right-4 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-3.5 py-2 shadow-2xl flex items-center gap-2 border border-white/10 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-3 duration-300 font-sansation rounded-none text-[10.5px] max-w-[90vw] sm:max-w-md">
           <div className="w-3.5 h-3.5 bg-[#7a3e0b] flex items-center justify-center flex-shrink-0">
             <Check className="w-2 h-2 text-white" />
           </div>

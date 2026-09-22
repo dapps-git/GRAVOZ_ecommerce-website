@@ -197,7 +197,7 @@ function LoginContent() {
 
       {/* Toast */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-[#030303] text-white px-4 py-2.5 shadow-xl flex items-center gap-2.5 border border-white/10 animate-in slide-in-from-bottom-4 duration-300 font-sansation">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-5 sm:right-5 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 shadow-2xl flex items-center gap-2.5 border border-white/10 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-4 duration-300 font-sansation max-w-[90vw] sm:max-w-md">
           <div className="w-4 h-4 bg-[#7a3e0b] flex items-center justify-center flex-shrink-0">
             <Check className="w-2.5 h-2.5 text-white" />
           </div>

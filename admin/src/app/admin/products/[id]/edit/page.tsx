@@ -23,6 +23,7 @@ import {
   ShoppingCart,
   LayoutGrid,
   RotateCcw,
+  Check,
 } from 'lucide-react';
 
 interface CategoryItem {
@@ -69,7 +70,11 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [error, setError] = useState('');
   const [uploadingVariantId, setUploadingVariantId] = useState<string | null>(null);
 
-  // Active Stepper Tab (1 to 8)
+  // 10. Add-Ons Cross-Sells
+  const [availableAddons, setAvailableAddons] = useState<any[]>([]);
+  const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([]);
+
+  // Active Stepper Tab (1 to 10)
   const [activeTab, setActiveTab] = useState<number>(1);
 
   // 1. Basic Info
@@ -230,10 +235,22 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       })
       .catch(() => {});
 
+    fetch('/api/addons')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.addons)) setAvailableAddons(data.addons);
+      })
+      .catch(() => {});
+
     fetch(`/api/products/${resolvedParams.id}`)
       .then((res) => res.json())
       .then((p) => {
         if (p._id) {
+          if (Array.isArray(p.addons)) {
+            setSelectedAddonIds(
+              p.addons.map((a: any) => (typeof a === 'object' && a !== null ? a._id : a))
+            );
+          }
           setName(p.name || '');
           setSku(p.sku || '');
           setTargetAudience(p.targetAudience || 'Men');
@@ -581,6 +598,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           isLatest,
           noReturnRefundExchange,
           status: targetStatus,
+          addons: selectedAddonIds,
           shippingAndReturn: {
             shippingTitle: shippingTitle || 'Complimentary Express Shipping',
             shippingDesc: shippingDesc || 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.',
@@ -652,6 +670,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     { id: 7, label: 'Specifications & Attributes' },
     { id: 8, label: 'SEO & Status' },
     { id: 9, label: 'Homepage Duo Mockups', badge: 'Optional' },
+    { id: 10, label: 'Cross-Sell Add-Ons', badge: selectedAddonIds.length > 0 ? `${selectedAddonIds.length} Added` : 'Optional' },
   ];
 
   if (fetching) {
@@ -1964,6 +1983,157 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
 
+          {/* ── TAB 10: Product Add-Ons & Cross-Sells ── */}
+          {activeTab === 10 && (
+            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#e8e2d8] space-y-5 shadow-2xs">
+              {/* Tab Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f0eae1] pb-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-[#89591C] text-white text-xs flex items-center justify-center font-bold">
+                    10
+                  </span>
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      Product Add-Ons &amp; Cross-Sells
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        {selectedAddonIds.length} of {availableAddons.length} Selected
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      Tick which add-ons will show up in "Complete the look" for this product on the store.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAddonIds(availableAddons.map((a) => a._id))}
+                    className="px-3 py-1.5 rounded-lg border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Select All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAddonIds([])}
+                    className="px-3 py-1.5 rounded-lg border border-[#e8e2d8] hover:bg-rose-50 hover:text-rose-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Deselect All
+                  </button>
+                  <Link
+                    href="/admin/addons"
+                    target="_blank"
+                    className="px-3 py-1.5 rounded-lg bg-[#89591C]/10 hover:bg-[#89591C]/20 text-[#89591C] text-xs font-semibold transition-colors flex items-center gap-1"
+                  >
+                    <span>Manage All Add-Ons</span>
+                    <span className="text-xs">↗</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Add-Ons List/Cards Grid */}
+              {availableAddons.length === 0 ? (
+                <div className="p-8 text-center bg-[#faf8f5] rounded-xl border border-dashed border-[#e8e2d8] space-y-3">
+                  <Sparkles className="w-8 h-8 text-[#89591C] mx-auto opacity-70" />
+                  <h3 className="text-sm font-bold text-slate-800">No Add-Ons Created Yet</h3>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Create shoe polish kits, extra laces, cedar shoe trees, or brushes in Add-Ons Management to link them to this product.
+                  </p>
+                  <Link
+                    href="/admin/addons"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#89591C] text-white text-xs font-semibold shadow-xs hover:bg-[#724816]"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Go to Add-Ons Management</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {availableAddons.map((addon) => {
+                    const isSelected = selectedAddonIds.includes(addon._id);
+                    return (
+                      <div
+                        key={addon._id}
+                        onClick={() => {
+                          setSelectedAddonIds((prev) =>
+                            prev.includes(addon._id)
+                              ? prev.filter((id) => id !== addon._id)
+                              : [...prev, addon._id]
+                          );
+                        }}
+                        className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer select-none flex items-center justify-between gap-3 ${
+                          isSelected
+                            ? 'border-[#89591C] bg-[#FDF8F2] shadow-xs ring-1 ring-[#89591C]/30'
+                            : 'border-[#e8e2d8] bg-white hover:border-[#c8a47a] hover:bg-[#faf6f0]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          {/* Checkbox indicator */}
+                          <div
+                            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                              isSelected
+                                ? 'bg-[#89591C] border-[#89591C] text-white'
+                                : 'bg-white border-[#c8c0b4]'
+                            }`}
+                          >
+                            {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                          </div>
+
+                          {/* Addon image */}
+                          <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 flex-shrink-0 flex items-center justify-center">
+                            {addon.imageUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={addon.imageUrl}
+                                alt={addon.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Sparkles className="w-5 h-5 text-slate-300" />
+                            )}
+                          </div>
+
+                          {/* Addon info */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className={`text-xs font-bold leading-snug truncate ${
+                                isSelected ? 'text-[#5C2D0A]' : 'text-slate-900'
+                              }`}>
+                                {addon.name}
+                              </p>
+                              <span className="text-[10px] font-mono px-1.5 py-0.2 bg-slate-100 text-slate-600 rounded">
+                                {addon.sku}
+                              </span>
+                            </div>
+                            {addon.description && (
+                              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1 truncate">
+                                {addon.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Price & Active Status */}
+                        <div className="flex flex-col items-end flex-shrink-0 pl-2">
+                          <span className={`text-xs font-bold ${
+                            isSelected ? 'text-[#89591C]' : 'text-slate-800'
+                          }`}>
+                            +₹{addon.price.toLocaleString('en-IN')}
+                          </span>
+                          <span className={`text-[10px] font-semibold mt-0.5 ${
+                            addon.isActive !== false ? 'text-emerald-600' : 'text-slate-400'
+                          }`}>
+                            {addon.isActive !== false ? '● Active' : '○ Inactive'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Stepper Navigation */}
           <div className="flex items-center justify-between pt-2">
             <button
@@ -1975,10 +2145,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               ← Previous Step
             </button>
 
-            {activeTab < 9 ? (
+            {activeTab < 10 ? (
               <button
                 type="button"
-                onClick={() => setActiveTab((t) => Math.min(9, t + 1))}
+                onClick={() => setActiveTab((t) => Math.min(10, t + 1))}
                 className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-all shadow-2xs cursor-pointer"
               >
                 Next Step →
