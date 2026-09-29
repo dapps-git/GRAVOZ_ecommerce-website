@@ -19,6 +19,12 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCcw,
+  Upload,
+  Download,
+  FileSpreadsheet,
+  Check,
+  X,
+  Loader2,
 } from 'lucide-react';
 
 interface ProductItem {
@@ -79,6 +85,21 @@ export default function ProductsPage() {
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionMenuOpenId, setActionMenuOpenId] = useState<string | null>(null);
+
+  // Bulk Import State
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{
+    success?: boolean;
+    message?: string;
+    totalRows?: number;
+    created?: number;
+    updated?: number;
+    errors?: Array<{ row: number; name?: string; message: string }>;
+    error?: string;
+  } | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Fetch Categories & Brands for dropdowns
   useEffect(() => {
@@ -166,6 +187,36 @@ export default function ProductsPage() {
     }
   };
 
+  const handleImportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!importFile) return;
+
+    setIsImporting(true);
+    setImportResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', importFile);
+
+      const res = await fetch('/api/products/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setImportResult({ error: data.error || 'Failed to import products.' });
+      } else {
+        setImportResult(data);
+        fetchProducts(); // Refresh list immediately
+      }
+    } catch (err: any) {
+      setImportResult({ error: err.message || 'An unexpected error occurred during import.' });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
     <div className="w-full space-y-5 pb-20 font-sans" style={{ fontFamily: 'var(--font-montserrat), Montserrat, sans-serif' }}>
       
@@ -181,7 +232,20 @@ export default function ProductsPage() {
           <p className="text-xs text-slate-500 font-normal mt-0.5">Manage your store products, variants and inventory.</p>
         </div>
 
-        <div>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              setImportFile(null);
+              setImportResult(null);
+              setIsImportModalOpen(true);
+            }}
+            className="h-9 px-3.5 rounded-md bg-white border border-[#d6cfc5] hover:bg-[#faf8f5] text-slate-800 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-[#89591C]" />
+            <span>Import Excel / CSV</span>
+          </button>
+
           <Link
             href="/admin/products/new"
             className="h-9 px-4 rounded-md bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
@@ -654,6 +718,200 @@ export default function ProductsPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Bulk Import Excel/CSV Modal ── */}
+      {isImportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#f4f2ee] text-[#89591C] flex items-center justify-center">
+                  <FileSpreadsheet className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Bulk Import Products</h3>
+                  <p className="text-xs text-slate-500">Upload up to 1,000+ products via Excel or CSV</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsImportModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Step 1: Download Templates */}
+            <div className="mt-5 p-4 rounded-xl bg-[#faf8f5] border border-[#e8e2d8] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-bold text-slate-800 block">Need the standard format?</span>
+                <span className="text-[11px] text-slate-500 block mt-0.5">Includes sample shoes, sizes, color variants & 5 image slots.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="/gravoz_product_import_template.xlsx"
+                  download="gravoz_product_import_template.xlsx"
+                  className="px-2.5 py-1.5 rounded-lg bg-white border border-[#d6cfc5] hover:bg-slate-50 text-[11px] font-semibold text-[#89591C] flex items-center gap-1.5 transition-all shadow-2xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Excel (.xlsx)</span>
+                </a>
+                <a
+                  href="/gravoz_product_import_template.csv"
+                  download="gravoz_product_import_template.csv"
+                  className="px-2.5 py-1.5 rounded-lg bg-white border border-[#d6cfc5] hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center gap-1.5 transition-all shadow-2xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>CSV</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Step 2: Upload Area Form */}
+            <form onSubmit={handleImportSubmit} className="mt-5 space-y-4">
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(true);
+                }}
+                onDragLeave={() => setIsDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragOver(false);
+                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    setImportFile(e.dataTransfer.files[0]);
+                  }
+                }}
+                className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
+                  isDragOver
+                    ? 'border-[#89591C] bg-[#faf8f5]'
+                    : importFile
+                    ? 'border-emerald-500 bg-emerald-50/30'
+                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                }`}
+              >
+                <input
+                  type="file"
+                  id="excelImportInput"
+                  accept=".xlsx, .xls, .csv"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImportFile(e.target.files[0]);
+                    }
+                  }}
+                  className="hidden"
+                />
+
+                {importFile ? (
+                  <div className="flex flex-col items-center">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2">
+                      <Check className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-900">{importFile.name}</span>
+                    <span className="text-[11px] text-slate-500 mt-0.5">
+                      {(importFile.size / 1024).toFixed(1)} KB &bull; Ready to upload
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setImportFile(null)}
+                      className="mt-2 text-[11px] text-rose-600 hover:underline cursor-pointer"
+                    >
+                      Change file
+                    </button>
+                  </div>
+                ) : (
+                  <label htmlFor="excelImportInput" className="cursor-pointer block">
+                    <div className="w-12 h-12 rounded-full bg-[#f4f2ee] text-[#89591C] flex items-center justify-center mx-auto mb-3">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-800 block">
+                      Click to browse or drag and drop Excel / CSV file
+                    </span>
+                    <span className="text-[11px] text-slate-400 block mt-1">
+                      Supports .xlsx, .xls, and .csv files
+                    </span>
+                  </label>
+                )}
+              </div>
+
+              {/* Status & Error Feedback */}
+              {importResult && (
+                <div
+                  className={`p-4 rounded-xl text-xs space-y-2 ${
+                    importResult.error
+                      ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                      : 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                  }`}
+                >
+                  {importResult.error ? (
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                      <span>{importResult.error}</span>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center gap-2 font-bold text-emerald-800">
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span>{importResult.message}</span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-emerald-700">
+                        Total Rows: {importResult.totalRows} | Created: {importResult.created} | Updated: {importResult.updated}
+                      </div>
+
+                      {importResult.errors && importResult.errors.length > 0 && (
+                        <div className="mt-3 pt-2 border-t border-emerald-200/60 text-slate-700">
+                          <span className="font-semibold text-amber-800 text-[11px] block">
+                            Skipped {importResult.errors.length} invalid rows:
+                          </span>
+                          <div className="max-h-24 overflow-y-auto mt-1 space-y-1 text-[10px]">
+                            {importResult.errors.map((err, idx) => (
+                              <div key={idx} className="text-slate-600">
+                                &bull; Row {err.row} ({err.name || 'Product'}): {err.message}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsImportModalOpen(false)}
+                  className="h-9 px-4 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  disabled={!importFile || isImporting}
+                  className="h-9 px-5 rounded-lg bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {isImporting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Importing Products...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      <span>Start Bulk Import</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
