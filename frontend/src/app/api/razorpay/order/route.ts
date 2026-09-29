@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Razorpay create order error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to initialize Razorpay order' },
+      { error: error?.error?.description || error?.message || 'Failed to initialize Razorpay order' },
       { status: 500 }
     );
   }
