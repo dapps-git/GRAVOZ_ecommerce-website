@@ -9,11 +9,31 @@ const nextConfig = {
     minimumCacheTTL: 31536000,
     // Enable modern formats — browser picks best format automatically
     formats: ['image/webp', 'image/avif'],
-    // Accept images from Cloudinary & localhost
+    // Accept images from Cloudinary, Unsplash, Google & localhost
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
         pathname: '/**',
       },
       {
