@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
         .map(c => c.trim())
         .filter(Boolean);
 
-      // Color Variants parsing (e.g. "Brown: url1, url2, url3 | Black: url4, url5, url6")
+      // Color Variants parsing
       const colorVariantsRaw = String(normalizedRow['colorvariantimages'] || normalizedRow['colorvariants'] || normalizedRow['variants'] || '');
       const colorVariants: Array<{
         name: string;
@@ -179,8 +179,51 @@ export async function POST(req: NextRequest) {
         isAvailable: boolean;
       }> = [];
 
-      if (colorVariantsRaw) {
-        // Splits by | or ; for each color block
+      // 1. Check for dedicated color columns (e.g. "Brown Image 1" .. "Brown Image 5", "Black Image 1" .. "Black Image 5")
+      for (const cName of colors) {
+        const cleanColorPrefix = cName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const cImages: Array<{ url: string; alt: string }> = [];
+
+        // Check columns like brownimage1..5, brownimg1..5, brownimages, etc.
+        for (let i = 1; i <= 10; i++) {
+          const possibleKeys = [
+            `${cleanColorPrefix}image${i}`,
+            `${cleanColorPrefix}img${i}`,
+            `${cleanColorPrefix}photo${i}`,
+          ];
+          for (const key of possibleKeys) {
+            const val = normalizedRow[key];
+            if (val && typeof val === 'string' && (val.startsWith('http') || val.startsWith('/'))) {
+              if (!cImages.some(img => img.url === val.trim())) {
+                cImages.push({ url: val.trim(), alt: `${name} ${cName} - view ${cImages.length + 1}` });
+              }
+            }
+          }
+        }
+
+        // Check bulk column like brownimages
+        const bulkVal = normalizedRow[`${cleanColorPrefix}images`] || normalizedRow[`${cleanColorPrefix}image`];
+        if (bulkVal && typeof bulkVal === 'string') {
+          const bulkUrls = bulkVal.split(/[,;\n]+/).map(u => u.trim()).filter(u => u.startsWith('http') || u.startsWith('/'));
+          for (const u of bulkUrls) {
+            if (!cImages.some(img => img.url === u)) {
+              cImages.push({ url: u, alt: `${name} ${cName} - view ${cImages.length + 1}` });
+            }
+          }
+        }
+
+        if (cImages.length > 0) {
+          colorVariants.push({
+            name: cName,
+            imageUrl: cImages[0].url,
+            images: cImages,
+            isAvailable: true,
+          });
+        }
+      }
+
+      // 2. If no per-color columns found, check Color Variant Images format (e.g. "Brown: url1, url2 | Black: url3, url4")
+      if (colorVariants.length === 0 && colorVariantsRaw) {
         const colorBlocks = colorVariantsRaw.split(/[|;]\s*(?=[A-Za-z0-9\s_-]+:)/).filter(Boolean);
         for (const block of colorBlocks) {
           const colonIdx = block.indexOf(':');
@@ -204,7 +247,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // If no explicit colorVariants parsed, generate variants from colors list and associate images
+      // 3. Fallback: generate default variants from colors list
       if (colorVariants.length === 0) {
         for (let i = 0; i < colors.length; i++) {
           const cName = colors[i];
@@ -212,7 +255,7 @@ export async function POST(req: NextRequest) {
           colorVariants.push({
             name: cName,
             imageUrl: primaryImg,
-            images: images, // Each color variant inherits the full gallery or primary
+            images: images,
             isAvailable: true,
           });
         }
