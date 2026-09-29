@@ -3,6 +3,8 @@ import { getUserSession } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getUserSession();

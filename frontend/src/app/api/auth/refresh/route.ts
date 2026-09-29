@@ -7,6 +7,8 @@ import {
   setUserAuthCookie,
 } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST() {
   try {
     const cookieStore = await cookies();
