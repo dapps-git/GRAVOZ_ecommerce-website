@@ -101,17 +101,35 @@ export default function ProductsPage() {
   } | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
+  // Helper to safely parse API responses and avoid SyntaxError on HTML/Redirects
+  const safeJson = async (res: Response) => {
+    if (res.status === 401) {
+      window.location.href = '/admin/login';
+      return { error: 'Unauthorized. Redirecting to login...' };
+    }
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      try {
+        return await res.json();
+      } catch (jsonErr: any) {
+        return { error: jsonErr?.message || 'Invalid JSON response from server' };
+      }
+    }
+    const text = await res.text().catch(() => '');
+    return { error: text && text.length < 200 ? text : `Server error (HTTP ${res.status})` };
+  };
+
   // Fetch Categories & Brands for dropdowns
   useEffect(() => {
     fetch('/api/categories')
-      .then((res) => res.json())
+      .then(safeJson)
       .then((data) => {
         if (Array.isArray(data)) setCategories(data);
       })
       .catch(() => {});
 
     fetch('/api/brands')
-      .then((res) => res.json())
+      .then(safeJson)
       .then((data) => {
         if (Array.isArray(data)) setBrands(data);
       })
@@ -134,15 +152,15 @@ export default function ProductsPage() {
       if (selectedStockStatus !== 'all') params.append('stockStatus', selectedStockStatus);
 
       const res = await fetch(`/api/products?${params.toString()}`);
-      const data = await res.json();
-      if (res.ok) {
+      const data = await safeJson(res);
+      if (res.ok && data) {
         setProducts(data.products || []);
         if (data.stats) setStats(data.stats);
         setTotalCount(data.pagination?.total || 0);
         setTotalPages(data.pagination?.totalPages || 1);
       }
-    } catch (err) {
-      console.error('Failed to fetch products:', err);
+    } catch (err: any) {
+      console.error('Failed to fetch products:', typeof err === 'object' && err?.message ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -182,8 +200,8 @@ export default function ProductsPage() {
       if (res.ok) {
         fetchProducts();
       }
-    } catch (err) {
-      console.error('Delete error:', err);
+    } catch (err: any) {
+      console.error('Delete error:', typeof err === 'object' && err?.message ? err.message : String(err));
     }
   };
 
@@ -200,7 +218,7 @@ export default function ProductsPage() {
     setIsDeletingAll(true);
     try {
       const res = await fetch('/api/products?all=true', { method: 'DELETE' });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (res.ok) {
         alert(data.message || 'All products have been deleted successfully.');
         setSelectedProductIds([]);
@@ -209,7 +227,7 @@ export default function ProductsPage() {
         alert(data.error || 'Failed to delete all products.');
       }
     } catch (err: any) {
-      alert(err.message || 'An error occurred while deleting products.');
+      alert(typeof err === 'object' && err?.message ? err.message : 'An error occurred while deleting products.');
     } finally {
       setIsDeletingAll(false);
     }
@@ -226,7 +244,7 @@ export default function ProductsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: selectedProductIds }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (res.ok) {
         setSelectedProductIds([]);
         fetchProducts();
@@ -234,7 +252,7 @@ export default function ProductsPage() {
         alert(data.error || 'Failed to delete selected products.');
       }
     } catch (err: any) {
-      alert(err.message || 'An error occurred while deleting selected products.');
+      alert(typeof err === 'object' && err?.message ? err.message : 'An error occurred while deleting selected products.');
     } finally {
       setIsDeletingSelected(false);
     }
@@ -256,7 +274,7 @@ export default function ProductsPage() {
         body: formData,
       });
 
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) {
         setImportResult({ error: data.error || 'Failed to import products.' });
       } else {
@@ -264,7 +282,7 @@ export default function ProductsPage() {
         fetchProducts(); // Refresh list immediately
       }
     } catch (err: any) {
-      setImportResult({ error: err.message || 'An unexpected error occurred during import.' });
+      setImportResult({ error: typeof err === 'object' && err?.message ? err.message : 'An unexpected error occurred during import.' });
     } finally {
       setIsImporting(false);
     }
