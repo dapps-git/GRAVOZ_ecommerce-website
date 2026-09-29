@@ -203,6 +203,7 @@ export default function CheckoutPage() {
   // Payment State
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('UPI');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [isOpeningGateway, setIsOpeningGateway] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<any>(null);
   const [orderError, setOrderError] = useState('');
   const [redirectCountdown, setRedirectCountdown] = useState<number>(10);
@@ -592,7 +593,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    setIsPlacingOrder(true);
     setOrderError('');
 
     const cleanPin =
@@ -637,6 +637,7 @@ export default function CheckoutPage() {
 
     // ── Cash on Delivery (COD) Flow ──
     if (paymentMethod === 'COD') {
+      setIsPlacingOrder(true);
       const [_, result] = await Promise.all([
         new Promise((r) => setTimeout(r, 1200)),
         (async () => {
@@ -667,10 +668,11 @@ export default function CheckoutPage() {
     }
 
     // ── Razorpay Online Payment Flow (UPI / Card / NetBanking / Wallet) ──
+    setIsOpeningGateway(true);
     try {
       const isScriptLoaded = await loadRazorpayScript();
       if (!isScriptLoaded) {
-        setIsPlacingOrder(false);
+        setIsOpeningGateway(false);
         setOrderError('Could not load secure payment gateway. Please check your connection.');
         return;
       }
@@ -684,7 +686,7 @@ export default function CheckoutPage() {
 
       const rzpOrderData = await rzpOrderRes.json();
       if (!rzpOrderRes.ok || !rzpOrderData.success || !rzpOrderData.orderId) {
-        setIsPlacingOrder(false);
+        setIsOpeningGateway(false);
         setOrderError(rzpOrderData.error || 'Failed to initialize payment gateway.');
         return;
       }
@@ -709,6 +711,7 @@ export default function CheckoutPage() {
         },
         modal: {
           ondismiss: function () {
+            setIsOpeningGateway(false);
             setIsPlacingOrder(false);
             showToast('Payment window dismissed.');
           },
@@ -748,6 +751,7 @@ export default function CheckoutPage() {
 
       const razorpayInstance = new (window as any).Razorpay(options);
       razorpayInstance.on('payment.failed', function (failResp: any) {
+        setIsOpeningGateway(false);
         setIsPlacingOrder(false);
         const errMsg =
           failResp?.error?.description ||
@@ -756,9 +760,10 @@ export default function CheckoutPage() {
         setOrderError(errMsg);
       });
 
-      setIsPlacingOrder(false);
+      setIsOpeningGateway(false);
       razorpayInstance.open();
     } catch (err: any) {
+      setIsOpeningGateway(false);
       setIsPlacingOrder(false);
       console.error('Payment checkout error:', err);
       setOrderError(err.message || 'An unexpected error occurred during payment.');
@@ -1138,12 +1143,21 @@ export default function CheckoutPage() {
         ) : (
           <button
             type="button"
-            disabled={isPlacingOrder || (currentStep === 'cart' && items.length === 0)}
+            disabled={isPlacingOrder || isOpeningGateway || (currentStep === 'cart' && items.length === 0)}
             onClick={onCtaClick}
             className="w-full h-[42px] sm:h-[46px] rounded-none bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs sm:text-[13px] font-semibold tracking-wider uppercase transition-all shadow-xs hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 font-poppins"
           >
-            <span>{ctaButtonText}</span>
-            <ArrowRight className="w-4 h-4" />
+            {isOpeningGateway ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Opening Secure Gateway...</span>
+              </>
+            ) : (
+              <>
+                <span>{ctaButtonText}</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         )}
       </div>
