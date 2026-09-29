@@ -31,17 +31,28 @@ export function getRazorpayInstance(): Razorpay | null {
 
 /**
  * Timing-safe HMAC SHA-256 verification of Razorpay payment signature
+ * Supports both verifyRazorpaySignature(orderId, paymentId, signature) and verifyRazorpaySignature({ orderId, paymentId, signature })
  */
-export function verifyRazorpaySignature({
-  orderId,
-  paymentId,
-  signature,
-}: {
-  orderId: string;
-  paymentId: string;
-  signature: string;
-}): boolean {
+export function verifyRazorpaySignature(
+  param1: string | { orderId?: string; razorpay_order_id?: string; paymentId?: string; razorpay_payment_id?: string; signature?: string; razorpay_signature?: string },
+  param2?: string,
+  param3?: string
+): boolean {
   try {
+    let orderId = '';
+    let paymentId = '';
+    let signature = '';
+
+    if (typeof param1 === 'object' && param1 !== null) {
+      orderId = param1.orderId || param1.razorpay_order_id || '';
+      paymentId = param1.paymentId || param1.razorpay_payment_id || '';
+      signature = param1.signature || param1.razorpay_signature || '';
+    } else {
+      orderId = param1 || '';
+      paymentId = param2 || '';
+      signature = param3 || '';
+    }
+
     const { keySecret } = getRazorpayKeys();
     if (!keySecret || !orderId || !paymentId || !signature) {
       return false;
