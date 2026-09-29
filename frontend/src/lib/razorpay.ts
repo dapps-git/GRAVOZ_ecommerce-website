@@ -5,10 +5,10 @@ export function getRazorpayKeys() {
   const keyId =
     process.env.RAZORPAY_KEY_ID ||
     process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
-    'rzp_test_ThnyuMOFPTOPXV';
+    'rzp_live_ThoKT60JX1kpL8';
   const keySecret =
     process.env.RAZORPAY_KEY_SECRET ||
-    'qC10sDvUOIH3QCmYI3yn8NNU';
+    'H13PuysOoGUC6q7JluZMsNnK';
 
   return { keyId, keySecret };
 }
