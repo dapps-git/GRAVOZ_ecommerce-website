@@ -187,6 +187,59 @@ export default function ProductsPage() {
     }
   };
 
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [isDeletingSelected, setIsDeletingSelected] = useState(false);
+
+  const handleDeleteAll = async () => {
+    const confirmation = prompt('⚠️ WARNING: This will permanently DELETE ALL PRODUCTS from your database!\n\nType "DELETE ALL" to confirm:');
+    if (confirmation !== 'DELETE ALL') {
+      if (confirmation !== null) alert('Deletion cancelled: Confirmation text did not match "DELETE ALL".');
+      return;
+    }
+
+    setIsDeletingAll(true);
+    try {
+      const res = await fetch('/api/products?all=true', { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || 'All products have been deleted successfully.');
+        setSelectedProductIds([]);
+        fetchProducts();
+      } else {
+        alert(data.error || 'Failed to delete all products.');
+      }
+    } catch (err: any) {
+      alert(err.message || 'An error occurred while deleting products.');
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedProductIds.length === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedProductIds.length} selected products?`)) return;
+
+    setIsDeletingSelected(true);
+    try {
+      const res = await fetch('/api/products', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedProductIds }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSelectedProductIds([]);
+        fetchProducts();
+      } else {
+        alert(data.error || 'Failed to delete selected products.');
+      }
+    } catch (err: any) {
+      alert(err.message || 'An error occurred while deleting selected products.');
+    } finally {
+      setIsDeletingSelected(false);
+    }
+  };
+
   const handleImportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!importFile) return;
@@ -232,7 +285,32 @@ export default function ProductsPage() {
           <p className="text-xs text-slate-500 font-normal mt-0.5">Manage your store products, variants and inventory.</p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Delete Selected Button (shown when items are selected) */}
+          {selectedProductIds.length > 0 && (
+            <button
+              type="button"
+              disabled={isDeletingSelected}
+              onClick={handleDeleteSelected}
+              className="h-9 px-3.5 rounded-md bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Selected ({selectedProductIds.length})</span>
+            </button>
+          )}
+
+          {/* Delete All Products Button */}
+          <button
+            type="button"
+            disabled={isDeletingAll || (stats.total === 0 && products.length === 0)}
+            onClick={handleDeleteAll}
+            className="h-9 px-3.5 rounded-md bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Delete all products in database"
+          >
+            <Trash2 className="w-4 h-4 text-rose-600" />
+            <span>{isDeletingAll ? 'Deleting All...' : 'Delete All'}</span>
+          </button>
+
           <button
             type="button"
             onClick={() => {

@@ -279,3 +279,59 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message || 'Failed to create product' }, { status: 500 });
   }
 }
+
+// DELETE /api/products (Bulk Delete or Delete All)
+export async function DELETE(req: NextRequest) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const isDeleteAllParam = searchParams.get('all') === 'true';
+
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
+
+    const isDeleteAll = isDeleteAllParam || Boolean(body.all);
+    const idsToDelete = Array.isArray(body.ids) ? body.ids : [];
+
+    if (isDeleteAll) {
+      const result = await Product.deleteMany({});
+      // Clear banners associated with products
+      await Banner.deleteMany({ slot: { $in: ['duo_product_1', 'duo_product_2'] } });
+      await invalidateCache('products*');
+      await invalidateCache('admin:dashboard:stats');
+
+      return NextResponse.json({
+        success: true,
+        message: `Successfully deleted all ${result.deletedCount} products.`,
+        deletedCount: result.deletedCount,
+      });
+    }
+
+    if (idsToDelete.length > 0) {
+      const result = await Product.deleteMany({ _id: { $in: idsToDelete } });
+      await Banner.deleteMany({ productId: { $in: idsToDelete } });
+      await invalidateCache('products*');
+      await invalidateCache('admin:dashboard:stats');
+
+      return NextResponse.json({
+        success: true,
+        message: `Successfully deleted ${result.deletedCount} selected products.`,
+        deletedCount: result.deletedCount,
+      });
+    }
+
+    return NextResponse.json(
+      { error: 'Please specify ids to delete or set all: true to delete all products.' },
+      { status: 400 }
+    );
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Delete products error:', err);
+    return NextResponse.json({ error: err.message || 'Failed to delete products' }, { status: 500 });
+  }
+}
+
