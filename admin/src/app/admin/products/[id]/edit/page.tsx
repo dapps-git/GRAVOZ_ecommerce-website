@@ -2230,8 +2230,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               </span>
 
               <div className="space-y-1.5">
-                {colorVariants.map((v) => (
-                  <div key={v.id} className="flex items-center justify-between text-[11px] text-slate-600">
+                {colorVariants.map((v, idx) => (
+                  <div key={v.id || v.name || `variant-${idx}`} className="flex items-center justify-between text-[11px] text-slate-600">
                     <div className="flex items-center gap-2">
                       <span
                         className="w-2.5 h-2.5 rounded-full border border-black/15 inline-block"

@@ -2226,8 +2226,8 @@ export default function NewProductPage() {
               </span>
 
               <div className="space-y-2">
-                {colorVariants.map((v) => (
-                  <div key={v.id} className="flex items-center justify-between text-xs text-slate-700 font-medium">
+                {colorVariants.map((v, idx) => (
+                  <div key={v.id || v.name || `variant-${idx}`} className="flex items-center justify-between text-xs text-slate-700 font-medium">
                     <div className="flex items-center gap-2">
                       <span
                         className="w-2.5 h-2.5 rounded-full border border-black/15 inline-block"
