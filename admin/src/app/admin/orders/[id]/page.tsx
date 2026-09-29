@@ -290,6 +290,30 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <p className="font-bold text-slate-900">{shippingAddr.country || 'India'}</p>
           </div>
 
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#e8e2d8] pb-2 pt-2">
+            Payment &amp; Transaction
+          </h3>
+          <div className="text-xs space-y-1.5 bg-[#FAF8F5] p-3 rounded-xl border border-[#E8E1D9]">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500 font-medium">Method:</span>
+              <span className="font-bold text-slate-900">
+                {order.paymentMethod === 'COD'
+                  ? 'Cash on Delivery (COD)'
+                  : order.paymentMethod || 'Online Prepaid'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500 font-medium">Status:</span>
+              <StatusBadge status={order.paymentStatus || 'pending'} />
+            </div>
+            {(order as any).razorpayPaymentId && (
+              <div className="pt-1 border-t border-[#E8E1D9] text-[10px]">
+                <span className="text-slate-500 block">Razorpay Payment ID:</span>
+                <span className="font-mono text-slate-800 break-all font-semibold">{(order as any).razorpayPaymentId}</span>
+              </div>
+            )}
+          </div>
+
           {/* Return Request Details (If Return Initiated) */}
           {order.returnDetails && order.returnDetails.reason && [
             'return_requested',
@@ -367,26 +391,49 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           </div>
 
           {/* Pricing Totals */}
-          <div className="border-t border-[#e8e2d8] pt-3 space-y-1.5 text-xs text-slate-600 font-normal">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span className="text-slate-900 font-semibold">₹{(order.subtotal || 0).toLocaleString('en-IN')}</span>
-            </div>
-            {order.discountAmount && order.discountAmount > 0 ? (
-              <div className="flex justify-between text-emerald-600 font-semibold">
-                <span>Coupon Discount {order.couponCode ? `(${order.couponCode})` : ''}</span>
-                <span>− ₹{order.discountAmount.toLocaleString('en-IN')}</span>
+          {(() => {
+            const rawSubtotal = order.subtotal || 0;
+            const rawDiscount = order.discountAmount || 0;
+            const netAmount = rawSubtotal - rawDiscount;
+            const rawShipping =
+              order.shippingFee !== undefined && order.shippingFee !== null && order.shippingFee > 0
+                ? order.shippingFee
+                : order.totalAmount > netAmount
+                ? order.totalAmount - netAmount
+                : 0;
+
+            return (
+              <div className="border-t border-[#e8e2d8] pt-3 space-y-1.5 text-xs text-slate-600 font-normal">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span className="text-slate-900 font-semibold">₹{rawSubtotal.toLocaleString('en-IN')}</span>
+                </div>
+                {rawDiscount > 0 ? (
+                  <div className="flex justify-between text-emerald-600 font-semibold">
+                    <span>Coupon Discount {order.couponCode ? `(${order.couponCode})` : ''}</span>
+                    <span>− ₹{rawDiscount.toLocaleString('en-IN')}</span>
+                  </div>
+                ) : null}
+                <div className="flex justify-between">
+                  <span>Delivery / Shipping</span>
+                  {rawShipping > 0 ? (
+                    <span className="text-slate-900 font-semibold">
+                      ₹{rawShipping.toLocaleString('en-IN')}{' '}
+                      {order.paymentMethod === 'COD' ? (
+                        <span className="text-[10px] text-amber-800 font-medium">(COD Charge)</span>
+                      ) : null}
+                    </span>
+                  ) : (
+                    <span className="text-emerald-700 font-semibold">FREE</span>
+                  )}
+                </div>
+                <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-[#e8e2d8]">
+                  <span>Total Amount</span>
+                  <span className="text-[#89591C]">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
+                </div>
               </div>
-            ) : null}
-            <div className="flex justify-between">
-              <span>Delivery / Shipping</span>
-              <span className="text-emerald-700 font-semibold">FREE</span>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-[#e8e2d8]">
-              <span>Total Amount</span>
-              <span className="text-[#89591C]">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
-            </div>
-          </div>
+            );
+          })()}
         </div>
       </div>
     </div>

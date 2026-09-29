@@ -54,7 +54,7 @@ const OrderSchema = new mongoose.Schema(
     totalAmount: { type: Number, required: true },
     paymentMethod: {
       type: String,
-      enum: ['COD', 'UPI', 'Card', 'Wallet'],
+      enum: ['COD', 'UPI', 'Card', 'NetBanking', 'Wallet', 'Razorpay'],
       default: 'COD',
     },
     paymentStatus: {
@@ -62,6 +62,13 @@ const OrderSchema = new mongoose.Schema(
       enum: ['pending', 'paid', 'failed', 'refunded'],
       default: 'pending',
       index: true,
+    },
+    razorpayOrderId: { type: String, default: '', index: true },
+    razorpayPaymentId: { type: String, default: '', index: true },
+    razorpaySignature: { type: String, default: '' },
+    paymentDetails: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
     },
     orderStatus: {
       type: String,

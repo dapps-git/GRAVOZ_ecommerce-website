@@ -1,26 +1,6 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+const mongoose = require('mongoose');
 
-export interface ISetting extends Document {
-  storeName: string;
-  storeTagline: string;
-  contactEmail: string;
-  contactPhone: string;
-  gstinTaxId: string;
-  currencySymbol: string;
-  currencyCode: string;
-  taxRatePercent: number;
-  freeShippingThreshold: number;
-  codDeliveryCharge: number;
-  flatShippingRate: number;
-  referralRewardCredit: number;
-  friendFirstOrderDiscountPercent: number;
-  cloudinaryPreset?: string;
-  bannerMessage?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const SettingSchema: Schema<ISetting> = new Schema(
+const SettingSchema = new mongoose.Schema(
   {
     storeName: { type: String, default: 'GRAVOZ Footwear' },
     storeTagline: { type: String, default: 'Premium Handcrafted Footwear & Leather Collections' },
@@ -41,7 +21,4 @@ const SettingSchema: Schema<ISetting> = new Schema(
   { timestamps: true }
 );
 
-export const Setting: Model<ISetting> =
-  mongoose.models.Setting || mongoose.model<ISetting>('Setting', SettingSchema);
-
-export default Setting;
+module.exports = mongoose.models.Setting || mongoose.model('Setting', SettingSchema);

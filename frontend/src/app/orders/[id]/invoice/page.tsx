@@ -79,8 +79,14 @@ export default function OrderInvoicePage() {
   }
 
   const subtotal = order.items?.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0) || order.totalAmount;
-  const shippingFee = 0; // 100% Free Delivery All Over India
   const discount = order.discountAmount || 0;
+  const netBeforeShipping = subtotal - discount;
+  const shippingFee =
+    order.shippingFee !== undefined && order.shippingFee !== null && order.shippingFee > 0
+      ? order.shippingFee
+      : order.totalAmount > netBeforeShipping
+      ? order.totalAmount - netBeforeShipping
+      : 0;
   const grandTotal = order.totalAmount;
   const orderDate = new Date(order.createdAt).toLocaleDateString('en-IN', {
     day: 'numeric',
@@ -161,7 +167,7 @@ export default function OrderInvoicePage() {
           <div className="space-y-1 bg-[#faf8f5] p-4 rounded-xl border border-[#f0ece5]">
             <h3 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Order Summary:</h3>
             <p><span className="text-slate-400">Order ID:</span> <span className="font-bold text-slate-800">#{order.orderNumber}</span></p>
-            <p><span className="text-slate-400">Payment Method:</span> <span className="font-semibold uppercase text-slate-800">{order.paymentMethod || 'Prepaid / Online'}</span></p>
+            <p><span className="text-slate-400">Payment Method:</span> <span className="font-semibold uppercase text-slate-800">{order.paymentMethod === 'COD' ? 'Cash on Delivery (COD)' : (order.paymentMethod || 'Prepaid / Online')}</span></p>
             <p><span className="text-slate-400">Fulfillment:</span> <span className="capitalize font-semibold text-slate-800">{order.orderStatus?.replace(/_/g, ' ')}</span></p>
             {order.shippingCourier && (
               <p><span className="text-slate-400">Courier:</span> <span className="font-semibold text-slate-800">{order.shippingCourier} ({order.shippingTrackingId})</span></p>
@@ -178,7 +184,7 @@ export default function OrderInvoicePage() {
                 <th className="py-3 px-2 text-center">Size</th>
                 <th className="py-3 px-2 text-center">Qty</th>
                 <th className="py-3 px-2 text-right">Price</th>
-                <th className="py-3 px-2 text-right">Amount</th>
+                <th className="py-3 px-4 text-right">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -191,7 +197,7 @@ export default function OrderInvoicePage() {
                   <td className="py-3.5 px-2 text-center font-medium">{item.size || '-'}</td>
                   <td className="py-3.5 px-2 text-center font-medium">{item.quantity}</td>
                   <td className="py-3.5 px-2 text-right">₹{item.price?.toLocaleString('en-IN')}</td>
-                  <td className="py-3.5 px-2 text-right font-bold text-slate-900">
+                  <td className="py-3.5 px-4 text-right font-bold text-slate-900">
                     ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                   </td>
                 </tr>
@@ -214,9 +220,16 @@ export default function OrderInvoicePage() {
               </div>
             )}
             <div className="flex justify-between text-slate-600">
-              <span>Shipping Fee:</span>
+              <span>Delivery / Shipping:</span>
               <span className="font-semibold text-slate-800">
-                {shippingFee === 0 ? 'FREE' : `₹${shippingFee}`}
+                {shippingFee > 0 ? (
+                  <>
+                    ₹{shippingFee.toLocaleString('en-IN')}{' '}
+                    {order.paymentMethod === 'COD' ? <span className="text-[10px] text-amber-800 font-normal">(COD Fee)</span> : null}
+                  </>
+                ) : (
+                  <span className="text-emerald-700 font-semibold">FREE</span>
+                )}
               </span>
             </div>
             <div className="flex justify-between text-slate-500 text-[10.5px]">

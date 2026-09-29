@@ -85,7 +85,13 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
 
   const subtotal = order.subtotal ?? (order.items || []).reduce((s, i) => s + i.price * i.quantity, 0);
   const discount = order.discountAmount || 0;
-  const shipping = order.shippingFee || 0;
+  const netBeforeShipping = subtotal - discount;
+  const shipping =
+    order.shippingFee !== undefined && order.shippingFee !== null && order.shippingFee > 0
+      ? order.shippingFee
+      : order.totalAmount > netBeforeShipping
+      ? order.totalAmount - netBeforeShipping
+      : 0;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 print:m-0 print:p-0 print:max-w-none print:w-full font-sansation">
@@ -135,11 +141,9 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
             <p className="text-[11px] text-slate-500">
               Date: {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
-            {order.paymentMethod && (
-              <p className="text-[11px] font-semibold text-slate-700">
-                Payment: {order.paymentMethod.toUpperCase()} ({order.paymentStatus || 'COMPLETED'})
-              </p>
-            )}
+            <p className="text-[11px] font-semibold text-slate-700">
+              Payment: {order.paymentMethod === 'COD' ? 'CASH ON DELIVERY (COD)' : (order.paymentMethod || 'PREPAID ONLINE').toUpperCase()} • <span className={order.paymentStatus === 'paid' ? 'text-emerald-600 font-bold' : 'text-amber-600 font-bold'}>{(order.paymentStatus || 'PENDING').toUpperCase()}</span>
+            </p>
           </div>
         </div>
 
@@ -210,9 +214,16 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
               </div>
             )}
             <div className="flex justify-between">
-              <span>Shipping Delivery</span>
+              <span>Delivery / Shipping</span>
               <span className="font-semibold text-slate-900">
-                {shipping > 0 ? `₹${shipping.toLocaleString('en-IN')}` : 'FREE'}
+                {shipping > 0 ? (
+                  <>
+                    ₹{shipping.toLocaleString('en-IN')}{' '}
+                    {order.paymentMethod === 'COD' ? <span className="text-[10px] text-amber-800 font-normal">(COD Charge)</span> : null}
+                  </>
+                ) : (
+                  <span className="text-emerald-700 font-semibold">FREE</span>
+                )}
               </span>
             </div>
             <div className="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-[#e8e2d8]">

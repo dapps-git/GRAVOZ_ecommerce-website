@@ -31,6 +31,8 @@ interface CustomerItem {
   rewardPoints: number;
   referralCode: string;
   referredBy?: string;
+  referralCodeUsed?: string;
+  referralDiscountBalance?: number;
   totalOrders: number;
   totalSpent: number;
   tier: 'Silver' | 'Gold' | 'Platinum';
@@ -320,6 +322,20 @@ export default function CustomersPage() {
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Loyalty Tier</span>
                 <span className="font-bold text-slate-900">{selectedCustomer.tier || 'Silver'}</span>
               </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Referral Code</span>
+                <span className="font-bold font-mono text-[#89591C]">{selectedCustomer.referralCode}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Referral Bonus Balance</span>
+                <span className="font-bold text-emerald-700">₹{selectedCustomer.referralDiscountBalance || 0}</span>
+              </div>
+              {selectedCustomer.referralCodeUsed && (
+                <div className="col-span-2 bg-white p-2 rounded-lg border border-[#e8e2d8]">
+                  <span className="text-[10px] text-slate-500 font-medium block">Referred by Code:</span>
+                  <span className="font-mono font-bold text-xs text-[#89591C]">{selectedCustomer.referralCodeUsed}</span>
+                </div>
+              )}
             </div>
 
             <div>

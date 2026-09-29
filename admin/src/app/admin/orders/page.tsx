@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import DataTable, { Column } from '@/components/admin/DataTable';
 import StatusBadge from '@/components/admin/StatusBadge';
 import Link from 'next/link';
-import { Eye, FileText, ShoppingCart } from 'lucide-react';
+import { Eye, FileText, ShoppingCart, CreditCard } from 'lucide-react';
 
 interface OrderItem {
   _id: string;
@@ -13,6 +13,7 @@ interface OrderItem {
   customerEmail?: string;
   customer?: { name?: string; email?: string; phone?: string };
   totalAmount: number;
+  paymentMethod?: string;
   orderStatus: string;
   paymentStatus: string;
   createdAt: string;
@@ -88,6 +89,25 @@ export default function OrdersPage() {
     {
       header: 'Total Amount',
       accessor: (row: OrderItem) => <span className="font-extrabold text-slate-900 text-xs">₹{(row.totalAmount || 0).toLocaleString('en-IN')}</span>,
+    },
+    {
+      header: 'Payment Method',
+      accessor: (row: OrderItem) => {
+        const method = (row.paymentMethod || 'COD').toUpperCase();
+        const isCod = method === 'COD' || method.includes('CASH');
+        return (
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border ${
+              isCod
+                ? 'bg-amber-50 text-amber-900 border-amber-200'
+                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            }`}
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            {isCod ? 'Cash on Delivery (COD)' : row.paymentMethod || 'Online (Razorpay)'}
+          </span>
+        );
+      },
     },
     {
       header: 'Payment Status',

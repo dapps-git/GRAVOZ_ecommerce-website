@@ -7,6 +7,7 @@ import { Cart } from '@/models/Cart';
 import { Product } from '@/models/Product';
 import { Referral } from '@/models/Referral';
 import { Coupon } from '@/models/Coupon';
+import { Setting } from '@/models/Setting';
 import { getUserSession } from '@/lib/auth';
 
 // GET /api/orders - Securely fetch orders for authenticated customer
@@ -233,10 +234,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── Backend Source of Truth Shipping Fee & COD Charge ──
+    const storeSetting = await Setting.findOne().lean();
+    const codCharge = storeSetting?.codDeliveryCharge !== undefined ? Number(storeSetting.codDeliveryCharge) : 25;
+    const verifiedShippingFee = (paymentMethod === 'COD') ? codCharge : 0;
+
     // Backend Source of Truth calculation of final total
     const verifiedTotalAmount = Math.max(
       0,
-      numSubtotal - verifiedCouponDiscount - verifiedReferralDiscount + numShippingFee
+      numSubtotal - verifiedCouponDiscount - verifiedReferralDiscount + verifiedShippingFee
     );
 
     // Generate unique human-readable order number

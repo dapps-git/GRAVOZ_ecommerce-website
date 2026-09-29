@@ -378,6 +378,30 @@ export default function CheckoutPage() {
     savedAddresses[0] ||
     null;
 
+  // Store Settings (Dynamic COD Charge & Delivery Limits)
+  const [storeSettings, setStoreSettings] = useState<{
+    freeShippingThreshold: number;
+    codDeliveryCharge: number;
+    referralRewardCredit: number;
+    friendFirstOrderDiscountPercent: number;
+  }>({
+    freeShippingThreshold: 999,
+    codDeliveryCharge: 25,
+    referralRewardCredit: 100,
+    friendFirstOrderDiscountPercent: 15,
+  });
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.settings) {
+          setStoreSettings(data.settings);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Pricing Calculations
   const calculatedDiscount = appliedCoupon ? appliedCoupon.discount : 0;
   let calculatedReferralDiscount = 0;
@@ -394,7 +418,8 @@ export default function CheckoutPage() {
     calculatedReferralDiscount = Math.min(100, Math.max(0, eligibleSubtotalForReferral - calculatedDiscount));
   }
 
-  const shippingFee = 0; // Free
+  const codChargeAmount = storeSettings.codDeliveryCharge !== undefined ? Number(storeSettings.codDeliveryCharge) : 25;
+  const shippingFee = paymentMethod === 'COD' ? codChargeAmount : 0;
   const totalItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const finalTotal = Math.max(0, subtotal - calculatedDiscount - calculatedReferralDiscount + shippingFee);
 
@@ -537,7 +562,28 @@ export default function CheckoutPage() {
     setIsAddressModalOpen(false);
   };
 
-  // Place Order Handler with simulated transition loading
+  // Helper to dynamically load Razorpay standard checkout script
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (typeof window !== 'undefined' && (window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      if (existing) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  // Place Order Handler with Razorpay integration and COD support
   const handlePlaceOrder = async () => {
     if (!activeAddress || !activeAddress.street || !activeAddress.postalCode) {
       setOrderError('Please add and select a valid delivery address before placing your order.');
@@ -549,73 +595,173 @@ export default function CheckoutPage() {
     setIsPlacingOrder(true);
     setOrderError('');
 
-    // Minimum delay to show the nice "Placing Your Order..." screen
-    const [_, result] = await Promise.all([
-      new Promise((r) => setTimeout(r, 1400)),
-      (async () => {
-        try {
-          const cleanPin =
-            (activeAddress.postalCode && activeAddress.postalCode.trim()) ||
-            (activeAddress.street && (activeAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
-            '';
+    const cleanPin =
+      (activeAddress.postalCode && activeAddress.postalCode.trim()) ||
+      (activeAddress.street && (activeAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
+      '';
 
-          const payload = {
-            customerId: (user as any)?._id || user?.id || '',
-            customerEmail: user?.email || (activeAddress as any)?.email || 'customer@gravoz.com',
-            customerName: activeAddress.name || user?.name || 'Customer',
-            customerPhone: activeAddress.phone || user?.phone || '',
-            shippingAddress: {
-              name: activeAddress.name || user?.name || 'Customer',
-              phone: activeAddress.phone || user?.phone || '',
-              street: activeAddress.street,
-              city: activeAddress.city || '',
-              state: activeAddress.state || '',
-              postalCode: cleanPin,
-              country: activeAddress.country || 'India',
-            },
-            items: items.map((itm) => ({
-              productId: itm.productId,
-              name: itm.title,
-              price: itm.price,
-              originalPrice: itm.originalPrice,
-              quantity: itm.quantity,
-              size: itm.size,
-              color: itm.color,
-              imageUrl: itm.imageUrl,
-              noReturnRefundExchange: Boolean(itm.noReturnRefundExchange),
-            })),
-            subtotal,
-            discountAmount: calculatedDiscount,
-            referralDiscountType: appliedReferralType || undefined,
-            referralDiscountAmount: calculatedReferralDiscount,
-            couponCode: appliedCoupon?.code || '',
-            shippingFee,
-            totalAmount: finalTotal,
-            paymentMethod,
-          };
+    const orderPayload = {
+      customerId: (user as any)?._id || user?.id || '',
+      customerEmail: user?.email || (activeAddress as any)?.email || 'customer@gravoz.com',
+      customerName: activeAddress.name || user?.name || 'Customer',
+      customerPhone: activeAddress.phone || user?.phone || '',
+      shippingAddress: {
+        name: activeAddress.name || user?.name || 'Customer',
+        phone: activeAddress.phone || user?.phone || '',
+        street: activeAddress.street,
+        city: activeAddress.city || '',
+        state: activeAddress.state || '',
+        postalCode: cleanPin,
+        country: activeAddress.country || 'India',
+      },
+      items: items.map((itm) => ({
+        productId: itm.productId,
+        name: itm.title,
+        price: itm.price,
+        originalPrice: itm.originalPrice,
+        quantity: itm.quantity,
+        size: itm.size,
+        color: itm.color,
+        imageUrl: itm.imageUrl,
+        noReturnRefundExchange: Boolean(itm.noReturnRefundExchange),
+      })),
+      subtotal,
+      discountAmount: calculatedDiscount,
+      referralDiscountType: appliedReferralType || undefined,
+      referralDiscountAmount: calculatedReferralDiscount,
+      couponCode: appliedCoupon?.code || '',
+      shippingFee,
+      totalAmount: finalTotal,
+      paymentMethod,
+    };
 
-          const res = await fetch('/api/orders', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
+    // ── Cash on Delivery (COD) Flow ──
+    if (paymentMethod === 'COD') {
+      const [_, result] = await Promise.all([
+        new Promise((r) => setTimeout(r, 1200)),
+        (async () => {
+          try {
+            const res = await fetch('/api/orders', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(orderPayload),
+            });
+            return await res.json();
+          } catch (err: any) {
+            return { error: err.message || 'Network error' };
+          }
+        })(),
+      ]);
 
-          return await res.json();
-        } catch (err: any) {
-          return { error: err.message || 'Network error' };
-        }
-      })(),
-    ]);
+      if (result && result.success && result.order) {
+        setPlacedOrder(result.order);
+        clearCart();
+        setIsPlacingOrder(false);
+        setCurrentStep('success');
+        playOrderSuccessSound();
+      } else {
+        setIsPlacingOrder(false);
+        setOrderError(result?.error || 'Failed to complete order. Please try again.');
+      }
+      return;
+    }
 
-    if (result && result.success && result.order) {
-      setPlacedOrder(result.order);
-      clearCart();
+    // ── Razorpay Online Payment Flow (UPI / Card / NetBanking / Wallet) ──
+    try {
+      const isScriptLoaded = await loadRazorpayScript();
+      if (!isScriptLoaded) {
+        setIsPlacingOrder(false);
+        setOrderError('Could not load secure payment gateway. Please check your connection.');
+        return;
+      }
+
+      // Step 1: Create server-authorized Razorpay Order
+      const rzpOrderRes = await fetch('/api/razorpay/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload),
+      });
+
+      const rzpOrderData = await rzpOrderRes.json();
+      if (!rzpOrderRes.ok || !rzpOrderData.success || !rzpOrderData.orderId) {
+        setIsPlacingOrder(false);
+        setOrderError(rzpOrderData.error || 'Failed to initialize payment gateway.');
+        return;
+      }
+
+      // Step 2: Open Razorpay Standard Checkout Modal
+      const options = {
+        key: rzpOrderData.keyId,
+        amount: rzpOrderData.amount,
+        currency: rzpOrderData.currency || 'INR',
+        name: 'GRAVOZ',
+        description: `Order Payment (${items.length} item${items.length > 1 ? 's' : ''})`,
+        image: '/images/bag.webp',
+        order_id: rzpOrderData.orderId,
+        prefill: {
+          name: rzpOrderData.prefill?.name || activeAddress.name || user?.name || 'Customer',
+          email: rzpOrderData.prefill?.email || user?.email || 'customer@gravoz.com',
+          contact: rzpOrderData.prefill?.contact || activeAddress.phone || user?.phone || '',
+        },
+        theme: {
+          color: '#8B4A12',
+          backdrop_color: 'rgba(0, 0, 0, 0.65)',
+        },
+        modal: {
+          ondismiss: function () {
+            setIsPlacingOrder(false);
+            showToast('Payment window dismissed.');
+          },
+        },
+        handler: async function (response: any) {
+          setIsPlacingOrder(true);
+          try {
+            // Step 3: Server-side cryptographic HMAC-SHA256 signature verification & Order creation
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                ...orderPayload,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok && verifyData.success && verifyData.order) {
+              setPlacedOrder(verifyData.order);
+              clearCart();
+              setIsPlacingOrder(false);
+              setCurrentStep('success');
+              playOrderSuccessSound();
+            } else {
+              setIsPlacingOrder(false);
+              setOrderError(verifyData.error || 'Payment verification failed. Please contact support.');
+            }
+          } catch (err: any) {
+            setIsPlacingOrder(false);
+            setOrderError('Network error while verifying payment. Please check your bank status.');
+          }
+        },
+      };
+
+      const razorpayInstance = new (window as any).Razorpay(options);
+      razorpayInstance.on('payment.failed', function (failResp: any) {
+        setIsPlacingOrder(false);
+        const errMsg =
+          failResp?.error?.description ||
+          failResp?.error?.reason ||
+          'Payment transaction could not be completed. Please try again.';
+        setOrderError(errMsg);
+      });
+
       setIsPlacingOrder(false);
-      setCurrentStep('success');
-      playOrderSuccessSound();
-    } else {
+      razorpayInstance.open();
+    } catch (err: any) {
       setIsPlacingOrder(false);
-      setOrderError(result?.error || 'Failed to complete order. Please try again.');
+      console.error('Payment checkout error:', err);
+      setOrderError(err.message || 'An unexpected error occurred during payment.');
     }
   };
 
@@ -709,8 +855,17 @@ export default function CheckoutPage() {
           </div>
 
           <div className="flex justify-between py-2 text-[#667085]">
-            <span>Shipping</span>
-            <span className="font-semibold text-[#16A34A]">FREE</span>
+            <span>Delivery / Shipping</span>
+            {paymentMethod === 'COD' ? (
+              <span className="font-semibold text-[#171717]">
+                ₹{codChargeAmount.toLocaleString('en-IN')}{' '}
+                <span className="text-[10px] text-amber-800 font-medium">(COD Charge)</span>
+              </span>
+            ) : (
+              <span className="font-semibold text-[#16A34A] flex items-center gap-1">
+                FREE <span className="text-[10px] text-emerald-700 font-medium">(Saved ₹{codChargeAmount})</span>
+              </span>
+            )}
           </div>
 
           {calculatedDiscount > 0 && (
@@ -1656,7 +1811,7 @@ export default function CheckoutPage() {
                       </div>
 
                       <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-bold text-[11px] rounded-none border border-[#C4E8BC]">
-                        SAVE ₹35
+                        SAVE ₹{codChargeAmount} • FREE
                       </span>
                     </div>
 
@@ -1799,13 +1954,13 @@ export default function CheckoutPage() {
                             Cash on Delivery
                           </h4>
                           <p className="text-[10px] text-[#667085] font-normal">
-                            Pay when you receive your order
+                            Pay upon delivery (₹{codChargeAmount} handling fee)
                           </p>
                         </div>
                       </div>
 
-                      <span className="px-2.5 py-1 bg-[#E8F5E4] text-[#16A34A] font-semibold text-[11px] rounded-none border border-[#C4E8BC]">
-                        Available
+                      <span className="px-2.5 py-1 bg-[#FFF9F2] text-[#92400E] font-bold text-[11px] rounded-none border border-[#F5C78E]">
+                        +₹{codChargeAmount} COD Fee
                       </span>
                     </div>
                   </div>

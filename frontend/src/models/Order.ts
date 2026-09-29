@@ -46,8 +46,25 @@ export interface IOrder extends Document {
   couponCode?: string;
   shippingFee: number;
   totalAmount: number;
-  paymentMethod: 'COD' | 'UPI' | 'Card' | 'Wallet';
+  paymentMethod: 'COD' | 'UPI' | 'Card' | 'NetBanking' | 'Wallet' | 'Razorpay';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  paymentDetails?: {
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
+    method?: string;
+    bank?: string;
+    wallet?: string;
+    vpa?: string;
+    email?: string;
+    contact?: string;
+    fee?: number;
+    tax?: number;
+    errorDescription?: string;
+  };
   orderStatus:
     | 'ordered'
     | 'confirmed'
@@ -158,7 +175,7 @@ const OrderSchema = new Schema<IOrder>(
     totalAmount: { type: Number, required: true },
     paymentMethod: {
       type: String,
-      enum: ['COD', 'UPI', 'Card', 'Wallet'],
+      enum: ['COD', 'UPI', 'Card', 'NetBanking', 'Wallet', 'Razorpay'],
       default: 'COD',
     },
     paymentStatus: {
@@ -166,6 +183,13 @@ const OrderSchema = new Schema<IOrder>(
       enum: ['pending', 'paid', 'failed', 'refunded'],
       default: 'pending',
       index: true,
+    },
+    razorpayOrderId: { type: String, default: '', index: true },
+    razorpayPaymentId: { type: String, default: '', index: true },
+    razorpaySignature: { type: String, default: '' },
+    paymentDetails: {
+      type: Schema.Types.Mixed,
+      default: {},
     },
     orderStatus: {
       type: String,
