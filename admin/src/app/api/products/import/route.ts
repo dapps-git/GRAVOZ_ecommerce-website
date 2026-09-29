@@ -247,18 +247,23 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 3. Fallback: generate default variants from colors list
-      if (colorVariants.length === 0) {
-        for (let i = 0; i < colors.length; i++) {
-          const cName = colors[i];
-          const primaryImg = images[i]?.url || images[0]?.url || '';
-          colorVariants.push({
-            name: cName,
-            imageUrl: primaryImg,
-            images: images,
-            isAvailable: true,
-          });
+      // If colorVariants have real photos, ensure the main product `images` array uses them instead of placeholder
+      let finalImages = images.filter(img => !img.url.includes('placeholder.svg') && !img.url.includes('photo-1542291026-7eec264c27ff'));
+      if (finalImages.length === 0 && colorVariants.length > 0) {
+        for (const cv of colorVariants) {
+          if (cv.images && cv.images.length > 0) {
+            for (const img of cv.images) {
+              if (!finalImages.some(fi => fi.url === img.url)) {
+                finalImages.push(img);
+              }
+            }
+          } else if (cv.imageUrl) {
+            finalImages.push({ url: cv.imageUrl, alt: `${name} - ${cv.name}` });
+          }
         }
+      }
+      if (finalImages.length === 0) {
+        finalImages = images;
       }
 
       // Badges and flags
@@ -288,7 +293,7 @@ export async function POST(req: NextRequest) {
         sizeAvailability,
         colors: colors.length ? colors : ['Black', 'Brown'],
         colorVariants,
-        images,
+        images: finalImages,
         material,
         description,
         isBestSeller,

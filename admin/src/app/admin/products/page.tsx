@@ -552,9 +552,11 @@ export default function ProductsPage() {
                 products.map((p) => {
                   const isSelected = selectedProductIds.includes(p._id);
 
-                  // Extract valid image
+                  // Extract valid image prioritizing color variants
                   const validImg =
-                    p.images?.find((img) => img?.url && !img.url.includes('placeholder.svg'))?.url ||
+                    p.colorVariants?.find((cv: any) => cv?.images && cv.images.length > 0 && !cv.images[0]?.url?.includes('photo-1542291026-7eec264c27ff'))?.images?.[0]?.url ||
+                    p.colorVariants?.find((cv: any) => cv?.imageUrl && !cv.imageUrl.includes('photo-1542291026-7eec264c27ff'))?.imageUrl ||
+                    p.images?.find((img) => img?.url && !img.url.includes('placeholder.svg') && !img.url.includes('photo-1542291026-7eec264c27ff'))?.url ||
                     (p.images && p.images[0]?.url) ||
                     '/products/placeholder.svg';
 
