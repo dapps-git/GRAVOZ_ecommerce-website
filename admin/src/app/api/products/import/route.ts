@@ -121,14 +121,17 @@ export async function POST(req: NextRequest) {
       const material = String(normalizedRow['material'] || '').trim();
       const description = String(normalizedRow['description'] || normalizedRow['desc'] || `${name} premium quality footwear.`).trim();
 
-      // Collect Images (Image 1 through Image 5 or generic images list)
+      // Collect Images (Image 1 through Image 10 or generic images list)
       const images: Array<{ url: string; alt: string }> = [];
-      const imageKeys = ['image1', 'image2', 'image3', 'image4', 'image5', 'img1', 'img2', 'img3', 'img4', 'img5', 'images', 'imageurl', 'image'];
+      const imageKeys = [
+        'image1', 'image2', 'image3', 'image4', 'image5', 'image6', 'image7', 'image8',
+        'img1', 'img2', 'img3', 'img4', 'img5', 'img6', 'img7', 'img8',
+        'images', 'imageurl', 'image', 'photo', 'photos'
+      ];
       
       for (const key of imageKeys) {
         const val = normalizedRow[key];
         if (val && typeof val === 'string') {
-          // If contains multiple URLs separated by commas or semicolons
           const urls = val.split(/[,;\n]+/).map(u => u.trim()).filter(u => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
           for (const u of urls) {
             if (!images.some(img => img.url === u)) {
@@ -160,14 +163,14 @@ export async function POST(req: NextRequest) {
       }));
 
       // Colors parsing
-      const colorsRaw = String(normalizedRow['colors'] || normalizedRow['color'] || 'Black, Brown, Tan');
+      const colorsRaw = String(normalizedRow['colors'] || normalizedRow['color'] || 'Brown, Black');
       const colors = colorsRaw
         .split(/[,;\/|]+/)
         .map(c => c.trim())
         .filter(Boolean);
 
-      // Color Variants parsing (e.g. "Black:http://img1.jpg; White:http://img2.jpg")
-      const colorVariantsRaw = String(normalizedRow['colorvariantimages'] || normalizedRow['colorvariants'] || '');
+      // Color Variants parsing (e.g. "Brown: url1, url2, url3 | Black: url4, url5, url6")
+      const colorVariantsRaw = String(normalizedRow['colorvariantimages'] || normalizedRow['colorvariants'] || normalizedRow['variants'] || '');
       const colorVariants: Array<{
         name: string;
         colorCode?: string;
@@ -177,29 +180,39 @@ export async function POST(req: NextRequest) {
       }> = [];
 
       if (colorVariantsRaw) {
-        const pairs = colorVariantsRaw.split(/;\s*/).filter(Boolean);
-        for (const pair of pairs) {
-          const [cName, cUrl] = pair.split(/:(https?:\/\/.*)/i).filter(Boolean);
-          if (cName) {
-            const cleanCName = cName.replace(/:/g, '').trim();
-            const cleanCUrl = cUrl ? cUrl.trim() : (images[0]?.url || '');
+        // Splits by | or ; for each color block
+        const colorBlocks = colorVariantsRaw.split(/[|;]\s*(?=[A-Za-z0-9\s_-]+:)/).filter(Boolean);
+        for (const block of colorBlocks) {
+          const colonIdx = block.indexOf(':');
+          if (colonIdx > 0) {
+            const cName = block.slice(0, colonIdx).trim();
+            const cUrlsRaw = block.slice(colonIdx + 1).trim();
+            const cUrls = cUrlsRaw.split(/[,;\s]+/).map(u => u.trim()).filter(u => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+            
+            const variantImages = cUrls.map((u, i) => ({
+              url: u,
+              alt: `${name} ${cName} view ${i + 1}`
+            }));
+
             colorVariants.push({
-              name: cleanCName,
-              imageUrl: cleanCUrl,
-              images: cleanCUrl ? [{ url: cleanCUrl, alt: `${name} ${cleanCName}` }] : [],
+              name: cName,
+              imageUrl: cUrls[0] || (images[0]?.url || ''),
+              images: variantImages.length > 0 ? variantImages : (images.length > 0 ? images : []),
               isAvailable: true,
             });
           }
         }
-      } else {
-        // Create standard color variants from colors list
+      }
+
+      // If no explicit colorVariants parsed, generate variants from colors list and associate images
+      if (colorVariants.length === 0) {
         for (let i = 0; i < colors.length; i++) {
           const cName = colors[i];
-          const imgUrl = images[i]?.url || images[0]?.url || '';
+          const primaryImg = images[i]?.url || images[0]?.url || '';
           colorVariants.push({
             name: cName,
-            imageUrl: imgUrl,
-            images: imgUrl ? [{ url: imgUrl, alt: `${name} ${cName}` }] : [],
+            imageUrl: primaryImg,
+            images: images, // Each color variant inherits the full gallery or primary
             isAvailable: true,
           });
         }
