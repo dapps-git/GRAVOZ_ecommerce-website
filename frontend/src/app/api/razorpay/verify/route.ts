@@ -10,6 +10,8 @@ import { Coupon } from '@/models/Coupon';
 import { getUserSession } from '@/lib/auth';
 import { verifyRazorpaySignature, getRazorpayInstance } from '@/lib/razorpay';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
@@ -289,13 +291,25 @@ export async function POST(req: NextRequest) {
       console.warn('Cart clear warning:', e);
     }
 
-    // 13. Atomic stock decrement
+    // 13. Atomic product & size-level stock decrement
     try {
       for (const itm of items) {
-        if (itm.productId && mongoose.Types.ObjectId.isValid(itm.productId)) {
-          await Product.findByIdAndUpdate(itm.productId, {
-            $inc: { stock: -Number(itm.quantity || 1) },
-          });
+        const pid = itm.productId || itm.id || itm._id;
+        if (pid && mongoose.Types.ObjectId.isValid(pid)) {
+          const qty = Number(itm.quantity || 1);
+          const itemSize = String(itm.size || '').trim();
+          const prodDoc = await Product.findById(pid);
+          if (prodDoc) {
+            prodDoc.stock = Math.max(0, (prodDoc.stock || 0) - qty);
+            if (itemSize && Array.isArray(prodDoc.sizeAvailability)) {
+              const sObj = prodDoc.sizeAvailability.find((s: any) => String(s.size).trim() === itemSize);
+              if (sObj && sObj.stock !== undefined) {
+                sObj.stock = Math.max(0, sObj.stock - qty);
+                if (sObj.stock === 0) sObj.isAvailable = false;
+              }
+            }
+            await prodDoc.save();
+          }
         }
       }
     } catch (e) {

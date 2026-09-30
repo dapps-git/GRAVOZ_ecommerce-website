@@ -595,6 +595,24 @@ export default function CheckoutPage() {
 
     setOrderError('');
 
+    // Real-time stock validation check before initiating payment or placing order
+    try {
+      const stockRes = await fetch('/api/cart/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
+      const stockData = await stockRes.json();
+      if (stockData && stockData.valid === false) {
+        const errorMsg = stockData.errors?.[0] || 'Some items in your cart are no longer in stock. Please update your cart.';
+        setOrderError(errorMsg);
+        showToast(`⚠️ ${errorMsg}`);
+        return;
+      }
+    } catch (e) {
+      console.warn('Stock validation notice:', e);
+    }
+
     const cleanPin =
       (activeAddress.postalCode && activeAddress.postalCode.trim()) ||
       (activeAddress.street && (activeAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
@@ -1637,7 +1655,24 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="lg:col-span-5 xl:col-span-4">
-                  {renderOrderSummary('CONTINUE TO ADDRESS', () => {
+                  {renderOrderSummary('CONTINUE TO ADDRESS', async () => {
+                    try {
+                      const stockRes = await fetch('/api/cart/validate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ items }),
+                      });
+                      const stockData = await stockRes.json();
+                      if (stockData && stockData.valid === false) {
+                        const errorMsg = stockData.errors?.[0] || 'Some items in your cart are no longer in stock.';
+                        showToast(`⚠️ ${errorMsg}`);
+                        setOrderError(errorMsg);
+                        return;
+                      }
+                    } catch (e) {
+                      console.warn('Stock validation notice:', e);
+                    }
+
                     if (savedAddresses.length === 0 || !activeAddress.street) {
                       handleOpenAddAddress();
                     } else {

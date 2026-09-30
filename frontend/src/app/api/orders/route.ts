@@ -10,6 +10,8 @@ import { Coupon } from '@/models/Coupon';
 import { Setting } from '@/models/Setting';
 import { getUserSession } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/orders - Securely fetch orders for authenticated customer
 export async function GET(req: NextRequest) {
   try {
@@ -83,11 +85,62 @@ export async function POST(req: NextRequest) {
 
     // Verify all items exist and are in stock
     for (const itm of items) {
-      if (itm.productId && mongoose.Types.ObjectId.isValid(itm.productId)) {
-        const prod = await Product.findById(itm.productId).lean();
-        if (!prod || (prod.stock !== undefined && prod.stock <= 0)) {
+      const pid = itm.productId || itm.id || itm._id;
+      if (pid && mongoose.Types.ObjectId.isValid(pid)) {
+        const prod = await Product.findById(pid).lean();
+        if (!prod || prod.status !== 'active') {
           return NextResponse.json(
-            { error: `Item "${itm.name || prod?.name || 'Product'}" is currently out of stock.` },
+            { error: `Item "${itm.name || itm.title || (prod as any)?.name || 'Product'}" is currently unavailable.` },
+            { status: 400 }
+          );
+        }
+
+        const itemSize = String(itm.size || '').trim();
+        const itemColor = String(itm.color || '').trim();
+        const requestedQty = Number(itm.quantity) || 1;
+        let availableStock = Number(prod.stock) || 0;
+
+        if (itemSize && Array.isArray(prod.sizeAvailability) && prod.sizeAvailability.length > 0) {
+          const sizeObj = prod.sizeAvailability.find((s: any) => String(s.size).trim() === itemSize);
+          if (sizeObj) {
+            if (sizeObj.isAvailable === false || (sizeObj.stock !== undefined && sizeObj.stock <= 0)) {
+              availableStock = 0;
+            } else if (sizeObj.stock !== undefined) {
+              availableStock = Math.min(availableStock, sizeObj.stock);
+            }
+          }
+        }
+
+        if (itemColor && Array.isArray(prod.colorVariants) && prod.colorVariants.length > 0) {
+          const variantObj = prod.colorVariants.find(
+            (v: any) => String(v.name).trim().toLowerCase() === itemColor.toLowerCase()
+          );
+          if (variantObj) {
+            if (variantObj.isAvailable === false) {
+              availableStock = 0;
+            }
+            if (itemSize && Array.isArray(variantObj.sizes) && variantObj.sizes.length > 0) {
+              const vSizeObj = variantObj.sizes.find((s: any) => String(s.size).trim() === itemSize);
+              if (vSizeObj) {
+                if (vSizeObj.isAvailable === false || (vSizeObj.stock !== undefined && vSizeObj.stock <= 0)) {
+                  availableStock = 0;
+                } else if (vSizeObj.stock !== undefined) {
+                  availableStock = Math.min(availableStock, vSizeObj.stock);
+                }
+              }
+            }
+          }
+        }
+
+        if (availableStock <= 0) {
+          return NextResponse.json(
+            { error: `"${itm.name || itm.title || (prod as any)?.name || 'Product'}" ${itemSize ? `(Size: ${itemSize})` : ''} is currently out of stock.` },
+            { status: 400 }
+          );
+        }
+        if (requestedQty > availableStock) {
+          return NextResponse.json(
+            { error: `Only ${availableStock} pair(s) available for "${itm.name || itm.title || (prod as any)?.name || 'Product'}" ${itemSize ? `(Size: ${itemSize})` : ''}.` },
             { status: 400 }
           );
         }
@@ -404,13 +457,25 @@ export async function POST(req: NextRequest) {
       console.warn('Cart clear warning:', e);
     }
 
-    // Atomic product stock decrement
+    // Atomic product & size-level stock decrement
     try {
       for (const itm of items) {
-        if (itm.productId && mongoose.Types.ObjectId.isValid(itm.productId)) {
-          await Product.findByIdAndUpdate(itm.productId, {
-            $inc: { stock: -Number(itm.quantity || 1) },
-          });
+        const pid = itm.productId || itm.id || itm._id;
+        if (pid && mongoose.Types.ObjectId.isValid(pid)) {
+          const qty = Number(itm.quantity || 1);
+          const itemSize = String(itm.size || '').trim();
+          const prodDoc = await Product.findById(pid);
+          if (prodDoc) {
+            prodDoc.stock = Math.max(0, (prodDoc.stock || 0) - qty);
+            if (itemSize && Array.isArray(prodDoc.sizeAvailability)) {
+              const sObj = prodDoc.sizeAvailability.find((s: any) => String(s.size).trim() === itemSize);
+              if (sObj && sObj.stock !== undefined) {
+                sObj.stock = Math.max(0, sObj.stock - qty);
+                if (sObj.stock === 0) sObj.isAvailable = false;
+              }
+            }
+            await prodDoc.save();
+          }
         }
       }
     } catch (e) {

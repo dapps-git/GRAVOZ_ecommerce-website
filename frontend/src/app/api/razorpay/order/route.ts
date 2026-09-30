@@ -9,6 +9,8 @@ import { Order } from '@/models/Order';
 import { getUserSession } from '@/lib/auth';
 import { getRazorpayInstance, getRazorpayKeys } from '@/lib/razorpay';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
@@ -38,16 +40,68 @@ export async function POST(req: NextRequest) {
     // 1. Verify item stock & calculate server-authoritative subtotal
     let verifiedSubtotal = 0;
     for (const itm of items) {
-      if (itm.productId && mongoose.Types.ObjectId.isValid(itm.productId)) {
-        const prod = await Product.findById(itm.productId).lean();
-        if (!prod || (prod.stock !== undefined && prod.stock <= 0)) {
+      const pid = itm.productId || itm.id || itm._id;
+      if (pid && mongoose.Types.ObjectId.isValid(pid)) {
+        const prod = await Product.findById(pid).lean();
+        if (!prod || prod.status !== 'active') {
           return NextResponse.json(
-            { error: `Item "${itm.name || (prod as any)?.name || 'Product'}" is currently out of stock.` },
+            { error: `Item "${itm.name || itm.title || (prod as any)?.name || 'Product'}" is currently unavailable.` },
             { status: 400 }
           );
         }
+
+        const itemSize = String(itm.size || '').trim();
+        const itemColor = String(itm.color || '').trim();
+        const requestedQty = Number(itm.quantity) || 1;
+        let availableStock = Number(prod.stock) || 0;
+
+        if (itemSize && Array.isArray(prod.sizeAvailability) && prod.sizeAvailability.length > 0) {
+          const sizeObj = prod.sizeAvailability.find((s: any) => String(s.size).trim() === itemSize);
+          if (sizeObj) {
+            if (sizeObj.isAvailable === false || (sizeObj.stock !== undefined && sizeObj.stock <= 0)) {
+              availableStock = 0;
+            } else if (sizeObj.stock !== undefined) {
+              availableStock = Math.min(availableStock, sizeObj.stock);
+            }
+          }
+        }
+
+        if (itemColor && Array.isArray(prod.colorVariants) && prod.colorVariants.length > 0) {
+          const variantObj = prod.colorVariants.find(
+            (v: any) => String(v.name).trim().toLowerCase() === itemColor.toLowerCase()
+          );
+          if (variantObj) {
+            if (variantObj.isAvailable === false) {
+              availableStock = 0;
+            }
+            if (itemSize && Array.isArray(variantObj.sizes) && variantObj.sizes.length > 0) {
+              const vSizeObj = variantObj.sizes.find((s: any) => String(s.size).trim() === itemSize);
+              if (vSizeObj) {
+                if (vSizeObj.isAvailable === false || (vSizeObj.stock !== undefined && vSizeObj.stock <= 0)) {
+                  availableStock = 0;
+                } else if (vSizeObj.stock !== undefined) {
+                  availableStock = Math.min(availableStock, vSizeObj.stock);
+                }
+              }
+            }
+          }
+        }
+
+        if (availableStock <= 0) {
+          return NextResponse.json(
+            { error: `"${itm.name || itm.title || (prod as any)?.name || 'Product'}" ${itemSize ? `(Size: ${itemSize})` : ''} is currently out of stock.` },
+            { status: 400 }
+          );
+        }
+        if (requestedQty > availableStock) {
+          return NextResponse.json(
+            { error: `Only ${availableStock} pair(s) available for "${itm.name || itm.title || (prod as any)?.name || 'Product'}" ${itemSize ? `(Size: ${itemSize})` : ''}.` },
+            { status: 400 }
+          );
+        }
+
         const unitPrice = (prod as any).price !== undefined ? Number((prod as any).price) : Number(itm.price);
-        verifiedSubtotal += unitPrice * (Number(itm.quantity) || 1);
+        verifiedSubtotal += unitPrice * requestedQty;
       } else {
         verifiedSubtotal += (Number(itm.price) || 0) * (Number(itm.quantity) || 1);
       }

@@ -47,43 +47,51 @@ export default function CartPage() {
   const [showCoupons, setShowCoupons] = useState(false);
   const [availableCoupons, setAvailableCoupons] = useState<CouponData[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [productStockMap, setProductStockMap] = useState<Record<string, number>>({});
+  const [stockValidationErrors, setStockValidationErrors] = useState<string[]>([]);
+  const [isCheckingStock, setIsCheckingStock] = useState(false);
+  const [stockDetailsMap, setStockDetailsMap] = useState<Record<string, { isOutOfStock: boolean; availableStock: number; message?: string }>>({});
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Fetch product stocks to detect out of stock items
-  useEffect(() => {
-    if (items.length === 0) return;
-    fetch('/api/products?limit=100')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.products && Array.isArray(data.products)) {
-          const map: Record<string, number> = {};
-          data.products.forEach((p: any) => {
-            map[p._id] = p.stock !== undefined ? p.stock : 10;
-            if (p.slug) map[p.slug] = p.stock !== undefined ? p.stock : 10;
-          });
-          setProductStockMap(map);
-        }
-      })
-      .catch(() => {});
+  // Live real-time stock verification against MongoDB
+  const checkLiveStock = useCallback(async () => {
+    if (items.length === 0) {
+      setStockValidationErrors([]);
+      setStockDetailsMap({});
+      return true;
+    }
+
+    try {
+      const res = await fetch('/api/cart/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
+      const data = await res.json();
+      if (data && Array.isArray(data.stockDetails)) {
+        const detailsMap: Record<string, any> = {};
+        data.stockDetails.forEach((d: any) => {
+          const key = `${d.productId}-${d.size || ''}`;
+          detailsMap[key] = d;
+        });
+        setStockDetailsMap(detailsMap);
+        setStockValidationErrors(data.errors || []);
+        return data.valid !== false;
+      }
+    } catch (e) {
+      console.warn('Stock validation network check notice:', e);
+    }
+    return true;
   }, [items]);
 
-  const isItemOutOfStock = useCallback(
-    (item: any) => {
-      const stock = productStockMap[item.productId];
-      if (stock !== undefined) {
-        return stock <= 0;
-      }
-      return item.stock !== undefined ? item.stock <= 0 : false;
-    },
-    [productStockMap]
-  );
+  useEffect(() => {
+    checkLiveStock();
+  }, [checkLiveStock]);
 
-  const hasOutOfStockItems = items.some((item) => isItemOutOfStock(item));
+  const hasOutOfStockItems = stockValidationErrors.length > 0;
 
   // Fetch available coupons from backend
   useEffect(() => {
@@ -249,12 +257,26 @@ export default function CartPage() {
                               <span>No Return / Refund</span>
                             </span>
                           )}
-                          {isItemOutOfStock(item) && (
-                            <span className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold px-2.5 py-0.5 rounded-none uppercase tracking-wider animate-pulse">
-                              <AlertTriangle className="w-3 h-3 text-rose-600" />
-                              <span>Out of Stock</span>
-                            </span>
-                          )}
+                          {(() => {
+                            const stockInfo = stockDetailsMap[`${item.productId}-${item.size || ''}`];
+                            if (stockInfo?.isOutOfStock) {
+                              return (
+                                <span className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold px-2.5 py-0.5 rounded-none uppercase tracking-wider animate-pulse">
+                                  <AlertTriangle className="w-3 h-3 text-rose-600" />
+                                  <span>Out of Stock</span>
+                                </span>
+                              );
+                            }
+                            if (stockInfo && stockInfo.availableStock !== undefined && stockInfo.availableStock < item.quantity) {
+                              return (
+                                <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-none uppercase tracking-wider">
+                                  <AlertTriangle className="w-3 h-3 text-amber-600" />
+                                  <span>Only {stockInfo.availableStock} Available</span>
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                       </div>
 
@@ -524,33 +546,60 @@ export default function CartPage() {
 
                 {/* Checkout CTA Button */}
                 {hasOutOfStockItems ? (
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <button
                       type="button"
                       disabled
-                      className="w-full py-3 sm:py-3.5 rounded-none bg-[#ede8e1] text-[#888888] text-xs sm:text-sm font-bold tracking-wide shadow-none flex items-center justify-center gap-2 cursor-not-allowed border border-[#d8d2c8]"
+                      className="w-full py-3 sm:py-3.5 rounded-none bg-[#fcedec] text-rose-700 text-xs sm:text-sm font-bold tracking-wide shadow-none flex items-center justify-center gap-2 cursor-not-allowed border border-rose-300"
                     >
                       <AlertTriangle className="w-4 h-4 text-rose-600" />
-                      <span>Out of Stock</span>
+                      <span>Stock Unavailable</span>
                     </button>
-                    <p className="text-[11px] text-rose-600 font-semibold text-center leading-snug">
-                      One or more items in your cart are currently out of stock. Please remove them to proceed to checkout.
-                    </p>
+                    <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-[11px] space-y-1 rounded-none">
+                      <p className="font-bold flex items-center gap-1.5 text-rose-900">
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" />
+                        <span>Please update your cart to proceed:</span>
+                      </p>
+                      {stockValidationErrors.map((errMsg, i) => (
+                        <p key={i} className="pl-5 text-[10px] leading-tight text-rose-700">
+                          &bull; {errMsg}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => {
+                    disabled={isCheckingStock}
+                    onClick={async () => {
+                      setIsCheckingStock(true);
+                      const isValid = await checkLiveStock();
+                      setIsCheckingStock(false);
+
+                      if (!isValid) {
+                        showToast('⚠️ Some items are out of stock. Please adjust quantities.');
+                        return;
+                      }
+
                       if (!isLoggedIn) {
                         router.push('/login?redirect=/checkout');
                         return;
                       }
                       router.push('/checkout');
                     }}
-                    className="w-full py-3 sm:py-3.5 rounded-none bg-[#68421A] hover:bg-[#543212] text-white text-xs sm:text-sm font-bold tracking-wide shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3 sm:py-3.5 rounded-none bg-[#68421A] hover:bg-[#543212] text-white text-xs sm:text-sm font-bold tracking-wide shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                   >
-                    <Lock className="w-4 h-4 text-white" />
-                    <span>Proceed to Checkout</span>
+                    {isCheckingStock ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Verifying Stock...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4 text-white" />
+                        <span>Proceed to Checkout</span>
+                      </>
+                    )}
                   </button>
                 )}
 
