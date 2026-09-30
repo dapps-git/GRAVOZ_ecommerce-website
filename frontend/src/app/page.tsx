@@ -132,11 +132,10 @@ function AnimatedProductCard({
           className="absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
         >
           <Heart
-            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${
-              isInWishlist(product.id)
-                ? 'fill-rose-500 text-rose-500'
-                : 'text-slate-600 hover:text-rose-500'
-            }`}
+            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isInWishlist(product.id)
+              ? 'fill-rose-500 text-rose-500'
+              : 'text-slate-600 hover:text-rose-500'
+              }`}
           />
         </button>
 
@@ -144,11 +143,10 @@ function AnimatedProductCard({
         {images.map((imgUrl, idx) => (
           <div
             key={`${imgUrl}-${idx}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              idx === currentIdx
-                ? 'opacity-100 z-10 pointer-events-auto'
-                : 'opacity-0 z-0 pointer-events-none'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${idx === currentIdx
+              ? 'opacity-100 z-10 pointer-events-auto'
+              : 'opacity-0 z-0 pointer-events-none'
+              }`}
           >
             <Image
               src={imgUrl}
@@ -199,8 +197,8 @@ function AnimatedProductCard({
 
 const DEFAULT_CATEGORIES: CategoryCardData[] = [
   { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/placeholder.svg' },
-  { key: 'men',   title: 'Men',   href: '/category/men',   imageUrl: '/images/placeholder.svg' },
-  { key: 'kids',  title: 'Kids',  href: '/category/kids',  imageUrl: '/images/placeholder.svg' },
+  { key: 'men', title: 'Men', href: '/category/men', imageUrl: '/images/placeholder.svg' },
+  { key: 'kids', title: 'Kids', href: '/category/kids', imageUrl: '/images/placeholder.svg' },
 ];
 
 // ─── Page Component ───────────────────────────────────────────────────────────
@@ -307,12 +305,12 @@ export default function StorefrontHomePage() {
           // Dynamic category card images
           setCategoryCards([
             { key: 'women', title: data.banners.category_women?.title || 'Women', href: data.banners.category_women?.linkUrl || '/category/women', imageUrl: data.banners.category_women?.imageUrl || '/images/placeholder.svg' },
-            { key: 'men',   title: data.banners.category_men?.title || 'Men',   href: data.banners.category_men?.linkUrl || '/category/men',   imageUrl: data.banners.category_men?.imageUrl || '/images/placeholder.svg' },
-            { key: 'kids',  title: data.banners.category_kids?.title || 'Kids',  href: data.banners.category_kids?.linkUrl || '/category/kids',  imageUrl: data.banners.category_kids?.imageUrl || '/images/placeholder.svg' },
+            { key: 'men', title: data.banners.category_men?.title || 'Men', href: data.banners.category_men?.linkUrl || '/category/men', imageUrl: data.banners.category_men?.imageUrl || '/images/placeholder.svg' },
+            { key: 'kids', title: data.banners.category_kids?.title || 'Kids', href: data.banners.category_kids?.linkUrl || '/category/kids', imageUrl: data.banners.category_kids?.imageUrl || '/images/placeholder.svg' },
           ]);
         }
       })
-      .catch(() => {/* keep default */})
+      .catch(() => {/* keep default */ })
       .finally(() => {
         setBannerLoading(false);
         setCategoriesLoading(false);
@@ -334,7 +332,7 @@ export default function StorefrontHomePage() {
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     // 3. Products API (suggested for you — fetch up to 12 for carousel)
     fetch('/api/products?limit=12&section=suggested', { cache: 'no-store' })
@@ -351,15 +349,15 @@ export default function StorefrontHomePage() {
               imgs.push(mainImg);
             }
             return {
-              id:            p._id || `p${idx + 1}`,
-              brand:         typeof p.brand === 'object' && p.brand !== null ? p.brand.name : (p.brand || 'Gravoz'),
-              title:         p.name || p.title || '',
-              price:         p.discountPrice || p.price || 0,
+              id: p._id || `p${idx + 1}`,
+              brand: typeof p.brand === 'object' && p.brand !== null ? p.brand.name : (p.brand || 'Gravoz'),
+              title: p.name || p.title || '',
+              price: p.discountPrice || p.price || 0,
               originalPrice: p.price || p.originalPrice || 0,
-              rating:        p.rating ?? 5.0,
-              imageUrl:      mainImg,
-              images:        imgs,
-              href:          `/products/${p.slug || p._id}`,
+              rating: p.rating ?? 5.0,
+              imageUrl: mainImg,
+              images: imgs,
+              href: `/products/${p.slug || p._id}`,
               noReturnRefundExchange: Boolean(p.noReturnRefundExchange),
             };
           });
@@ -379,38 +377,37 @@ export default function StorefrontHomePage() {
 
       {/* 2. Main Body Content (Overall Pure White Background & Wide Container) */}
       <main className="flex-1 max-w-[1530px] w-full mx-auto px-4 sm:px-8 md:px-20 lg:px-28 pt-0 pb-6 md:pb-10 space-y-6 sm:space-y-10 bg-white">
-        
+
         {/* A. Top Hero Banner Card — 2s Continuous Seamless Crossfade */}
         {bannerLoading ? (
           <SkeletonBannerHero />
         ) : (
-        <section
-          className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[1816/866] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white"
-        >
-          {heroSlides.map((slide, idx) => {
-            const isActive = idx === currentHeroSlide;
-            return (
-              <Link
-                key={slide.id}
-                href={slide.linkUrl}
-                tabIndex={isActive ? 0 : -1}
-                aria-hidden={!isActive}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                  isActive ? 'opacity-100 pointer-events-auto z-10' : 'opacity-0 pointer-events-none z-0'
-                }`}
-              >
-                <Image
-                  src={slide.imageUrl}
-                  alt={slide.title || 'GRAVOZ Footwear Banner'}
-                  fill
-                  priority={idx === 0}
-                  sizes="100vw"
-                  className="object-cover object-center group-hover:scale-[1.015] transition-transform duration-700"
-                />
-              </Link>
-            );
-          })}
-        </section>
+          <section
+            className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[1816/866] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white"
+          >
+            {heroSlides.map((slide, idx) => {
+              const isActive = idx === currentHeroSlide;
+              return (
+                <Link
+                  key={slide.id}
+                  href={slide.linkUrl}
+                  tabIndex={isActive ? 0 : -1}
+                  aria-hidden={!isActive}
+                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 pointer-events-auto z-10' : 'opacity-0 pointer-events-none z-0'
+                    }`}
+                >
+                  <Image
+                    src={slide.imageUrl}
+                    alt={slide.title || 'GRAVOZ Footwear Banner'}
+                    fill
+                    priority={idx === 0}
+                    sizes="100vw"
+                    className="object-cover object-center group-hover:scale-[1.015] transition-transform duration-700"
+                  />
+                </Link>
+              );
+            })}
+          </section>
         )}
 
         {/* B. 3 Category Cards Section (Women, Men, Kids in 1 row on mobile & desktop) */}
@@ -418,70 +415,70 @@ export default function StorefrontHomePage() {
           {categoriesLoading
             ? [0, 1, 2].map((i) => <SkeletonCategoryCard key={i} />)
             : categoryCards.map((card) => (
-            <Link
-              key={card.key}
-              href={card.href}
-              className="group flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e2d8] shadow-2xs hover:shadow-md transition-all bg-[#f4f2ee]"
-            >
-              <div className="relative aspect-[3/4] sm:aspect-[4/5] w-full bg-[#f4f2ee] overflow-hidden">
-                <Image
-                  src={card.imageUrl}
-                  alt={`${card.title} Footwear Collection`}
-                  fill
-                  sizes="(max-width: 768px) 33vw, 33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="bg-[#f4f2ee] px-2.5 sm:px-4 md:px-5 py-2 sm:py-3.5 flex items-center justify-between border-t border-[#e8e2d8]">
-                <span className="text-[11px] sm:text-sm md:text-base font-semibold text-[#030303] truncate">
-                  {card.title}
-                </span>
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#030303] group-hover:translate-x-1 transition-transform flex-shrink-0" />
-              </div>
-            </Link>
-          ))}
+              <Link
+                key={card.key}
+                href={card.href}
+                className="group flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e2d8] shadow-2xs hover:shadow-md transition-all bg-[#f4f2ee]"
+              >
+                <div className="relative aspect-[3/4] sm:aspect-[4/5] w-full bg-[#f4f2ee] overflow-hidden">
+                  <Image
+                    src={card.imageUrl}
+                    alt={`${card.title} Footwear Collection`}
+                    fill
+                    sizes="(max-width: 768px) 33vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="bg-[#f4f2ee] px-2.5 sm:px-4 md:px-5 py-2 sm:py-3.5 flex items-center justify-between border-t border-[#e8e2d8]">
+                  <span className="text-[11px] sm:text-sm md:text-base font-semibold text-[#030303] truncate">
+                    {card.title}
+                  </span>
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#030303] group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                </div>
+              </Link>
+            ))}
         </section>
 
         {/* C. "Suggested for You" Products Section (Only displays when products exist in DB) */}
         {(productsLoading || products.length > 0) && (
-        <section className="space-y-4 pt-2">
-          {/* Header Row: Centered title, arrows pinned right on desktop only */}
-          <div className="relative flex items-center justify-center">
-            <h2 className="font-poppins font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#111111] uppercase text-center px-4">
-              Suggested for You
-            </h2>
-            {/* Circular Carousel Controls (< >) — pinned right (Desktop only to prevent mobile overlap) */}
-            <div className="hidden sm:flex absolute right-0 items-center gap-2">
-              <button
-                type="button"
-                aria-label="Previous Product"
-                onClick={() => {
-                  const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
-                  setCarouselPage((p) => (p > 0 ? p - 1 : maxP));
-                }}
-                className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
-              >
-                <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
-              </button>
-              <button
-                type="button"
-                aria-label="Next Product"
-                onClick={() => {
-                  const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
-                  setCarouselPage((p) => (p < maxP ? p + 1 : 0));
-                }}
-                className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
-              >
-                <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
-              </button>
+          <section className="space-y-4 pt-2">
+            {/* Header Row: Centered title, arrows pinned right on desktop only */}
+            <div className="relative flex items-center justify-center">
+              <h2 className="font-poppins font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#111111] uppercase text-center px-4">
+                Suggested for You
+              </h2>
+              {/* Circular Carousel Controls (< >) — pinned right (Desktop only to prevent mobile overlap) */}
+              <div className="hidden sm:flex absolute right-0 items-center gap-2">
+                <button
+                  type="button"
+                  aria-label="Previous Product"
+                  onClick={() => {
+                    const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
+                    setCarouselPage((p) => (p > 0 ? p - 1 : maxP));
+                  }}
+                  className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
+                >
+                  <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next Product"
+                  onClick={() => {
+                    const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
+                    setCarouselPage((p) => (p < maxP ? p + 1 : 0));
+                  }}
+                  className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
+                >
+                  <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-            {productsLoading
-              ? [0, 1, 2, 3].map((i) => <SkeletonProductCard key={i} />)
-              : (products.length > 4
+            {/* Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+              {productsLoading
+                ? [0, 1, 2, 3].map((i) => <SkeletonProductCard key={i} />)
+                : (products.length > 4
                   ? products.slice(carouselPage * 4, carouselPage * 4 + 4)
                   : products
                 ).map((product) => (
@@ -492,8 +489,8 @@ export default function StorefrontHomePage() {
                     toggleWishlist={toggleWishlist}
                   />
                 ))}
-          </div>
-        </section>
+            </div>
+          </section>
         )}
 
         {/* Dynamic Behavioral Recommendation Strip (You May Also Like) */}
@@ -572,17 +569,17 @@ export default function StorefrontHomePage() {
 
         {/* F. Promotional Banner (Comfort Sandal) — dynamic from admin */}
         {(banners.comfort_sandal?.imageUrl) && (
-        <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3076/1208] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
-          <Link href="/products" className="block w-full h-full cursor-pointer">
-            <Image
-              src={banners.comfort_sandal.imageUrl}
-              alt="GRAVOZ Comfort Sandal Banner"
-              fill
-              sizes="100vw"
-              className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
-            />
-          </Link>
-        </section>
+          <section className="relative w-[calc(100%+2rem)] sm:w-[calc(100%+4rem)] md:w-[calc(100%+10rem)] lg:w-[calc(100%+14rem)] aspect-[3076/1208] -mx-4 sm:-mx-8 md:-mx-20 lg:-mx-28 overflow-hidden group bg-white">
+            <Link href="/products" className="block w-full h-full cursor-pointer">
+              <Image
+                src={banners.comfort_sandal.imageUrl}
+                alt="GRAVOZ Comfort Sandal Banner"
+                fill
+                sizes="100vw"
+                className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
+              />
+            </Link>
+          </section>
         )}
 
         {/* G. Best Sellers Curated Showcase (Matching Screenshot Layout) */}
@@ -700,7 +697,7 @@ export default function StorefrontHomePage() {
 
           {/* 2 Testimonial Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-5xl mx-auto">
-            
+
             {/* Card 1 — Hashim */}
             <div className="bg-white border border-[#e8e2d8] rounded-2xl p-6 sm:p-7 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between space-y-4">
               <div className="flex items-center justify-between">
@@ -777,11 +774,11 @@ export default function StorefrontHomePage() {
 
       {/* 3. Rich Premium Footer Section */}
       <footer className="w-full bg-white mt-10">
-        
+
         {/* Black Feature Highlights Strip with 4 White Cards (2 in 1 row on mobile, 4 on desktop) */}
         <div className="w-full bg-[#030303] py-6 sm:py-10 px-3 sm:px-8 md:px-20 lg:px-28">
           <div className="max-w-[1530px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
-            
+
             {/* Feature 1: Delivery & Shipping */}
             <div className="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 md:p-6 flex flex-col justify-between shadow-sm min-h-[125px] sm:min-h-[145px]">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#f4f2ee] border border-[#e8e2d8] flex items-center justify-center text-[#030303] mb-2 sm:mb-3 flex-shrink-0">
@@ -848,7 +845,7 @@ export default function StorefrontHomePage() {
         {/* Main Footer Links & Branding */}
         <div className="max-w-[1530px] mx-auto px-4 sm:px-8 md:px-20 lg:px-28 pt-12 pb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1.2fr_1fr] gap-8 sm:gap-10">
-            
+
             {/* Brand column */}
             <div className="space-y-4 max-w-sm">
               <div className="flex items-center gap-2">
@@ -937,7 +934,7 @@ export default function StorefrontHomePage() {
           {/* Bottom Copyright & Payment Methods */}
           <div className="border-t border-[#e8e2d8] mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-sansation text-xs text-slate-500">
             <p>© 2026 Gravoz. All Rights Reserved.</p>
-            
+
             {/* Payment Icons */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="bg-[#003087] text-white font-bold text-[10px] px-2 py-0.5 rounded tracking-wider flex items-center gap-0.5">

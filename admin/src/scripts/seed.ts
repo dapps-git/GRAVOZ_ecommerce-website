@@ -8,11 +8,11 @@ async function seed() {
   await mongoose.connect(MONGODB_URI);
 
   const db = mongoose.connection;
-  
+
   // 1. Seed Admin
   const adminEmail = process.env.ADMIN_EMAIL || 'gravoxshopadmin@gmail.com';
   const rawAdminPass = process.env.ADMIN_PASSWORD || 'admin123456';
-  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || 
+  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH ||
     (rawAdminPass.startsWith('$2') ? rawAdminPass : await bcrypt.hash(rawAdminPass, 10));
 
   await db.collection('admins').deleteMany({});
@@ -27,6 +27,12 @@ async function seed() {
   console.log(`✔ Super Admin created: ${adminEmail}`);
 
   // 2. Seed Categories
+
+
+
+
+
+
   await db.collection('categories').deleteMany({});
   const menCat = await db.collection('categories').insertOne({
     name: "Men's Footwear",

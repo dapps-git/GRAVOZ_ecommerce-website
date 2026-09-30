@@ -41,7 +41,14 @@ interface ProductItem {
   noReturnRefundExchange?: boolean;
   images: Array<{ url: string; alt?: string }>;
   colors?: string[];
-  colorVariants?: Array<{ name: string; colorCode?: string }>;
+  colorVariants?: Array<{
+    name: string;
+    colorCode?: string;
+    imageUrl?: string;
+    images?: Array<{ url: string; alt?: string }>;
+    sizes?: Array<{ size: string; isAvailable?: boolean; stock?: number }>;
+    isAvailable?: boolean;
+  }>;
   sizes?: string[];
   status: string;
   category?: { _id: string; name: string } | string;
