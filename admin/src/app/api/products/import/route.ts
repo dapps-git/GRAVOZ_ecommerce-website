@@ -179,12 +179,41 @@ export async function POST(req: NextRequest) {
         isAvailable: boolean;
       }> = [];
 
-      // 1. Check for dedicated color columns (e.g. "Brown Image 1" .. "Brown Image 5", "Black Image 1" .. "Black Image 5")
+      // 1. Check for dedicated color columns:
+      // - Method 1: Single bulk column per color (e.g. "Brown Images", "Black Images", "Tan Images", "Brown Photos", etc.)
+      // - Granular columns (e.g. "Brown Image 1" .. "Brown Image 5", etc.)
+      const processedColors = new Set<string>();
+
+      // First check all colors specified in colors list
       for (const cName of colors) {
         const cleanColorPrefix = cName.toLowerCase().replace(/[^a-z0-9]/g, '');
         const cImages: Array<{ url: string; alt: string }> = [];
 
-        // Check columns like brownimage1..5, brownimg1..5, brownimages, etc.
+        // Check bulk column like brownimages, brownphotos, brownimage, brownurls
+        const bulkKeys = [
+          `${cleanColorPrefix}images`,
+          `${cleanColorPrefix}photos`,
+          `${cleanColorPrefix}image`,
+          `${cleanColorPrefix}photo`,
+          `${cleanColorPrefix}urls`,
+          `${cleanColorPrefix}url`,
+        ];
+        for (const bKey of bulkKeys) {
+          const bulkVal = normalizedRow[bKey];
+          if (bulkVal && typeof bulkVal === 'string') {
+            const bulkUrls = bulkVal
+              .split(/[,;\n\r]+/)
+              .map((u) => u.trim())
+              .filter((u) => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+            for (const u of bulkUrls) {
+              if (!cImages.some((img) => img.url === u)) {
+                cImages.push({ url: u, alt: `${name} ${cName} - view ${cImages.length + 1}` });
+              }
+            }
+          }
+        }
+
+        // Also check numbered columns like brownimage1..10, brownimg1..10
         for (let i = 1; i <= 10; i++) {
           const possibleKeys = [
             `${cleanColorPrefix}image${i}`,
@@ -194,20 +223,9 @@ export async function POST(req: NextRequest) {
           for (const key of possibleKeys) {
             const val = normalizedRow[key];
             if (val && typeof val === 'string' && (val.startsWith('http') || val.startsWith('/'))) {
-              if (!cImages.some(img => img.url === val.trim())) {
+              if (!cImages.some((img) => img.url === val.trim())) {
                 cImages.push({ url: val.trim(), alt: `${name} ${cName} - view ${cImages.length + 1}` });
               }
-            }
-          }
-        }
-
-        // Check bulk column like brownimages
-        const bulkVal = normalizedRow[`${cleanColorPrefix}images`] || normalizedRow[`${cleanColorPrefix}image`];
-        if (bulkVal && typeof bulkVal === 'string') {
-          const bulkUrls = bulkVal.split(/[,;\n]+/).map(u => u.trim()).filter(u => u.startsWith('http') || u.startsWith('/'));
-          for (const u of bulkUrls) {
-            if (!cImages.some(img => img.url === u)) {
-              cImages.push({ url: u, alt: `${name} ${cName} - view ${cImages.length + 1}` });
             }
           }
         }
@@ -219,6 +237,40 @@ export async function POST(req: NextRequest) {
             images: cImages,
             isAvailable: true,
           });
+          processedColors.add(cName.toLowerCase());
+        }
+      }
+
+      // Auto-discover any additional color columns in the row (e.g. "Tan Images", "Navy Images", etc.)
+      for (const [rowKey, rowVal] of Object.entries(normalizedRow)) {
+        if (typeof rowVal === 'string' && (rowVal.startsWith('http') || rowVal.startsWith('/'))) {
+          const match = rowKey.match(/^([a-z]+)(images|photos|image|photo)$/);
+          if (match && match[1] && !['product', 'item', 'main', 'sub', 'brand', 'cat'].includes(match[1])) {
+            const detectedColorRaw = match[1];
+            if (!processedColors.has(detectedColorRaw) && !['img', 'image', 'photo', 'images', 'photos'].includes(detectedColorRaw)) {
+              const detectedColor = detectedColorRaw.charAt(0).toUpperCase() + detectedColorRaw.slice(1);
+              const extraUrls = rowVal
+                .split(/[,;\n\r]+/)
+                .map((u) => u.trim())
+                .filter((u) => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+              if (extraUrls.length > 0) {
+                const variantImgs = extraUrls.map((u, idx) => ({
+                  url: u,
+                  alt: `${name} ${detectedColor} - view ${idx + 1}`,
+                }));
+                colorVariants.push({
+                  name: detectedColor,
+                  imageUrl: variantImgs[0].url,
+                  images: variantImgs,
+                  isAvailable: true,
+                });
+                processedColors.add(detectedColorRaw);
+                if (!colors.includes(detectedColor)) {
+                  colors.push(detectedColor);
+                }
+              }
+            }
+          }
         }
       }
 
