@@ -239,7 +239,7 @@ export async function sendRepurchaseEmail(payload: RepurchaseEmailPayload): Prom
   if (!smtpEmail || !smtpPassword) {
     return {
       success: true,
-      message: `Demo email generated for ${payload.toEmail} (${payload.type || '3_months'}). Preview is ready!`,
+      message: `Email preview generated for ${payload.toEmail} (${payload.type || '3_months'}). SMTP credentials not configured.`,
       previewHtml: html,
     };
   }

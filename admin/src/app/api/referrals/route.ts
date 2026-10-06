@@ -67,6 +67,16 @@ export async function GET(req: Request) {
         ...(ordersByCustomerEmail.get(refUserEmail) || []),
       ].filter((v, idx, arr) => arr.findIndex((t) => String(t._id) === String(v._id)) === idx);
 
+      const hasCompleted = userOrders.some(
+        (ord) =>
+          (ord.paymentMethod !== 'COD' && ord.paymentStatus === 'paid') ||
+          ord.orderStatus === 'delivered'
+      );
+      const isPendingDelivery = userOrders.some(
+        (ord) =>
+          ord.paymentMethod === 'COD' &&
+          !['delivered', 'cancelled', 'returned', 'refunded'].includes(ord.orderStatus)
+      );
       const hasPurchased = userOrders.length > 0;
       const firstOrder = userOrders.length > 0 ? userOrders[userOrders.length - 1] : null;
       const latestOrder = userOrders.length > 0 ? userOrders[0] : null;
@@ -84,19 +94,31 @@ export async function GET(req: Request) {
         }))
       );
 
+      const effectiveStatus = ref.rewardIssued || hasCompleted
+        ? 'completed'
+        : isPendingDelivery
+        ? 'purchased'
+        : ref.status === 'cancelled'
+        ? 'cancelled'
+        : 'pending';
+
       const key = `${String((ref.referrer as any)._id)}_${refUserId}`;
       processedReferralMap.set(key, {
         _id: String(ref._id),
         referralCode: ref.referralCode,
         referrer: ref.referrer,
         referredUser: ref.referredUser,
-        status: hasPurchased ? 'completed' : ref.status || 'pending',
+        status: effectiveStatus,
+        rewardIssued: Boolean(ref.rewardIssued || (ref.rewardAmount && hasCompleted)),
+        rewardIssuedAt: ref.rewardIssuedAt || null,
         referredDiscountPercent: ref.referredDiscountPercent || 15,
         referredDiscountUsed: ref.referredDiscountUsed || hasPurchased,
         referrerDiscountAmount: ref.referrerDiscountAmount || 100,
-        referrerDiscountAvailable: ref.referrerDiscountAvailable || hasPurchased,
+        referrerDiscountAvailable: Boolean(ref.rewardIssued || hasCompleted),
         referrerDiscountUsed: ref.referrerDiscountUsed || false,
         hasPurchased,
+        hasCompleted,
+        isPendingDelivery,
         ordersCount: userOrders.length,
         totalPurchasedAmount,
         firstOrder: firstOrder
@@ -266,12 +288,18 @@ export async function GET(req: Request) {
     // 8. Calculate Overall Referral Performance KPIs
     const allReferralsArray = Array.from(processedReferralMap.values());
     const totalReferredUsers = allReferralsArray.length;
-    const purchasedReferrals = allReferralsArray.filter((r) => r.hasPurchased);
-    const totalPurchasedUsers = purchasedReferrals.length;
+    const totalReferralLinksGenerated = await Customer.countDocuments({
+      referralEligible: true,
+      referralCode: { $exists: true, $ne: '' },
+    });
+    const completedReferrals = allReferralsArray.filter((r) => r.status === 'completed' || r.rewardIssued).length;
+    const pendingReferrals = allReferralsArray.filter((r) => r.status !== 'completed' && !r.rewardIssued).length;
     const conversionRate =
-      totalReferredUsers > 0 ? ((totalPurchasedUsers / totalReferredUsers) * 100).toFixed(1) : '0';
-    const totalReferralRevenue = purchasedReferrals.reduce((sum, r) => sum + r.totalPurchasedAmount, 0);
-    const totalRewardsCredited = purchasedReferrals.length * 100; // ₹100 per successful purchased referral
+      totalReferredUsers > 0 ? ((completedReferrals / totalReferredUsers) * 100).toFixed(1) : '0';
+    const totalReferralRevenue = allReferralsArray
+      .filter((r) => r.hasPurchased)
+      .reduce((sum, r) => sum + r.totalPurchasedAmount, 0);
+    const totalRewardsCredited = completedReferrals * 100; // ₹100 per completed referral
 
     // 9. Aggregate Top Referrers Leaderboard
     const referrerStatsMap = new Map<string, any>();
@@ -308,9 +336,11 @@ export async function GET(req: Request) {
     return NextResponse.json({
       success: true,
       stats: {
+        totalReferralLinksGenerated,
         totalReferredUsers,
-        totalPurchasedUsers,
-        pendingPurchases: totalReferredUsers - totalPurchasedUsers,
+        totalSuccessfulReferrals: completedReferrals,
+        completedReferrals,
+        pendingReferrals,
         conversionRate,
         totalReferralRevenue,
         totalRewardsCredited,

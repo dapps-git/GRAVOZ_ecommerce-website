@@ -78,7 +78,7 @@ export default function Footer() {
 
       {/* 2. Main Footer Links & Branding */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-16 lg:px-24 pt-10 pb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1.2fr_1fr] gap-8 sm:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr] gap-8 sm:gap-10">
 
           {/* Brand column */}
           <div className="space-y-3.5 max-w-sm">
@@ -105,20 +105,6 @@ export default function Footer() {
               <li><Link href="/category/men" className="hover:text-[#89591C] transition-colors">Men Shoes</Link></li>
               <li><Link href="/category/women" className="hover:text-[#89591C] transition-colors">Women Shoes</Link></li>
               <li><Link href="/category/unisex" className="hover:text-[#89591C] transition-colors">Unisex</Link></li>
-            </ul>
-          </div>
-
-          {/* POLICIES Column */}
-          <div className="space-y-2.5">
-            <h5 className="font-sansation font-bold text-xs uppercase tracking-wider text-[#030303]">
-              POLICIES
-            </h5>
-            <ul className="space-y-2 font-sansation text-xs text-slate-600">
-              <li><Link href="/terms" className="hover:text-[#89591C] transition-colors">Terms & Conditions</Link></li>
-              <li><Link href="/privacy" className="hover:text-[#89591C] transition-colors">Privacy policy</Link></li>
-              <li><Link href="/refund" className="hover:text-[#89591C] transition-colors">Return & Refund</Link></li>
-              <li><Link href="/shipping" className="hover:text-[#89591C] transition-colors">Shipping & Delivery</Link></li>
-              <li><Link href="/faq" className="hover:text-[#89591C] transition-colors">FAQ</Link></li>
             </ul>
           </div>
 

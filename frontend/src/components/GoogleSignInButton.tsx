@@ -78,31 +78,7 @@ export default function GoogleSignInButton({
 
   const handleGoogleClick = () => {
     if (!clientId) {
-      // If Google Client ID is not yet entered in .env.local, prompt the user with clear instructions
-      const demoEmail = prompt(
-        'Google OAuth Client ID is not configured yet.\n\nTo test Google login right now, enter any email (e.g. yourname@gmail.com):',
-        'customer@gmail.com'
-      );
-      if (demoEmail) {
-        if (setIsSubmitting) setIsSubmitting(true);
-        loginWithGoogle({
-          email: demoEmail.trim(),
-          name: demoEmail.split('@')[0],
-          googleId: 'demo-google-' + Date.now(),
-          referralCode,
-        }).then((res) => {
-          if (res.success && res.user) {
-            playSuccessSound();
-            onSuccess(res.user);
-          } else {
-            onError(res.error || 'Google login failed');
-          }
-        }).catch((err) => {
-          onError(err.message || 'Google authentication error');
-        }).finally(() => {
-          if (setIsSubmitting) setIsSubmitting(false);
-        });
-      }
+      onError('Google Sign-in service is currently not configured. Please sign in using your email and password.');
       return;
     }
 

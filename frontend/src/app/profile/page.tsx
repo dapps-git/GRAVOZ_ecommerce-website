@@ -119,6 +119,7 @@ export default function ProfilePage() {
 
   // Referral State
   const [referralData, setReferralData] = useState<{
+    referralEligible?: boolean;
     referralCode?: string;
     referralLink?: string;
     referralDiscountBalance?: number;
@@ -281,14 +282,14 @@ export default function ProfilePage() {
       saveSavedAddresses(updatedList);
     } else if (address) {
       const newAddr: SavedAddress = {
-        id: 'default-' + Date.now(),
-        name: name || 'Default User',
-        phone: phone || '',
+        id: 'addr-' + Date.now(),
+        name: name || user?.name || '',
+        phone: phone || user?.phone || '',
         street: parsed.street || address,
-        city: parsed.city || 'Calicut',
-        state: parsed.state || 'Kerala',
-        postalCode: parsed.postalCode || '673001',
-        country: 'India',
+        city: parsed.city || '',
+        state: parsed.state || '',
+        postalCode: parsed.postalCode || '',
+        country: parsed.country || 'India',
         isDefault: true,
       };
       saveSavedAddresses([newAddr]);
@@ -805,100 +806,130 @@ export default function ProfilePage() {
                       Total ₹{referralData?.stats?.totalRewardsEarned ?? 0} earned to date
                     </p>
                   </div>
-                </div>
-
-                {/* Shareable Code & Link Box */}
-                <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 shadow-2xs space-y-5">
-                  <div className="border-b border-[#f0ece5] pb-3">
-                    <h4 className="text-sm sm:text-base font-bold text-[#030303]">Share Your Referral</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Send your link or unique code directly to friends. Your code will be pre-filled automatically.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                    {/* Unique Referral Code */}
-                    <div className="lg:col-span-5 space-y-2">
-                      <label className="text-xs font-semibold text-slate-700 block">Your Referral Code</label>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-4 py-2.5 flex items-center justify-center font-mono font-bold text-base text-[#030303] tracking-wider select-all">
-                          {referralData?.referralCode || user?.referralCode || 'AIFA100'}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const code = referralData?.referralCode || user?.referralCode || '';
-                            if (code) {
-                              navigator.clipboard.writeText(code);
-                              setCopiedCode(true);
-                              showToast('Referral code copied to clipboard!');
-                              setTimeout(() => setCopiedCode(false), 2000);
-                            }
-                          }}
-                          className="h-11 px-4 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
-                        >
-                          {copiedCode ? (
-                            <><CheckCheck className="w-4 h-4" /> Copied</>
-                          ) : (
-                            <><Copy className="w-4 h-4" /> Copy Code</>
-                          )}
-                        </button>
-                      </div>
+                      {/* Shareable Code & Link Box or Eligibility Unlock Card */}
+                {referralData?.referralEligible && (referralData?.referralCode || user?.referralCode) ? (
+                  <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 shadow-2xs space-y-5">
+                    <div className="border-b border-[#f0ece5] pb-3">
+                      <h4 className="text-sm sm:text-base font-bold text-[#030303]">Share Your Referral</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Send your link or unique code directly to friends. Your code will give them 15% off.
+                      </p>
                     </div>
 
-                    {/* Shareable Referral Link */}
-                    <div className="lg:col-span-7 space-y-2">
-                      <label className="text-xs font-semibold text-slate-700 block">Your Shareable Link</label>
-                      <div className="flex flex-col sm:flex-row items-stretch gap-2">
-                        <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-3.5 py-2.5 text-xs text-slate-700 font-mono truncate select-all flex items-center">
-                          {referralData?.referralLink ||
-                            (typeof window !== 'undefined'
-                              ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
-                              : `https://gravoz.in/register?ref=${referralData?.referralCode || user?.referralCode || ''}`)}
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                      {/* Unique Referral Code */}
+                      <div className="lg:col-span-5 space-y-2">
+                        <label className="text-xs font-semibold text-slate-700 block">Your Referral Code</label>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-4 py-2.5 flex items-center justify-center font-mono font-bold text-base text-[#030303] tracking-wider select-all">
+                            {referralData?.referralCode || user?.referralCode}
+                          </div>
                           <button
                             type="button"
                             onClick={() => {
-                              const link =
-                                referralData?.referralLink ||
-                                `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`;
-                              navigator.clipboard.writeText(link);
-                              setCopiedLink(true);
-                              showToast('Referral link copied to clipboard!');
-                              setTimeout(() => setCopiedLink(false), 2000);
+                              const code = referralData?.referralCode || user?.referralCode || '';
+                              if (code) {
+                                navigator.clipboard.writeText(code);
+                                setCopiedCode(true);
+                                showToast('Referral code copied to clipboard!');
+                                setTimeout(() => setCopiedCode(false), 2000);
+                              }
                             }}
-                            className="flex-1 sm:flex-initial h-11 px-3.5 bg-white border border-[#e5e5e5] hover:bg-slate-50 text-slate-800 font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            className="h-11 px-4 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
                           >
-                            {copiedLink ? (
-                              <><CheckCheck className="w-4 h-4 text-emerald-600" /> Copied</>
+                            {copiedCode ? (
+                              <><CheckCheck className="w-4 h-4" /> Copied</>
                             ) : (
-                              <><Copy className="w-4 h-4 text-slate-600" /> Copy Link</>
+                              <><Copy className="w-4 h-4" /> Copy Code</>
                             )}
                           </button>
+                        </div>
+                      </div>
 
-                          <a
-                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                              `Hey! Use my referral code ${
-                                referralData?.referralCode || user?.referralCode || ''
-                              } to get 15% OFF on premium footwear at GRAVOZ: ${
-                                referralData?.referralLink ||
-                                `${typeof window !== 'undefined' ? window.location.origin : 'https://gravoz.in'}/register?ref=${
+                      {/* Shareable Referral Link */}
+                      <div className="lg:col-span-7 space-y-2">
+                        <label className="text-xs font-semibold text-slate-700 block">Your Shareable Link</label>
+                        <div className="flex flex-col sm:flex-row items-stretch gap-2">
+                          <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-3.5 py-2.5 text-xs text-slate-700 font-mono truncate select-all flex items-center">
+                            {referralData?.referralLink ||
+                              (typeof window !== 'undefined'
+                                ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
+                                : `/register?ref=${referralData?.referralCode || user?.referralCode || ''}`)}
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const link =
+                                  referralData?.referralLink ||
+                                  (typeof window !== 'undefined'
+                                    ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
+                                    : '');
+                                if (link) {
+                                  navigator.clipboard.writeText(link);
+                                  setCopiedLink(true);
+                                  showToast('Referral link copied to clipboard!');
+                                  setTimeout(() => setCopiedLink(false), 2000);
+                                }
+                              }}
+                              className="flex-1 sm:flex-initial h-11 px-3.5 bg-white border border-[#e5e5e5] hover:bg-slate-50 text-slate-800 font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              {copiedLink ? (
+                                <><CheckCheck className="w-4 h-4 text-emerald-600" /> Copied</>
+                              ) : (
+                                <><Copy className="w-4 h-4 text-slate-600" /> Copy Link</>
+                              )}
+                            </button>
+
+                            <a
+                              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                                `Hey! Use my referral code ${
                                   referralData?.referralCode || user?.referralCode || ''
+                                } to get 15% OFF on premium footwear: ${
+                                  referralData?.referralLink ||
+                                  (typeof window !== 'undefined'
+                                    ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
+                                    : '')
                                 }`
-                              }`
-                            )}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 sm:flex-initial h-11 px-3.5 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                          >
-                            <Share2 className="w-4 h-4" /> Share
-                          </a>
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 sm:flex-initial h-11 px-3.5 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              <Share2 className="w-4 h-4" /> Share
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-5 sm:p-6 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[#89591C]/10 text-[#89591C] flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Gift className="w-5 h-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm sm:text-base font-bold text-[#030303]">Unlock Your Referral Link</h4>
+                        <p className="text-xs text-slate-600 leading-relaxed">
+                          Your unique referral link is generated after completing your <strong>first qualifying purchase of ₹999 or above</strong>.
+                        </p>
+                        <p className="text-[11px] text-slate-500 pt-1">
+                          • <strong>Online Payments (UPI/Card):</strong> Unlocks immediately upon payment confirmation.<br />
+                          • <strong>Cash on Delivery (COD):</strong> Unlocks once your order is successfully delivered.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="pt-2 flex justify-start">
+                      <Link
+                        href="/"
+                        className="px-5 py-2.5 bg-[#89591C] hover:bg-[#724a17] text-white text-xs font-bold rounded-lg transition-colors inline-block"
+                      >
+                        Shop Footwear (Min ₹999)
+                      </Link>
+                    </div>
+                  </div>
+                )}              </div>
 
                 {/* 3-Step How It Works Guide */}
                 <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 space-y-4">

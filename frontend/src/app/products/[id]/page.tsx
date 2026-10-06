@@ -939,6 +939,26 @@ export default function ProductInnerPage() {
                 <div className="flex items-center gap-3">
                   {activeColorVariants.map((variant) => {
                     const isSelected = selectedColor.toLowerCase() === variant.name.toLowerCase();
+                    const vName = (variant.name || '').trim().toLowerCase();
+                    let swatchColor = variant.colorCode;
+
+                    // If colorCode is #000000 or missing, map real leather tones based on name
+                    if (!swatchColor || swatchColor === '#000000' || swatchColor === '#1a1a1a') {
+                      if (vName.includes('tan')) swatchColor = '#C19A6B';
+                      else if (vName.includes('dark brown')) swatchColor = '#4B3621';
+                      else if (vName.includes('brown') || vName.includes('coffee')) swatchColor = '#8B4513';
+                      else if (vName.includes('camel')) swatchColor = '#C19A6B';
+                      else if (vName.includes('cognac')) swatchColor = '#9B4400';
+                      else if (vName.includes('beige')) swatchColor = '#F5F5DC';
+                      else if (vName.includes('burgundy')) swatchColor = '#800020';
+                      else if (vName.includes('maroon')) swatchColor = '#800000';
+                      else if (vName.includes('navy') || vName.includes('blue')) swatchColor = '#1E3A8A';
+                      else if (vName.includes('white')) swatchColor = '#FFFFFF';
+                      else if (vName.includes('grey') || vName.includes('gray')) swatchColor = '#808080';
+                      else if (vName.includes('olive') || vName.includes('green')) swatchColor = '#556B2F';
+                      else swatchColor = '#1C1C1C';
+                    }
+
                     return (
                       <button
                         key={variant.name}
@@ -953,7 +973,7 @@ export default function ProductInnerPage() {
                       >
                         <span
                           className="w-full h-full rounded-full border border-black/15 shadow-inner"
-                          style={{ backgroundColor: variant.colorCode || '#1a1a1a' }}
+                          style={{ backgroundColor: swatchColor }}
                         />
                       </button>
                     );

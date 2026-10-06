@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Order } from '@/models/Order';
 import { invalidateCache } from '@/lib/redis';
+import { syncReferralLifecycleOnStatusChange } from '@/lib/referral';
 
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
@@ -30,6 +31,8 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
+    const previousStatus = existingOrder.orderStatus;
+
     if (orderStatus) existingOrder.orderStatus = orderStatus;
     if (paymentStatus) existingOrder.paymentStatus = paymentStatus;
     if (location !== undefined && location.trim()) existingOrder.currentLocation = location.trim();
@@ -46,6 +49,17 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
 
     await existingOrder.save();
     await invalidateCache('admin:dashboard:stats');
+
+    // Trigger referral lifecycle when status changes (especially delivered/cancelled)
+    if (orderStatus && orderStatus !== previousStatus) {
+      try {
+        await syncReferralLifecycleOnStatusChange(existingOrder, orderStatus);
+      } catch (refErr) {
+        console.error('[REFERRAL] Lifecycle sync error in admin order PUT:', refErr);
+        // Non-fatal — order update already saved
+      }
+    }
+
     return NextResponse.json({ success: true, order: existingOrder });
   } catch (error: unknown) {
     const err = error as Error;

@@ -4,11 +4,16 @@ export interface IReferral extends Document {
   referrer: mongoose.Types.ObjectId;
   referredUser: mongoose.Types.ObjectId;
   referralCode: string;
-  status: 'pending' | 'completed' | 'cancelled';
+  status: 'pending' | 'purchased' | 'delivered' | 'completed' | 'reward_issued' | 'cancelled';
   referredDiscountPercent: number;
   referredDiscountUsed: boolean;
+  referredDiscountApplied?: boolean;
   referredOrderId?: mongoose.Types.ObjectId;
+  qualifyingOrderId?: mongoose.Types.ObjectId;
   referrerDiscountAmount: number;
+  rewardAmount: number;
+  rewardIssued: boolean;
+  rewardIssuedAt?: Date;
   referrerDiscountAvailable: boolean;
   referrerDiscountUsed: boolean;
   referrerOrderId?: mongoose.Types.ObjectId;
@@ -40,7 +45,7 @@ const ReferralSchema = new Schema<IReferral>(
     },
     status: {
       type: String,
-      enum: ['pending', 'completed', 'cancelled'],
+      enum: ['pending', 'purchased', 'delivered', 'completed', 'reward_issued', 'cancelled'],
       default: 'pending',
       index: true,
     },
@@ -52,7 +57,16 @@ const ReferralSchema = new Schema<IReferral>(
       type: Boolean,
       default: false,
     },
+    referredDiscountApplied: {
+      type: Boolean,
+      default: false,
+    },
     referredOrderId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Order',
+      default: null,
+    },
+    qualifyingOrderId: {
       type: Schema.Types.ObjectId,
       ref: 'Order',
       default: null,
@@ -60,6 +74,19 @@ const ReferralSchema = new Schema<IReferral>(
     referrerDiscountAmount: {
       type: Number,
       default: 100,
+    },
+    rewardAmount: {
+      type: Number,
+      default: 100,
+    },
+    rewardIssued: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    rewardIssuedAt: {
+      type: Date,
+      default: null,
     },
     referrerDiscountAvailable: {
       type: Boolean,

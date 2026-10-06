@@ -20,6 +20,7 @@ import '@/models/Coupon';
 import '@/models/HomeSection';
 import '@/models/ReturnRefund';
 import '@/models/Review';
+import '@/models/Referral';
 import '@/models/Setting';
 import '@/models/Testimonial';
 

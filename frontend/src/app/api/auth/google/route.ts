@@ -84,14 +84,6 @@ export async function POST(req: NextRequest) {
       });
       await customer.save();
     } else {
-      // New user: Create customer account in MongoDB (GRAVOX)
-      let referralCode = generateReferralCode(userName || 'User');
-      let attempts = 0;
-      while (await Customer.findOne({ referralCode }) && attempts < 5) {
-        referralCode = generateReferralCode(userName || 'User');
-        attempts++;
-      }
-
       let referrerCustomer: any = null;
       if (inputRefCode && typeof inputRefCode === 'string') {
         const cleanRef = inputRefCode.trim().toUpperCase();
@@ -108,7 +100,9 @@ export async function POST(req: NextRequest) {
         avatarUrl: userAvatar || '',
         authProvider: 'google',
         isEmailVerified: true,
-        referralCode,
+        referralEligible: false,
+        firstPurchaseCompleted: false,
+        referralEligibleOrderId: null,
         referredBy: referrerCustomer ? referrerCustomer._id.toString() : '',
         referralCodeUsed: referrerCustomer ? referrerCustomer.referralCode : '',
         referralDiscountBalance: 0,

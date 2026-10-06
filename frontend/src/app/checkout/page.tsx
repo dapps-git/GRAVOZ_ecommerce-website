@@ -618,9 +618,15 @@ export default function CheckoutPage() {
       (activeAddress.street && (activeAddress.street.match(/\b\d{6}\b/) || [])[0]) ||
       '';
 
+    const effectiveEmail = (user?.email || (activeAddress as any)?.email || '').trim().toLowerCase();
+    if (!effectiveEmail) {
+      setOrderError('A valid customer account email is required to place an order.');
+      return;
+    }
+
     const orderPayload = {
       customerId: (user as any)?._id || user?.id || '',
-      customerEmail: user?.email || (activeAddress as any)?.email || 'customer@gravoz.com',
+      customerEmail: effectiveEmail,
       customerName: activeAddress.name || user?.name || 'Customer',
       customerPhone: activeAddress.phone || user?.phone || '',
       shippingAddress: {
@@ -719,8 +725,8 @@ export default function CheckoutPage() {
         image: '/images/bag.webp',
         order_id: rzpOrderData.orderId,
         prefill: {
-          name: rzpOrderData.prefill?.name || activeAddress.name || user?.name || 'Customer',
-          email: rzpOrderData.prefill?.email || user?.email || 'customer@gravoz.com',
+          name: rzpOrderData.prefill?.name || activeAddress.name || user?.name || '',
+          email: rzpOrderData.prefill?.email || effectiveEmail || user?.email || '',
           contact: rzpOrderData.prefill?.contact || activeAddress.phone || user?.phone || '',
         },
         theme: {
@@ -929,8 +935,8 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        {/* ── Referral Welcome First Order (Exclusive 15% discount, coupons hidden) ── */}
-        {referralStatus?.isFirstOrderEligible && !referralStatus?.hasUsedReferralDiscount ? (
+        {/* ── Referral Welcome First Order (15% Discount - Stacks with Welcome Coupon) ── */}
+        {referralStatus?.isFirstOrderEligible && !referralStatus?.hasUsedReferralDiscount && (
           <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3.5 space-y-2 font-poppins">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -942,7 +948,7 @@ export default function CheckoutPage() {
               </span>
             </div>
             <p className="text-[11px] text-[#667085]">
-              Exclusive 15% discount automatically applied to your first order via referral link.
+              Exclusive 15% referral discount automatically applied. You can also apply an eligible welcome coupon!
             </p>
             <div className="flex items-center justify-between pt-1 border-t border-[#f0ece5]">
               <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
@@ -950,93 +956,92 @@ export default function CheckoutPage() {
               </span>
             </div>
           </div>
-        ) : (
-          /* ── Coupon / Promo Code Card (For standard orders & returning customers) ── */
-          <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 space-y-2.5 font-poppins">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Tag className="w-4 h-4 text-[#8B4A12]" />
-                <span className="font-semibold text-xs text-[#171717]">Apply Coupon</span>
-              </div>
-              {availableCoupons.filter((c) => {
-                const isRefUser = Boolean(user?.referredBy || user?.referralCodeUsed || referralStatus?.referredBy || referralStatus?.hasUsedReferralDiscount);
-                const isRetUser = Boolean((user?.totalOrders || 0) > 0);
-                if (c.code === 'FIRSTSTEP' && (isRefUser || isRetUser)) return false;
-                return true;
-              }).length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setShowCoupons((prev) => !prev)}
-                  className="text-[11px] font-semibold text-[#8B4A12] hover:underline flex items-center gap-0.5 cursor-pointer"
-                >
-                  <span>{showCoupons ? 'Hide Offers' : 'View Offers'}</span>
-                  {showCoupons ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                </button>
-              )}
+        )}
+
+        {/* ── Coupon / Promo Code Card (Available for all eligible customers, stacks with referral) ── */}
+        <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 space-y-2.5 font-poppins">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Tag className="w-4 h-4 text-[#8B4A12]" />
+              <span className="font-semibold text-xs text-[#171717]">Apply Coupon</span>
             </div>
-
-            {/* Applied Coupon Display */}
-            {appliedCoupon ? (
-              <div className="flex items-center justify-between bg-white border border-[#E8E1D9] px-2.5 py-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold tracking-wider">
-                    {appliedCoupon.code}
-                  </span>
-                  <span className="text-[11px] text-emerald-700 font-semibold">
-                    -₹{appliedCoupon.discount.toLocaleString('en-IN')} Applied
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleRemoveCoupon}
-                  className="text-[11px] text-rose-600 hover:underline font-medium cursor-pointer"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleApplyCoupon();
-                }}
-                className="flex gap-1.5"
+            {availableCoupons.filter((c) => {
+              const isRetUser = Boolean((user?.totalOrders || 0) > 0);
+              if (c.code === 'FIRSTSTEP' && isRetUser) return false;
+              return true;
+            }).length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowCoupons((prev) => !prev)}
+                className="text-[11px] font-semibold text-[#8B4A12] hover:underline flex items-center gap-0.5 cursor-pointer"
               >
-                <input
-                  type="text"
-                  value={couponInput}
-                  onChange={(e) => {
-                    setCouponInput(e.target.value.toUpperCase());
-                    setCouponError('');
-                  }}
-                  placeholder="ENTER COUPON CODE"
-                  className="flex-1 px-2.5 py-1.5 text-xs bg-white border border-[#E8E1D9] rounded-none focus:outline-none focus:border-[#8B4A12] uppercase tracking-wider font-sans"
-                />
-                <button
-                  type="submit"
-                  disabled={couponLoading || !couponInput.trim()}
-                  className="px-3.5 py-1.5 bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs font-bold rounded-none transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  {couponLoading ? '...' : 'APPLY'}
-                </button>
-              </form>
+                <span>{showCoupons ? 'Hide Offers' : 'View Offers'}</span>
+                {showCoupons ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
             )}
+          </div>
 
-            {couponError && (
-              <p className="text-[10px] text-rose-600 font-medium">{couponError}</p>
-            )}
+          {/* Applied Coupon Display */}
+          {appliedCoupon ? (
+            <div className="flex items-center justify-between bg-white border border-[#E8E1D9] px-2.5 py-1.5">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-[#8B4A12] text-white text-[10px] font-bold tracking-wider">
+                  {appliedCoupon.code}
+                </span>
+                <span className="text-[11px] text-emerald-700 font-semibold">
+                  -₹{appliedCoupon.discount.toLocaleString('en-IN')} Applied
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRemoveCoupon}
+                className="text-[11px] text-rose-600 hover:underline font-medium cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleApplyCoupon();
+              }}
+              className="flex gap-1.5"
+            >
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => {
+                  setCouponInput(e.target.value.toUpperCase());
+                  setCouponError('');
+                }}
+                placeholder="ENTER COUPON CODE"
+                className="flex-1 px-2.5 py-1.5 text-xs bg-white border border-[#E8E1D9] rounded-none focus:outline-none focus:border-[#8B4A12] uppercase tracking-wider font-sans"
+              />
+              <button
+                type="submit"
+                disabled={couponLoading || !couponInput.trim()}
+                className="px-3.5 py-1.5 bg-[#8B4A12] hover:bg-[#6F390C] text-white text-xs font-bold rounded-none transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {couponLoading ? '...' : 'APPLY'}
+              </button>
+            </form>
+          )}
 
-            {/* Collapsible Available Coupons List (Filtered) */}
-            {showCoupons && (
-              <div className="space-y-1.5 pt-1 max-h-48 overflow-y-auto pr-1">
-                {availableCoupons
-                  .filter((c) => {
-                    const isRefUser = Boolean(user?.referredBy || user?.referralCodeUsed || referralStatus?.referredBy || referralStatus?.hasUsedReferralDiscount);
-                    const isRetUser = Boolean((user?.totalOrders || 0) > 0);
-                    if (c.code === 'FIRSTSTEP' && (isRefUser || isRetUser)) return false;
-                    return true;
-                  })
-                  .map((c) => (
+          {couponError && (
+            <p className="text-[10px] text-rose-600 font-medium">{couponError}</p>
+          )}
+
+          {/* Collapsible Available Coupons List (Filtered) */}
+          {showCoupons && (
+            <div className="space-y-1.5 pt-1 max-h-48 overflow-y-auto pr-1">
+              {availableCoupons
+                .filter((c) => {
+                  const isRetUser = Boolean((user?.totalOrders || 0) > 0);
+                  if (c.code === 'FIRSTSTEP' && isRetUser) return false;
+                  return true;
+                })
+                .map((c) => (
                     <div
                       key={c.code}
                       className="flex items-center justify-between gap-2 border border-dashed border-[#c9a46e] px-2.5 py-2 bg-white hover:bg-[#FAF4EC] transition-colors"
@@ -1067,7 +1072,6 @@ export default function CheckoutPage() {
               </div>
             )}
           </div>
-        )}
 
         {(referralStatus?.availableDiscount || 0) >= 100 && (
           <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-none p-3 text-xs space-y-2 font-poppins">

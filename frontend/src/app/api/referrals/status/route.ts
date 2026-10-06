@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
 import { Referral } from '@/models/Referral';
-import { getUserSession, generateReferralCode } from '@/lib/auth';
+import { Order } from '@/models/Order';
+import { getUserSession } from '@/lib/auth';
+import { checkAndGrantReferralEligibility } from '@/lib/referral';
 
 // Helper to mask name/email for privacy (e.g. "Rahul S." -> "Ra*** S.", "user@gmail.com" -> "u***@gmail.com")
 function maskName(name: string): string {
@@ -28,18 +30,38 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
     }
 
-    // Ensure customer has a referral code
-    if (!customer.referralCode) {
-      let code = generateReferralCode(customer.name);
-      while (await Customer.findOne({ referralCode: code })) {
-        code = generateReferralCode(customer.name);
+    // If customer is not yet marked referral-eligible, check if they have a qualifying first order
+    if (!customer.referralEligible || !customer.referralCode) {
+      const qualifyingOrder = await Order.findOne({
+        $and: [
+          {
+            $or: [
+              { customerId: customer._id.toString() },
+              { customerEmail: customer.email.toLowerCase().trim() },
+            ],
+          },
+          {
+            orderStatus: { $nin: ['cancelled', 'return_rejected'] },
+          },
+          {
+            $or: [
+              { paymentStatus: 'paid' },
+              { orderStatus: 'delivered' },
+            ],
+          },
+        ],
+      }).sort({ createdAt: 1 });
+
+      if (qualifyingOrder) {
+        await checkAndGrantReferralEligibility(qualifyingOrder);
+        customer = await Customer.findById(session.userId);
       }
-      customer.referralCode = code;
-      await customer.save();
     }
 
+    const isReferralEligible = Boolean(customer?.referralEligible && customer?.referralCode);
+
     // Fetch referral history where this customer is the referrer
-    const referrals = await Referral.find({ referrer: customer._id })
+    const referrals = await Referral.find({ referrer: customer?._id })
       .populate('referredUser', 'name email createdAt')
       .sort({ createdAt: -1 })
       .lean();
@@ -47,58 +69,62 @@ export async function GET(req: NextRequest) {
     const formattedHistory = referrals.map((r: any) => ({
       id: r._id.toString(),
       friendName: r.referredUser?.name ? maskName(r.referredUser.name) : 'Referred Friend',
-      status: r.status, // 'pending' | 'completed' | 'cancelled'
+      status: r.status, // 'pending' | 'purchased' | 'delivered' | 'completed' | 'cancelled'
       date: r.createdAt,
-      rewardAmount: r.referrerDiscountAmount || 100,
-      rewardAvailable: r.referrerDiscountAvailable || false,
+      rewardAmount: r.rewardAmount || r.referrerDiscountAmount || 100,
+      rewardAvailable: r.referrerDiscountAvailable || r.rewardIssued || false,
       rewardUsed: r.referrerDiscountUsed || false,
     }));
 
     const totalReferred = referrals.length;
-    const completedOrders = referrals.filter((r) => r.status === 'completed').length;
+    const completedOrders = referrals.filter(
+      (r) => r.status === 'completed' || r.status === 'reward_issued' || r.rewardIssued
+    ).length;
     const totalDiscountEarned = completedOrders * 100;
 
     // Check if customer is eligible for 15% first order discount (strictly single-use on first purchase)
-    const { Order } = await import('@/models/Order');
     const priorOrdersCount = await Order.countDocuments({
       $or: [
-        { customerId: customer._id.toString() },
-        { customerEmail: customer.email.toLowerCase().trim() },
+        { customerId: customer?._id.toString() },
+        { customerEmail: customer?.email.toLowerCase().trim() },
       ],
       orderStatus: { $ne: 'cancelled' },
     });
 
     const existingUsedRef = await Referral.findOne({
-      referredUser: customer._id,
-      referredDiscountUsed: true,
+      referredUser: customer?._id,
+      $or: [{ referredDiscountUsed: true }, { referredDiscountApplied: true }],
     });
 
     const isFirstOrderEligible =
-      Boolean(customer.referredBy || customer.referralCodeUsed) &&
-      !customer.hasUsedReferralDiscount &&
-      (customer.totalOrders || 0) === 0 &&
+      Boolean(customer?.referredBy || customer?.referralCodeUsed) &&
+      !customer?.hasUsedReferralDiscount &&
+      (customer?.totalOrders || 0) === 0 &&
       priorOrdersCount === 0 &&
       !existingUsedRef;
 
-    // Build the base URL
-    const host = req.headers.get('host') || 'localhost:3000';
-    const protocol = req.headers.get('x-forwarded-proto') || 'http';
+    // Build the dynamic base URL for shareable referral link
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || req.nextUrl.host;
+    const protocol = req.headers.get('x-forwarded-proto') || req.nextUrl.protocol.replace(':', '');
     const baseUrl = `${protocol}://${host}`;
-    const referralLink = `${baseUrl}/register?ref=${customer.referralCode}`;
+    const referralLink = isReferralEligible
+      ? `${baseUrl}/register?ref=${customer?.referralCode}`
+      : null;
 
     return NextResponse.json({
       success: true,
-      referralCode: customer.referralCode,
+      referralEligible: isReferralEligible,
+      referralCode: isReferralEligible ? customer?.referralCode : null,
       referralLink,
-      availableDiscount: customer.referralDiscountBalance || 0,
-      availableDiscountRupees: customer.referralDiscountBalance || 0,
-      referralDiscountBalance: customer.referralDiscountBalance || 0,
+      availableDiscount: customer?.referralDiscountBalance || 0,
+      availableDiscountRupees: customer?.referralDiscountBalance || 0,
+      referralDiscountBalance: customer?.referralDiscountBalance || 0,
       isFirstOrderEligible,
       eligibleForFirstOrderDiscount: isFirstOrderEligible,
       firstOrderDiscountPercent: isFirstOrderEligible ? 15 : 0,
-      hasUsedReferralDiscount: customer.hasUsedReferralDiscount || false,
-      referredBy: customer.referredBy || '',
-      referralCodeUsed: customer.referralCodeUsed || '',
+      hasUsedReferralDiscount: customer?.hasUsedReferralDiscount || false,
+      referredBy: customer?.referredBy || '',
+      referralCodeUsed: customer?.referralCodeUsed || '',
       stats: {
         totalReferred,
         totalReferrals: totalReferred,
@@ -111,7 +137,7 @@ export async function GET(req: NextRequest) {
       history: formattedHistory.map((h) => ({
         ...h,
         referredName: h.friendName,
-        rewardEarned: h.status === 'completed' ? 100 : 0,
+        rewardEarned: h.status === 'completed' || h.rewardAvailable ? 100 : 0,
       })),
     });
   } catch (error: any) {

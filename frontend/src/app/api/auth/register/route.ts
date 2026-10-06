@@ -29,14 +29,20 @@ export async function POST(req: NextRequest) {
     // Check if email already exists
     const existingEmailCustomer = await Customer.findOne({ email: normalizedEmail });
     if (existingEmailCustomer) {
-      return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 });
+      return NextResponse.json({ error: 'This email address is already registered.' }, { status: 409 });
     }
 
-    // Check if phone number already exists (if phone provided)
+    // Check if mobile number already exists (if phone provided)
     if (formattedPhone && formattedPhone.length >= 7) {
-      const existingPhoneCustomer = await Customer.findOne({ phone: formattedPhone });
+      const digits10 = formattedPhone.replace(/\D/g, '').slice(-10);
+      const existingPhoneCustomer = await Customer.findOne({
+        $or: [
+          { phone: formattedPhone },
+          { phone: { $regex: digits10 + '$' } },
+        ],
+      });
       if (existingPhoneCustomer) {
-        return NextResponse.json({ error: 'An account with this phone number already exists' }, { status: 409 });
+        return NextResponse.json({ error: 'This mobile number is already registered.' }, { status: 409 });
       }
     }
 
@@ -57,8 +63,13 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Self-referral prevention
-      if (referrerCustomer.email.toLowerCase().trim() === normalizedEmail) {
+      // Self-referral prevention (Email & Mobile)
+      const referrerPhoneClean = referrerCustomer.phone ? referrerCustomer.phone.replace(/\D/g, '').slice(-10) : '';
+      const inputPhoneClean = formattedPhone ? formattedPhone.replace(/\D/g, '').slice(-10) : '';
+      if (
+        referrerCustomer.email.toLowerCase().trim() === normalizedEmail ||
+        (referrerPhoneClean && inputPhoneClean && referrerPhoneClean === inputPhoneClean)
+      ) {
         return NextResponse.json(
           { error: 'You cannot use your own referral code.' },
           { status: 400 }
@@ -69,23 +80,17 @@ export async function POST(req: NextRequest) {
     // Hash password with bcrypt
     const passwordHash = await hashPassword(password);
 
-    // Generate unique referral code for the new customer
-    let referralCode = generateReferralCode(name);
-    let attempts = 0;
-    while (await Customer.findOne({ referralCode }) && attempts < 10) {
-      referralCode = generateReferralCode(name);
-      attempts++;
-    }
-
-    // Create customer with welcome bonus reward points and referral connection
+    // Create customer: Referral link will ONLY be generated after their FIRST qualifying purchase of ₹999+
     const customer = await Customer.create({
       name: name.trim(),
       email: normalizedEmail,
       passwordHash,
       authProvider: 'local',
       isEmailVerified: false,
-      phone: phone ? String(phone).trim() : '',
-      referralCode,
+      phone: formattedPhone,
+      referralEligible: false,
+      firstPurchaseCompleted: false,
+      referralEligibleOrderId: null,
       referredBy: referrerCustomer ? referrerCustomer._id.toString() : '',
       referralCodeUsed: referrerCustomer ? referrerCustomer.referralCode : '',
       referralDiscountBalance: 0,
@@ -115,6 +120,8 @@ export async function POST(req: NextRequest) {
           referredDiscountPercent: 15,
           referredDiscountUsed: false,
           referrerDiscountAmount: 100,
+          rewardAmount: 100,
+          rewardIssued: false,
           referrerDiscountAvailable: false,
           referrerDiscountUsed: false,
         });

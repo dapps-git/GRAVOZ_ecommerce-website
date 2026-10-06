@@ -6,6 +6,7 @@ import { Customer } from '@/models/Customer';
 import { Referral } from '@/models/Referral';
 import { ReturnRefund } from '@/models/ReturnRefund';
 import { getUserSession } from '@/lib/auth';
+import { syncReferralLifecycleOnStatusChange } from '@/lib/referral';
 
 // GET /api/orders/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -91,54 +92,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     order.orderStatus = status;
 
-    // Handle referral discount restoration or reward revocation on cancellation/refund
-    if (status === 'cancelled' || status === 'refunded') {
-      try {
-        const customerLookup =
-          order.customerId && mongoose.Types.ObjectId.isValid(order.customerId)
-            ? { _id: order.customerId }
-            : { email: order.customerEmail.toLowerCase().trim() };
-
-        // 1. If customer used ₹100 referral discount on this order, restore their balance
-        if (order.referralDiscountType === 'referrer_reward_100') {
-          await Customer.findOneAndUpdate(customerLookup, {
-            $inc: { referralDiscountBalance: 100 },
-          });
-          await Referral.findOneAndUpdate(
-            { referrerOrderId: order._id },
-            { referrerDiscountUsed: false, referrerOrderId: null }
-          );
-        }
-
-        // 2. If customer used 15% first order discount, restore eligibility
-        if (order.referralDiscountType === 'referred_first_order_15') {
-          await Customer.findOneAndUpdate(customerLookup, {
-            hasUsedReferralDiscount: false,
-          });
-          await Referral.findOneAndUpdate(
-            { referredOrderId: order._id },
-            { referredDiscountUsed: false, referredOrderId: null }
-          );
-        }
-
-        // 3. If this order generated a ₹100 reward for the referrer and referrer hasn't used it yet, revoke it
-        const pendingOrCompletedRef = await Referral.findOne({
-          referredOrderId: order._id,
-          referrerDiscountAvailable: true,
-          referrerDiscountUsed: false,
-        });
-
-        if (pendingOrCompletedRef) {
-          await Customer.findByIdAndUpdate(pendingOrCompletedRef.referrer, {
-            $inc: { referralDiscountBalance: -100 },
-          });
-          pendingOrCompletedRef.referrerDiscountAvailable = false;
-          pendingOrCompletedRef.status = 'cancelled';
-          await pendingOrCompletedRef.save();
-        }
-      } catch (revErr) {
-        console.warn('Referral discount reversal warning:', revErr);
-      }
+    // Handle referral discount restoration or reward/eligibility sync
+    try {
+      await syncReferralLifecycleOnStatusChange(order, status);
+    } catch (refErr) {
+      console.warn('syncReferralLifecycleOnStatusChange error:', refErr);
     }
 
     if (status === 'return_requested') {
@@ -158,7 +116,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
               order: order._id,
               orderNumber: order.orderNumber,
               customerName: order.customerName || order.shippingAddress?.name || 'Customer',
-              customerEmail: order.customerEmail || 'customer@gravoz.com',
+              customerEmail: (order.customerEmail || session?.email || '').toLowerCase().trim(),
               customerPhone: order.customerPhone || order.shippingAddress?.phone || '',
               reason: returnReason || 'Other Reason',
               description: returnDescription || '',

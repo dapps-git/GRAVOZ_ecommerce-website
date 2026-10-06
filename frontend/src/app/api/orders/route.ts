@@ -9,6 +9,7 @@ import { Referral } from '@/models/Referral';
 import { Coupon } from '@/models/Coupon';
 import { Setting } from '@/models/Setting';
 import { getUserSession } from '@/lib/auth';
+import { checkAndGrantReferralEligibility, processReferralRewardForReferrer } from '@/lib/referral';
 
 export const dynamic = 'force-dynamic';
 
@@ -160,25 +161,10 @@ export async function POST(req: NextRequest) {
     if (couponCode) {
       const cleanCoupon = couponCode.toUpperCase().trim();
       if (cleanCoupon === 'FIRSTSTEP') {
-        // Disallow FIRSTSTEP for referral customers (they receive 15% referral discount instead)
         if (orderingCustomer) {
-          if (orderingCustomer.referredBy || orderingCustomer.referralCodeUsed) {
-            return NextResponse.json(
-              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
-              { status: 400 }
-            );
-          }
           if ((orderingCustomer.totalOrders || 0) > 0) {
             return NextResponse.json(
               { error: 'The FIRSTSTEP welcome coupon is only valid on your first order.' },
-              { status: 400 }
-            );
-          }
-
-          const existingRef = await Referral.findOne({ referredUser: orderingCustomer._id });
-          if (existingRef) {
-            return NextResponse.json(
-              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
               { status: 400 }
             );
           }
@@ -234,7 +220,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Backend Validation of Referral Discount ──
+    // ── Backend Validation of Referral Discount (Stacks with welcome coupon safely) ──
     let verifiedReferralDiscount = 0;
     let verifiedReferralType: string | null = null;
     const numShippingFee = Number(shippingFee) || 0;
@@ -261,11 +247,9 @@ export async function POST(req: NextRequest) {
         });
 
         if (priorOrdersCount === 0 && !existingUsedRef) {
-          // Exactly 15% discount on subtotal
+          // Exactly 15% discount on subtotal (stacks with eligible welcome offer)
           verifiedReferralDiscount = Math.round(numSubtotal * 0.15);
           verifiedReferralType = 'referred_first_order_15';
-          // On first referral order, the 15% referral discount is exclusive
-          verifiedCouponDiscount = 0;
         }
       }
     } else if (referralDiscountType === 'referrer_reward_100') {
@@ -404,34 +388,14 @@ export async function POST(req: NextRequest) {
       console.warn('Customer referral discount update warning:', custErr);
     }
 
-    // ── Reward Original Referrer with ₹100 Discount on Completed First Purchase ──
+    // ── Referral Lifecycle Handling (COD waits for delivery) ──
     try {
       if (orderingCustomer) {
-        const pendingReferral = await Referral.findOne({
-          referredUser: orderingCustomer._id,
-          referrerDiscountAvailable: false,
-        });
-
-        if (pendingReferral) {
-          const referrerCust = await Customer.findById(pendingReferral.referrer);
-          if (referrerCust) {
-            referrerCust.referralDiscountBalance = (referrerCust.referralDiscountBalance || 0) + 100;
-            referrerCust.activityLogs.push({
-              action: 'Referral Discount Earned',
-              details: `Earned ₹100 referral discount for friend order #${orderNumber}`,
-              timestamp: new Date(),
-            });
-            await referrerCust.save();
-
-            pendingReferral.referrerDiscountAvailable = true;
-            pendingReferral.status = 'completed';
-            pendingReferral.referredOrderId = newOrder._id;
-            await pendingReferral.save();
-          }
-        }
+        await checkAndGrantReferralEligibility(newOrder);
+        await processReferralRewardForReferrer(newOrder);
       }
     } catch (refRewardErr) {
-      console.warn('Referral reward credit warning:', refRewardErr);
+      console.warn('Referral reward processing warning:', refRewardErr);
     }
 
     // Increment coupon usage count if coupon was applied

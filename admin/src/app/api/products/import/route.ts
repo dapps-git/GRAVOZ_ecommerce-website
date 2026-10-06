@@ -3,7 +3,101 @@ import { connectDB } from '@/lib/db';
 import { Product } from '@/models/Product';
 import { Category } from '@/models/Category';
 import { invalidateCache } from '@/lib/redis';
+import cloudinary from '@/lib/cloudinary';
 import * as XLSX from 'xlsx';
+
+const imageUploadCache = new Map<string, string>();
+
+async function uploadToCloudinaryIfNeeded(url: string): Promise<string> {
+  if (!url) return url;
+  if (url.includes('cloudinary.com')) return url;
+  if (imageUploadCache.has(url)) return imageUploadCache.get(url)!;
+
+  try {
+    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
+      const res = await cloudinary.uploader.upload(url, {
+        folder: 'gravoz/products',
+        format: 'webp',
+        quality: 'auto',
+      });
+      imageUploadCache.set(url, res.secure_url);
+      return res.secure_url;
+    }
+  } catch (err: any) {
+    console.warn('Auto Cloudinary upload warning for', url, err?.message);
+  }
+  return url;
+}
+
+function normalizeAndExtractUrls(rawVal: any): string[] {
+  if (!rawVal || typeof rawVal !== 'string') return [];
+  const cleanVal = rawVal
+    .replace(/\.(https?:\/\/)/g, ',$1')
+    .replace(/\s+(https?:\/\/)/g, ',$1');
+  const urls = cleanVal
+    .split(/[,;\n\r]+/)
+    .map((u) => u.trim())
+    .filter((u) => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+
+  return urls.map((u) => {
+    const driveMatch = u.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveMatch && driveMatch[1]) {
+      return `https://drive.usercontent.google.com/download?id=${driveMatch[1]}&export=view`;
+    }
+    const idParamMatch = u.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (u.includes('drive.google.com') && idParamMatch && idParamMatch[1]) {
+      return `https://drive.usercontent.google.com/download?id=${idParamMatch[1]}&export=view`;
+    }
+    return u;
+  });
+}
+
+async function resolveImageUrls(rawVal: any): Promise<string[]> {
+  const directUrls = normalizeAndExtractUrls(rawVal);
+  const resolved: string[] = [];
+  for (const u of directUrls) {
+    const finalUrl = await uploadToCloudinaryIfNeeded(u);
+    resolved.push(finalUrl);
+  }
+  return resolved;
+}
+
+const COLOR_HEX_MAP: Record<string, string> = {
+  tan: '#C19A6B',
+  brown: '#8B4513',
+  black: '#1C1C1C',
+  'dark brown': '#4B3621',
+  camel: '#C19A6B',
+  cognac: '#9B4400',
+  beige: '#F5F5DC',
+  burgundy: '#800020',
+  maroon: '#800000',
+  navy: '#1E3A8A',
+  blue: '#1E3A8A',
+  white: '#FFFFFF',
+  grey: '#808080',
+  gray: '#808080',
+  coffee: '#6F4E37',
+  olive: '#556B2F',
+};
+
+function getLeatherColorHex(name: string): string {
+  const clean = (name || '').trim().toLowerCase();
+  if (COLOR_HEX_MAP[clean]) return COLOR_HEX_MAP[clean];
+  if (clean.includes('tan')) return '#C19A6B';
+  if (clean.includes('dark brown')) return '#4B3621';
+  if (clean.includes('brown') || clean.includes('coffee')) return '#8B4513';
+  if (clean.includes('black')) return '#1C1C1C';
+  if (clean.includes('camel')) return '#C19A6B';
+  if (clean.includes('cognac')) return '#9B4400';
+  if (clean.includes('beige')) return '#F5F5DC';
+  if (clean.includes('burgundy')) return '#800020';
+  if (clean.includes('maroon')) return '#800000';
+  if (clean.includes('navy') || clean.includes('blue')) return '#1E3A8A';
+  if (clean.includes('white')) return '#FFFFFF';
+  return '#8B4513';
+}
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -131,8 +225,8 @@ export async function POST(req: NextRequest) {
       
       for (const key of imageKeys) {
         const val = normalizedRow[key];
-        if (val && typeof val === 'string') {
-          const urls = val.split(/[,;\n]+/).map(u => u.trim()).filter(u => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+        if (val) {
+          const urls = await resolveImageUrls(val);
           for (const u of urls) {
             if (!images.some(img => img.url === u)) {
               images.push({ url: u, alt: `${name} - view ${images.length + 1}` });
@@ -200,11 +294,8 @@ export async function POST(req: NextRequest) {
         ];
         for (const bKey of bulkKeys) {
           const bulkVal = normalizedRow[bKey];
-          if (bulkVal && typeof bulkVal === 'string') {
-            const bulkUrls = bulkVal
-              .split(/[,;\n\r]+/)
-              .map((u) => u.trim())
-              .filter((u) => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+          if (bulkVal) {
+            const bulkUrls = await resolveImageUrls(bulkVal);
             for (const u of bulkUrls) {
               if (!cImages.some((img) => img.url === u)) {
                 cImages.push({ url: u, alt: `${name} ${cName} - view ${cImages.length + 1}` });
@@ -223,8 +314,10 @@ export async function POST(req: NextRequest) {
           for (const key of possibleKeys) {
             const val = normalizedRow[key];
             if (val && typeof val === 'string' && (val.startsWith('http') || val.startsWith('/'))) {
-              if (!cImages.some((img) => img.url === val.trim())) {
-                cImages.push({ url: val.trim(), alt: `${name} ${cName} - view ${cImages.length + 1}` });
+              const directU = normalizeAndExtractUrls(val)[0] || val.trim();
+              const cUrl = await uploadToCloudinaryIfNeeded(directU);
+              if (!cImages.some((img) => img.url === cUrl)) {
+                cImages.push({ url: cUrl, alt: `${name} ${cName} - view ${cImages.length + 1}` });
               }
             }
           }
@@ -233,6 +326,7 @@ export async function POST(req: NextRequest) {
         if (cImages.length > 0) {
           colorVariants.push({
             name: cName,
+            colorCode: getLeatherColorHex(cName),
             imageUrl: cImages[0].url,
             images: cImages,
             isAvailable: true,
@@ -249,10 +343,7 @@ export async function POST(req: NextRequest) {
             const detectedColorRaw = match[1];
             if (!processedColors.has(detectedColorRaw) && !['img', 'image', 'photo', 'images', 'photos'].includes(detectedColorRaw)) {
               const detectedColor = detectedColorRaw.charAt(0).toUpperCase() + detectedColorRaw.slice(1);
-              const extraUrls = rowVal
-                .split(/[,;\n\r]+/)
-                .map((u) => u.trim())
-                .filter((u) => u.startsWith('http://') || u.startsWith('https://') || u.startsWith('/'));
+              const extraUrls = await resolveImageUrls(rowVal);
               if (extraUrls.length > 0) {
                 const variantImgs = extraUrls.map((u, idx) => ({
                   url: u,
@@ -260,6 +351,7 @@ export async function POST(req: NextRequest) {
                 }));
                 colorVariants.push({
                   name: detectedColor,
+                  colorCode: getLeatherColorHex(detectedColor),
                   imageUrl: variantImgs[0].url,
                   images: variantImgs,
                   isAvailable: true,

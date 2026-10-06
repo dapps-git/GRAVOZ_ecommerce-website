@@ -22,26 +22,28 @@ async function handleRepurchase(req: NextRequest) {
     const testEmail = searchParams.get('testEmail') || searchParams.get('email');
     const emailType = (searchParams.get('type') === '4_months' ? '4_months' : '3_months') as '3_months' | '4_months';
     const format = searchParams.get('format'); // 'html' or 'json'
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gravoz-ecommerce-website.vercel.app';
 
-    // ── 1. TEST MODE: Send demo email to a specific address ─────────────────────
+    const forwardedHost = req.headers.get('x-forwarded-host') || req.headers.get('host') || req.nextUrl.host;
+    const protocol = req.headers.get('x-forwarded-proto') || req.nextUrl.protocol.replace(':', '');
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${forwardedHost}`;
+
+    // ── 1. TEST MODE: Send email to a specific address ─────────────────────
     if (testEmail) {
       let sampleProduct = await Product.findOne({ status: 'active' }).lean();
       if (!sampleProduct) {
         sampleProduct = await Product.findOne().lean();
       }
 
-      const productName = sampleProduct?.name || 'GRAVOZ Pure Leather Casual Shoe';
+      const productName = sampleProduct?.name || 'GRAVOZ Leather Footwear';
       const productPrice = sampleProduct?.discountPrice || sampleProduct?.price || 1399;
-      const productImage = sampleProduct?.images?.[0]?.url || 
-        'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800';
-      const productId = sampleProduct?.slug || sampleProduct?._id || 'sample';
+      const productImage = sampleProduct?.images?.[0]?.url || '';
+      const productId = sampleProduct?.slug || sampleProduct?._id || '';
       const productUrl = `${appUrl}/products/${productId}?ref=repurchase_${emailType}`;
 
       const daysAgo = emailType === '4_months' ? 120 : 90;
       const payload = {
         toEmail: testEmail.trim(),
-        customerName: 'Aifas',
+        customerName: testEmail.split('@')[0],
         productName,
         productImage,
         productPrice,

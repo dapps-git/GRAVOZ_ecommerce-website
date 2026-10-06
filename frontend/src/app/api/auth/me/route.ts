@@ -21,17 +21,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
 
-    // Auto-ensure referralCode exists
-    if (!customer.referralCode) {
-      const { generateReferralCode } = await import('@/lib/auth');
-      let code = generateReferralCode(customer.name);
-      while (await Customer.findOne({ referralCode: code })) {
-        code = generateReferralCode(customer.name);
-      }
-      customer.referralCode = code;
-      await customer.save();
-    }
-
     return NextResponse.json({
       authenticated: true,
       user: {

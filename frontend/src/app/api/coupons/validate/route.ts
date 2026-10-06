@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       const effCustomerId = session?.userId || customerId;
       const effEmail = (session?.email || email || '').toLowerCase().trim();
 
-      // Disallow FIRSTSTEP for referral accounts (they receive 15% referral discount instead)
+      // Check that customer has not already placed an order (FIRSTSTEP is valid on first order)
       if (effCustomerId || effEmail) {
         const custQuery = effCustomerId && mongoose.Types.ObjectId.isValid(effCustomerId)
           ? { _id: effCustomerId }
@@ -36,25 +36,9 @@ export async function POST(req: NextRequest) {
         const foundCustomer = await Customer.findOne(custQuery);
 
         if (foundCustomer) {
-          if (foundCustomer.referredBy || foundCustomer.referralCodeUsed) {
-            return NextResponse.json(
-              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
-              { status: 400 }
-            );
-          }
           if ((foundCustomer.totalOrders || 0) > 0) {
             return NextResponse.json(
               { error: 'The FIRSTSTEP welcome offer is only valid on your first order.' },
-              { status: 400 }
-            );
-          }
-        }
-
-        if (effCustomerId && mongoose.Types.ObjectId.isValid(effCustomerId)) {
-          const existingRef = await Referral.findOne({ referredUser: effCustomerId });
-          if (existingRef) {
-            return NextResponse.json(
-              { error: 'Referral accounts receive a 15% first-order discount and are not eligible for the FIRSTSTEP welcome coupon.' },
               { status: 400 }
             );
           }

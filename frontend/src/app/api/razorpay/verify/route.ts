@@ -9,6 +9,7 @@ import { Referral } from '@/models/Referral';
 import { Coupon } from '@/models/Coupon';
 import { getUserSession } from '@/lib/auth';
 import { verifyRazorpaySignature, getRazorpayInstance } from '@/lib/razorpay';
+import { checkAndGrantReferralEligibility, processReferralRewardForReferrer } from '@/lib/referral';
 
 export const dynamic = 'force-dynamic';
 
@@ -238,34 +239,14 @@ export async function POST(req: NextRequest) {
       console.warn('Customer referral discount update warning:', custErr);
     }
 
-    // 10. Reward Original Referrer with ₹100 on Completed First Purchase
+    // 10. Referral Lifecycle: User A Eligibility + User B Reward for Referrer
     try {
       if (orderingCustomer) {
-        const pendingReferral = await Referral.findOne({
-          referredUser: orderingCustomer._id,
-          referrerDiscountAvailable: false,
-        });
-
-        if (pendingReferral) {
-          const referrerCust = await Customer.findById(pendingReferral.referrer);
-          if (referrerCust) {
-            referrerCust.referralDiscountBalance = (referrerCust.referralDiscountBalance || 0) + 100;
-            referrerCust.activityLogs.push({
-              action: 'Referral Discount Earned',
-              details: `Earned ₹100 referral discount for friend order #${orderNumber}`,
-              timestamp: new Date(),
-            });
-            await referrerCust.save();
-
-            pendingReferral.referrerDiscountAvailable = true;
-            pendingReferral.status = 'completed';
-            pendingReferral.referredOrderId = newOrder._id;
-            await pendingReferral.save();
-          }
-        }
+        await checkAndGrantReferralEligibility(newOrder);
+        await processReferralRewardForReferrer(newOrder);
       }
     } catch (refRewardErr) {
-      console.warn('Referral reward credit warning:', refRewardErr);
+      console.warn('Referral reward processing warning:', refRewardErr);
     }
 
     // 11. Increment coupon usage

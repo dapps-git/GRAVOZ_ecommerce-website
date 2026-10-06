@@ -31,7 +31,10 @@ export interface ICustomer extends Document {
   avatarUrl?: string;
   addresses: ICustomerAddress[];
   rewardPoints: number;
-  referralCode: string;
+  referralCode?: string;
+  referralEligible?: boolean;
+  referralEligibleOrderId?: string | mongoose.Types.ObjectId;
+  firstPurchaseCompleted?: boolean;
   referredBy?: string;
   referralCodeUsed?: string;
   referralDiscountBalance: number;
@@ -72,13 +75,16 @@ const CustomerSchema = new Schema<ICustomer>(
     isEmailVerified: { type: Boolean, default: false },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
-    phone: { type: String, default: '' },
+    phone: { type: String, default: '', index: true },
     otpCode: { type: String, default: null },
     otpExpires: { type: Date, default: null },
     avatarUrl: { type: String, default: '' },
     addresses: [AddressSchema],
     rewardPoints: { type: Number, default: 0 },
-    referralCode: { type: String, required: true, unique: true, index: true },
+    referralCode: { type: String, sparse: true, unique: true, index: true, uppercase: true, trim: true },
+    referralEligible: { type: Boolean, default: false, index: true },
+    referralEligibleOrderId: { type: Schema.Types.ObjectId, ref: 'Order', default: null },
+    firstPurchaseCompleted: { type: Boolean, default: false },
     referredBy: { type: String, default: '', index: true },
     referralCodeUsed: { type: String, default: '' },
     referralDiscountBalance: { type: Number, default: 0, min: 0 },
