@@ -8,15 +8,58 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { productId, stockChange, newStock } = body;
+    const { productId, stockChange, newStock, variantName, variantIsAvailable, variantStock, colorVariants } = body;
 
     if (!productId) {
       return NextResponse.json({ error: 'productId is required' }, { status: 400 });
     }
 
-    let updatedProduct;
+    let updatedProduct: any;
 
-    if (newStock !== undefined && typeof newStock === 'number') {
+    if (colorVariants && Array.isArray(colorVariants)) {
+      // Direct update of colorVariants array
+      const product = await Product.findById(productId);
+      if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+
+      product.colorVariants = colorVariants;
+      // Re-sum total stock from available variants
+      const totalStock = colorVariants.reduce((sum: number, v: any) => {
+        if (v.isAvailable === false) return sum;
+        return sum + (v.stock !== undefined ? Number(v.stock) : 10);
+      }, 0);
+      product.stock = totalStock;
+      updatedProduct = await product.save();
+    } else if (variantName) {
+      // Toggle / edit a single variant by name
+      const product = await Product.findById(productId);
+      if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+
+      const variants = product.colorVariants || [];
+      const vIndex = variants.findIndex(
+        (v: any) => String(v.name).toLowerCase() === String(variantName).toLowerCase()
+      );
+
+      if (vIndex >= 0) {
+        if (variantIsAvailable !== undefined) variants[vIndex].isAvailable = Boolean(variantIsAvailable);
+        if (variantStock !== undefined) variants[vIndex].stock = Math.max(0, Number(variantStock));
+      } else {
+        variants.push({
+          name: variantName,
+          colorCode: '#000000',
+          isAvailable: variantIsAvailable !== undefined ? Boolean(variantIsAvailable) : true,
+          stock: variantStock !== undefined ? Math.max(0, Number(variantStock)) : 10,
+        });
+      }
+
+      product.colorVariants = variants;
+      // Recalculate stock
+      const totalStock = variants.reduce((sum: number, v: any) => {
+        if (v.isAvailable === false) return sum;
+        return sum + (v.stock !== undefined ? Number(v.stock) : 10);
+      }, 0);
+      product.stock = totalStock;
+      updatedProduct = await product.save();
+    } else if (newStock !== undefined && typeof newStock === 'number') {
       // Set absolute stock value
       updatedProduct = await Product.findByIdAndUpdate(
         productId,
@@ -31,7 +74,7 @@ export async function PUT(req: NextRequest) {
         { new: true }
       );
     } else {
-      return NextResponse.json({ error: 'Provide either stockChange or newStock' }, { status: 400 });
+      return NextResponse.json({ error: 'Provide stockChange, newStock, or variant updates' }, { status: 400 });
     }
 
     if (!updatedProduct) {

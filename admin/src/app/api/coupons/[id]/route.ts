@@ -24,6 +24,8 @@ export async function PUT(
     if (body.minPurchaseAmount !== undefined) updateData.minPurchaseAmount = Number(body.minPurchaseAmount);
     if (body.maxDiscountAmount !== undefined) updateData.maxDiscountAmount = body.maxDiscountAmount ? Number(body.maxDiscountAmount) : null;
     if (body.totalUsageLimit !== undefined) updateData.totalUsageLimit = Number(body.totalUsageLimit);
+    if (body.usageLimitPerCustomer !== undefined) updateData.usageLimitPerCustomer = Number(body.usageLimitPerCustomer);
+    if (body.firstOrderOnly !== undefined) updateData.firstOrderOnly = Boolean(body.firstOrderOnly);
     if (body.startDate) updateData.startDate = new Date(body.startDate);
     if (body.expiryDate) updateData.expiryDate = new Date(body.expiryDate);
     if (body.isActive !== undefined) updateData.isActive = Boolean(body.isActive);

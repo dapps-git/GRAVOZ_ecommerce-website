@@ -8,6 +8,7 @@ export interface ICoupon extends Document {
   minPurchaseAmount: number;
   maxDiscountAmount?: number | null;
   usageLimitPerCustomer: number;
+  firstOrderOnly: boolean;
   totalUsageLimit: number;
   usedCount: number;
   startDate: Date;
@@ -26,6 +27,7 @@ const CouponSchema = new Schema<ICoupon>(
     minPurchaseAmount: { type: Number, default: 0 },
     maxDiscountAmount: { type: Number, default: null },
     usageLimitPerCustomer: { type: Number, default: 1 },
+    firstOrderOnly: { type: Boolean, default: false },
     totalUsageLimit: { type: Number, default: 100 },
     usedCount: { type: Number, default: 0 },
     startDate: { type: Date, default: Date.now },

@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { name, targetAudience, image, subCategories, displayOrder } = body;
+    const { name, targetAudience, image, subCategories, displayOrder, discountPercentage } = body;
 
     if (!name || !targetAudience) {
       return NextResponse.json({ error: 'Name and targetAudience (Men, Women, Babies, All) are required' }, { status: 400 });
@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
       slug,
       targetAudience,
       image: image || '',
+      discountPercentage: discountPercentage !== undefined ? Number(discountPercentage) : 0,
       subCategories: subCategories || [],
       displayOrder: displayOrder || 0,
     });

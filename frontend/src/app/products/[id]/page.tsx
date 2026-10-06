@@ -49,6 +49,7 @@ export interface ColorVariant {
   imageUrl?: string;
   images?: ProductImage[];
   sizes?: ProductSizeItem[];
+  stock?: number;
   isAvailable?: boolean;
 }
 
@@ -517,7 +518,13 @@ export default function ProductInnerPage() {
       : (product.sizes || []).map((s) => ({ size: s, isAvailable: isProductInStock }));
 
   const currentSelectedSizeObj = currentSizeList.find((s) => s.size === selectedSize);
-  const isCurrentSizeAvailable = isProductInStock && (currentSelectedSizeObj ? currentSelectedSizeObj.isAvailable : true);
+  const selectedVariantObj = activeColorVariants.find(
+    (v) => (v.name || '').trim().toLowerCase() === (selectedColor || '').trim().toLowerCase()
+  );
+  const isCurrentColorAvailable = selectedVariantObj
+    ? selectedVariantObj.isAvailable !== false && (selectedVariantObj.stock === undefined || selectedVariantObj.stock > 0)
+    : true;
+  const isCurrentSizeAvailable = isProductInStock && isCurrentColorAvailable && (currentSelectedSizeObj ? currentSelectedSizeObj.isAvailable : true);
 
 
   return (
@@ -959,26 +966,39 @@ export default function ProductInnerPage() {
                       else swatchColor = '#1C1C1C';
                     }
 
+                    const isVariantOutOfStock = variant.isAvailable === false || (variant.stock !== undefined && variant.stock <= 0);
+
                     return (
                       <button
                         key={variant.name}
                         type="button"
                         onClick={() => handleColorSelect(variant)}
-                        title={`Color: ${variant.name}`}
+                        title={`Color: ${variant.name}${isVariantOutOfStock ? ' (Out of Stock)' : ''}`}
                         className={`relative w-8 h-8 rounded-full transition-all cursor-pointer flex items-center justify-center ${
                           isSelected
                             ? 'ring-2 ring-[#111111] ring-offset-2 scale-110 shadow-xs'
                             : 'hover:scale-105 opacity-85 hover:opacity-100'
-                        }`}
+                        } ${isVariantOutOfStock ? 'opacity-50' : ''}`}
                       >
                         <span
                           className="w-full h-full rounded-full border border-black/15 shadow-inner"
                           style={{ backgroundColor: swatchColor }}
                         />
+                        {isVariantOutOfStock && (
+                          <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span className="w-full h-0.5 bg-rose-600 rotate-45 transform rounded-full" />
+                          </span>
+                        )}
                       </button>
                     );
                   })}
                 </div>
+
+                {!isCurrentColorAvailable && (
+                  <p className="text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-md mt-1 inline-block">
+                    Color &quot;{selectedColor}&quot; is currently Out of Stock. Please select another color.
+                  </p>
+                )}
               </div>
 
               {/* Action Buttons Row: Quantity Pill + ADD TO CART (Primary) + BUY NOW (Outline) */}
@@ -1014,6 +1034,10 @@ export default function ProductInnerPage() {
                   type="button"
                   disabled={!isCurrentSizeAvailable}
                   onClick={async () => {
+                    if (!isCurrentColorAvailable) {
+                      showToast(`Selected color "${selectedColor}" is out of stock. Please pick another color.`);
+                      return;
+                    }
                     if (!isCurrentSizeAvailable) {
                       showToast(
                         !isProductInStock
@@ -1059,6 +1083,8 @@ export default function ProductInnerPage() {
                 >
                   {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
                     ? 'OUT OF STOCK'
+                    : !isCurrentColorAvailable
+                    ? `OUT OF STOCK (${(selectedColor || '').toUpperCase()})`
                     : isCurrentSizeAvailable
                     ? 'ADD TO CART'
                     : 'SIZE OUT OF STOCK'}
@@ -1069,6 +1095,10 @@ export default function ProductInnerPage() {
                   type="button"
                   disabled={!isCurrentSizeAvailable}
                   onClick={async () => {
+                    if (!isCurrentColorAvailable) {
+                      showToast(`Selected color "${selectedColor}" is out of stock. Please pick another color.`);
+                      return;
+                    }
                     if (!isCurrentSizeAvailable) {
                       showToast(
                         !isProductInStock
@@ -1123,6 +1153,8 @@ export default function ProductInnerPage() {
                 >
                   {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
                     ? 'OUT OF STOCK'
+                    : !isCurrentColorAvailable
+                    ? `OUT OF STOCK (${(selectedColor || '').toUpperCase()})`
                     : 'BUY NOW'}
                 </button>
               </div>

@@ -193,3 +193,22 @@ a {
 .animate-marquee {
   animation: marquee 18s linear infinite;
 }
+
+/* ── Razorpay Modal & SVG Containment Protection ── */
+.razorpay-container {
+  position: fixed !important;
+  z-index: 99999999 !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.razorpay-checkout-frame {
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border: none !important;
+}
+
+svg {
+  max-width: 100%;
+}

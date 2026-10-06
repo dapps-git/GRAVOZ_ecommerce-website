@@ -92,8 +92,10 @@ export async function POST(req: NextRequest) {
           (v: any) => String(v.name).trim().toLowerCase() === itemColor.toLowerCase()
         );
         if (variantObj) {
-          if (variantObj.isAvailable === false) {
+          if (variantObj.isAvailable === false || (variantObj.stock !== undefined && variantObj.stock <= 0)) {
             availableStock = 0;
+          } else if (variantObj.stock !== undefined) {
+            availableStock = Math.min(availableStock, variantObj.stock);
           }
           if (itemSize && Array.isArray(variantObj.sizes) && variantObj.sizes.length > 0) {
             const vSizeObj = variantObj.sizes.find((s: any) => String(s.size).trim() === itemSize);

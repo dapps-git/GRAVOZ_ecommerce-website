@@ -375,6 +375,7 @@ export default function CategoriesPage() {
                               fill
                               sizes="40px"
                               className="object-cover object-center"
+                              unoptimized
                             />
                           </div>
                           <div>
@@ -531,7 +532,7 @@ export default function CategoriesPage() {
                 <div className="flex items-center gap-3">
                   {image && (
                     <div className="relative w-12 h-12 rounded-md overflow-hidden bg-[#faf8f5] border border-[#e8e2d8]">
-                      <Image src={image} alt="Category" fill className="object-cover" />
+                      <Image src={image} alt="Category" fill className="object-cover" unoptimized />
                     </div>
                   )}
 

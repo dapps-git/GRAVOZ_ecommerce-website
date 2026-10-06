@@ -26,6 +26,8 @@ interface CouponItem {
   description?: string;
   minPurchaseAmount: number;
   maxDiscountAmount?: number | null;
+  usageLimitPerCustomer?: number;
+  firstOrderOnly?: boolean;
   totalUsageLimit: number;
   usedCount: number;
   startDate: string;
@@ -48,6 +50,8 @@ export default function AdminCouponsPage() {
   const [minPurchaseAmount, setMinPurchaseAmount] = useState('999');
   const [maxDiscountAmount, setMaxDiscountAmount] = useState('');
   const [totalUsageLimit, setTotalUsageLimit] = useState('100');
+  const [usageLimitPerCustomer, setUsageLimitPerCustomer] = useState('1');
+  const [firstOrderOnly, setFirstOrderOnly] = useState(false);
   const [expiryDate, setExpiryDate] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -87,6 +91,8 @@ export default function AdminCouponsPage() {
     setMinPurchaseAmount('999');
     setMaxDiscountAmount('');
     setTotalUsageLimit('100');
+    setUsageLimitPerCustomer('1');
+    setFirstOrderOnly(false);
     // Default 30 days from now
     const d = new Date();
     d.setDate(d.getDate() + 30);
@@ -104,6 +110,8 @@ export default function AdminCouponsPage() {
     setMinPurchaseAmount(coupon.minPurchaseAmount.toString());
     setMaxDiscountAmount(coupon.maxDiscountAmount ? coupon.maxDiscountAmount.toString() : '');
     setTotalUsageLimit(coupon.totalUsageLimit.toString());
+    setUsageLimitPerCustomer(coupon.usageLimitPerCustomer ? coupon.usageLimitPerCustomer.toString() : '1');
+    setFirstOrderOnly(Boolean(coupon.firstOrderOnly));
     setExpiryDate(new Date(coupon.expiryDate).toISOString().split('T')[0]);
     setIsActive(coupon.isActive);
     setIsModalOpen(true);
@@ -122,6 +130,8 @@ export default function AdminCouponsPage() {
         minPurchaseAmount: Number(minPurchaseAmount) || 0,
         maxDiscountAmount: maxDiscountAmount ? Number(maxDiscountAmount) : null,
         totalUsageLimit: Number(totalUsageLimit) || 100,
+        usageLimitPerCustomer: Number(usageLimitPerCustomer) || 1,
+        firstOrderOnly,
         expiryDate,
         isActive,
       };
@@ -192,9 +202,16 @@ export default function AdminCouponsPage() {
             <TicketPercent className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-mono font-bold text-xs text-slate-900 tracking-wider">
-              {row.code}
-            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-mono font-bold text-xs text-slate-900 tracking-wider">
+                {row.code}
+              </span>
+              {row.firstOrderOnly && (
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#fcf4e8] text-[#89591C] border border-[#e8d8be]">
+                  1st Order Only
+                </span>
+              )}
+            </div>
             {row.description && (
               <p className="text-[10px] text-slate-500 truncate max-w-xs">{row.description}</p>
             )}
@@ -436,8 +453,8 @@ export default function AdminCouponsPage() {
             />
           </div>
 
-          {/* Expiry Date & Total Usage Limit */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Expiry Date, Total Usage Limit & Usage Per Customer */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Expiry Date *
@@ -453,7 +470,7 @@ export default function AdminCouponsPage() {
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Total Usage Limit (Times)
+                Total Usage Limit
               </label>
               <input
                 type="number"
@@ -463,6 +480,39 @@ export default function AdminCouponsPage() {
                 onChange={(e) => setTotalUsageLimit(e.target.value)}
                 className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Usage Limit / User
+              </label>
+              <input
+                type="number"
+                min="1"
+                placeholder="1"
+                value={usageLimitPerCustomer}
+                onChange={(e) => setUsageLimitPerCustomer(e.target.value)}
+                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              />
+            </div>
+          </div>
+
+          {/* First Order / Welcome Offer Checkbox */}
+          <div className="p-3 bg-[#faf4ec] rounded-xl border border-[#e8d8be] flex items-start gap-2.5">
+            <input
+              type="checkbox"
+              id="couponFirstOrder"
+              checked={firstOrderOnly}
+              onChange={(e) => setFirstOrderOnly(e.target.checked)}
+              className="mt-0.5 w-4 h-4 text-[#89591C] rounded border-slate-300 focus:ring-[#89591C] cursor-pointer"
+            />
+            <div>
+              <label htmlFor="couponFirstOrder" className="text-xs font-bold text-slate-900 cursor-pointer block">
+                Welcome Offer: Valid on First Order Only
+              </label>
+              <p className="text-[11px] text-slate-600 mt-0.5">
+                Restricts this coupon strictly to newly registered customers making their very first order.
+              </p>
             </div>
           </div>
 

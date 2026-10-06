@@ -21,6 +21,7 @@ export interface IProductColorVariant {
   imageUrl?: string;
   images?: IProductImage[];
   sizes?: IProductSizeItem[];
+  stock?: number;
   isAvailable?: boolean;
 }
 
@@ -110,6 +111,7 @@ const ProductColorVariantSchema = new Schema<IProductColorVariant>(
     imageUrl: { type: String, default: '' },
     images: { type: [ProductImageSchema], default: [] },
     sizes: { type: [ProductSizeItemSchema], default: [] },
+    stock: { type: Number, default: 10 },
     isAvailable: { type: Boolean, default: true },
   },
   { _id: false }

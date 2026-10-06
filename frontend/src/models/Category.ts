@@ -6,6 +6,7 @@ export interface ICategory extends Document {
   targetAudience: 'Men' | 'Women' | 'Babies' | 'Kids';
   image: string;
   subCategories: string[];
+  discountPercentage?: number;
   displayOrder: number;
   isActive: boolean;
   createdAt: Date;
@@ -16,8 +17,9 @@ const CategorySchema = new Schema<ICategory>(
   {
     name: { type: String, required: true, index: true },
     slug: { type: String, required: true, unique: true, index: true },
-    targetAudience: { type: String, required: true, enum: ['Men', 'Women', 'Babies', 'Kids'], index: true },
-    image: { type: String, required: true },
+    targetAudience: { type: String, required: true, enum: ['Men', 'Women', 'Babies', 'Kids', 'All'], index: true },
+    image: { type: String, default: '' },
+    discountPercentage: { type: Number, default: 0 },
     subCategories: [{ type: String }],
     displayOrder: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true, index: true },

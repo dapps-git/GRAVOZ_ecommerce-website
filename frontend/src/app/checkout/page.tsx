@@ -716,13 +716,16 @@ export default function CheckoutPage() {
       }
 
       // Step 2: Open Razorpay Standard Checkout Modal
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.gravoz.com';
+      const logoUrl = `${origin}/gravoz-logo.png`;
+
       const options = {
         key: rzpOrderData.keyId,
         amount: rzpOrderData.amount,
         currency: rzpOrderData.currency || 'INR',
         name: 'GRAVOZ',
         description: `Order Payment (${items.length} item${items.length > 1 ? 's' : ''})`,
-        image: '/images/bag.webp',
+        image: logoUrl,
         order_id: rzpOrderData.orderId,
         prefill: {
           name: rzpOrderData.prefill?.name || activeAddress.name || user?.name || '',
@@ -731,16 +734,24 @@ export default function CheckoutPage() {
         },
         theme: {
           color: '#8B4A12',
-          backdrop_color: 'rgba(0, 0, 0, 0.65)',
+        },
+        retry: {
+          enabled: true,
+          max_count: 2,
         },
         modal: {
+          backdropclose: false,
+          escape: true,
+          handleback: true,
+          confirm_close: true,
           ondismiss: function () {
             setIsOpeningGateway(false);
             setIsPlacingOrder(false);
-            showToast('Payment window dismissed.');
+            showToast('Payment window closed.');
           },
         },
         handler: async function (response: any) {
+          setIsOpeningGateway(false);
           setIsPlacingOrder(true);
           try {
             // Step 3: Server-side cryptographic HMAC-SHA256 signature verification & Order creation
@@ -780,12 +791,17 @@ export default function CheckoutPage() {
         const errMsg =
           failResp?.error?.description ||
           failResp?.error?.reason ||
-          'Payment transaction could not be completed. Please try again.';
+          'Payment transaction could not be completed. Please try again or select Cash on Delivery.';
         setOrderError(errMsg);
       });
 
-      setIsOpeningGateway(false);
-      razorpayInstance.open();
+      try {
+        razorpayInstance.open();
+      } catch (openErr: any) {
+        setIsOpeningGateway(false);
+        setIsPlacingOrder(false);
+        setOrderError('Unable to open payment modal. Please refresh or choose Cash on Delivery.');
+      }
     } catch (err: any) {
       setIsOpeningGateway(false);
       setIsPlacingOrder(false);
@@ -967,7 +983,7 @@ export default function CheckoutPage() {
             </div>
             {availableCoupons.filter((c) => {
               const isRetUser = Boolean((user?.totalOrders || 0) > 0);
-              if (c.code === 'FIRSTSTEP' && isRetUser) return false;
+              if ((c.code === 'FIRSTSTEP' || c.firstOrderOnly) && isRetUser) return false;
               return true;
             }).length > 0 && (
               <button
@@ -1038,7 +1054,7 @@ export default function CheckoutPage() {
               {availableCoupons
                 .filter((c) => {
                   const isRetUser = Boolean((user?.totalOrders || 0) > 0);
-                  if (c.code === 'FIRSTSTEP' && isRetUser) return false;
+                  if ((c.code === 'FIRSTSTEP' || c.firstOrderOnly) && isRetUser) return false;
                   return true;
                 })
                 .map((c) => (
@@ -1053,7 +1069,7 @@ export default function CheckoutPage() {
                         <div className="min-w-0">
                           <p className="text-[11px] font-bold text-[#171717] truncate">{c.description}</p>
                           <p className="text-[9px] text-[#667085]">
-                            {c.code === 'FIRSTSTEP'
+                            {c.code === 'FIRSTSTEP' || c.firstOrderOnly
                               ? 'Welcome Offer • Valid on 1st Order'
                               : `Min order ₹${(c.minPurchaseAmount || 0).toLocaleString('en-IN')}`}
                           </p>

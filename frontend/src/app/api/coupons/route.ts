@@ -9,6 +9,8 @@ export interface CouponItem {
   description: string;
   minPurchaseAmount: number;
   maxDiscountAmount?: number | null;
+  firstOrderOnly?: boolean;
+  usageLimitPerCustomer?: number;
 }
 
 export async function GET() {
@@ -19,7 +21,7 @@ export async function GET() {
       isActive: true,
       expiryDate: { $gte: now },
     })
-      .select('code type value description minPurchaseAmount maxDiscountAmount')
+      .select('code type value description minPurchaseAmount maxDiscountAmount firstOrderOnly usageLimitPerCustomer')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -36,6 +38,8 @@ export async function GET() {
           : 'Free Shipping'),
       minPurchaseAmount: c.minPurchaseAmount || 0,
       maxDiscountAmount: c.maxDiscountAmount || null,
+      firstOrderOnly: Boolean(c.firstOrderOnly),
+      usageLimitPerCustomer: c.usageLimitPerCustomer || 1,
     }));
 
     return NextResponse.json(
