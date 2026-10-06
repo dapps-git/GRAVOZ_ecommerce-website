@@ -609,10 +609,10 @@ export default function ProfilePage() {
                                 if (st === 'cancelled') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>;
                                 }
-                                if (st === 'return_approved') {
+                                if (st === 'return_approved' || st === 'approved') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-[#E8F8EE] text-[#22C55E] border border-[#22C55E]/30">Return Accepted</span>;
                                 }
-                                if (st === 'return_requested') {
+                                if (st === 'return_requested' || st === 'requested') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Return Requested</span>;
                                 }
                                 if (st === 'under_review') {
@@ -621,22 +621,31 @@ export default function ProfilePage() {
                                 if (st === 'pickup_scheduled') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">Pickup Scheduled</span>;
                                 }
-                                if (st === 'return_received') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">Return Received</span>;
+                                if (st === 'return_received' || st === 'received_at_hub' || st === 'received') {
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">Received at Hub</span>;
                                 }
                                 if (st === 'refund_initiated') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-teal-50 text-teal-800 border border-teal-200">Refund Initiated</span>;
                                 }
-                                if (st === 'refunded') {
+                                if (st === 'refunded' || st === 'returned' || st === 'processed') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">Refunded</span>;
                                 }
-                                if (st === 'return_rejected') {
+                                if (st === 'return_rejected' || st === 'rejected') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Return Declined</span>;
                                 }
                                 if (st === 'delivered') {
                                   return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>;
                                 }
-                                return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 capitalize">{st.replace(/_/g, ' ')}</span>;
+                                if (st === 'shipped') {
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-sky-50 text-sky-700 border border-sky-200">Shipped</span>;
+                                }
+                                if (st === 'out_for_delivery') {
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-cyan-50 text-cyan-700 border border-cyan-200">Out for Delivery</span>;
+                                }
+                                if (st === 'confirmed' || st === 'processing') {
+                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Confirmed</span>;
+                                }
+                                return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-[#FAF7F3] text-slate-700 border border-[#E5E1DC] capitalize">{st ? st.replace(/_/g, ' ') : 'Ordered'}</span>;
                               })()}
 
                               <div className="flex items-center gap-1.5 ml-auto sm:ml-0">

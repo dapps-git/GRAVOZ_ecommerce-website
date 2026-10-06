@@ -45,9 +45,9 @@ const RETURN_STEP_DEFINITIONS = [
   { key: 'under_review', label: 'Under Review', defaultDesc: 'Our quality team is reviewing your request.' },
   { key: 'approved', label: 'Return Request Accepted', defaultDesc: 'Return request accepted! Pickup will be scheduled.' },
   { key: 'pickup_scheduled', label: 'Pickup Scheduled', defaultDesc: 'Courier partner scheduled for parcel pickup.' },
-  { key: 'received', label: 'Received', defaultDesc: 'Item received at GRAVOZ fulfillment center.' },
-  { key: 'refund_initiated', label: 'Refund Initiated', defaultDesc: 'Refund initiated to your account.' },
-  { key: 'refunded', label: 'Refunded', defaultDesc: 'Refund completed successfully.' },
+  { key: 'received', label: 'Received at Hub', defaultDesc: 'Item received and verified at GRAVOZ fulfillment center.' },
+  { key: 'refund_initiated', label: 'Refund Initiated', defaultDesc: 'Refund initiated back to original payment source.' },
+  { key: 'refunded', label: 'Refunded', defaultDesc: 'Refund completed successfully to your bank account.' },
 ];
 
 const RETURN_REASONS = [
@@ -240,14 +240,20 @@ export default function OrderTrackingPage() {
 
   const RETURN_STATUSES = [
     'return_requested',
+    'requested',
     'under_review',
     'return_approved',
+    'approved',
     'pickup_scheduled',
     'return_received',
+    'received',
+    'received_at_hub',
     'refund_initiated',
     'refunded',
     'returned',
+    'processed',
     'return_rejected',
+    'rejected',
   ];
 
   const orderStatus = order.orderStatus || 'ordered';
@@ -260,15 +266,18 @@ export default function OrderTrackingPage() {
   // Return step indexing
   const returnStepMap: Record<string, number> = {
     return_requested: 0,
+    requested: 0,
     under_review: 1,
     approved: 2,
     return_approved: 2,
     pickup_scheduled: 3,
     received: 4,
     return_received: 4,
+    received_at_hub: 4,
     refund_initiated: 5,
     refunded: 6,
     returned: 6,
+    processed: 6,
   };
   const activeReturnStepIdx = returnStepMap[returnStatus || orderStatus] ?? 0;
   const isReturnRejected = returnStatus === 'rejected' || orderStatus === 'return_rejected';

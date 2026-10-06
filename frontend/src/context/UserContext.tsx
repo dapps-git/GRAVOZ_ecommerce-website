@@ -133,11 +133,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await logoutAccount();
-    } catch {}
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
     setUser(null);
     try {
       localStorage.removeItem(LOCAL_STORAGE_KEY);
+      sessionStorage.clear();
+      document.cookie = 'gravoz_user_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0';
+      document.cookie = 'gravoz_user_refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0';
     } catch {}
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   const isLoggedIn = !!user && !!user.email;

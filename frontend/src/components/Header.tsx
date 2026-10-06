@@ -100,7 +100,10 @@ export default function Header() {
                 <span className="text-[#d8cebe]">|</span>
                 <button
                   type="button"
-                  onClick={() => logout()}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await logout();
+                  }}
                   className="hover:text-rose-600 transition-colors text-[11px] font-semibold cursor-pointer uppercase"
                 >
                   LOGOUT
@@ -424,9 +427,10 @@ export default function Header() {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => {
-                        logout();
+                      onClick={async (e) => {
+                        e.preventDefault();
                         closeMobileMenu();
+                        await logout();
                       }}
                       className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-md hover:bg-rose-100 transition-colors"
                     >

@@ -24,6 +24,8 @@ import {
   FileCheck2,
   CheckCircle2,
   PackageCheck,
+  RotateCcw,
+  XCircle,
 } from 'lucide-react';
 
 const STEP_DEFINITIONS = [
@@ -32,6 +34,34 @@ const STEP_DEFINITIONS = [
   { key: 'shipped', label: 'Shipped', defaultDesc: 'Your package is on the way', icon: Truck },
   { key: 'out_for_delivery', label: 'Out for Delivery', defaultDesc: 'Your order is out for delivery and will reach you soon.', icon: MapPin },
   { key: 'delivered', label: 'Delivered', defaultDesc: 'Package delivered to recipient', icon: PackageCheck },
+];
+
+const RETURN_STEP_DEFINITIONS = [
+  { key: 'return_requested', label: 'Return Requested', defaultDesc: 'Your return request has been submitted.' },
+  { key: 'under_review', label: 'Under Review', defaultDesc: 'Our quality team is reviewing your request.' },
+  { key: 'approved', label: 'Return Accepted', defaultDesc: 'Return request accepted! Pickup will be scheduled.' },
+  { key: 'pickup_scheduled', label: 'Pickup Scheduled', defaultDesc: 'Courier partner scheduled for parcel pickup.' },
+  { key: 'received', label: 'Received at Hub', defaultDesc: 'Item received and verified at GRAVOZ fulfillment center.' },
+  { key: 'refund_initiated', label: 'Refund Initiated', defaultDesc: 'Refund initiated back to original payment source.' },
+  { key: 'refunded', label: 'Refunded', defaultDesc: 'Refund completed successfully to your bank account.' },
+];
+
+const RETURN_STATUSES = [
+  'return_requested',
+  'requested',
+  'under_review',
+  'return_approved',
+  'approved',
+  'pickup_scheduled',
+  'return_received',
+  'received',
+  'received_at_hub',
+  'refund_initiated',
+  'refunded',
+  'returned',
+  'processed',
+  'return_rejected',
+  'rejected',
 ];
 
 function TrackOrderContent() {
@@ -122,6 +152,28 @@ function TrackOrderContent() {
   }, [initialQuery]);
 
   const orderStatus = order?.orderStatus || 'ordered';
+  const isReturnFlow = RETURN_STATUSES.includes(orderStatus);
+  const returnStatus = isReturnFlow ? (order?.returnDetails?.status || orderStatus) : null;
+  const isCancelled = orderStatus === 'cancelled';
+  const isReturnRejected = returnStatus === 'rejected' || orderStatus === 'return_rejected';
+
+  const returnStepMap: Record<string, number> = {
+    return_requested: 0,
+    requested: 0,
+    under_review: 1,
+    approved: 2,
+    return_approved: 2,
+    pickup_scheduled: 3,
+    received: 4,
+    return_received: 4,
+    received_at_hub: 4,
+    refund_initiated: 5,
+    refunded: 6,
+    returned: 6,
+    processed: 6,
+  };
+  const activeReturnStepIdx = returnStepMap[returnStatus || orderStatus] ?? 0;
+
   const stepIndexMap: Record<string, number> = {
     ordered: 0,
     confirmed: 1,
@@ -131,7 +183,9 @@ function TrackOrderContent() {
     delivered: 4,
   };
   const activeStepIdx = stepIndexMap[orderStatus] ?? 0;
-  const currentStepDef = STEP_DEFINITIONS[activeStepIdx] || STEP_DEFINITIONS[0];
+  const currentStepDef = isReturnFlow
+    ? RETURN_STEP_DEFINITIONS[activeReturnStepIdx] || RETURN_STEP_DEFINITIONS[0]
+    : STEP_DEFINITIONS[activeStepIdx] || STEP_DEFINITIONS[0];
 
   const createdAtDate = order ? new Date(order.createdAt || Date.now()) : new Date();
   const deliveryExpectedDate = new Date(createdAtDate);
@@ -314,89 +368,161 @@ function TrackOrderContent() {
             </Link>
           </div>
 
-          {/* Stepper Timeline */}
-          <div className="w-full pt-2 pb-6 border-b border-[#f0ece5] font-montserrat">
-            <div className="relative flex items-start justify-between">
-              {/* Connecting Background Line */}
-              <div className="absolute top-3.5 sm:top-4.5 left-4 right-4 h-[2px] bg-[#e8e2d8] z-0">
-                <div
-                  className="h-full bg-[#557244] transition-all duration-500"
-                  style={{
-                    width: `${(activeStepIdx / (STEP_DEFINITIONS.length - 1)) * 100}%`,
-                  }}
-                />
+          {/* ── CANCELLED ORDER BANNER ── */}
+          {isCancelled && (
+            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex items-center gap-3 text-rose-800">
+              <XCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+              <div>
+                <h3 className="text-xs sm:text-sm font-bold">This Order Has Been Cancelled</h3>
+                <p className="text-[11px] text-rose-600 mt-0.5 font-normal">
+                  If payment was deducted online via UPI/Card, the refund will be credited back to your original bank account within 1-2 business days.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ── RETURN LIFECYCLE STEPPER (When In Return Flow) ── */}
+          {isReturnFlow && !isReturnRejected && (
+            <div className="w-full p-4 sm:p-5 bg-white border border-[#e8e2d8] rounded-xl shadow-2xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <RotateCcw className="w-4 h-4 text-[#89591C]" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#89591C]">
+                    Return &amp; Refund Status
+                  </span>
+                </div>
+                <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-md ${
+                  activeReturnStepIdx >= 2 ? 'bg-[#E8F8EE] text-[#22C55E]' : 'bg-[#FAF7F3] text-[#89591C] border border-[#e8e2d8]'
+                }`}>
+                  {RETURN_STEP_DEFINITIONS[activeReturnStepIdx]?.label}
+                </span>
               </div>
 
-              {STEP_DEFINITIONS.map((step, i) => {
-                const isCompleted = i < activeStepIdx;
-                const isActive = i === activeStepIdx;
-                const StepIcon = step.icon || Package;
-                const stepMeta = getStepStatusMeta(step.key, i);
-
-                return (
+              {/* Return Step Nodes */}
+              <div className="relative flex items-start justify-between pt-2">
+                <div className="absolute top-3.5 left-3 right-3 h-[2px] bg-[#e8e2d8] z-0">
                   <div
-                    key={step.key}
-                    className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[70px] sm:max-w-[110px]"
-                  >
+                    className="h-full bg-[#89591C] transition-all duration-500"
+                    style={{
+                      width: `${(activeReturnStepIdx / (RETURN_STEP_DEFINITIONS.length - 1)) * 100}%`,
+                    }}
+                  />
+                </div>
+
+                {RETURN_STEP_DEFINITIONS.map((step, i) => {
+                  const isCompleted = i < activeReturnStepIdx;
+                  const isActive = i === activeReturnStepIdx;
+
+                  return (
+                    <div key={step.key} className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[45px] sm:max-w-[80px]">
+                      <div
+                        className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] font-medium transition-all ${
+                          isCompleted
+                            ? 'bg-[#89591C] text-white shadow-xs'
+                            : isActive
+                            ? 'bg-[#111111] text-white ring-2 ring-[#89591C]/30 shadow-xs'
+                            : 'bg-white border border-[#e8e2d8] text-[#888888]'
+                        }`}
+                      >
+                        {isCompleted ? <Check className="w-3 h-3 stroke-[2.5]" /> : i + 1}
+                      </div>
+                      <span className={`text-[8.5px] sm:text-[10px] mt-1.5 leading-tight ${
+                        isActive ? 'font-semibold text-[#111111]' : isCompleted ? 'font-medium text-[#555555]' : 'text-[#888888]'
+                      }`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── STANDARD DELIVERY STEPPER TIMELINE (When Not In Return Flow and Not Cancelled) ── */}
+          {!isCancelled && !isReturnFlow && (
+            <div className="w-full pt-2 pb-6 border-b border-[#f0ece5] font-montserrat">
+              <div className="relative flex items-start justify-between">
+                {/* Connecting Background Line */}
+                <div className="absolute top-3.5 sm:top-4.5 left-4 right-4 h-[2px] bg-[#e8e2d8] z-0">
+                  <div
+                    className="h-full bg-[#557244] transition-all duration-500"
+                    style={{
+                      width: `${(activeStepIdx / (STEP_DEFINITIONS.length - 1)) * 100}%`,
+                    }}
+                  />
+                </div>
+
+                {STEP_DEFINITIONS.map((step, i) => {
+                  const isCompleted = i < activeStepIdx;
+                  const isActive = i === activeStepIdx;
+                  const StepIcon = step.icon || Package;
+                  const stepMeta = getStepStatusMeta(step.key, i);
+
+                  return (
                     <div
-                      className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
-                        isCompleted
-                          ? 'bg-[#557244] text-white shadow-xs border border-[#557244]'
-                          : isActive
-                          ? 'bg-[#89591C] text-white shadow-xs ring-3 sm:ring-4 ring-[#89591C]/20 border border-[#89591C]'
-                          : 'bg-white border border-[#d8cebe] text-slate-400'
-                      }`}
+                      key={step.key}
+                      className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[70px] sm:max-w-[110px]"
                     >
-                      {isCompleted ? (
-                        <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5]" />
-                      ) : (
-                        <StepIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                      <div
+                        className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
+                          isCompleted
+                            ? 'bg-[#557244] text-white shadow-xs border border-[#557244]'
+                            : isActive
+                            ? 'bg-[#89591C] text-white shadow-xs ring-3 sm:ring-4 ring-[#89591C]/20 border border-[#89591C]'
+                            : 'bg-white border border-[#d8cebe] text-slate-400'
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5]" />
+                        ) : (
+                          <StepIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                        )}
+                      </div>
+
+                      <span
+                        className={`text-[9px] sm:text-[11px] mt-1.5 sm:mt-2 leading-tight tracking-tight ${
+                          isActive
+                            ? 'font-semibold text-[#030303]'
+                            : isCompleted
+                            ? 'font-medium text-slate-700'
+                            : 'font-normal text-slate-400'
+                        }`}
+                      >
+                        {step.label}
+                      </span>
+
+                      {/* Status Date in Light Font */}
+                      {stepMeta.dateStr && (
+                        <span className="text-[8px] sm:text-[10px] text-slate-400 font-light mt-0.5 leading-tight tracking-tight">
+                          {stepMeta.dateStr}
+                        </span>
+                      )}
+
+                      {/* Location in Light Font if available */}
+                      {stepMeta.location && (
+                        <span className="text-[7.5px] sm:text-[9px] text-slate-400 font-light mt-0.5 leading-tight flex items-center justify-center gap-0.5 max-w-[90px] truncate">
+                          <MapPin className="w-2.5 h-2.5 text-slate-400 shrink-0 inline" />
+                          <span className="truncate">{stepMeta.location}</span>
+                        </span>
                       )}
                     </div>
-
-                    <span
-                      className={`text-[9px] sm:text-[11px] mt-1.5 sm:mt-2 leading-tight tracking-tight ${
-                        isActive
-                          ? 'font-semibold text-[#030303]'
-                          : isCompleted
-                          ? 'font-medium text-slate-700'
-                          : 'font-normal text-slate-400'
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-
-                    {/* Status Date in Light Font */}
-                    {stepMeta.dateStr && (
-                      <span className="text-[8px] sm:text-[10px] text-slate-400 font-light mt-0.5 leading-tight tracking-tight">
-                        {stepMeta.dateStr}
-                      </span>
-                    )}
-
-                    {/* Location in Light Font if available */}
-                    {stepMeta.location && (
-                      <span className="text-[7.5px] sm:text-[9px] text-slate-400 font-light mt-0.5 leading-tight flex items-center justify-center gap-0.5 max-w-[90px] truncate">
-                        <MapPin className="w-2.5 h-2.5 text-slate-400 shrink-0 inline" />
-                        <span className="truncate">{stepMeta.location}</span>
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Current Hub Location Banner if available */}
-            {order.currentLocation && (
-              <div className="mt-4 px-3.5 py-2 bg-[#faf8f5] border border-[#e8e2d8] rounded-xl flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-slate-600">
-                  <MapPin className="w-3.5 h-3.5 text-[#89591C]" />
-                  <span>Current Tracking Location:</span>
-                  <strong className="text-[#030303] font-semibold">{order.currentLocation}</strong>
-                </div>
-                <span className="text-[10px] text-slate-400 font-light">In Transit</span>
+                  );
+                })}
               </div>
-            )}
-          </div>
+
+              {/* Current Hub Location Banner if available */}
+              {order.currentLocation && (
+                <div className="mt-4 px-3.5 py-2 bg-[#faf8f5] border border-[#e8e2d8] rounded-xl flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-slate-600">
+                    <MapPin className="w-3.5 h-3.5 text-[#89591C]" />
+                    <span>Current Tracking Location:</span>
+                    <strong className="text-[#030303] font-semibold">{order.currentLocation}</strong>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-light">In Transit</span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Active Status Card matching Screenshot 2 */}
           <div className="space-y-1">
