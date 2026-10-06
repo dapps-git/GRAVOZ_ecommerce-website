@@ -99,6 +99,10 @@ export interface IOrder extends Document {
   estimatedDelivery?: Date;
   paymentMethod: string;
   transactionId?: string;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  paymentDetails?: any;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -230,6 +234,10 @@ const OrderSchema: Schema<IOrder> = new Schema(
     estimatedDelivery: { type: Date },
     paymentMethod: { type: String, default: 'COD' },
     transactionId: { type: String },
+    razorpayOrderId: { type: String, default: '', index: true },
+    razorpayPaymentId: { type: String, default: '', index: true },
+    razorpaySignature: { type: String, default: '' },
+    paymentDetails: { type: Schema.Types.Mixed, default: {} },
     notes: { type: String },
   },
   { timestamps: true }

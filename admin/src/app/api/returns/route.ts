@@ -70,6 +70,40 @@ export async function PUT(req: NextRequest) {
       orderUpdate['returnDetails.status'] = 'refunded';
       orderUpdate['returnDetails.refundedAt'] = now;
 
+      // If Razorpay online payment, trigger gateway reversal back to customer bank account
+      if (returnItem.order) {
+        try {
+          const ord = await Order.findById(returnItem.order);
+          if (ord && ord.paymentMethod !== 'COD' && (ord.razorpayPaymentId || ord.transactionId)) {
+            const pId = ord.razorpayPaymentId || ord.transactionId;
+            const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_ThoKT60JX1kpL8';
+            const keySecret = process.env.RAZORPAY_KEY_SECRET || 'H13PuysOoGUC6q7JluZMsNnK';
+            if (keyId && keySecret && pId) {
+              const amountInPaise = Math.round((returnItem.refundAmount || ord.totalAmount) * 100);
+              const rzpRes = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(pId)}/refund`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString('base64')}`,
+                },
+                body: JSON.stringify({
+                  amount: amountInPaise,
+                  notes: { orderNumber: ord.orderNumber, reason: 'Approved customer return refund' },
+                }),
+              });
+              const rzpJson = await rzpRes.json();
+              if (rzpRes.ok && rzpJson.id) {
+                orderUpdate['paymentDetails.refundId'] = rzpJson.id;
+                orderUpdate['paymentDetails.refundStatus'] = rzpJson.status || 'processed';
+                orderUpdate['paymentDetails.refundedAt'] = now;
+              }
+            }
+          }
+        } catch (gatewayErr) {
+          console.error('[RAZORPAY REFUND] Gateway reversal error in returns route:', gatewayErr);
+        }
+      }
+
       // Background refund processing task
       try {
         await backgroundQueue.addJob('PROCESS_REFUND', {

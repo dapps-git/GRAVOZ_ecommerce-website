@@ -3,7 +3,20 @@
 import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import StatusBadge from '@/components/admin/StatusBadge';
-import { ArrowLeft, FileText, MapPin, Clock, CheckCircle2, Truck } from 'lucide-react';
+import {
+  ArrowLeft,
+  FileText,
+  MapPin,
+  Clock,
+  CheckCircle2,
+  Truck,
+  AlertTriangle,
+  ShieldAlert,
+  Loader2,
+  RotateCcw,
+  X,
+  CreditCard,
+} from 'lucide-react';
 import Link from 'next/link';
 
 export interface StatusHistoryItem {
@@ -46,6 +59,10 @@ interface OrderDetail {
   paymentStatus: string;
   orderStatus: string;
   paymentMethod: string;
+  transactionId?: string;
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
+  paymentDetails?: any;
   returnDetails?: {
     reason?: string;
     description?: string;
@@ -68,6 +85,12 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [statusNote, setStatusNote] = useState('');
   const [updateSuccessMsg, setUpdateSuccessMsg] = useState('');
 
+  // Refund Confirmation Modal State
+  const [showRefundConfirmModal, setShowRefundConfirmModal] = useState(false);
+  const [isProcessingRefund, setIsProcessingRefund] = useState(false);
+  const [refundError, setRefundError] = useState('');
+  const [refundSuccessData, setRefundSuccessData] = useState<any>(null);
+
   useEffect(() => {
     fetch(`/api/orders/${resolvedParams.id}`)
       .then((res) => res.json())
@@ -82,9 +105,34 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       .finally(() => setLoading(false));
   }, [resolvedParams.id]);
 
+  const handleStatusChange = (newStatus: string) => {
+    setSelectedStatus(newStatus);
+    // Double Check: If admin selects refund_initiated or refunded, trigger confirmation modal immediately
+    if ((newStatus === 'refund_initiated' || newStatus === 'refunded') && order?.paymentStatus !== 'refunded') {
+      setShowRefundConfirmModal(true);
+    }
+  };
+
+  const handleCloseRefundModal = () => {
+    setShowRefundConfirmModal(false);
+    setRefundError('');
+    setRefundSuccessData(null);
+    // Revert dropdown if refund was not completed
+    if (order && order.paymentStatus !== 'refunded') {
+      setSelectedStatus(order.orderStatus || 'ordered');
+    }
+  };
+
   const handleUpdateStatusAndLocation = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!selectedStatus) return;
+
+    // Double Check: If admin selects refund_initiated or refunded, trigger confirmation modal first
+    if ((selectedStatus === 'refund_initiated' || selectedStatus === 'refunded') && order?.paymentStatus !== 'refunded') {
+      setShowRefundConfirmModal(true);
+      return;
+    }
+
     setUpdating(true);
     setUpdateSuccessMsg('');
     try {
@@ -109,6 +157,38 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       console.error('Failed to update status & location:', err);
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleProcessRefund = async () => {
+    setIsProcessingRefund(true);
+    setRefundError('');
+    try {
+      const targetStatus = selectedStatus === 'refunded' ? 'refunded' : 'refund_initiated';
+      const res = await fetch(`/api/orders/${resolvedParams.id}/refund`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetStatus }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setRefundSuccessData(data);
+        if (data.order) {
+          setOrder(data.order);
+          setSelectedStatus(data.order.orderStatus);
+        }
+        setUpdateSuccessMsg(data.message || 'Refund sent to customer bank account successfully!');
+        setTimeout(() => {
+          setShowRefundConfirmModal(false);
+          setRefundSuccessData(null);
+        }, 3500);
+      } else {
+        setRefundError(data.error || 'Failed to process bank refund.');
+      }
+    } catch (err: any) {
+      setRefundError(err.message || 'Network error occurred while processing refund.');
+    } finally {
+      setIsProcessingRefund(false);
     }
   };
 
@@ -204,7 +284,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <select
               value={selectedStatus}
               disabled={updating}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              onChange={(e) => handleStatusChange(e.target.value)}
               className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#89591C]"
             >
               <option value="ordered">Ordered (Placed)</option>
@@ -311,6 +391,32 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 <span className="text-slate-500 block">Razorpay Payment ID:</span>
                 <span className="font-mono text-slate-800 break-all font-semibold">{(order as any).razorpayPaymentId}</span>
               </div>
+            )}
+
+            {order.paymentStatus === 'refunded' ? (
+              <div className="mt-2.5 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-[11px] text-emerald-800">
+                <div className="flex items-center gap-1 font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Refund Processed to Bank</span>
+                </div>
+                {(order as any).paymentDetails?.refundId && (
+                  <span className="font-mono text-[10px] text-emerald-700 block mt-0.5">
+                    Refund ID: {(order as any).paymentDetails.refundId}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedStatus('refund_initiated');
+                  setShowRefundConfirmModal(true);
+                }}
+                className="mt-2.5 w-full py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Initiate Bank Refund</span>
+              </button>
             )}
           </div>
 
@@ -436,6 +542,184 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           })()}
         </div>
       </div>
+
+      {/* ── DOUBLE-CHECK BANK REFUND CONFIRMATION MODAL ── */}
+      {showRefundConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-slate-200 relative space-y-5 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 flex-shrink-0">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Double-Check: Confirm Bank Refund
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Verify order details before sending money to customer&apos;s bank account
+                  </p>
+                </div>
+              </div>
+
+              {!isProcessingRefund && (
+                <button
+                  type="button"
+                  onClick={handleCloseRefundModal}
+                  className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Refund Order Summary Details */}
+            <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-xl p-4 space-y-2 text-xs">
+              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+                <span className="text-slate-500 font-medium">Order Number:</span>
+                <span className="font-bold text-slate-900 font-mono">{order.orderNumber}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+                <span className="text-slate-500 font-medium">Customer:</span>
+                <span className="font-semibold text-slate-900">{customerName}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+                <span className="text-slate-500 font-medium">Customer Email / Phone:</span>
+                <span className="text-slate-700">{customerEmail} • {customerPhone}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+                <span className="text-slate-500 font-medium">Payment Method:</span>
+                <span className="font-bold text-slate-900">
+                  {order.paymentMethod === 'COD' ? 'Cash on Delivery (COD)' : `${order.paymentMethod || 'Online'} (UPI / Razorpay)`}
+                </span>
+              </div>
+              {(order as any).razorpayPaymentId && (
+                <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+                  <span className="text-slate-500 font-medium">Razorpay Payment ID:</span>
+                  <span className="font-mono text-slate-800 font-semibold text-[11px]">
+                    {(order as any).razorpayPaymentId}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between py-1.5 text-sm font-bold text-slate-900">
+                <span className="text-rose-700 font-semibold">Refund Amount to Send:</span>
+                <span className="text-base text-rose-700 font-bold">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+
+            {/* Target Status Choice */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                Target Status after Bank Transfer:
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedStatus('refund_initiated')}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    selectedStatus === 'refund_initiated'
+                      ? 'border-[#89591C] bg-[#FAF4EC] text-[#89591C] font-bold shadow-xs'
+                      : 'border-slate-200 hover:border-slate-300 text-slate-700 font-medium'
+                  }`}
+                >
+                  <div className="text-xs">Refund Initiated</div>
+                  <div className="text-[10px] text-slate-500 font-normal">Customer tracking shows Step 5 (Processing)</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedStatus('refunded')}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    selectedStatus === 'refunded'
+                      ? 'border-emerald-600 bg-emerald-50 text-emerald-800 font-bold shadow-xs'
+                      : 'border-slate-200 hover:border-slate-300 text-slate-700 font-medium'
+                  }`}
+                >
+                  <div className="text-xs">Refund Completed</div>
+                  <div className="text-[10px] text-slate-500 font-normal">Customer tracking shows Step 6 (Completed)</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Payment Destination Security Explanation */}
+            {order.paymentMethod === 'COD' ? (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <span>Manual COD Refund Notice</span>
+                </div>
+                <p className="text-[11px] text-amber-700 leading-relaxed font-normal">
+                  This was a Cash on Delivery order. Razorpay does not hold these funds. Confirming this will update the system status. Ensure you have transferred the funds manually to the customer&apos;s bank.
+                </p>
+              </div>
+            ) : (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>Automated Direct Bank Reversal via Razorpay</span>
+                </div>
+                <p className="text-[11px] text-emerald-800 leading-relaxed font-normal">
+                  Clicking <strong>&quot;Yes, Send Refund to Bank&quot;</strong> calls Razorpay&apos;s live API. The ₹{(order.totalAmount || 0).toLocaleString('en-IN')} will be reversed directly back to the customer&apos;s original source bank account or UPI VPA (Google Pay / PhonePe / Paytm).
+                </p>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {refundError && (
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-700">
+                {refundError}
+              </div>
+            )}
+
+            {/* Success Message */}
+            {refundSuccessData && (
+              <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl text-xs text-emerald-900 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>{refundSuccessData.message}</span>
+                </div>
+                {refundSuccessData.refundId && (
+                  <p className="font-mono text-[11px] text-emerald-700">
+                    Razorpay Gateway Refund ID: {refundSuccessData.refundId}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                disabled={isProcessingRefund}
+                onClick={handleCloseRefundModal}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Cancel / Keep Order
+              </button>
+
+              <button
+                type="button"
+                disabled={isProcessingRefund || Boolean(refundSuccessData)}
+                onClick={handleProcessRefund}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/20 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isProcessingRefund ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Sending to Bank...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Yes, Send Refund to Bank (₹{(order.totalAmount || 0).toLocaleString('en-IN')})</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
