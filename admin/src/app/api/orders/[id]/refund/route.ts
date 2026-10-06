@@ -82,7 +82,12 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     const refundId = refundResult?.id || `manual_ref_${Date.now()}`;
     const now = new Date();
 
-    order.orderStatus = targetStatus;
+    // If Razorpay processed the reversal immediately to bank, automatically mark status as 'refunded'
+    const finalStatus = (refundResult?.status === 'processed' || targetStatus === 'refunded')
+      ? 'refunded'
+      : 'refund_initiated';
+
+    order.orderStatus = finalStatus;
     order.paymentStatus = 'refunded';
 
     if (!order.paymentDetails) order.paymentDetails = {};
@@ -90,27 +95,28 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     order.paymentDetails.refundStatus = refundResult?.status || 'processed';
     order.paymentDetails.refundAmount = order.totalAmount;
     order.paymentDetails.refundedAt = now;
+    order.markModified('paymentDetails');
 
     if (!order.statusHistory) order.statusHistory = [];
     order.statusHistory.push({
-      status: targetStatus,
+      status: finalStatus,
       timestamp: now,
       note: isCod
-        ? `Cash / Manual refund marked as ${targetStatus === 'refund_initiated' ? 'Refund Initiated' : 'Refunded'} by admin.`
+        ? `Cash / Manual refund marked as ${finalStatus === 'refund_initiated' ? 'Refund Initiated' : 'Refunded'} by admin.`
         : `Razorpay UPI/Bank Refund (${refundId}) processed successfully. ₹${order.totalAmount} reversed directly to customer's bank account.`,
     });
 
     if (order.returnDetails) {
-      order.returnDetails.status = targetStatus;
+      order.returnDetails.status = finalStatus;
       order.returnDetails.refundedAt = now;
-      if (targetStatus === 'refund_initiated') {
+      if (finalStatus === 'refund_initiated') {
         order.returnDetails.refundInitiatedAt = now;
       }
     }
 
     await order.save();
 
-    const statusLabel = targetStatus === 'refund_initiated' ? 'Refund Initiated' : 'Refund Completed';
+    const statusLabel = finalStatus === 'refund_initiated' ? 'Refund Initiated' : 'Refund Completed';
 
     return NextResponse.json({
       success: true,
