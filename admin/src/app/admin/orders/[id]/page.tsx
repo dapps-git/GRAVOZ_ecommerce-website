@@ -405,7 +405,28 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </span>
                 )}
               </div>
-            ) : (
+            ) : order.paymentMethod === 'COD' ? (
+              order.paymentStatus === 'pending' ? (
+                <div className="mt-2.5 p-2 bg-amber-50/70 border border-amber-200 rounded-lg text-[11px] text-amber-800">
+                  <span className="font-semibold">Cash on Delivery (Pending)</span>
+                  <span className="block text-[10px] text-amber-700 mt-0.5">
+                    Payment will be collected upon delivery. No bank refund applicable.
+                  </span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedStatus('refund_initiated');
+                    setShowRefundConfirmModal(true);
+                  }}
+                  className="mt-2.5 w-full py-2 px-3 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Record Manual COD Refund</span>
+                </button>
+              )
+            ) : (order.paymentStatus === 'paid' || (order as any).razorpayPaymentId) ? (
               <button
                 type="button"
                 onClick={() => {
@@ -417,7 +438,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Initiate Bank Refund</span>
               </button>
-            )}
+            ) : null}
           </div>
 
           {/* Return Request Details (If Return Initiated) */}

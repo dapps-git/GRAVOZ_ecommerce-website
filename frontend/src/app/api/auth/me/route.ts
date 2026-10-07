@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getUserSession();
     if (!session) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+      return NextResponse.json({ authenticated: false, user: null }, { status: 200 });
     }
 
     await connectDB();
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     );
 
     if (!customer || !customer.isActive) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+      return NextResponse.json({ authenticated: false, user: null }, { status: 200 });
     }
 
     return NextResponse.json({
