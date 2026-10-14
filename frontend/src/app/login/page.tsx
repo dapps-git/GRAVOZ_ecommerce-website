@@ -7,15 +7,34 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
-import { loginAccount } from '@/lib/auth-client';
+import { loginAccount, loginWithGoogle } from '@/lib/auth-client';
 import { useUser } from '@/context/UserContext';
 import { playSuccessSound } from '@/lib/sounds';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 
+function getSafeRedirect(raw: string | null): string {
+  if (!raw) return '/';
+  try {
+    const decoded = decodeURIComponent(raw);
+    if (decoded.startsWith('http://') || decoded.startsWith('https://') || decoded.startsWith('//')) {
+      return '/';
+    }
+    if (!decoded.startsWith('/')) {
+      return `/${decoded}`;
+    }
+    if (decoded.startsWith('/login') || decoded.startsWith('/signup') || decoded.startsWith('/register')) {
+      return '/';
+    }
+    return decoded;
+  } catch {
+    return '/';
+  }
+}
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || '/';
+  const redirectPath = getSafeRedirect(searchParams.get('redirect') || searchParams.get('callbackUrl'));
   const { updateUser } = useUser();
 
   const [email, setEmail] = useState('');
@@ -32,6 +51,38 @@ function LoginContent() {
   useEffect(() => {
     router.prefetch(redirectPath);
   }, [router, redirectPath]);
+
+  // Handle Google OAuth full-page redirect return on mobile (#access_token=...)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+      const params = new URLSearchParams(hash.replace(/^#/, ''));
+      const accessToken = params.get('access_token');
+      if (accessToken) {
+        setIsSubmitting(true);
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        loginWithGoogle({ accessToken }).then((res) => {
+          if (res.success && res.user) {
+            playSuccessSound();
+            updateUser({
+              name: res.user.name,
+              email: res.user.email,
+              phone: res.user.phone || '',
+              avatarUrl: res.user.avatarUrl || null,
+            });
+            router.push(redirectPath);
+          } else {
+            setErrorMessage(res.error || 'Google authentication failed');
+          }
+        }).catch((err: any) => {
+          setErrorMessage(err.message || 'Google authentication error');
+        }).finally(() => {
+          setIsSubmitting(false);
+        });
+      }
+    }
+  }, [router, redirectPath, updateUser]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

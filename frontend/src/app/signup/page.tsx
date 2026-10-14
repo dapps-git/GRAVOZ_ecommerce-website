@@ -5,15 +5,34 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User, Mail, Lock, Eye, EyeOff, Check, AlertCircle, Gift, Loader2 } from 'lucide-react';
-import { registerAccount } from '@/lib/auth-client';
+import { registerAccount, loginWithGoogle } from '@/lib/auth-client';
 import { useUser } from '@/context/UserContext';
 import { playSuccessSound } from '@/lib/sounds';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 
+function getSafeRedirect(raw: string | null): string {
+  if (!raw) return '/';
+  try {
+    const decoded = decodeURIComponent(raw);
+    if (decoded.startsWith('http://') || decoded.startsWith('https://') || decoded.startsWith('//')) {
+      return '/';
+    }
+    if (!decoded.startsWith('/')) {
+      return `/${decoded}`;
+    }
+    if (decoded.startsWith('/login') || decoded.startsWith('/signup') || decoded.startsWith('/register')) {
+      return '/';
+    }
+    return decoded;
+  } catch {
+    return '/';
+  }
+}
+
 function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || '/';
+  const redirectPath = getSafeRedirect(searchParams.get('redirect') || searchParams.get('callbackUrl'));
   const queryRef = searchParams.get('ref') || searchParams.get('referral') || '';
   const { updateUser } = useUser();
 
@@ -90,6 +109,46 @@ function SignupContent() {
   useEffect(() => {
     router.prefetch(redirectPath);
   }, [router, redirectPath]);
+
+  // Handle Google OAuth full-page redirect return on mobile (#access_token=...)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+      const params = new URLSearchParams(hash.replace(/^#/, ''));
+      const accessToken = params.get('access_token');
+      if (accessToken) {
+        setIsSubmitting(true);
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        loginWithGoogle({
+          accessToken,
+          referralCode: referralCode.trim() || undefined,
+        }).then((res) => {
+          if (res.success && res.user) {
+            playSuccessSound();
+            updateUser({
+              name: res.user.name,
+              email: res.user.email,
+              phone: res.user.phone || '',
+              avatarUrl: res.user.avatarUrl || null,
+              referralCode: res.user.referralCode,
+              referralDiscountBalance: res.user.referralDiscountBalance || 0,
+              hasUsedReferralDiscount: res.user.hasUsedReferralDiscount || false,
+              referredBy: res.user.referredBy || '',
+              referralCodeUsed: res.user.referralCodeUsed || '',
+            });
+            router.push(redirectPath);
+          } else {
+            setErrorMessage(res.error || 'Google authentication failed');
+          }
+        }).catch((err: any) => {
+          setErrorMessage(err.message || 'Google authentication error');
+        }).finally(() => {
+          setIsSubmitting(false);
+        });
+      }
+    }
+  }, [router, redirectPath, updateUser, referralCode]);
 
 
 
