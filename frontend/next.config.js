@@ -131,6 +131,22 @@ const nextConfig = {
     ];
   },
 
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'gravoz.com',
+          },
+        ],
+        destination: 'https://www.gravoz.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   // ── Performance Optimizations ─────────────────────────────────────────────
   compress: true,
   poweredByHeader: false,

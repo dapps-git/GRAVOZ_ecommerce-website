@@ -27,10 +27,10 @@ export default function GoogleSignInButton({
   text = 'Continue with Google',
   referralCode,
 }: Props) {
-  const [isGsiLoaded, setIsGsiLoaded] = useState(false);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 
-  // Stable callback refs
+  // Stable callback refs so closures never get stale
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
   const setIsSubmittingRef = useRef(setIsSubmitting);
@@ -100,75 +100,88 @@ export default function GoogleSignInButton({
     }
   };
 
-  // Initialize Google Identity Services script
+  // Initialize Google Identity Services script ONCE (Never remove from head)
   useEffect(() => {
-    if (typeof window === 'undefined' || !clientId) return;
+    if (typeof window === 'undefined') return;
 
-    const initGsi = () => {
+    const setupGoogle = () => {
       if (!window.google?.accounts) return;
-      setIsGsiLoaded(true);
+      setIsScriptLoaded(true);
 
-      // Initialize One-Tap for smooth Android / Mobile & Desktop experience
-      try {
-        if (window.google.accounts.id) {
+      // Initialize One-Tap if client ID is ready
+      if (clientId && window.google.accounts.id) {
+        try {
           window.google.accounts.id.initialize({
             client_id: clientId,
             callback: handleCredentialResponse,
             auto_select: false,
             cancel_on_tap_outside: true,
           });
-          // Show One-Tap prompt if eligible
+          // Show One-Tap bottom sheet on mobile if available
           window.google.accounts.id.prompt();
+        } catch (e) {
+          console.warn('GSI One-Tap notice:', e);
         }
-      } catch (err) {
-        console.warn('GSI One-Tap initialization notice:', err);
       }
     };
 
     if (window.google?.accounts) {
-      initGsi();
+      setupGoogle();
       return;
     }
 
-    // Check if script tag already exists
-    if (document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
+    // Check if script tag is already in DOM
+    const existing = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (existing) {
+      existing.addEventListener('load', setupGoogle);
       const poll = setInterval(() => {
         if (window.google?.accounts) {
           clearInterval(poll);
-          initGsi();
+          setupGoogle();
         }
       }, 100);
       return () => clearInterval(poll);
     }
 
-    // Fresh script load
+    // Inject permanent script into head
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    script.onload = () => initGsi();
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    script.onload = setupGoogle;
+    document.head.appendChild(script);
   }, [clientId]);
 
+  // Helper to wait for window.google if user clicks before network finishes
+  const waitForGoogle = async (maxMs = 3000): Promise<boolean> => {
+    const start = Date.now();
+    while (!window.google?.accounts && Date.now() - start < maxMs) {
+      await new Promise((r) => setTimeout(r, 150));
+    }
+    return Boolean(window.google?.accounts);
+  };
+
   // Click handler that triggers Google authentication
-  const handleGoogleClick = () => {
+  const handleGoogleClick = async () => {
     if (!clientId) {
       onErrorRef.current('Google Sign-in service is currently not configured. Please sign in using your email and password.');
       return;
     }
 
-    if (!window.google?.accounts) {
-      onErrorRef.current('Google services are still loading. Please try in a moment.');
+    // If script is still downloading, wait gracefully instead of throwing an error
+    let googleAvailable = Boolean(window.google?.accounts);
+    if (!googleAvailable) {
+      if (setIsSubmittingRef.current) setIsSubmittingRef.current(true);
+      googleAvailable = await waitForGoogle(3000);
+      if (setIsSubmittingRef.current) setIsSubmittingRef.current(false);
+    }
+
+    if (!googleAvailable) {
+      onErrorRef.current('Google services could not load. Please check your internet connection or reload the page.');
       return;
     }
 
-    // Method 1: Google OAuth2 Token Client (Works reliably on mobile & desktop without iframe 400 error)
+    // Method 1: Google OAuth2 Token Client (Works natively on both mobile & desktop)
     if (window.google.accounts.oauth2) {
       try {
         const client = window.google.accounts.oauth2.initTokenClient({
@@ -179,7 +192,7 @@ export default function GoogleSignInButton({
         client.requestAccessToken();
         return;
       } catch (err: any) {
-        console.warn('Token client error, falling back to One-Tap prompt:', err);
+        console.warn('OAuth2 client error, falling back to One-Tap:', err);
       }
     }
 

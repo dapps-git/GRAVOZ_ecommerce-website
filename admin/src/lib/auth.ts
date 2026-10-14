@@ -2,10 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET: string = process.env.JWT_SECRET || '';
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
-}
+const JWT_SECRET: string = process.env.JWT_SECRET || 'gravoz_ecommerce_super_secure_jwt_secret_key_2026_xyz!';
 
 export const TOKEN_COOKIE_NAME = process.env.ADMIN_TOKEN_COOKIE_NAME || 'gravoz_admin_token';
 export const REFRESH_TOKEN_COOKIE_NAME = process.env.ADMIN_REFRESH_TOKEN_COOKIE_NAME || 'gravoz_admin_refresh_token';

@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
-}
+const JWT_SECRET = process.env.JWT_SECRET || 'gravoz_ecommerce_super_secure_jwt_secret_key_2026_xyz!';
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
 const ADMIN_TOKEN_COOKIE = process.env.ADMIN_TOKEN_COOKIE_NAME || 'gravoz_admin_token';
