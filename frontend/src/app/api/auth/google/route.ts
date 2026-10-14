@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { credential, googleId, email, name, avatarUrl, referralCode: inputRefCode } = body;
+    const { credential, accessToken, googleId, email, name, avatarUrl, referralCode: inputRefCode } = body;
 
     let userEmail = email;
     let userName = name;
@@ -54,6 +54,26 @@ export async function POST(req: NextRequest) {
         }
       } catch {
         // Fallback to decoded payload if Google tokeninfo has network glitch
+      }
+    }
+
+    // 2. If Google OAuth2 access token is passed
+    if (accessToken && !userEmail) {
+      try {
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (userInfoRes.ok) {
+          const profile = await userInfoRes.json();
+          if (profile.email) {
+            userEmail = profile.email;
+            userName = profile.name || profile.given_name || userEmail.split('@')[0];
+            userAvatar = profile.picture || userAvatar;
+            userGoogleId = profile.sub || userGoogleId;
+          }
+        }
+      } catch {
+        // Fallback
       }
     }
 

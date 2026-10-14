@@ -48,6 +48,7 @@ export interface LoginPayload {
 
 export interface GoogleAuthPayload {
   credential?: string;
+  accessToken?: string;
   googleId?: string;
   email?: string;
   name?: string;
