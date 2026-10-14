@@ -137,7 +137,7 @@ function SignupContent() {
               referredBy: res.user.referredBy || '',
               referralCodeUsed: res.user.referralCodeUsed || '',
             });
-            router.push(redirectPath);
+            router.push('/');
           } else {
             setErrorMessage(res.error || 'Google authentication failed');
           }
@@ -211,7 +211,7 @@ function SignupContent() {
       referredBy: user.referredBy || '',
       referralCodeUsed: user.referralCodeUsed || '',
     });
-    router.push(redirectPath);
+    router.push('/');
   };
 
   return (

@@ -84,7 +84,7 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.redirect(new URL(decodeURIComponent(callbackUrl), request.url));
       return applySecurityHeaders(response);
     }
-    const response = NextResponse.redirect(new URL('/profile', request.url));
+    const response = NextResponse.redirect(new URL('/', request.url));
     return applySecurityHeaders(response);
   }
 

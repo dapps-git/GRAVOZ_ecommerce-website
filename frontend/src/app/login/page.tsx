@@ -71,7 +71,7 @@ function LoginContent() {
               phone: res.user.phone || '',
               avatarUrl: res.user.avatarUrl || null,
             });
-            router.push(redirectPath);
+            router.push('/');
           } else {
             setErrorMessage(res.error || 'Google authentication failed');
           }
@@ -107,7 +107,7 @@ function LoginContent() {
 
   const handleGoogleSuccess = (user: any) => {
     updateUser({ name: user.name, email: user.email, phone: user.phone || '', avatarUrl: user.avatarUrl || null });
-    router.push(redirectPath);
+    router.push('/');
   };
 
 
