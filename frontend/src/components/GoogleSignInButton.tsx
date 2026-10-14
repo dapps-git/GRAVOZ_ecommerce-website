@@ -27,10 +27,10 @@ export default function GoogleSignInButton({
   text = 'Continue with Google',
   referralCode,
 }: Props) {
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 
-  // Stable callback refs so closures never get stale
+  // Stable callback refs
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
   const setIsSubmittingRef = useRef(setIsSubmitting);
@@ -41,31 +41,7 @@ export default function GoogleSignInButton({
   useEffect(() => { setIsSubmittingRef.current = setIsSubmitting; }, [setIsSubmitting]);
   useEffect(() => { referralCodeRef.current = referralCode; }, [referralCode]);
 
-  // Handle GIS ID Token (One-Tap / Credential response)
-  const handleCredentialResponse = async (response: any) => {
-    if (setIsSubmittingRef.current) setIsSubmittingRef.current(true);
-    try {
-      if (!response?.credential) throw new Error('No Google credential returned');
-
-      const res = await loginWithGoogle({
-        credential: response.credential,
-        referralCode: referralCodeRef.current,
-      });
-
-      if (res.success && res.user) {
-        playSuccessSound();
-        onSuccessRef.current(res.user);
-      } else {
-        onErrorRef.current(res.error || 'Google sign-in failed');
-      }
-    } catch (err: any) {
-      onErrorRef.current(err.message || 'Google authentication error');
-    } finally {
-      if (setIsSubmittingRef.current) setIsSubmittingRef.current(false);
-    }
-  };
-
-  // Handle OAuth2 Access Token response
+  // Handle Token response (Desktop OAuth2 popup)
   const handleTokenResponse = async (tokenRes: any) => {
     if (tokenRes.error) {
       if (tokenRes.error !== 'popup_closed_by_user') {
@@ -75,7 +51,7 @@ export default function GoogleSignInButton({
       return;
     }
 
-    if (!tokenRes.access_token) {
+    if (!tokenRes?.access_token) {
       if (setIsSubmittingRef.current) setIsSubmittingRef.current(false);
       return;
     }
@@ -100,89 +76,59 @@ export default function GoogleSignInButton({
     }
   };
 
-  // Initialize Google Identity Services script ONCE (Never remove from head)
+  // Preload Google script into head ONCE on component mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const setupGoogle = () => {
-      if (!window.google?.accounts) return;
-      setIsScriptLoaded(true);
-
-      // Initialize One-Tap if client ID is ready
-      if (clientId && window.google.accounts.id) {
-        try {
-          window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: handleCredentialResponse,
-            auto_select: false,
-            cancel_on_tap_outside: true,
-          });
-          // Show One-Tap bottom sheet on mobile if available
-          window.google.accounts.id.prompt();
-        } catch (e) {
-          console.warn('GSI One-Tap notice:', e);
-        }
-      }
-    };
-
     if (window.google?.accounts) {
-      setupGoogle();
+      setIsReady(true);
       return;
     }
 
-    // Check if script tag is already in DOM
     const existing = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
     if (existing) {
-      existing.addEventListener('load', setupGoogle);
-      const poll = setInterval(() => {
-        if (window.google?.accounts) {
-          clearInterval(poll);
-          setupGoogle();
-        }
-      }, 100);
-      return () => clearInterval(poll);
+      existing.addEventListener('load', () => setIsReady(true));
+      if (window.google?.accounts) setIsReady(true);
+      return;
     }
 
-    // Inject permanent script into head
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    script.onload = setupGoogle;
+    script.onload = () => setIsReady(true);
     document.head.appendChild(script);
-  }, [clientId]);
+  }, []);
 
-  // Helper to wait for window.google if user clicks before network finishes
-  const waitForGoogle = async (maxMs = 3000): Promise<boolean> => {
-    const start = Date.now();
-    while (!window.google?.accounts && Date.now() - start < maxMs) {
-      await new Promise((r) => setTimeout(r, 150));
-    }
-    return Boolean(window.google?.accounts);
-  };
-
-  // Click handler that triggers Google authentication
-  const handleGoogleClick = async () => {
+  // Synchronous Click Handler — directly in user touch gesture (NO async await delays before trigger)
+  const handleGoogleClick = () => {
     if (!clientId) {
-      onErrorRef.current('Google Sign-in service is currently not configured. Please sign in using your email and password.');
+      onErrorRef.current('Google Sign-in is not configured. Please use email and password.');
       return;
     }
 
-    // If script is still downloading, wait gracefully instead of throwing an error
-    let googleAvailable = Boolean(window.google?.accounts);
-    if (!googleAvailable) {
-      if (setIsSubmittingRef.current) setIsSubmittingRef.current(true);
-      googleAvailable = await waitForGoogle(3000);
-      if (setIsSubmittingRef.current) setIsSubmittingRef.current(false);
-    }
+    // Detect mobile browser or in-app webviews (WhatsApp, Safari iOS, Android Chrome)
+    const isMobile =
+      typeof navigator !== 'undefined' &&
+      /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent);
 
-    if (!googleAvailable) {
-      onErrorRef.current('Google services could not load. Please check your internet connection or reload the page.');
+    if (isMobile) {
+      // On mobile / in-app browsers, popups open blank or switch tabs.
+      // Use direct same-tab OAuth redirect for 100% reliable flow without blank screens.
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.gravoz.com';
+      const redirectUri = `${origin}/login`;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
+        clientId
+      )}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&response_type=token&scope=${encodeURIComponent('openid email profile')}&prompt=select_account`;
+
+      window.location.assign(authUrl);
       return;
     }
 
-    // Method 1: Google OAuth2 Token Client (Works natively on both mobile & desktop)
-    if (window.google.accounts.oauth2) {
+    // On Desktop: use Google OAuth2 Token Client popup (SYNCHRONOUS call)
+    if (window.google?.accounts?.oauth2) {
       try {
         const client = window.google.accounts.oauth2.initTokenClient({
           client_id: clientId,
@@ -192,24 +138,20 @@ export default function GoogleSignInButton({
         client.requestAccessToken();
         return;
       } catch (err: any) {
-        console.warn('OAuth2 client error, falling back to One-Tap:', err);
+        console.warn('OAuth2 client notice:', err);
       }
     }
 
-    // Method 2: Fallback to GSI One-Tap prompt
-    if (window.google.accounts.id) {
-      try {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleCredentialResponse,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-        });
-        window.google.accounts.id.prompt();
-      } catch (err: any) {
-        onErrorRef.current(err.message || 'Failed to initialize Google Sign-in');
-      }
-    }
+    // Desktop fallback: same-tab redirect
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.gravoz.com';
+    const redirectUri = `${origin}/login`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
+      clientId
+    )}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&response_type=token&scope=${encodeURIComponent('openid email profile')}&prompt=select_account`;
+
+    window.location.assign(authUrl);
   };
 
   return (

@@ -107,7 +107,7 @@ function LoginContent() {
 
   const handleGoogleSuccess = (user: any) => {
     updateUser({ name: user.name, email: user.email, phone: user.phone || '', avatarUrl: user.avatarUrl || null });
-    router.push('/');
+    window.location.replace('/');
   };
 
 
