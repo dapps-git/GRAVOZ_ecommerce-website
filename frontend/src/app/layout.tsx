@@ -31,7 +31,9 @@ export default function RootLayout({
             <ScrollToTop />
           </Suspense>
           {children}
-          <BottomNav />
+          <Suspense fallback={null}>
+            <BottomNav />
+          </Suspense>
         </Providers>
       </body>
     </html>
