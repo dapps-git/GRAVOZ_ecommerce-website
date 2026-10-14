@@ -43,8 +43,8 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
         );
       }
 
-      const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_ThoKT60JX1kpL8';
-      const keySecret = process.env.RAZORPAY_KEY_SECRET || 'H13PuysOoGUC6q7JluZMsNnK';
+      const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
       if (!keyId || !keySecret) {
         return NextResponse.json({ error: 'Razorpay API credentials are not configured.' }, { status: 500 });

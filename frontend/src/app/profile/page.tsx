@@ -167,8 +167,8 @@ export default function ProfilePage() {
       setPasswordError('Please fill in current and new password');
       return;
     }
-    if (newPassword.length < 6) {
-      setPasswordError('New password must be at least 6 characters');
+    if (newPassword.length < 4) {
+      setPasswordError('New password must be at least 4 characters');
       return;
     }
     if (newPassword !== confirmNewPassword) {
@@ -815,22 +815,27 @@ export default function ProfilePage() {
                       Total ₹{referralData?.stats?.totalRewardsEarned ?? 0} earned to date
                     </p>
                   </div>
-                      {/* Shareable Code & Link Box or Eligibility Unlock Card */}
+                {/* Shareable Code & Link Box or Eligibility Unlock Card */}
                 {referralData?.referralEligible && (referralData?.referralCode || user?.referralCode) ? (
                   <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 shadow-2xs space-y-5">
                     <div className="border-b border-[#f0ece5] pb-3">
                       <h4 className="text-sm sm:text-base font-bold text-[#030303]">Share Your Referral</h4>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Send your link or unique code directly to friends. Your code will give them 15% off.
+                        Send your link or unique code directly to friends. Your code will give them 15% off their first footwear purchase.
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                       {/* Unique Referral Code */}
-                      <div className="lg:col-span-5 space-y-2">
-                        <label className="text-xs font-semibold text-slate-700 block">Your Referral Code</label>
+                      <div className="bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] flex flex-col justify-between space-y-3">
+                        <div>
+                          <label className="text-xs font-bold text-slate-700 block uppercase tracking-wider text-[11px]">
+                            Your Referral Code
+                          </label>
+                          <p className="text-[11px] text-slate-500 mt-0.5">Share this code with friends to enter at checkout</p>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-4 py-2.5 flex items-center justify-center font-mono font-bold text-base text-[#030303] tracking-wider select-all">
+                          <div className="flex-1 min-w-0 bg-white border border-[#e5e5e5] rounded-lg px-3 py-2.5 flex items-center justify-center font-mono font-bold text-base text-[#030303] tracking-widest select-all shadow-2xs">
                             {referralData?.referralCode || user?.referralCode}
                           </div>
                           <button
@@ -844,10 +849,10 @@ export default function ProfilePage() {
                                 setTimeout(() => setCopiedCode(false), 2000);
                               }
                             }}
-                            className="h-11 px-4 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
+                            className="h-11 px-4 bg-black hover:bg-neutral-800 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
                           >
                             {copiedCode ? (
-                              <><CheckCheck className="w-4 h-4" /> Copied</>
+                              <><CheckCheck className="w-4 h-4 text-emerald-400" /> Copied</>
                             ) : (
                               <><Copy className="w-4 h-4" /> Copy Code</>
                             )}
@@ -856,23 +861,30 @@ export default function ProfilePage() {
                       </div>
 
                       {/* Shareable Referral Link */}
-                      <div className="lg:col-span-7 space-y-2">
-                        <label className="text-xs font-semibold text-slate-700 block">Your Shareable Link</label>
-                        <div className="flex flex-col sm:flex-row items-stretch gap-2">
-                          <div className="flex-1 bg-slate-50 border border-[#e5e5e5] rounded-lg px-3.5 py-2.5 text-xs text-slate-700 font-mono truncate select-all flex items-center">
-                            {referralData?.referralLink ||
-                              (typeof window !== 'undefined'
-                                ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
-                                : `/register?ref=${referralData?.referralCode || user?.referralCode || ''}`)}
+                      <div className="bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] flex flex-col justify-between space-y-3">
+                        <div>
+                          <label className="text-xs font-bold text-slate-700 block uppercase tracking-wider text-[11px]">
+                            Your Shareable Link
+                          </label>
+                          <p className="text-[11px] text-slate-500 mt-0.5">Direct signup link with auto-applied 15% discount</p>
+                        </div>
+                        <div className="space-y-2.5">
+                          <div className="w-full bg-white border border-[#e5e5e5] rounded-lg px-3 py-2 text-xs text-slate-700 font-mono select-all flex items-center shadow-2xs overflow-hidden">
+                            <span className="truncate block w-full">
+                              {referralData?.referralLink ||
+                                (typeof window !== 'undefined'
+                                  ? `${window.location.origin}/signup?ref=${referralData?.referralCode || user?.referralCode || ''}`
+                                  : `/signup?ref=${referralData?.referralCode || user?.referralCode || ''}`)}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
+                          <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => {
                                 const link =
                                   referralData?.referralLink ||
                                   (typeof window !== 'undefined'
-                                    ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
+                                    ? `${window.location.origin}/signup?ref=${referralData?.referralCode || user?.referralCode || ''}`
                                     : '');
                                 if (link) {
                                   navigator.clipboard.writeText(link);
@@ -881,7 +893,7 @@ export default function ProfilePage() {
                                   setTimeout(() => setCopiedLink(false), 2000);
                                 }
                               }}
-                              className="flex-1 sm:flex-initial h-11 px-3.5 bg-white border border-[#e5e5e5] hover:bg-slate-50 text-slate-800 font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              className="flex-1 h-10 px-3 bg-white border border-[#e5e5e5] hover:bg-slate-50 text-slate-800 font-semibold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                             >
                               {copiedLink ? (
                                 <><CheckCheck className="w-4 h-4 text-emerald-600" /> Copied</>
@@ -897,13 +909,13 @@ export default function ProfilePage() {
                                 } to get 15% OFF on premium footwear: ${
                                   referralData?.referralLink ||
                                   (typeof window !== 'undefined'
-                                    ? `${window.location.origin}/register?ref=${referralData?.referralCode || user?.referralCode || ''}`
+                                    ? `${window.location.origin}/signup?ref=${referralData?.referralCode || user?.referralCode || ''}`
                                     : '')
                                 }`
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 sm:flex-initial h-11 px-3.5 bg-black hover:bg-neutral-800 text-white font-medium text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              className="flex-1 h-10 px-3 bg-black hover:bg-neutral-800 text-white font-semibold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                             >
                               <Share2 className="w-4 h-4" /> Share
                             </a>
@@ -1293,86 +1305,6 @@ export default function ProfilePage() {
           </div>
 
         </div>
-
-        {/* TESTIMONIAL SECTION (Matches reference screenshot bottom layout) */}
-        <section className="mt-12 sm:mt-24 space-y-6 sm:space-y-8">
-          <div className="text-center space-y-1">
-            <h2 className="text-xl sm:text-2xl font-bold text-[#030303] tracking-tight font-sansation">
-              Testimonial
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
-            
-            {/* Testimonial Card 1 (Hashim) */}
-            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ef4444] flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                    H
-                  </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-[#030303] font-sansation">
-                      Hashim
-                    </h3>
-                    <p className="text-[10px] text-slate-400 font-sansation">
-                      Verified User
-                    </p>
-                  </div>
-                </div>
-
-                {/* 5 Stars */}
-                <div className="flex items-center gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-[#C19968] text-[#C19968]" />
-                  ))}
-                </div>
-              </div>
-
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sansation italic">
-                &ldquo;The quality is exceptional, and the shoes feel incredibly comfortable from the first wear. The craftsmanship and finish are truly impressive.&rdquo;
-              </p>
-            </div>
-
-            {/* Testimonial Card 2 (Lakshmi) */}
-            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#f59e0b] flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                    L
-                  </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-[#030303] font-sansation">
-                      lakshmi
-                    </h3>
-                    <p className="text-[10px] text-slate-400 font-sansation">
-                      Verified User
-                    </p>
-                  </div>
-                </div>
-
-                {/* 5 Stars */}
-                <div className="flex items-center gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-[#C19968] text-[#C19968]" />
-                  ))}
-                </div>
-              </div>
-
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sansation italic">
-                &ldquo;Gravoz has the perfect balance of premium style and comfort. The leather feels luxurious, and the fit is excellent.&rdquo;
-              </p>
-            </div>
-
-          </div>
-
-          {/* Carousel Dots */}
-          <div className="flex items-center justify-center gap-2 pt-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
-            <span className="w-7 h-2.5 rounded-full bg-slate-800"></span>
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
-          </div>
-        </section>
 
       </main>
 

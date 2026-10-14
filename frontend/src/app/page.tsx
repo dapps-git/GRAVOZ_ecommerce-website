@@ -9,6 +9,7 @@ import RecentlyViewedStrip from '@/components/RecentlyViewedStrip';
 import DynamicProductSection from '@/components/DynamicProductSection';
 import CuratedShowcaseSection from '@/components/CuratedShowcaseSection';
 import DuoSpotlightSection from '@/components/DuoSpotlightSection';
+import MobileProductSlider from '@/components/MobileProductSlider';
 import { ArrowRight, ChevronLeft, ChevronRight, Star, Eye, Truck, ShieldCheck, Leaf, Globe, Heart } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
@@ -474,8 +475,8 @@ export default function StorefrontHomePage() {
               </div>
             </div>
 
-            {/* Product Cards Grid (2 in 1 row on mobile, 4 on desktop) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+            {/* Desktop Carousel Grid (4 on desktop) */}
+            <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
               {productsLoading
                 ? [0, 1, 2, 3].map((i) => <SkeletonProductCard key={i} />)
                 : (products.length > 4
@@ -490,6 +491,24 @@ export default function StorefrontHomePage() {
                   />
                 ))}
             </div>
+
+            {/* Mobile Animated Product Slider with Swipe & Slide Buttons */}
+            {productsLoading ? (
+              <div className="sm:hidden grid grid-cols-2 gap-3">
+                {[0, 1].map((i) => <SkeletonProductCard key={i} />)}
+              </div>
+            ) : (
+              <MobileProductSlider>
+                {products.map((product) => (
+                  <AnimatedProductCard
+                    key={product.id}
+                    product={product}
+                    isInWishlist={isInWishlist}
+                    toggleWishlist={toggleWishlist}
+                  />
+                ))}
+              </MobileProductSlider>
+            )}
           </section>
         )}
 

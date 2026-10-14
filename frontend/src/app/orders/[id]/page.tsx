@@ -28,6 +28,7 @@ import {
   ChevronRight,
   Sparkles,
   FileText,
+  Calendar,
 } from 'lucide-react';
 
 import { useUser } from '@/context/UserContext';
@@ -384,6 +385,33 @@ export default function OrderTrackingPage() {
             </a>
           </div>
         </div>
+
+        {/* Estimated Delivery Banner if set by Admin */}
+        {order.estimatedDelivery && !isCancelled && order.orderStatus !== 'delivered' && (
+          <div className="p-3.5 sm:p-4 bg-white border border-[#E5E1DC] rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#FAF5EE] border border-[#d4af7a]/40 text-[#8A5B2A] flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4 text-[#8A5B2A]" />
+              </div>
+              <div>
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-slate-500 font-medium block">
+                  Approx. Delivery Date
+                </span>
+                <p className="text-sm font-semibold text-[#111111]">
+                  {new Date(order.estimatedDelivery).toLocaleDateString('en-IN', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
+            </div>
+            <span className="text-[11px] font-medium text-[#8A5B2A] bg-[#FAF7F3] border border-[#E5E1DC] px-2.5 py-1 rounded-md">
+              On Schedule
+            </span>
+          </div>
+        )}
 
         {/* ── STANDARD DELIVERY STEPPER BAR (When Not In Return Flow) ── */}
         {!isCancelled && !isReturnFlow && (

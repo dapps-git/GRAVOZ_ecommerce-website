@@ -17,7 +17,11 @@ if (!envUri) {
   } catch (e) {}
 }
 
-const MONGODB_URI = envUri || 'mongodb://127.0.0.1:27017/gravoz';
+const MONGODB_URI = envUri;
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI not found in environment or .env.local');
+  process.exit(1);
+}
 
 const AdminSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -33,9 +37,20 @@ async function main() {
 
   const Admin = mongoose.models.Admin || mongoose.model('Admin', AdminSchema);
 
-  const email = 'gravoxshopadmin@gmail.com';
-  const plainPassword = 'gravoxadmin#0289';
-  const passwordHash = await bcrypt.hash(plainPassword, 10);
+  const email = process.env.ADMIN_EMAIL || 'gravoxshopadmin@gmail.com';
+  const rawAdminPass = process.env.ADMIN_PASSWORD;
+  const passwordHash =
+    process.env.ADMIN_PASSWORD_HASH ||
+    (rawAdminPass?.startsWith('$2')
+      ? rawAdminPass
+      : rawAdminPass
+      ? await bcrypt.hash(rawAdminPass, 10)
+      : null);
+
+  if (!passwordHash) {
+    console.error('ADMIN_PASSWORD_HASH or ADMIN_PASSWORD required.');
+    process.exit(1);
+  }
 
   const existing = await Admin.findOne({ email });
   if (existing) {
@@ -55,7 +70,7 @@ async function main() {
   }
 
   await mongoose.disconnect();
-  console.log('Done. You can now login with gravoxshopadmin@gmail.com / gravoxadmin#0289');
+  console.log(`Done. You can now login with ${email}`);
 }
 
 main().catch(err => {

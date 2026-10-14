@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Current password and new password are required' }, { status: 400 });
     }
 
-    if (newPassword.length < 6) {
-      return NextResponse.json({ error: 'New password must be at least 6 characters' }, { status: 400 });
+    if (newPassword.length < 4) {
+      return NextResponse.json({ error: 'New password must be at least 4 characters' }, { status: 400 });
     }
 
     if (confirmPassword && newPassword !== confirmPassword) {

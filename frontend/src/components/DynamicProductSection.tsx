@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Star, Heart } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
+import MobileProductSlider from '@/components/MobileProductSlider';
 
 interface ApiProduct {
   _id: string;
@@ -199,8 +200,8 @@ export default function DynamicProductSection({
         )}
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+      {/* Desktop Grid (4 in row) */}
+      <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
         {loading
           ? [0, 1, 2, 3].map((i) => <SkeletonCard key={i} />)
           : products.slice(0, limit).map((product) => (
@@ -212,6 +213,20 @@ export default function DynamicProductSection({
             />
           ))}
       </div>
+
+      {/* Mobile Animated Product Slider with Swipe & Slide Buttons */}
+      {!loading && products.length > 0 && (
+        <MobileProductSlider>
+          {products.slice(0, limit).map((product) => (
+            <DynamicGridCard
+              key={product.id}
+              product={product}
+              isInWishlist={isInWishlist}
+              toggleWishlist={toggleWishlist}
+            />
+          ))}
+        </MobileProductSlider>
+      )}
     </section>
   );
 }

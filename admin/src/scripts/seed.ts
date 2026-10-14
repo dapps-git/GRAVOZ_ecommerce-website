@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gravoz';
+const MONGODB_URI = process.env.MONGODB_URI as string;
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI environment variable is required.');
+  process.exit(1);
+}
 
 async function seed() {
   console.log('Connecting to MongoDB at:', MONGODB_URI);
@@ -10,10 +14,25 @@ async function seed() {
   const db = mongoose.connection;
 
   // 1. Seed Admin
-  const adminEmail = process.env.ADMIN_EMAIL || 'gravoxshopadmin@gmail.com';
-  const rawAdminPass = process.env.ADMIN_PASSWORD || 'admin123456';
-  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH ||
-    (rawAdminPass.startsWith('$2') ? rawAdminPass : await bcrypt.hash(rawAdminPass, 10));
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.error('ADMIN_EMAIL environment variable is required.');
+    process.exit(1);
+  }
+
+  const rawAdminPass = process.env.ADMIN_PASSWORD;
+  const adminPasswordHash =
+    process.env.ADMIN_PASSWORD_HASH ||
+    (rawAdminPass?.startsWith('$2')
+      ? rawAdminPass
+      : rawAdminPass
+      ? await bcrypt.hash(rawAdminPass, 10)
+      : null);
+
+  if (!adminPasswordHash) {
+    console.error('ADMIN_PASSWORD_HASH or ADMIN_PASSWORD environment variable is required.');
+    process.exit(1);
+  }
 
   await db.collection('admins').deleteMany({});
   await db.collection('admins').insertOne({

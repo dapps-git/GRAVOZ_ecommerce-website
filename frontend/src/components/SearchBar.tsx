@@ -170,7 +170,6 @@ export default function SearchBar() {
         type="button"
         onClick={() => {
           setIsOpen(true);
-          setTimeout(() => inputRef.current?.focus(), 80);
         }}
         aria-label="Search products"
         className="p-1 text-[#171717] hover:text-[#8B4A12] transition-colors cursor-pointer"
@@ -205,7 +204,6 @@ export default function SearchBar() {
               placeholder="Search for shoes, sandals..."
               autoComplete="off"
               spellCheck={false}
-              autoFocus
               className="w-full text-[13px] bg-transparent text-[#171717] placeholder:text-[#667085] focus:outline-none"
             />
 
@@ -215,7 +213,6 @@ export default function SearchBar() {
                 onClick={() => {
                   setQuery('');
                   setResults([]);
-                  inputRef.current?.focus();
                 }}
                 className="w-5 h-5 rounded-full bg-slate-100 hover:bg-slate-200 text-[#667085] flex items-center justify-center transition-colors cursor-pointer mr-1"
               >

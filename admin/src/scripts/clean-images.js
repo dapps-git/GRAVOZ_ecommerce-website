@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
-const MONGODB_URI = 'mongodb+srv://gravozshoes_db_user:9zEDpISGySjZ2gcA@cluster0.b8byz7c.mongodb.net/GRAVOX';
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI environment variable is required.');
+  process.exit(1);
+}
 
 async function cleanup() {
   await mongoose.connect(MONGODB_URI);

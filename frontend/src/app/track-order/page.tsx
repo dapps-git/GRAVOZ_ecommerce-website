@@ -26,6 +26,7 @@ import {
   PackageCheck,
   RotateCcw,
   XCircle,
+  Calendar,
 } from 'lucide-react';
 
 const STEP_DEFINITIONS = [
@@ -521,6 +522,33 @@ function TrackOrderContent() {
                   <span className="text-[10px] text-slate-400 font-light">In Transit</span>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Approx Delivery Date Banner if set by Admin */}
+          {order.estimatedDelivery && !isCancelled && orderStatus !== 'delivered' && (
+            <div className="bg-[#FAF7F3] border border-[#E5E1DC] rounded-2xl p-4 sm:p-5 shadow-2xs flex items-center justify-between gap-3 font-sansation">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white border border-[#E5E1DC] text-[#89591C] flex items-center justify-center shrink-0 shadow-2xs">
+                  <Calendar className="w-5 h-5 text-[#89591C]" />
+                </div>
+                <div>
+                  <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-slate-500 font-semibold block">
+                    Approx. Delivery Date
+                  </span>
+                  <p className="text-sm sm:text-base font-bold text-[#030303]">
+                    {new Date(order.estimatedDelivery).toLocaleDateString('en-IN', {
+                      weekday: 'short',
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+              </div>
+              <span className="text-[11px] font-semibold text-[#89591C] bg-white border border-[#E5E1DC] px-3 py-1 rounded-lg shadow-2xs">
+                On Schedule
+              </span>
             </div>
           )}
 

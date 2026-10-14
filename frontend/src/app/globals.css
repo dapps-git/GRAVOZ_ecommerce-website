@@ -194,6 +194,26 @@ a {
   animation: marquee 18s linear infinite;
 }
 
+@keyframes trainMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-train {
+  display: flex;
+  width: max-content;
+  animation: trainMarquee 24s linear infinite;
+  will-change: transform;
+}
+
+.animate-train:hover {
+  animation-play-state: paused;
+}
+
 /* ── Razorpay Modal & SVG Containment Protection ── */
 .razorpay-container {
   position: fixed !important;

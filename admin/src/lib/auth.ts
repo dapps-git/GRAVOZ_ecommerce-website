@@ -3,13 +3,13 @@ import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'gravoz_ecommerce_super_secure_jwt_secret_key_2026_xyz!';
-export const TOKEN_COOKIE_NAME = 'gravoz_admin_token';
-export const REFRESH_TOKEN_COOKIE_NAME = 'gravoz_admin_refresh_token';
 
-// 2 days in seconds (2 * 24 * 60 * 60)
-export const ACCESS_TOKEN_MAX_AGE = 2 * 24 * 60 * 60; // 172,800s
-// 24 days in seconds (24 * 24 * 60 * 60)
-export const REFRESH_TOKEN_MAX_AGE = 24 * 24 * 60 * 60; // 2,073,600s
+export const TOKEN_COOKIE_NAME = process.env.ADMIN_TOKEN_COOKIE_NAME || 'gravoz_admin_token';
+export const REFRESH_TOKEN_COOKIE_NAME = process.env.ADMIN_REFRESH_TOKEN_COOKIE_NAME || 'gravoz_admin_refresh_token';
+
+// Read token expiry durations from environment variables (defaults: 2 days, 24 days)
+export const ACCESS_TOKEN_MAX_AGE = Number(process.env.ACCESS_TOKEN_MAX_AGE) || 2 * 24 * 60 * 60;
+export const REFRESH_TOKEN_MAX_AGE = Number(process.env.REFRESH_TOKEN_MAX_AGE) || 24 * 24 * 60 * 60;
 
 export interface AdminJwtPayload {
   adminId: string;
@@ -35,7 +35,7 @@ export function signAdminRefreshToken(payload: AdminJwtPayload): string {
 
 export function verifyAdminToken(token: string): AdminJwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as AdminJwtPayload;
+    return jwt.verify(token, JWT_SECRET) as unknown as AdminJwtPayload;
   } catch {
     return null;
   }
@@ -61,13 +61,17 @@ export async function getAdminSession(): Promise<AdminJwtPayload | null> {
           email: payload.email,
           role: payload.role,
         });
-        cookieStore.set(TOKEN_COOKIE_NAME, newAccessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          path: '/',
-          maxAge: ACCESS_TOKEN_MAX_AGE,
-        });
+        try {
+          cookieStore.set(TOKEN_COOKIE_NAME, newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: ACCESS_TOKEN_MAX_AGE,
+          });
+        } catch {
+          // Read-only server component render context; still return valid payload
+        }
         return payload;
       }
     }

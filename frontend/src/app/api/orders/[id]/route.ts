@@ -71,13 +71,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           { status: 403 }
         );
       }
-    } else if (rawEmail) {
-      if (order.customerEmail.toLowerCase().trim() !== rawEmail.toLowerCase().trim()) {
+    } else if (rawEmail && typeof rawEmail === 'string' && rawEmail.trim()) {
+      if (!order.customerEmail || order.customerEmail.toLowerCase().trim() !== rawEmail.toLowerCase().trim()) {
         return NextResponse.json(
           { error: 'Customer verification failed for this order.' },
           { status: 403 }
         );
       }
+    } else {
+      return NextResponse.json(
+        { error: 'Authentication or verified customer email required to modify order.' },
+        { status: 401 }
+      );
     }
 
     const cancellableStatuses = ['ordered', 'confirmed', 'processing'];

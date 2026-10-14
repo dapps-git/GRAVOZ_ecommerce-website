@@ -102,14 +102,25 @@ exports.placeOrder = async (req, res) => {
 // ── GET /api/orders?email=xxx&customerId=xxx ──────────────────────────────────
 exports.getOrders = async (req, res) => {
   try {
-    const { email, customerId } = req.query;
-    if (!email && !customerId) {
-      return res.status(400).json({ error: 'email or customerId required' });
-    }
+    let filter = {};
 
-    const filter = customerId
-      ? { customerId }
-      : { customerEmail: email.toLowerCase() };
+    if (req.admin) {
+      // Admin can query any order or filter by query params
+      const { email, customerId, status } = req.query;
+      if (customerId) filter.customerId = customerId;
+      if (email) filter.customerEmail = email.toLowerCase().trim();
+      if (status) filter.orderStatus = status;
+    } else if (req.user) {
+      // Customer is strictly restricted to their own orders
+      filter = {
+        $or: [
+          { customerId: req.user.userId },
+          { customerEmail: req.user.email.toLowerCase().trim() },
+        ],
+      };
+    } else {
+      return res.status(401).json({ error: 'Authentication required to view orders' });
+    }
 
     const orders = await Order.find(filter).sort({ createdAt: -1 }).lean();
     res.json({ success: true, orders });
@@ -123,6 +134,17 @@ exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).lean();
     if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    // If authenticated user is not an admin, verify ownership
+    if (req.user && !req.admin) {
+      const isOwner =
+        (order.customerId && order.customerId.toString() === req.user.userId) ||
+        (order.customerEmail && order.customerEmail.toLowerCase().trim() === req.user.email.toLowerCase().trim());
+      if (!isOwner) {
+        return res.status(403).json({ error: 'You are not authorized to view this order.' });
+      }
+    }
+
     res.json({ success: true, order });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -132,9 +154,25 @@ exports.getOrderById = async (req, res) => {
 // ── PATCH /api/orders/:id/status ─────────────────────────────────────────────
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { status, note, returnReason, returnDescription, returnImages, location } = req.body;
+    const { status, note, returnReason, returnDescription, returnImages, location, estimatedDelivery } = req.body;
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    // Authorization: if not admin, customer can only cancel or request return for their OWN order
+    if (!req.admin) {
+      const isOwner =
+        req.user &&
+        ((order.customerId && order.customerId.toString() === req.user.userId) ||
+         (order.customerEmail && order.customerEmail.toLowerCase().trim() === req.user.email.toLowerCase().trim()));
+
+      if (!isOwner) {
+        return res.status(403).json({ error: 'You are not authorized to modify this order' });
+      }
+
+      if (status !== 'cancelled' && status !== 'return_requested') {
+        return res.status(403).json({ error: 'Customers are only permitted to cancel or request returns.' });
+      }
+    }
 
     const cancellableStatuses = ['ordered', 'confirmed', 'processing'];
     const returnableStatuses  = ['delivered'];
@@ -149,6 +187,9 @@ exports.updateOrderStatus = async (req, res) => {
     order.orderStatus = status;
     if (location !== undefined && location.trim()) {
       order.currentLocation = location.trim();
+    }
+    if (estimatedDelivery !== undefined && req.admin) {
+      order.estimatedDelivery = estimatedDelivery ? new Date(estimatedDelivery) : undefined;
     }
 
     if (status === 'return_requested') {

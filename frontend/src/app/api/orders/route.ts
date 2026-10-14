@@ -17,33 +17,22 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     const session = await getUserSession();
-    const { searchParams } = new URL(req.url);
-    const emailParam = searchParams.get('email');
-    const customerIdParam = searchParams.get('customerId');
-
-    await connectDB();
-
-    // Enforce authorization: if logged in, enforce matching session user; otherwise require email/customerId query
-    let query: Record<string, any> = {};
-
-    if (session) {
-      // Logged-in user: only allow viewing their own orders
-      query = {
-        $or: [
-          { customerId: session.userId },
-          { customerEmail: session.email.toLowerCase().trim() },
-        ],
-      };
-    } else if (emailParam) {
-      query.customerEmail = emailParam.toLowerCase().trim();
-    } else if (customerIdParam && mongoose.Types.ObjectId.isValid(customerIdParam)) {
-      query.customerId = customerIdParam;
-    } else {
+    if (!session || !session.userId) {
       return NextResponse.json(
-        { error: 'Authentication required to view orders' },
+        { error: 'Authentication required. Please log in to view your orders.' },
         { status: 401 }
       );
     }
+
+    await connectDB();
+
+    // Logged-in user: only allow viewing their own orders
+    const query = {
+      $or: [
+        { customerId: session.userId },
+        { customerEmail: session.email.toLowerCase().trim() },
+      ],
+    };
 
     const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json({ success: true, orders });

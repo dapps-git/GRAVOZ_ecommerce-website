@@ -4,13 +4,13 @@ import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'gravoz_ecommerce_super_secure_jwt_secret_key_2026_xyz!';
-export const USER_TOKEN_COOKIE_NAME = 'gravoz_user_token';
-export const USER_REFRESH_TOKEN_COOKIE_NAME = 'gravoz_user_refresh_token';
 
-// 2 days in seconds (2 * 24 * 60 * 60)
-export const ACCESS_TOKEN_MAX_AGE = 2 * 24 * 60 * 60; // 172,800s
-// 24 days in seconds (24 * 24 * 60 * 60)
-export const REFRESH_TOKEN_MAX_AGE = 24 * 24 * 60 * 60; // 2,073,600s
+export const USER_TOKEN_COOKIE_NAME = process.env.USER_TOKEN_COOKIE_NAME || 'gravoz_user_token';
+export const USER_REFRESH_TOKEN_COOKIE_NAME = process.env.USER_REFRESH_TOKEN_COOKIE_NAME || 'gravoz_user_refresh_token';
+
+// Read token expiry durations from environment variables (defaults: 2 days, 24 days)
+export const ACCESS_TOKEN_MAX_AGE = Number(process.env.ACCESS_TOKEN_MAX_AGE) || 2 * 24 * 60 * 60;
+export const REFRESH_TOKEN_MAX_AGE = Number(process.env.REFRESH_TOKEN_MAX_AGE) || 24 * 24 * 60 * 60;
 
 export interface UserJwtPayload {
   userId: string;
@@ -49,7 +49,7 @@ export function signUserRefreshToken(payload: UserJwtPayload): string {
 
 export function verifyUserToken(token: string): UserJwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as UserJwtPayload;
+    return jwt.verify(token, JWT_SECRET) as unknown as UserJwtPayload;
   } catch {
     return null;
   }
@@ -77,13 +77,17 @@ export async function getUserSession(): Promise<UserJwtPayload | null> {
           role: payload.role,
           tier: payload.tier,
         });
-        cookieStore.set(USER_TOKEN_COOKIE_NAME, newAccessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          path: '/',
-          maxAge: ACCESS_TOKEN_MAX_AGE,
-        });
+        try {
+          cookieStore.set(USER_TOKEN_COOKIE_NAME, newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: ACCESS_TOKEN_MAX_AGE,
+          });
+        } catch {
+          // Read-only server component render context; still return valid payload
+        }
         return payload;
       }
     }

@@ -31,6 +31,8 @@ export const metadata: Metadata = {
 
 import Providers from '@/components/Providers';
 import BottomNav from '@/components/BottomNav';
+import ScrollToTop from '@/components/ScrollToTop';
+import { Suspense } from 'react';
 
 export default function RootLayout({
   children,
@@ -41,6 +43,9 @@ export default function RootLayout({
     <html lang="en" className={`${poppins.variable} ${montserrat.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="bg-[#FAF7F3] text-[#111111] min-h-screen antialiased selection:bg-[#8A5B2A] selection:text-white" suppressHydrationWarning>
         <Providers>
+          <Suspense fallback={null}>
+            <ScrollToTop />
+          </Suspense>
           {children}
           <BottomNav />
         </Providers>

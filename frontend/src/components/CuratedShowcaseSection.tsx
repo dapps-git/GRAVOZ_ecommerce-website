@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Heart, Star } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
+import MobileProductSlider from '@/components/MobileProductSlider';
 
 export interface ShowcaseCardColor {
   name: string;
@@ -93,9 +94,9 @@ export default function CuratedShowcaseSection({
         </div>
       )}
 
-      {/* ── Product Cards Grid (Bigger cards, 4 in row, rounded-none) ── */}
+      {/* ── Desktop Product Cards Grid (4 in row, rounded-none) ── */}
       {!loading && items.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {items.slice(0, 8).map((item, idx) => (
             <CuratedCardItem
               key={item.id || `${sectionKey}-card-${idx}`}
@@ -106,6 +107,21 @@ export default function CuratedShowcaseSection({
             />
           ))}
         </div>
+      )}
+
+      {/* ── Mobile Product Slider with Swipe & Slide Buttons ── */}
+      {!loading && items.length > 0 && (
+        <MobileProductSlider>
+          {items.slice(0, 8).map((item, idx) => (
+            <CuratedCardItem
+              key={item.id || `${sectionKey}-card-${idx}`}
+              item={item}
+              sectionKey={sectionKey}
+              isInWishlist={isInWishlist}
+              toggleWishlist={toggleWishlist}
+            />
+          ))}
+        </MobileProductSlider>
       )}
     </section>
   );

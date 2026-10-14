@@ -1,51 +1,42 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { ChevronUp } from 'lucide-react';
-
-function ScrollHandler() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    // Disable browser's automatic scroll restoration so it doesn't jump to previous scroll position
-    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
-    }
-
-    const forceScrollTop = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      if (document.documentElement) document.documentElement.scrollTop = 0;
-      if (document.body) document.body.scrollTop = 0;
-    };
-
-    // Instant execution
-    forceScrollTop();
-
-    // Re-verify after DOM layout rendering
-    const rafId = requestAnimationFrame(forceScrollTop);
-    const t1 = setTimeout(forceScrollTop, 20);
-    const t2 = setTimeout(forceScrollTop, 100);
-    const t3 = setTimeout(forceScrollTop, 250);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [pathname, searchParams]);
-
-  return null;
-}
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { ArrowUp } from 'lucide-react';
 
 export default function ScrollToTop() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
 
+  // 1. Force instant scroll to top on every route / page change
+  useEffect(() => {
+    // Immediate scroll reset
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant' as ScrollBehavior,
+    });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+
+    // Small delay fallback for dynamic content rendering
+    const timer = setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant' as ScrollBehavior,
+      });
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
+  // 2. Track scroll position for floating back-to-top button
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 280) {
+      if (window.scrollY > 320) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -63,29 +54,17 @@ export default function ScrollToTop() {
     });
   };
 
-  return (
-    <>
-      <Suspense fallback={null}>
-        <ScrollHandler />
-      </Suspense>
+  if (!isVisible) return null;
 
-      <button
-        type="button"
-        onClick={scrollToTop}
-        aria-label="Scroll to top"
-        className={`fixed bottom-20 sm:bottom-8 right-4 sm:right-6 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#8B4A12] hover:bg-[#6F390C] text-white shadow-xl hover:shadow-2xl border border-white/90 flex items-center justify-center transition-all duration-300 transform active:scale-95 group cursor-pointer ${
-          isVisible
-            ? 'opacity-100 translate-y-0 pointer-events-auto scale-100'
-            : 'opacity-0 translate-y-6 pointer-events-none scale-75'
-        }`}
-      >
-        <ChevronUp className="w-5 h-5 transition-transform duration-200 group-hover:-translate-y-0.5 stroke-[2.5]" />
-        
-        {/* Tooltip */}
-        <span className="absolute -top-8 bg-[#171717] text-white text-[10px] font-medium px-2 py-0.5 rounded-[5px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md">
-          Back to top
-        </span>
-      </button>
-    </>
+  return (
+    <button
+      type="button"
+      onClick={scrollToTop}
+      aria-label="Scroll to top"
+      className="fixed bottom-20 sm:bottom-8 right-4 sm:right-8 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#171717] hover:bg-[#8B4A12] text-white flex items-center justify-center shadow-2xl border border-white/20 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer animate-in fade-in slide-in-from-bottom-3"
+      title="Back to Top"
+    >
+      <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 text-white stroke-[2.2]" />
+    </button>
   );
 }

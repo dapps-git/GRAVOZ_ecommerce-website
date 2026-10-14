@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 
 async function fixImages() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/gravoz');
+  const uri = process.env.MONGODB_URI;
+  if (!uri) throw new Error('MONGODB_URI is required');
+  await mongoose.connect(uri);
   const db = mongoose.connection;
   const products = await db.collection('products').find().toArray();
   for (const p of products) {

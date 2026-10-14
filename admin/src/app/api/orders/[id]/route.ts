@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     const params = await props.params;
     await connectDB();
     const body = await req.json();
-    const { orderStatus, paymentStatus, location, note } = body;
+    const { orderStatus, paymentStatus, location, note, estimatedDelivery } = body;
 
     const existingOrder = await Order.findById(params.id);
     if (!existingOrder) {
@@ -34,8 +34,15 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     const previousStatus = existingOrder.orderStatus;
 
     if (orderStatus) existingOrder.orderStatus = orderStatus;
-    if (paymentStatus) existingOrder.paymentStatus = paymentStatus;
+    if (paymentStatus) {
+      existingOrder.paymentStatus = paymentStatus;
+    } else if (orderStatus === 'delivered' && existingOrder.paymentMethod === 'COD') {
+      existingOrder.paymentStatus = 'paid';
+    }
     if (location !== undefined && location.trim()) existingOrder.currentLocation = location.trim();
+    if (estimatedDelivery !== undefined) {
+      existingOrder.estimatedDelivery = estimatedDelivery ? new Date(estimatedDelivery) : undefined;
+    }
 
     if (orderStatus) {
       if (!existingOrder.statusHistory) existingOrder.statusHistory = [];

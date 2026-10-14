@@ -16,6 +16,7 @@ import {
   RotateCcw,
   X,
   CreditCard,
+  Calendar,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -70,6 +71,7 @@ interface OrderDetail {
     status?: string;
     rejectionReason?: string;
   };
+  estimatedDelivery?: string;
   createdAt: string;
 }
 
@@ -83,6 +85,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [selectedStatus, setSelectedStatus] = useState('');
   const [locationInput, setLocationInput] = useState('');
   const [statusNote, setStatusNote] = useState('');
+  const [approxDeliveryDate, setApproxDeliveryDate] = useState('');
   const [updateSuccessMsg, setUpdateSuccessMsg] = useState('');
 
   // Refund Confirmation Modal State
@@ -99,6 +102,12 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           setOrder(data);
           setSelectedStatus(data.orderStatus || 'ordered');
           setLocationInput(data.currentLocation || '');
+          if (data.estimatedDelivery) {
+            const d = new Date(data.estimatedDelivery);
+            if (!isNaN(d.getTime())) {
+              setApproxDeliveryDate(d.toISOString().split('T')[0]);
+            }
+          }
         }
       })
       .catch((err) => console.error(err))
@@ -143,6 +152,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           orderStatus: selectedStatus,
           location: locationInput.trim(),
           note: statusNote.trim(),
+          estimatedDelivery: approxDeliveryDate || null,
         }),
       });
 
@@ -248,11 +258,17 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-bold text-slate-900">{order.orderNumber}</h1>
             <StatusBadge status={order.orderStatus} />
-            <StatusBadge status={order.paymentStatus} />
+            <StatusBadge status={(order.orderStatus === 'delivered' && order.paymentMethod === 'COD') ? 'paid' : (order.paymentStatus || 'pending')} />
             {order.currentLocation && (
               <span className="inline-flex items-center gap-1 text-xs font-semibold bg-[#FFF9F2] text-[#8B4A12] border border-[#F5C78E] px-2.5 py-1 rounded-full shadow-2xs">
                 <MapPin className="w-3.5 h-3.5 text-[#8B4A12]" />
                 <span>{order.currentLocation}</span>
+              </span>
+            )}
+            {order.estimatedDelivery && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#FAF5EE] text-[#89591C] border border-[#d4af7a] px-3 py-1 rounded-full shadow-2xs">
+                <Calendar className="w-3.5 h-3.5 text-[#89591C]" />
+                <span>Est. Delivery: {new Date(order.estimatedDelivery).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </span>
             )}
           </div>
@@ -279,7 +295,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <form onSubmit={handleUpdateStatusAndLocation} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-          <div className="sm:col-span-4 space-y-1">
+          <div className={`${selectedStatus === 'shipped' ? 'sm:col-span-3' : 'sm:col-span-4'} space-y-1`}>
             <label className="block text-[11px] font-semibold text-slate-700">Order Status *</label>
             <select
               value={selectedStatus}
@@ -306,7 +322,23 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </select>
           </div>
 
-          <div className="sm:col-span-4 space-y-1">
+          {selectedStatus === 'shipped' && (
+            <div className="sm:col-span-3 space-y-1 animate-in fade-in duration-200">
+              <label className="block text-[11px] font-bold text-[#89591C] flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-[#89591C]" />
+                <span>Approx. Delivery Date</span>
+              </label>
+              <input
+                type="date"
+                value={approxDeliveryDate}
+                disabled={updating}
+                onChange={(e) => setApproxDeliveryDate(e.target.value)}
+                className="w-full bg-[#FAF5EE] border-2 border-[#89591C]/50 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#89591C] focus:ring-1 focus:ring-[#89591C]"
+              />
+            </div>
+          )}
+
+          <div className={`${selectedStatus === 'shipped' ? 'sm:col-span-3' : 'sm:col-span-4'} space-y-1`}>
             <label className="block text-[11px] font-semibold text-slate-700">
               Current Location (Hub / City / Facility)
             </label>
@@ -320,7 +352,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             />
           </div>
 
-          <div className="sm:col-span-3 space-y-1">
+          <div className={`${selectedStatus === 'shipped' ? 'sm:col-span-2' : 'sm:col-span-3'} space-y-1`}>
             <label className="block text-[11px] font-semibold text-slate-700">
               Tracking Remarks (Optional)
             </label>
@@ -384,7 +416,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-500 font-medium">Status:</span>
-              <StatusBadge status={order.paymentStatus || 'pending'} />
+              <StatusBadge status={(order.orderStatus === 'delivered' && order.paymentMethod === 'COD') ? 'paid' : (order.paymentStatus || 'pending')} />
             </div>
             {(order as any).razorpayPaymentId && (
               <div className="pt-1 border-t border-[#E8E1D9] text-[10px]">
@@ -406,7 +438,17 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 )}
               </div>
             ) : order.paymentMethod === 'COD' ? (
-              order.paymentStatus === 'pending' ? (
+              (order.orderStatus === 'delivered' || order.paymentStatus === 'paid') ? (
+                <div className="mt-2.5 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-[11px] text-emerald-800">
+                  <div className="flex items-center gap-1 font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                    <span>Cash Collected on Delivery (Paid)</span>
+                  </div>
+                  <span className="block text-[10px] text-emerald-700 mt-0.5">
+                    Payment collected from customer upon successful delivery.
+                  </span>
+                </div>
+              ) : order.paymentStatus === 'pending' ? (
                 <div className="mt-2.5 p-2 bg-amber-50/70 border border-amber-200 rounded-lg text-[11px] text-amber-800">
                   <span className="font-semibold">Cash on Delivery (Pending)</span>
                   <span className="block text-[10px] text-amber-700 mt-0.5">

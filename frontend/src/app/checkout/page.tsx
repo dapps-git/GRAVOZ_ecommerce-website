@@ -130,10 +130,15 @@ export default function CheckoutPage() {
     if (!target) return;
     setCouponLoading(true);
     setCouponError('');
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     try {
       const res = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           code: target,
           cartTotal: subtotal,
@@ -142,6 +147,7 @@ export default function CheckoutPage() {
           customerId: user?.id,
         }),
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (res.ok && data.success) {
         setAppliedCoupon({
@@ -155,8 +161,13 @@ export default function CheckoutPage() {
       } else {
         setCouponError(data.error || 'Invalid or ineligible coupon code.');
       }
-    } catch {
-      setCouponError('Network error. Please try again.');
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        setCouponError('Request timed out. Please tap Apply again.');
+      } else {
+        setCouponError('Network error. Please try again.');
+      }
     } finally {
       setCouponLoading(false);
     }
@@ -1676,12 +1687,16 @@ export default function CheckoutPage() {
 
                 <div className="lg:col-span-5 xl:col-span-4">
                   {renderOrderSummary('CONTINUE TO ADDRESS', async () => {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 2000);
                     try {
                       const stockRes = await fetch('/api/cart/validate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal,
                         body: JSON.stringify({ items }),
                       });
+                      clearTimeout(timeoutId);
                       const stockData = await stockRes.json();
                       if (stockData && stockData.valid === false) {
                         const errorMsg = stockData.errors?.[0] || 'Some items in your cart are no longer in stock.';
@@ -1690,6 +1705,7 @@ export default function CheckoutPage() {
                         return;
                       }
                     } catch (e) {
+                      clearTimeout(timeoutId);
                       console.warn('Stock validation notice:', e);
                     }
 

@@ -1,5 +1,8 @@
 const router = require('express').Router();
 const ctrl   = require('../controllers/cartController');
+const { optionalUser } = require('../middleware/auth');
+
+router.use(optionalUser);
 
 router.get   ('/', ctrl.getCart);
 router.post  ('/', ctrl.addToCart);

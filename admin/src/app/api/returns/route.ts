@@ -76,8 +76,8 @@ export async function PUT(req: NextRequest) {
           const ord = await Order.findById(returnItem.order);
           if (ord && ord.paymentMethod !== 'COD' && (ord.razorpayPaymentId || ord.transactionId)) {
             const pId = ord.razorpayPaymentId || ord.transactionId;
-            const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_ThoKT60JX1kpL8';
-            const keySecret = process.env.RAZORPAY_KEY_SECRET || 'H13PuysOoGUC6q7JluZMsNnK';
+            const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+            const keySecret = process.env.RAZORPAY_KEY_SECRET;
             if (keyId && keySecret && pId) {
               const amountInPaise = Math.round((returnItem.refundAmount || ord.totalAmount) * 100);
               const rzpRes = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(pId)}/refund`, {

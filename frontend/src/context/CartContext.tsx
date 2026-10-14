@@ -77,7 +77,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // 1. Play Add to Cart chime
     playAddToCartSound();
 
-    // 2. Optimistic Local Update
+    // 2. Optimistic Instant Local Update
     const current = [...items];
     const idx = current.findIndex(
       (i) => i.productId === newItem.productId && i.size === newItem.size
@@ -99,16 +99,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       price: newItem.price,
     });
 
-    // 4. Sync to API in background
-    try {
-      await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item: newItem }),
-      });
-    } catch {
-      // local copy persisted
-    }
+    // 4. Non-blocking asynchronous background sync
+    fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item: newItem }),
+    }).catch(() => {});
   };
 
   const updateQuantity = async (productId: string, size: string, quantity: number) => {
@@ -124,15 +120,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
     saveLocal(current);
 
-    try {
-      await fetch('/api/cart', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, size, quantity }),
-      });
-    } catch {
-      // local copy persisted
-    }
+    // Non-blocking background sync
+    fetch('/api/cart', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, size, quantity }),
+    }).catch(() => {});
   };
 
   const removeFromCart = async (productId: string, size: string) => {
@@ -140,23 +133,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const filtered = items.filter((i) => !(i.productId === productId && i.size === size));
     saveLocal(filtered);
 
-    try {
-      await fetch(
-        `/api/cart?productId=${encodeURIComponent(productId)}&size=${encodeURIComponent(size)}`,
-        { method: 'DELETE' }
-      );
-    } catch {
-      // local copy persisted
-    }
+    // Non-blocking background sync
+    fetch(
+      `/api/cart?productId=${encodeURIComponent(productId)}&size=${encodeURIComponent(size)}`,
+      { method: 'DELETE' }
+    ).catch(() => {});
   };
 
   const clearCart = async () => {
     saveLocal([]);
-    try {
-      await fetch('/api/cart?clearAll=true', { method: 'DELETE' });
-    } catch {
-      // local copy persisted
-    }
+    fetch('/api/cart?clearAll=true', { method: 'DELETE' }).catch(() => {});
   };
 
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);

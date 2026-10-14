@@ -31,6 +31,27 @@ interface UserContextType {
   checkAuth: () => Promise<boolean>;
 }
 
+// Whitelist strictly non-sensitive public profile fields (guarantees passwords/tokens can NEVER enter localStorage)
+function sanitizeProfileForStorage(p: UserProfile | Record<string, any>) {
+  return {
+    id: p.id,
+    name: p.name,
+    email: p.email,
+    phone: p.phone,
+    address: p.address,
+    avatarUrl: p.avatarUrl,
+    rewardPoints: p.rewardPoints,
+    referralCode: p.referralCode,
+    referralDiscountBalance: p.referralDiscountBalance,
+    hasUsedReferralDiscount: p.hasUsedReferralDiscount,
+    referredBy: p.referredBy,
+    referralCodeUsed: p.referralCodeUsed,
+    tier: p.tier,
+    totalOrders: p.totalOrders,
+    totalSpent: p.totalSpent,
+  };
+}
+
 const LOCAL_STORAGE_KEY = 'gravoz_user_profile';
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -71,21 +92,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         };
         setUser(profile);
         try {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(profile));
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sanitizeProfileForStorage(profile)));
         } catch {}
         return true;
       } else {
-        // Fallback check localStorage
-        if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            if (parsed && parsed.email) {
-              setUser(parsed);
-              return true;
-            }
-          } catch {}
-        }
         setUser(null);
+        try {
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+        } catch {}
         return false;
       }
     } catch {
@@ -97,6 +111,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('gravoz_behavior');
+        localStorage.removeItem('gravoz_recently_viewed');
+      } catch {}
+    }
     checkAuth();
   }, []);
 
@@ -111,7 +131,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUser((prev) => {
       const updated = prev ? { ...prev, ...data } : (data as UserProfile);
       try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sanitizeProfileForStorage(updated)));
       } catch {}
       return updated;
     });

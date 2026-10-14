@@ -10,8 +10,8 @@ const calcTotals = (items) => ({
 // ── GET /api/cart ─────────────────────────────────────────────────────────────
 exports.getCart = async (req, res) => {
   try {
-    const { guestId, userId } = req.query;
-    const filter = userId ? { userId } : { guestId };
+    const effectiveUserId = req.user?.userId || req.query.userId;
+    const filter = effectiveUserId ? { userId: effectiveUserId } : { guestId: req.query.guestId };
     if (!filter.userId && !filter.guestId) {
       return res.json({ success: true, items: [], subtotal: 0, count: 0 });
     }
@@ -27,13 +27,14 @@ exports.getCart = async (req, res) => {
 // ── POST /api/cart ────────────────────────────────────────────────────────────
 exports.addToCart = async (req, res) => {
   try {
-    const { guestId, userId, item } = req.body;
+    const { guestId, item } = req.body;
+    const effectiveUserId = req.user?.userId || req.body.userId;
     if (!item?.productId || !item?.size) {
       return res.status(400).json({ error: 'Product ID and size are required' });
     }
 
-    const filter = userId
-      ? { userId }
+    const filter = effectiveUserId
+      ? { userId: effectiveUserId }
       : { guestId: guestId || 'guest_' + Math.random().toString(36).substring(2, 10) };
 
     let cart = await Cart.findOne(filter);
@@ -72,8 +73,9 @@ exports.addToCart = async (req, res) => {
 // ── PUT /api/cart ─────────────────────────────────────────────────────────────
 exports.updateCart = async (req, res) => {
   try {
-    const { guestId, userId, productId, size, quantity } = req.body;
-    const filter = userId ? { userId } : { guestId };
+    const { guestId, productId, size, quantity } = req.body;
+    const effectiveUserId = req.user?.userId || req.body.userId;
+    const filter = effectiveUserId ? { userId: effectiveUserId } : { guestId };
 
     const cart = await Cart.findOne(filter);
     if (!cart) return res.json({ success: true, items: [], subtotal: 0, count: 0 });
@@ -97,8 +99,9 @@ exports.updateCart = async (req, res) => {
 // ── DELETE /api/cart ──────────────────────────────────────────────────────────
 exports.deleteFromCart = async (req, res) => {
   try {
-    const { guestId, userId, productId, size, clearAll } = req.query;
-    const filter = userId ? { userId } : { guestId };
+    const { guestId, productId, size, clearAll } = req.query;
+    const effectiveUserId = req.user?.userId || req.query.userId;
+    const filter = effectiveUserId ? { userId: effectiveUserId } : { guestId };
 
     const cart = await Cart.findOne(filter);
     if (!cart) return res.json({ success: true, items: [], subtotal: 0, count: 0 });

@@ -598,7 +598,6 @@ export default function StockPage() {
                               <div className="flex items-center gap-1">
                                 <input
                                   type="number"
-                                  autoFocus
                                   min="0"
                                   value={tempStockValue}
                                   onChange={(e) => setTempStockValue(e.target.value)}

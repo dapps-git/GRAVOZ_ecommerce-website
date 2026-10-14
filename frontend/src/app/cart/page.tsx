@@ -64,12 +64,17 @@ export default function CartPage() {
       return true;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+
     try {
       const res = await fetch('/api/cart/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({ items }),
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (data && Array.isArray(data.stockDetails)) {
         const detailsMap: Record<string, any> = {};
@@ -82,6 +87,7 @@ export default function CartPage() {
         return data.valid !== false;
       }
     } catch (e) {
+      clearTimeout(timeoutId);
       console.warn('Stock validation network check notice:', e);
     }
     return true;
@@ -110,10 +116,15 @@ export default function CartPage() {
     if (!target) return;
     setCouponLoading(true);
     setCouponError('');
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     try {
       const res = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           code: target,
           cartTotal: subtotal,
@@ -122,6 +133,7 @@ export default function CartPage() {
           customerId: user?.id,
         }),
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (res.ok && data.success) {
         setAppliedCoupon(data.coupon);
@@ -132,8 +144,13 @@ export default function CartPage() {
       } else {
         setCouponError(data.error || 'Invalid coupon code.');
       }
-    } catch {
-      setCouponError('Network error. Please try again.');
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        setCouponError('Request timed out. Please tap Apply again.');
+      } else {
+        setCouponError('Network error. Please try again.');
+      }
     } finally {
       setCouponLoading(false);
     }

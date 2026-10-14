@@ -11,7 +11,11 @@ if (!envUri) {
   } catch (e) {}
 }
 
-const MONGODB_URI = envUri || 'mongodb://127.0.0.1:27017/gravoz';
+const MONGODB_URI = envUri;
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI not found in environment or .env.local');
+  process.exit(1);
+}
 
 const BannerSchema = new mongoose.Schema({
   slot: { type: String, required: true, unique: true },
