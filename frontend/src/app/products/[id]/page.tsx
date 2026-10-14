@@ -186,6 +186,72 @@ export default function ProductInnerPage() {
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
   const mainImageRef = useRef<HTMLDivElement>(null);
 
+  // Mobile Touch Swipe States for Smooth Product Image Sliding
+  const [swipeOffset, setSwipeOffset] = useState<number>(0);
+  const [isSwiping, setIsSwiping] = useState<boolean>(false);
+  const touchStartXRef = useRef<number>(0);
+  const touchStartYRef = useRef<number>(0);
+  const touchCurrentXRef = useRef<number>(0);
+  const isHorizontalSwipeRef = useRef<boolean | null>(null);
+
+  const handleGalleryTouchStart = (e: React.TouchEvent) => {
+    if (displayImages.length <= 1) return;
+    setIsZooming(false);
+    const touch = e.touches[0];
+    touchStartXRef.current = touch.clientX;
+    touchStartYRef.current = touch.clientY;
+    touchCurrentXRef.current = touch.clientX;
+    isHorizontalSwipeRef.current = null;
+    setIsSwiping(true);
+  };
+
+  const handleGalleryTouchMove = (e: React.TouchEvent) => {
+    if (!isSwiping || displayImages.length <= 1) return;
+    const touch = e.touches[0];
+    touchCurrentXRef.current = touch.clientX;
+    const deltaX = touch.clientX - touchStartXRef.current;
+    const deltaY = touch.clientY - touchStartYRef.current;
+
+    if (isHorizontalSwipeRef.current === null) {
+      if (Math.abs(deltaX) > 6 || Math.abs(deltaY) > 6) {
+        isHorizontalSwipeRef.current = Math.abs(deltaX) > Math.abs(deltaY);
+      }
+    }
+
+    if (isHorizontalSwipeRef.current) {
+      let effectiveDelta = deltaX;
+      if (
+        (selectedImageIndex === 0 && deltaX > 0) ||
+        (selectedImageIndex === displayImages.length - 1 && deltaX < 0)
+      ) {
+        effectiveDelta = deltaX * 0.32;
+      }
+      setSwipeOffset(effectiveDelta);
+    }
+  };
+
+  const handleGalleryTouchEnd = () => {
+    if (!isSwiping) return;
+    setIsSwiping(false);
+    const deltaX = touchCurrentXRef.current - touchStartXRef.current;
+    const threshold = 35; // px swipe sensitivity threshold
+
+    if (isHorizontalSwipeRef.current && Math.abs(deltaX) > threshold) {
+      if (deltaX < -threshold) {
+        // Swiped Left -> Advance to next image
+        setSelectedImageIndex((prev) => (prev < displayImages.length - 1 ? prev + 1 : 0));
+        setActiveHeroImage(null);
+      } else if (deltaX > threshold) {
+        // Swiped Right -> Go to previous image
+        setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : displayImages.length - 1));
+        setActiveHeroImage(null);
+      }
+    }
+
+    setSwipeOffset(0);
+    isHorizontalSwipeRef.current = null;
+  };
+
   const fetchReviews = (id: string) => {
     fetch(`/api/reviews?productId=${encodeURIComponent(id)}`)
       .then((res) => res.json())
@@ -582,7 +648,7 @@ export default function ProductInnerPage() {
             {/* ═════════════════════════════════════════════════════════════════ */}
             <div className="lg:col-span-6 flex flex-col gap-3">
               
-              {/* 1. Main Product Image Box with Interactive Zoom Lens & Overlays */}
+              {/* 1. Main Product Image Box with Interactive Zoom Lens, Arrows & Real-Time Touch Swipe Sliding */}
               <div
                 ref={mainImageRef}
                 onMouseEnter={() => {
@@ -593,11 +659,14 @@ export default function ProductInnerPage() {
                 onMouseLeave={() => setIsZooming(false)}
                 onMouseMove={handleMouseMove}
                 onClick={() => setIsLightboxOpen(true)}
-                className="relative w-full aspect-square max-h-[420px] sm:max-h-[450px] rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] shadow-2xs cursor-crosshair group select-none flex items-center justify-center"
+                onTouchStart={handleGalleryTouchStart}
+                onTouchMove={handleGalleryTouchMove}
+                onTouchEnd={handleGalleryTouchEnd}
+                className="relative w-full aspect-square max-h-[420px] sm:max-h-[450px] rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] shadow-2xs cursor-crosshair group select-none flex items-center justify-center touch-pan-y"
               >
                 {/* Product Badge: BEST SELLER */}
                 {(product.badge || product.isBestSeller || product.isTopSeller || product.isLatest || true) && (
-                  <div className="absolute top-3 left-3 z-10">
+                  <div className="absolute top-3 left-3 z-10 pointer-events-none">
                     <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
                       {product.badge || (product.isBestSeller ? 'BEST SELLER' : product.isTopSeller ? 'TOP SELLER' : product.isLatest ? 'NEW' : 'BEST SELLER')}
                     </span>
@@ -623,7 +692,7 @@ export default function ProductInnerPage() {
                     showToast(isInWishlist(product._id) ? 'Removed from Wishlist' : 'Added to Wishlist!');
                   }}
                   title="Save to Wishlist"
-                  className={`absolute top-3 right-3 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/95 hover:bg-white backdrop-blur-xs border border-white/80 flex items-center justify-center shadow-xs transition-all duration-200 active:scale-90 cursor-pointer ${
+                  className={`absolute top-3 right-3 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/95 hover:bg-white backdrop-blur-xs border border-white/80 flex items-center justify-center shadow-xs transition-all duration-200 active:scale-90 cursor-pointer ${
                     isInWishlist(product._id) ? 'text-rose-500' : 'text-slate-700 hover:text-rose-500'
                   }`}
                 >
@@ -644,7 +713,7 @@ export default function ProductInnerPage() {
                     setActiveHeroImage(null);
                   }}
                   title="Previous image"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 hover:bg-white text-slate-800 flex items-center justify-center shadow-sm transition-all z-10 cursor-pointer opacity-90 hover:opacity-100 active:scale-95"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 hover:bg-white text-slate-800 flex items-center justify-center shadow-sm transition-all z-20 cursor-pointer opacity-90 hover:opacity-100 active:scale-95"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -663,31 +732,73 @@ export default function ProductInnerPage() {
                     setActiveHeroImage(null);
                   }}
                   title="Next image"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 hover:bg-white text-slate-800 flex items-center justify-center shadow-sm transition-all z-10 cursor-pointer opacity-90 hover:opacity-100 active:scale-95"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 hover:bg-white text-slate-800 flex items-center justify-center shadow-sm transition-all z-20 cursor-pointer opacity-90 hover:opacity-100 active:scale-95"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
 
-                {/* Main Product Image with Smooth Cursor Tracking Zoom */}
-                <Image
-                  src={heroPhotoUrl}
-                  alt={activeImage?.alt || product.name}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover object-center transition-transform duration-100 ease-out pointer-events-none"
-                  style={
-                    isZooming
-                      ? {
-                          transform: 'scale(1.85)',
-                          transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                        }
-                      : {
-                          transform: 'scale(1)',
-                          transformOrigin: 'center center',
-                        }
-                  }
-                />
+                {/* Smooth Sliding Image Carousel Track with Real-Time Touch Drag & Spring Transition */}
+                <div
+                  className="flex h-full w-full will-change-transform"
+                  style={{
+                    transform: `translate3d(calc(-${selectedImageIndex * 100}% + ${swipeOffset}px), 0, 0)`,
+                    transition: isSwiping ? 'none' : 'transform 360ms cubic-bezier(0.22, 1, 0.36, 1)',
+                  }}
+                >
+                  {displayImages.map((img, idx) => {
+                    const isSelected = idx === selectedImageIndex;
+                    const imgSrc = activeHeroImage && isSelected ? activeHeroImage : img.url || '/products/placeholder.svg';
+                    return (
+                      <div
+                        key={`${img.url || idx}-${idx}`}
+                        className="relative w-full h-full flex-shrink-0"
+                      >
+                        <Image
+                          src={imgSrc}
+                          alt={img.alt || product.name}
+                          fill
+                          priority={idx === 0}
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                          className="object-cover object-center pointer-events-none select-none"
+                          style={
+                            isSelected && isZooming
+                              ? {
+                                  transform: 'scale(1.85)',
+                                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                                }
+                              : {
+                                  transform: 'scale(1)',
+                                  transformOrigin: 'center center',
+                                }
+                          }
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Mobile Slide Indicator Dots */}
+                {displayImages.length > 1 && (
+                  <div className="sm:hidden absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/35 backdrop-blur-xs pointer-events-auto">
+                    {displayImages.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedImageIndex(idx);
+                          setActiveHeroImage(null);
+                        }}
+                        aria-label={`Photo ${idx + 1}`}
+                        className={`transition-all duration-300 rounded-full cursor-pointer ${
+                          idx === selectedImageIndex
+                            ? 'w-4 h-1.5 bg-white'
+                            : 'w-1.5 h-1.5 bg-white/50'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
 
                 {/* Zoom Prompt Button at Bottom-Right */}
                 <button
@@ -696,7 +807,7 @@ export default function ProductInnerPage() {
                     e.stopPropagation();
                     setIsLightboxOpen(true);
                   }}
-                  className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-white/90 backdrop-blur-xs text-slate-800 text-xs font-semibold flex items-center gap-1.5 shadow-xs hover:bg-white transition-all cursor-pointer z-10"
+                  className="hidden sm:flex absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-white/90 backdrop-blur-xs text-slate-800 text-xs font-semibold items-center gap-1.5 shadow-xs hover:bg-white transition-all cursor-pointer z-20"
                 >
                   <ZoomIn className="w-3.5 h-3.5 text-slate-600" />
                   <span>Zoom</span>

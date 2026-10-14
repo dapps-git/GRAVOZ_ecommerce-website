@@ -274,7 +274,7 @@ export default function ForgotPasswordPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Minimum 4 characters"
+                    placeholder="New Password"
                     className="flex-1 text-xs bg-transparent focus:outline-none text-[#030303] placeholder:text-slate-400 pr-6"
                     required
                   />

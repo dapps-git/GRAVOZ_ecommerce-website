@@ -129,3 +129,13 @@ h1, h2, h3, h4, h5, h6, input, select, textarea, button, table, p, span, a, div 
     box-shadow: none !important;
   }
 }
+
+/* Prevent iOS Safari from auto-zooming when tapping inputs */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+

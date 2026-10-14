@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
 import { Referral } from '@/models/Referral';
-import { signUserToken, setUserAuthCookie, generateReferralCode } from '@/lib/auth';
+import { signUserToken, signUserRefreshToken, setUserAuthCookie, generateReferralCode } from '@/lib/auth';
 
 // Helper to decode JWT payload safely
 function decodeJwtPayload(token: string): Record<string, any> | null {
@@ -140,16 +140,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Sign 2-week persistent JWT session
-    const token = signUserToken({
+    // Sign JWT access token and 24-day refresh token
+    const userPayload = {
       userId: customer._id.toString(),
       email: customer.email,
       name: customer.name,
       tier: customer.tier,
-    });
+    };
+    const token = signUserToken(userPayload);
+    const refreshToken = signUserRefreshToken(userPayload);
 
-    // Store in httpOnly, secure cookie
-    await setUserAuthCookie(token);
+    // Store in httpOnly, secure cookies
+    await setUserAuthCookie(token, refreshToken);
 
     return NextResponse.json({
       success: true,

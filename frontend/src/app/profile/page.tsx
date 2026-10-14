@@ -1276,7 +1276,7 @@ export default function ProfilePage() {
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="New Password (min 6 chars)"
+                      placeholder="New Password"
                       className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]"
                       required
                     />

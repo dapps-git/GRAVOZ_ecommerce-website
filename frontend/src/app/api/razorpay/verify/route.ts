@@ -100,10 +100,11 @@ export async function POST(req: NextRequest) {
     };
     let resolvedMethod = paymentMethod || 'UPI';
 
+    let paymentInfo: any = null;
     const razorpay = getRazorpayInstance();
     if (razorpay) {
       try {
-        const paymentInfo: any = await razorpay.payments.fetch(razorpay_payment_id);
+        paymentInfo = await razorpay.payments.fetch(razorpay_payment_id);
         if (paymentInfo) {
           paymentDetails = {
             ...paymentDetails,
@@ -170,7 +171,7 @@ export async function POST(req: NextRequest) {
       referralCodeUsed: orderingCustomer?.referralCodeUsed || '',
       couponCode: couponCode || '',
       shippingFee: Number(shippingFee) || 0,
-      totalAmount: Number(totalAmount) || 0,
+      totalAmount: paymentInfo?.amount ? Math.round(Number(paymentInfo.amount) / 100) : Number(totalAmount) || 0,
       paymentMethod: resolvedMethod,
       paymentStatus: 'paid',
       razorpayOrderId: razorpay_order_id,

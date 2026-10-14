@@ -100,11 +100,29 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        const unitPrice = (prod as any).price !== undefined ? Number((prod as any).price) : Number(itm.price);
+        const prodDiscountPrice = Number((prod as any).discountPrice);
+        const prodRegularPrice = Number((prod as any).price);
+        const authoritativeProductPrice =
+          !isNaN(prodDiscountPrice) && prodDiscountPrice > 0
+            ? prodDiscountPrice
+            : !isNaN(prodRegularPrice) && prodRegularPrice > 0
+            ? prodRegularPrice
+            : Number(itm.price);
+
+        const unitPrice =
+          !isNaN(authoritativeProductPrice) && authoritativeProductPrice > 0
+            ? authoritativeProductPrice
+            : Number(itm.price) || 0;
+
         verifiedSubtotal += unitPrice * requestedQty;
       } else {
         verifiedSubtotal += (Number(itm.price) || 0) * (Number(itm.quantity) || 1);
       }
+    }
+
+    // Fallback to client subtotal if verifiedSubtotal evaluates to 0
+    if (verifiedSubtotal === 0 && Number(subtotal) > 0) {
+      verifiedSubtotal = Number(subtotal);
     }
 
     // 2. Fetch Customer for discounts check

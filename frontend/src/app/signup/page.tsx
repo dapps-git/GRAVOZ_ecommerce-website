@@ -269,7 +269,7 @@ function SignupContent() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 6 chars"
+                    placeholder="Password"
                     className="flex-1 text-[11px] sm:text-xs bg-transparent focus:outline-none text-[#030303] placeholder:text-slate-400 font-sansation pr-4 min-w-0"
                     required
                   />
@@ -348,7 +348,7 @@ function SignupContent() {
                       type="text"
                       value={referralCode}
                       onChange={(e) => handleReferralChange(e.target.value)}
-                      placeholder="e.g. AIFA100"
+                      placeholder="Enter referral code"
                       className="flex-1 text-[11px] sm:text-xs uppercase tracking-wider bg-transparent focus:outline-none text-[#030303] placeholder:text-slate-400 font-sansation font-bold"
                     />
                     {referralLoading && <Loader2 className="w-3 h-3 text-slate-400 animate-spin flex-shrink-0" />}
