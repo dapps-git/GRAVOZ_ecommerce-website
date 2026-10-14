@@ -35,15 +35,7 @@ export default function ForgotPasswordPage() {
     }
   }, [countdown]);
 
-  // Lock body scroll
-  useEffect(() => {
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
+
 
   // Step 1: Send OTP
   const handleSendOtp = async (e: React.FormEvent) => {
@@ -151,7 +143,7 @@ export default function ForgotPasswordPage() {
           sizes="100vw"
           className="object-cover object-center select-none pointer-events-none"
         />
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
       </div>
 
       {/* Card */}

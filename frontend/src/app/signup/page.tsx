@@ -168,7 +168,7 @@ function SignupContent() {
           sizes="100vw"
           className="object-cover object-center select-none pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/20 to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/20 to-black/45 pointer-events-none" />
       </div>
 
       {/* Center Container — fits 100% on one screen */}
