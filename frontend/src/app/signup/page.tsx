@@ -91,17 +91,7 @@ function SignupContent() {
     router.prefetch(redirectPath);
   }, [router, redirectPath]);
 
-  // Lock scroll strictly to keep in single mobile view without scrolling
-  useEffect(() => {
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
+
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +156,7 @@ function SignupContent() {
   };
 
   return (
-    <div className="h-[100dvh] max-h-screen w-full flex flex-col items-center justify-center p-3 sm:p-4 relative overflow-hidden bg-[#120e0a]">
+    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-3 sm:p-4 relative overflow-y-auto bg-[#120e0a]">
 
       {/* Background — fixed cover */}
       <div className="fixed inset-0 z-0">

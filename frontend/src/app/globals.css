@@ -233,12 +233,6 @@ svg {
   max-width: 100%;
 }
 
-/* ── Prevent iOS Safari auto-zoom when tapping inputs (Email, Password, Address, Pincode) ── */
-/* Uses max(16px, 1em) so inputs < 16px are bumped up (preventing zoom) without overriding intentional sizes */
-@media screen and (max-width: 768px) {
-  input,
-  select,
-  textarea {
-    font-size: max(16px, 1em);
-  }
-}
+/* ── Prevent iOS Safari auto-zoom when tapping inputs ── */
+/* Handled by viewport meta: maximum-scale=1, user-scalable=no in layout.tsx */
+/* No CSS override needed — font sizes are preserved as designed */

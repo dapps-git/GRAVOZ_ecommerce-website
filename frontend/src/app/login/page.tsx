@@ -59,17 +59,8 @@ function LoginContent() {
     router.push(redirectPath);
   };
 
-  // Lock body scroll — prevents white edges from browser scroll bounce
-  useEffect(() => {
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
+
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center overflow-hidden">
