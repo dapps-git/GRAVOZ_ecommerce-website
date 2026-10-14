@@ -234,10 +234,11 @@ svg {
 }
 
 /* ── Prevent iOS Safari auto-zoom when tapping inputs (Email, Password, Address, Pincode) ── */
+/* Uses max(16px, 1em) so inputs < 16px are bumped up (preventing zoom) without overriding intentional sizes */
 @media screen and (max-width: 768px) {
   input,
   select,
   textarea {
-    font-size: 16px !important;
+    font-size: max(16px, 1em);
   }
 }
