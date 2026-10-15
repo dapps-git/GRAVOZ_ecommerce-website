@@ -91,8 +91,8 @@ export default function WishlistPage() {
 
         {/* ── EMPTY STATE ── */}
         {!isLoading && items.length === 0 ? (
-          <div className="py-12 sm:py-16 text-center space-y-5 bg-white rounded-none border border-[#e8e2d8] p-6 shadow-2xs max-w-lg mx-auto animate-in fade-in duration-300">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-none bg-[#faf8f5] border border-[#e8e2d8] flex items-center justify-center text-rose-500 mx-auto shadow-2xs">
+          <div className="py-12 sm:py-16 text-center space-y-5 bg-white rounded-md border border-[#e8e2d8] p-6 shadow-2xs max-w-lg mx-auto animate-in fade-in duration-300">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-md bg-[#faf8f5] border border-[#e8e2d8] flex items-center justify-center text-rose-500 mx-auto shadow-2xs">
               <Heart className="w-10 h-10 stroke-[1.5]" />
             </div>
 
@@ -107,25 +107,25 @@ export default function WishlistPage() {
 
             <Link
               href="/products"
-              className="inline-flex items-center justify-center px-6 py-2.5 rounded-none bg-[#89591C] hover:bg-[#68421A] text-white text-xs sm:text-sm font-semibold tracking-wide shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center px-6 py-2.5 rounded-md bg-[#89591C] hover:bg-[#68421A] text-white text-xs sm:text-sm font-semibold tracking-wide shadow-2xs transition-colors cursor-pointer"
             >
               Explore Footwear
             </Link>
           </div>
         ) : (
-          /* ── POPULATED WISHLIST ITEMS (Image Left, Content Right, Square Corners) ── */
+          /* ── POPULATED WISHLIST ITEMS (Image Left, Content Right, Rounded Corners) ── */
           <div className="space-y-4 animate-in fade-in duration-300">
             {items.map((item) => {
               const productLink = `/products/${(item as any).slug || item.productId || (item as any).id || ''}`;
               return (
                 <div
                   key={item.productId}
-                  className="bg-white rounded-none border border-[#e8e2d8] p-3.5 sm:p-4 shadow-2xs relative flex flex-row items-start sm:items-center gap-3.5 sm:gap-5 hover:shadow-md transition-all duration-300"
+                  className="bg-white rounded-md border border-[#e8e2d8] p-3.5 sm:p-4 shadow-2xs relative flex flex-row items-start sm:items-center gap-3.5 sm:gap-5 hover:shadow-md transition-all duration-300"
                 >
                   {/* Product Image (Left Side - Clickable to Product Details) */}
                   <Link
                     href={productLink}
-                    className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-none bg-[#faf8f5] flex items-center justify-center overflow-hidden border border-[#f0ece5] flex-shrink-0 hover:opacity-85 transition-opacity block cursor-pointer"
+                    className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-md bg-[#faf8f5] flex items-center justify-center overflow-hidden border border-[#f0ece5] flex-shrink-0 hover:opacity-85 transition-opacity block cursor-pointer"
                   >
                     <ProductImage
                       src={item.imageUrl}
@@ -193,7 +193,7 @@ export default function WishlistPage() {
                           removeFromWishlist(item.productId);
                           showToast(`Removed ${item.title} from wishlist.`);
                         }}
-                        className="flex-1 sm:flex-none border border-[#e8e2d8] bg-white hover:bg-slate-50 text-[#111111] text-xs font-semibold px-3.5 py-2 rounded-none flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                        className="flex-1 sm:flex-none border border-[#e8e2d8] bg-white hover:bg-slate-50 text-[#111111] text-xs font-semibold px-3.5 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-slate-700" />
                         <span>Remove Item</span>
@@ -217,7 +217,7 @@ export default function WishlistPage() {
                           showToast(`Moved ${item.title} to Cart! Redirecting...`);
                           router.push('/cart');
                         }}
-                        className="flex-1 sm:flex-none bg-[#89591C] hover:bg-[#68421A] text-white text-xs font-semibold px-4 py-2 rounded-none flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                        className="flex-1 sm:flex-none bg-[#89591C] hover:bg-[#68421A] text-white text-xs font-semibold px-4 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                       >
                         <ShoppingBag className="w-3.5 h-3.5 text-white" />
                         <span>Add to Cart</span>
@@ -254,14 +254,14 @@ export default function WishlistPage() {
                 <Link
                   key={prod._id || idx}
                   href={`/products/${prod.slug || prod._id}`}
-                  className="group bg-white rounded-none border border-[#e8e2d8] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+                  className="group bg-white rounded-md border border-[#e8e2d8] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
                 >
                   {/* Card Image */}
-                  <div className="relative aspect-[4/3] w-full rounded-none overflow-hidden bg-[#faf8f5]">
+                  <div className="relative aspect-[4/3] w-full rounded-md overflow-hidden bg-[#faf8f5]">
                     {/* Best Seller Pill (top most left) */}
                     {prod.isBestSeller && (
                       <div className="absolute top-0 left-0 z-10">
-                        <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+                        <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
                           BEST SELLER
                         </span>
                       </div>
@@ -334,10 +334,10 @@ export default function WishlistPage() {
         </div>
 
         {/* ── TRUST BADGES STRIP ── */}
-        <div className="bg-[#faf8f5] rounded-none border border-[#e8e2d8] p-3.5 sm:p-4 grid grid-cols-3 gap-2 text-center sm:text-left shadow-2xs">
+        <div className="bg-[#faf8f5] rounded-md border border-[#e8e2d8] p-3.5 sm:p-4 grid grid-cols-3 gap-2 text-center sm:text-left shadow-2xs">
           {/* Badge 1 */}
           <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3">
-            <div className="w-8 h-8 rounded-none bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
+            <div className="w-8 h-8 rounded-md bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
@@ -348,7 +348,7 @@ export default function WishlistPage() {
 
           {/* Badge 2 */}
           <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3 border-x border-[#e8e2d8]/80 px-1.5 sm:px-4">
-            <div className="w-8 h-8 rounded-none bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
+            <div className="w-8 h-8 rounded-md bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
               <RotateCcw className="w-4 h-4" />
             </div>
             <div>
@@ -359,7 +359,7 @@ export default function WishlistPage() {
 
           {/* Badge 3 */}
           <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3">
-            <div className="w-8 h-8 rounded-none bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
+            <div className="w-8 h-8 rounded-md bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
               <Headphones className="w-4 h-4" />
             </div>
             <div>
@@ -375,8 +375,8 @@ export default function WishlistPage() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-20 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-none shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
-          <div className="w-5 h-5 rounded-none bg-[#89591C] flex items-center justify-center flex-shrink-0">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-20 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-md shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
+          <div className="w-5 h-5 rounded-md bg-[#89591C] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>
           <span className="text-xs font-medium">{toastMessage}</span>

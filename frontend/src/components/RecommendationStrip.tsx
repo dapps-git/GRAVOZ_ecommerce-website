@@ -197,10 +197,10 @@ function RecProductCard({
   return (
     <Link
       href={`/products/${product._id}`}
-      className="group bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer relative"
+      className="group bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer relative"
     >
-      {/* Product Image Card - aspect-square gives taller, bigger size, rounded-none */}
-      <div className="relative aspect-square w-full rounded-none overflow-hidden bg-[#faf8f5]">
+      {/* Product Image Card - aspect-square gives taller, bigger size, rounded-md */}
+      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#faf8f5]">
         {/* Wishlist Button */}
         <button
           type="button"
@@ -229,11 +229,11 @@ function RecProductCard({
 
         {/* Match Badge or Final Sale Badge (top most left) */}
         {product.noReturnRefundExchange ? (
-          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
             Final Sale
           </span>
         ) : hasColorMatch ? (
-          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
             In {contextProduct?.selectedColor}
           </span>
         ) : null}

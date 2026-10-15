@@ -80,10 +80,10 @@ function ListingProductCard({
   return (
     <Link
       href={`/products/${product.slug || product._id}`}
-      className="group bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+      className="group bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
     >
-      {/* Product Image Card - aspect-square gives bigger size, rounded-none */}
-      <div className="relative aspect-square w-full rounded-none overflow-hidden bg-[#faf8f5]">
+      {/* Product Image Card - aspect-square gives bigger size, rounded-md */}
+      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#faf8f5]">
         {/* Wishlist Button */}
         <button
           type="button"
@@ -101,25 +101,25 @@ function ListingProductCard({
         {/* Badges: All lightweight font, beige bg with brown text, top most left */}
         {product.stock !== undefined && product.stock <= 0 ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
               OUT OF STOCK
             </span>
           </div>
         ) : product.noReturnRefundExchange ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
               FINAL SALE
             </span>
           </div>
         ) : product.stock !== undefined && product.stock > 0 && product.stock <= 3 ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
               {product.stock === 1 ? '1 LEFT' : `${product.stock} LEFT`}
             </span>
           </div>
         ) : product.isBestSeller ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
               BEST SELLER
             </span>
           </div>
@@ -600,7 +600,7 @@ function ProductsContent() {
             <button
               type="button"
               onClick={() => setIsFilterDrawerOpen(true)}
-              className="py-1 px-2.5 sm:px-3 bg-white border border-[#e8e2d8] rounded-none text-[11px] font-medium text-slate-700 flex items-center gap-1.5 shadow-2xs hover:border-[#89591C] hover:text-[#89591C] transition-colors cursor-pointer"
+              className="py-1 px-2.5 sm:px-3 bg-white border border-[#e8e2d8] rounded-md text-[11px] font-medium text-slate-700 flex items-center gap-1.5 shadow-2xs hover:border-[#89591C] hover:text-[#89591C] transition-colors cursor-pointer"
             >
               <SlidersHorizontal className="w-3 h-3 text-slate-600" />
               <span className="tracking-wide">Filter</span>
@@ -616,7 +616,7 @@ function ProductsContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none bg-white border border-[#e8e2d8] rounded-none pl-2.5 pr-6 py-1 text-[11px] font-medium text-slate-700 focus:outline-none focus:border-[#89591C] shadow-2xs cursor-pointer"
+                className="appearance-none bg-white border border-[#e8e2d8] rounded-md pl-2.5 pr-6 py-1 text-[11px] font-medium text-slate-700 focus:outline-none focus:border-[#89591C] shadow-2xs cursor-pointer"
               >
                 <option value="popularity">Sort: Popularity</option>
                 <option value="newest">Sort: Newest</option>
@@ -633,7 +633,7 @@ function ProductsContent() {
         {activeFiltersCount > 0 && (
           <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
             {(displayCategory || selectedCategory) && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] font-normal">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] rounded-md font-normal">
                 <span>Category: {displayCategory || selectedCategory}</span>
                 <button
                   type="button"
@@ -645,7 +645,7 @@ function ProductsContent() {
               </span>
             )}
             {selectedBrands.map((b) => (
-              <span key={b} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] font-normal">
+              <span key={b} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] rounded-md font-normal">
                 <span>Brand: {b}</span>
                 <button
                   type="button"
@@ -657,7 +657,7 @@ function ProductsContent() {
               </span>
             ))}
             {selectedSizes.map((s) => (
-              <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] font-normal">
+              <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] rounded-md font-normal">
                 <span>Size: {s}</span>
                 <button
                   type="button"
@@ -669,7 +669,7 @@ function ProductsContent() {
               </span>
             ))}
             {selectedColors.map((c) => (
-              <span key={c} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] font-normal">
+              <span key={c} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] rounded-md font-normal">
                 <span>Color: {c}</span>
                 <button
                   type="button"
@@ -681,7 +681,7 @@ function ProductsContent() {
               </span>
             ))}
             {priceRange < 5000 && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] font-normal">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB] rounded-md font-normal">
                 <span>Max: ₹{priceRange}</span>
                 <button
                   type="button"
@@ -709,12 +709,12 @@ function ProductsContent() {
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div
                   key={i}
-                  className="aspect-square bg-[#f4f2ee] rounded-none animate-pulse border border-[#e8e2d8]"
+                  className="aspect-square bg-[#f4f2ee] rounded-md animate-pulse border border-[#e8e2d8]"
                 />
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="py-20 text-center space-y-3 bg-[#faf8f5] rounded-none border border-[#e8e2d8] p-8">
+            <div className="py-20 text-center space-y-3 bg-[#faf8f5] rounded-md border border-[#e8e2d8] p-8">
               <div className="w-12 h-12 rounded-full bg-[#f4f2ee] text-slate-400 mx-auto flex items-center justify-center">
                 <SlidersHorizontal className="w-6 h-6" />
               </div>
@@ -725,7 +725,7 @@ function ProductsContent() {
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="px-4 py-2 bg-[#89591C] text-white text-xs font-medium rounded-none shadow-xs hover:bg-[#724816] transition-colors cursor-pointer"
+                className="px-4 py-2 bg-[#89591C] text-white text-xs font-medium rounded-md shadow-xs hover:bg-[#724816] transition-colors cursor-pointer"
               >
                 Reset All Filters
               </button>

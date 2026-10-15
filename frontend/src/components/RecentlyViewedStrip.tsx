@@ -58,14 +58,14 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
           <Link
             key={`${product._id}-${idx}`}
             href={`/products/${product._id}`}
-            className="group bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+            className="group bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
           >
             {/* Product Image Card */}
-            <div className="relative aspect-square w-full rounded-none overflow-hidden bg-[#faf8f5]">
+            <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#faf8f5]">
               {/* Best Seller Badge (top most left) */}
               {product.badge && (
                 <div className="absolute top-0 left-0 z-10">
-                  <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+                  <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
                     {product.badge}
                   </span>
                 </div>

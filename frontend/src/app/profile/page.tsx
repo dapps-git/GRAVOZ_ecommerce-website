@@ -423,7 +423,7 @@ export default function ProfilePage() {
             <div className="pt-6 border-t border-[#eae5dc] mt-6">
               <button
                 type="button"
-                onClick={() => showToast('Signed out safely.')}
+                onClick={async () => { await logout(); }}
                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50/50 transition-colors font-sansation"
               >
                 <LogOut className="w-4 h-4" />
@@ -540,12 +540,20 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  <div className="pt-2 flex justify-center">
+                  <div className="pt-2 flex flex-col items-center gap-3">
                     <button
                       type="submit"
-                      className="w-full sm:w-auto bg-black hover:bg-neutral-800 text-white font-medium text-xs sm:text-sm px-8 py-3 rounded-full transition-colors font-sansation shadow-xs cursor-pointer text-center"
+                      className="w-full sm:w-auto bg-black hover:bg-neutral-800 text-white font-medium text-xs sm:text-sm px-8 py-3 rounded-lg transition-colors font-sansation shadow-xs cursor-pointer text-center"
                     >
                       Save & Update
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => { await logout(); }}
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 font-medium text-xs sm:text-sm px-8 py-3 rounded-lg transition-colors font-sansation cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
                     </button>
                   </div>
                 </form>
@@ -571,7 +579,7 @@ export default function ProfilePage() {
                     <Loader2 className="w-6 h-6 animate-spin text-[#89591C]" />
                   </div>
                 ) : orders.length === 0 ? (
-                  <div className="py-12 text-center space-y-3 bg-[#faf8f5] rounded-none border border-[#e8e2d8]">
+                  <div className="py-12 text-center space-y-3 bg-[#faf8f5] rounded-lg border border-[#e8e2d8]">
                     <Package className="w-10 h-10 text-slate-400 mx-auto" />
                     <p className="text-sm font-semibold text-slate-700">No orders placed yet</p>
                     <Link
@@ -587,7 +595,7 @@ export default function ProfilePage() {
                       const isDelivered = ord.orderStatus === 'delivered';
                       const isCancelled = ord.orderStatus === 'cancelled';
                       return (
-                        <div key={ord._id} className="border border-[#e5e5e5] rounded-none p-4 sm:p-5 space-y-4 shadow-2xs bg-white">
+                        <div key={ord._id} className="border border-[#e5e5e5] rounded-lg p-4 sm:p-5 space-y-4 shadow-2xs bg-white">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs font-sansation border-b border-[#f0ece5] pb-3">
                             <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 sm:gap-3 min-w-0">
                               <div>
@@ -607,59 +615,59 @@ export default function ProfilePage() {
                               {(() => {
                                 const st = ord.orderStatus;
                                 if (st === 'cancelled') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Cancelled</span>;
                                 }
                                 if (st === 'return_approved' || st === 'approved') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-[#E8F8EE] text-[#22C55E] border border-[#22C55E]/30">Return Accepted</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#E8F8EE] text-[#22C55E] border border-[#22C55E]/30">Return Accepted</span>;
                                 }
                                 if (st === 'return_requested' || st === 'requested') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Return Requested</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Return Requested</span>;
                                 }
                                 if (st === 'under_review') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-blue-50 text-blue-800 border border-blue-200">Under Review</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-blue-50 text-blue-800 border border-blue-200">Under Review</span>;
                                 }
                                 if (st === 'pickup_scheduled') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">Pickup Scheduled</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">Pickup Scheduled</span>;
                                 }
                                 if (st === 'return_received' || st === 'received_at_hub' || st === 'received') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">Received at Hub</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">Received at Hub</span>;
                                 }
                                 if (st === 'refund_initiated') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-teal-50 text-teal-800 border border-teal-200">Refund Initiated</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-teal-50 text-teal-800 border border-teal-200">Refund Initiated</span>;
                                 }
                                 if (st === 'refunded' || st === 'returned' || st === 'processed') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">Refunded</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">Refunded</span>;
                                 }
                                 if (st === 'return_rejected' || st === 'rejected') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Return Declined</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Return Declined</span>;
                                 }
                                 if (st === 'delivered') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Delivered</span>;
                                 }
                                 if (st === 'shipped') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-sky-50 text-sky-700 border border-sky-200">Shipped</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-sky-50 text-sky-700 border border-sky-200">Shipped</span>;
                                 }
                                 if (st === 'out_for_delivery') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-cyan-50 text-cyan-700 border border-cyan-200">Out for Delivery</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-cyan-50 text-cyan-700 border border-cyan-200">Out for Delivery</span>;
                                 }
                                 if (st === 'confirmed' || st === 'processing') {
-                                  return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Confirmed</span>;
+                                  return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Confirmed</span>;
                                 }
-                                return <span className="px-2.5 py-1 rounded-none text-[11px] font-medium bg-[#FAF7F3] text-slate-700 border border-[#E5E1DC] capitalize">{st ? st.replace(/_/g, ' ') : 'Ordered'}</span>;
+                                return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#FAF7F3] text-slate-700 border border-[#E5E1DC] capitalize">{st ? st.replace(/_/g, ' ') : 'Ordered'}</span>;
                               })()}
 
                               <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
                                 <Link
                                   href={`/orders/${ord._id}/invoice`}
                                   target="_blank"
-                                  className="px-2.5 sm:px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium rounded-none border border-[#E5E1DC] transition-colors flex items-center gap-1 cursor-pointer"
+                                  className="px-2.5 sm:px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium rounded-md border border-[#E5E1DC] transition-colors flex items-center gap-1 cursor-pointer"
                                   title="Download / Print Tax Invoice"
                                 >
                                   <FileText className="w-3 h-3 text-[#8A5B2A]" /> Invoice
                                 </Link>
                                 <Link
                                   href={`/orders/${ord._id}`}
-                                  className="px-2.5 sm:px-3 py-1 bg-[#FAF7F3] hover:bg-[#F6E9D7]/50 text-[#8A5B2A] text-[11px] font-semibold rounded-none border border-[#E5E1DC] transition-colors"
+                                  className="px-2.5 sm:px-3 py-1 bg-[#FAF7F3] hover:bg-[#F6E9D7]/50 text-[#8A5B2A] text-[11px] font-semibold rounded-md border border-[#E5E1DC] transition-colors"
                                 >
                                   Track / Manage
                                 </Link>
@@ -1115,7 +1123,7 @@ export default function ProfilePage() {
                     {wishlistItems.map((item) => {
                       const prodHref = `/products/${item.productId || (item as any).slug || (item as any)._id}`;
                       return (
-                        <div key={item.productId} className="p-3.5 rounded-none border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
+                        <div key={item.productId} className="p-3.5 rounded-lg border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
                           <div className="flex items-center gap-3 min-w-0 flex-1">
                             <Link href={prodHref} className="w-14 h-14 rounded-none bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
                               <ProductImage src={item.imageUrl} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
@@ -1145,7 +1153,7 @@ export default function ProfilePage() {
                               showToast(`Moved ${item.title} to Cart! Redirecting...`);
                               router.push('/cart');
                             }}
-                            className="bg-[#c25e09] hover:bg-[#a04a05] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-none transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
+                            className="bg-[#c25e09] hover:bg-[#a04a05] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-md transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
                           >
                             Add to Cart
                           </button>
@@ -1180,7 +1188,7 @@ export default function ProfilePage() {
                     {cartItems.map((item) => {
                       const prodHref = `/products/${item.productId || (item as any).slug || (item as any)._id}`;
                       return (
-                        <div key={item.productId} className="p-3.5 rounded-none border border-[#e5e5e5] flex items-center justify-between bg-white">
+                        <div key={item.productId} className="p-3.5 rounded-lg border border-[#e5e5e5] flex items-center justify-between bg-white">
                           <div className="flex items-center gap-3">
                             <Link href={prodHref} className="w-12 h-12 rounded-none bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
                               <ProductImage src={item.imageUrl} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
@@ -1212,7 +1220,7 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-bold text-[#030303] font-sansation">Return & Refund Requests</h3>
                   <p className="text-xs text-slate-500 font-sansation">Manage returns and check refund status</p>
                 </div>
-                <div className="p-6 rounded-2xl border border-[#e5e5e5] bg-[#faf9f6] text-center space-y-3 font-sansation">
+                <div className="p-6 rounded-xl border border-[#e5e5e5] bg-[#faf9f6] text-center space-y-3 font-sansation">
                   <RotateCcw className="w-8 h-8 text-[#89591C] mx-auto" />
                   <h4 className="text-sm font-bold text-[#030303]">No Active Return Requests</h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">

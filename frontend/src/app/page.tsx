@@ -17,12 +17,12 @@ import { useWishlist } from '@/context/WishlistContext';
 
 function SkeletonProductCard() {
   return (
-    <div className="flex flex-col animate-pulse bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5">
-      <div className="relative w-full aspect-square rounded-none overflow-hidden bg-[#faf8f5]" />
+    <div className="flex flex-col animate-pulse bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5">
+      <div className="relative w-full aspect-square rounded-md overflow-hidden bg-[#faf8f5]" />
       <div className="mt-3 space-y-2">
-        <div className="h-3.5 w-3/4 rounded-none bg-[#ede9e2]" />
-        <div className="h-3 w-1/3 rounded-none bg-[#ede9e2]" />
-        <div className="h-4 w-1/2 rounded-none bg-[#ede9e2]" />
+        <div className="h-3.5 w-3/4 rounded bg-[#ede9e2]" />
+        <div className="h-3 w-1/3 rounded bg-[#ede9e2]" />
+        <div className="h-4 w-1/2 rounded bg-[#ede9e2]" />
       </div>
     </div>
   );
@@ -95,7 +95,7 @@ function AnimatedProductCard({
   return (
     <Link
       href={product.href || `/products/${product.id}`}
-      className="group bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+      className="group bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
     >
       {/* Product Image Card - aspect-square gives taller, more substantial size, rounded-none */}
       <div className="relative aspect-square w-full rounded-none overflow-hidden bg-[#faf8f5]">

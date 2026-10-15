@@ -38,9 +38,7 @@ export default function SearchBar() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([
-    'Black Sandals',
-  ]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
