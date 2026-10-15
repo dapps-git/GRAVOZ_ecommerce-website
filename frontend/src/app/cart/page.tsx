@@ -15,7 +15,6 @@ import { useUser } from '@/context/UserContext';
 import {
   Heart,
   Trash2,
-  Bookmark,
   Tag,
   ChevronDown,
   ChevronUp,

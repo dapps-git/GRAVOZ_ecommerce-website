@@ -159,7 +159,7 @@ export default function GoogleSignInButton({
       type="button"
       onClick={handleGoogleClick}
       disabled={isSubmitting}
-      className="w-full flex items-center justify-center gap-2.5 py-2.5 border border-[#ddd6cc] bg-white hover:bg-[#faf9f7] text-slate-700 text-[11.5px] font-medium transition-colors cursor-pointer font-sansation disabled:opacity-60"
+      className="w-full flex items-center justify-center gap-2.5 py-2.5 border border-[#ddd6cc] bg-white hover:bg-[#faf9f7] text-slate-700 text-[11.5px] font-medium transition-colors cursor-pointer font-sansation disabled:opacity-60 rounded-md"
     >
       <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
         <path

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Star, Heart } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
-import { error } from 'console';
 
 interface RecentlyViewedItem {
   _id: string;
