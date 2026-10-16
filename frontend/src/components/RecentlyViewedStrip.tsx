@@ -30,7 +30,7 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Filter out legacy mock IDs from prior testing
-          const valid = parsed.filter((item: any) => item?._id && !item._id.startsWith('p'));
+          const valid = parsed.filter((item: any) => item && typeof item._id === 'string' && !item._id.startsWith('p'));
           setItems(valid.slice(0, limit));
         }
       }

@@ -174,7 +174,7 @@ export default function Header() {
               <>
                 <Link href="/profile" className="flex items-center gap-1 hover:text-[#89591C] transition-colors font-bold text-[#89591C]">
                   <UserCheck className="w-3 h-3 text-[#89591C]" />
-                  <span>HI, {user.name.split(' ')[0].toUpperCase()}</span>
+                  <span>HI, {(user?.name || 'USER').split(' ')[0].toUpperCase()}</span>
                 </Link>
                 <span className="text-[#d8cebe]">|</span>
                 <button

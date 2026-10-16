@@ -75,7 +75,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (res.authenticated && res.user) {
         const profile: UserProfile = {
           id: res.user.id,
-          name: res.user.name,
+          name: res.user.name || 'User',
           email: res.user.email,
           phone: res.user.phone || '',
           address: res.user.address || '',
