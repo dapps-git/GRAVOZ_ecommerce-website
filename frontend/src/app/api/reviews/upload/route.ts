@@ -25,6 +25,19 @@ export async function POST(req: NextRequest) {
     const result = await cloudinary.uploader.upload(dataURI, {
       folder: 'gravoz/reviews',
       resource_type: isVideo ? 'video' : 'image',
+      format: isVideo ? undefined : 'webp',
+      fetch_format: isVideo ? undefined : 'webp',
+      transformation: isVideo
+        ? undefined
+        : [
+            {
+              width: 1200,
+              height: 1200,
+              crop: 'limit',
+              quality: 'auto:good',
+              fetch_format: 'webp',
+            },
+          ],
     });
 
     return NextResponse.json({ success: true, url: result.secure_url, type: isVideo ? 'video' : 'image' });

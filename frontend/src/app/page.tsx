@@ -410,34 +410,36 @@ export default function StorefrontHomePage() {
           </section>
         )}
 
-        {/* B. 3 Category Cards Section (Women, Men, Kids in 1 row on mobile & desktop) */}
-        <section className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
-          {categoriesLoading
-            ? [0, 1, 2].map((i) => <SkeletonCategoryCard key={i} />)
-            : categoryCards.map((card) => (
-              <Link
-                key={card.key}
-                href={card.href}
-                className="group flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e2d8] shadow-2xs hover:shadow-md transition-all bg-[#f4f2ee]"
-              >
-                <div className="relative aspect-[3/4] sm:aspect-[4/5] w-full bg-[#f4f2ee] overflow-hidden">
-                  <Image
-                    src={card.imageUrl}
-                    alt={`${card.title} Footwear Collection`}
-                    fill
-                    sizes="(max-width: 768px) 33vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="bg-[#f4f2ee] px-2.5 sm:px-4 md:px-5 py-2 sm:py-3.5 flex items-center justify-between border-t border-[#e8e2d8]">
-                  <span className="text-[11px] sm:text-sm md:text-base font-semibold text-[#030303] truncate">
-                    {card.title}
-                  </span>
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#030303] group-hover:translate-x-1 transition-transform flex-shrink-0" />
-                </div>
-              </Link>
-            ))}
-        </section>
+        {/* B. 3 Category Cards Section (Women, Men, Kids in 1 row on mobile & desktop) — Temporarily hidden as requested */}
+        {false && (
+          <section className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
+            {categoriesLoading
+              ? [0, 1, 2].map((i) => <SkeletonCategoryCard key={i} />)
+              : categoryCards.map((card) => (
+                <Link
+                  key={card.key}
+                  href={card.href}
+                  className="group flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e2d8] shadow-2xs hover:shadow-md transition-all bg-[#f4f2ee]"
+                >
+                  <div className="relative aspect-[3/4] sm:aspect-[4/5] w-full bg-[#f4f2ee] overflow-hidden">
+                    <Image
+                      src={card.imageUrl}
+                      alt={`${card.title} Footwear Collection`}
+                      fill
+                      sizes="(max-width: 768px) 33vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="bg-[#f4f2ee] px-2.5 sm:px-4 md:px-5 py-2 sm:py-3.5 flex items-center justify-between border-t border-[#e8e2d8]">
+                    <span className="text-[11px] sm:text-sm md:text-base font-semibold text-[#030303] truncate">
+                      {card.title}
+                    </span>
+                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#030303] group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                  </div>
+                </Link>
+              ))}
+          </section>
+        )}
 
         {/* C. "Suggested for You" Products Section (Only displays when products exist in DB) */}
         {(productsLoading || products.length > 0) && (

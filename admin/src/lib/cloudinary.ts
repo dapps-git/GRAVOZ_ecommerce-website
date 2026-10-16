@@ -101,7 +101,11 @@ export async function uploadUrlToCloudinary(
       const uploadResult = await cloudinary.uploader.upload(base64Data, {
         folder,
         format: 'webp',
-        quality: 'auto',
+        fetch_format: 'webp',
+        quality: 'auto:good',
+        transformation: [
+          { width: 1400, height: 1400, crop: 'limit', quality: 'auto:good', fetch_format: 'webp' }
+        ],
       });
 
       urlUploadCache.set(trimmed, uploadResult.secure_url);
@@ -111,7 +115,11 @@ export async function uploadUrlToCloudinary(
       const uploadResult = await cloudinary.uploader.upload(trimmed, {
         folder,
         format: 'webp',
-        quality: 'auto',
+        fetch_format: 'webp',
+        quality: 'auto:good',
+        transformation: [
+          { width: 1400, height: 1400, crop: 'limit', quality: 'auto:good', fetch_format: 'webp' }
+        ],
       });
       urlUploadCache.set(trimmed, uploadResult.secure_url);
       return uploadResult.secure_url;

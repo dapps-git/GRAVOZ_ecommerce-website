@@ -31,12 +31,25 @@ export async function POST(req: NextRequest) {
           width: number;
           height: number;
         }>((resolve, reject) => {
+          const isBanner = folder.includes('banner');
+          const maxWidth = isBanner ? 1920 : 1400;
+          const maxHeight = isBanner ? 1080 : 1400;
+
           const uploadStream = cloudinary.uploader.upload_stream(
             {
               folder: folder,
               format: 'webp',
               fetch_format: 'webp',
               quality: 'auto:good',
+              transformation: [
+                {
+                  width: maxWidth,
+                  height: maxHeight,
+                  crop: 'limit',
+                  quality: 'auto:good',
+                  fetch_format: 'webp',
+                },
+              ],
             },
             (error, result) => {
               if (error || !result) return reject(error);
