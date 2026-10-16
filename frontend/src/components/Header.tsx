@@ -83,6 +83,11 @@ export default function Header() {
   const { wishlistCount } = useWishlist();
   const { user, isLoggedIn, logout } = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -246,7 +251,7 @@ export default function Header() {
                 height={20}
                 className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
               />
-              {wishlistCount > 0 && (
+              {mounted && wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#89591C] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center animate-in zoom-in-50 duration-200">
                   {wishlistCount}
                 </span>
@@ -266,9 +271,11 @@ export default function Header() {
                 height={20}
                 className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
               />
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#89591C] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center">
-                {cartCount}
-              </span>
+              {mounted && cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#89591C] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </Link>
 
             {/* Profile Icon / Avatar */}

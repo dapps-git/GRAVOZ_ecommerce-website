@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, LayoutGrid, Heart, ShoppingBag, User } from 'lucide-react';
@@ -13,6 +13,11 @@ export default function BottomNav() {
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const { isLoggedIn } = useUser();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Exclude bottom navigation bar completely from invoices, auth screens, and checkout
   if (
@@ -64,7 +69,7 @@ export default function BottomNav() {
       >
         <div className="relative">
           <Heart className={`w-4 h-4 ${isWishlist ? 'stroke-[2.5] fill-[#89591C]' : 'stroke-2'}`} />
-          {wishlistCount > 0 && (
+          {mounted && wishlistCount > 0 && (
             <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 rounded-full bg-[#68421A] text-white text-[8px] font-bold flex items-center justify-center">
               {wishlistCount}
             </span>
@@ -81,7 +86,7 @@ export default function BottomNav() {
       >
         <div className="relative">
           <ShoppingBag className={`w-4 h-4 ${isCart ? 'stroke-[2.5]' : 'stroke-2'}`} />
-          {cartCount > 0 && (
+          {mounted && cartCount > 0 && (
             <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 rounded-full bg-[#68421A] text-white text-[8px] font-bold flex items-center justify-center">
               {cartCount}
             </span>
