@@ -59,8 +59,48 @@ export async function PUT(req: NextRequest) {
     } else if (status === 'refund_initiated') {
       returnItem.refundInitiatedAt = now;
       orderUpdate['orderStatus'] = 'refund_initiated';
+      orderUpdate['paymentStatus'] = 'refund_initiated';
       orderUpdate['returnDetails.status'] = 'refund_initiated';
       orderUpdate['returnDetails.refundInitiatedAt'] = now;
+
+      // Automatically initiate Razorpay refund for online payments if not already triggered
+      if (returnItem.order) {
+        try {
+          const ord = await Order.findById(returnItem.order);
+          if (ord && ord.paymentMethod !== 'COD' && (ord.razorpayPaymentId || (ord as any).transactionId)) {
+            const pId = ord.razorpayPaymentId || (ord as any).transactionId;
+            const alreadyHasRefund = ord.paymentDetails?.refundId;
+
+            if (!alreadyHasRefund) {
+              const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+              const keySecret = process.env.RAZORPAY_KEY_SECRET;
+              if (keyId && keySecret && pId) {
+                const amountInPaise = Math.round((returnItem.refundAmount || ord.totalAmount) * 100);
+                const rzpRes = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(pId)}/refund`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString('base64')}`,
+                  },
+                  body: JSON.stringify({
+                    amount: amountInPaise,
+                    notes: { orderNumber: ord.orderNumber, reason: 'Approved customer return (without exchange) refund' },
+                  }),
+                });
+                const rzpJson = await rzpRes.json();
+                if (rzpRes.ok && rzpJson.id) {
+                  orderUpdate['paymentDetails.refundId'] = rzpJson.id;
+                  orderUpdate['paymentDetails.refundStatus'] = rzpJson.status || 'initiated';
+                  orderUpdate['paymentDetails.refundAmount'] = returnItem.refundAmount || ord.totalAmount;
+                  orderUpdate['paymentDetails.refundInitiatedAt'] = now;
+                }
+              }
+            }
+          }
+        } catch (gatewayErr) {
+          console.error('[RAZORPAY REFUND] Gateway reversal error in returns refund_initiated:', gatewayErr);
+        }
+      }
     } else if (status === 'refunded' || status === 'processed') {
       returnItem.status = 'refunded';
       returnItem.refundedAt = now;
@@ -70,32 +110,37 @@ export async function PUT(req: NextRequest) {
       orderUpdate['returnDetails.status'] = 'refunded';
       orderUpdate['returnDetails.refundedAt'] = now;
 
-      // If Razorpay online payment, trigger gateway reversal back to customer bank account
+      // If Razorpay online payment and not yet refunded, trigger gateway reversal
       if (returnItem.order) {
         try {
           const ord = await Order.findById(returnItem.order);
-          if (ord && ord.paymentMethod !== 'COD' && (ord.razorpayPaymentId || ord.transactionId)) {
-            const pId = ord.razorpayPaymentId || ord.transactionId;
-            const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-            const keySecret = process.env.RAZORPAY_KEY_SECRET;
-            if (keyId && keySecret && pId) {
-              const amountInPaise = Math.round((returnItem.refundAmount || ord.totalAmount) * 100);
-              const rzpRes = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(pId)}/refund`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString('base64')}`,
-                },
-                body: JSON.stringify({
-                  amount: amountInPaise,
-                  notes: { orderNumber: ord.orderNumber, reason: 'Approved customer return refund' },
-                }),
-              });
-              const rzpJson = await rzpRes.json();
-              if (rzpRes.ok && rzpJson.id) {
-                orderUpdate['paymentDetails.refundId'] = rzpJson.id;
-                orderUpdate['paymentDetails.refundStatus'] = rzpJson.status || 'processed';
-                orderUpdate['paymentDetails.refundedAt'] = now;
+          if (ord && ord.paymentMethod !== 'COD' && (ord.razorpayPaymentId || (ord as any).transactionId)) {
+            const pId = ord.razorpayPaymentId || (ord as any).transactionId;
+            const alreadyHasRefund = ord.paymentDetails?.refundId;
+
+            if (!alreadyHasRefund) {
+              const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+              const keySecret = process.env.RAZORPAY_KEY_SECRET;
+              if (keyId && keySecret && pId) {
+                const amountInPaise = Math.round((returnItem.refundAmount || ord.totalAmount) * 100);
+                const rzpRes = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(pId)}/refund`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString('base64')}`,
+                  },
+                  body: JSON.stringify({
+                    amount: amountInPaise,
+                    notes: { orderNumber: ord.orderNumber, reason: 'Approved customer return refund' },
+                  }),
+                });
+                const rzpJson = await rzpRes.json();
+                if (rzpRes.ok && rzpJson.id) {
+                  orderUpdate['paymentDetails.refundId'] = rzpJson.id;
+                  orderUpdate['paymentDetails.refundStatus'] = rzpJson.status || 'processed';
+                  orderUpdate['paymentDetails.refundAmount'] = returnItem.refundAmount || ord.totalAmount;
+                  orderUpdate['paymentDetails.refundedAt'] = now;
+                }
               }
             }
           }

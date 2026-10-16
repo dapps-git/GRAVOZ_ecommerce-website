@@ -68,10 +68,42 @@ export async function POST(req: NextRequest) {
         const order = await Order.findOne({ razorpayPaymentId: paymentId });
         if (order) {
           order.paymentStatus = 'refunded';
+          if (order.orderStatus === 'refund_initiated') {
+            order.orderStatus = 'refunded';
+          }
+          if (order.returnDetails && order.returnDetails.status === 'refund_initiated') {
+            order.returnDetails.status = 'refunded';
+            order.returnDetails.refundedAt = new Date();
+          }
+          if (!order.paymentDetails) order.paymentDetails = {};
+          order.paymentDetails.refundStatus = 'processed';
+          order.paymentDetails.refundedAt = new Date();
+          order.markModified('paymentDetails');
+
           order.statusHistory.push({
             status: order.orderStatus,
             timestamp: new Date(),
-            note: `Refund of ₹${(refundEntity.amount / 100).toLocaleString('en-IN')} processed via Razorpay Webhook`,
+            note: `Refund of ₹${(refundEntity.amount / 100).toLocaleString('en-IN')} confirmed and processed by Razorpay gateway (Refund ID: ${refundEntity.id}). Money reversed to customer's account.`,
+          });
+          await order.save();
+        }
+      }
+    } else if (eventType === 'refund.failed') {
+      const refundEntity = payload.refund?.entity;
+      const paymentId = refundEntity?.payment_id;
+      if (paymentId) {
+        const order = await Order.findOne({ razorpayPaymentId: paymentId });
+        if (order) {
+          order.paymentStatus = 'refund_failed';
+          if (!order.paymentDetails) order.paymentDetails = {};
+          order.paymentDetails.refundStatus = 'failed';
+          order.paymentDetails.refundError = refundEntity.error_description || refundEntity.error_reason || 'Gateway reversal failed';
+          order.markModified('paymentDetails');
+
+          order.statusHistory.push({
+            status: order.orderStatus,
+            timestamp: new Date(),
+            note: `Razorpay refund failed: ${refundEntity.error_description || 'Payment gateway could not reverse funds'}. Manual intervention required.`,
           });
           await order.save();
         }

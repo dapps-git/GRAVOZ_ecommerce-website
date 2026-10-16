@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import ProductImage from '@/components/ProductImage';
 import { Star, Heart, Sparkles } from 'lucide-react';
 import { extractSignals } from '@/lib/userBehavior';
 import { getProductRating } from '@/lib/ratingUtils';
@@ -248,7 +249,7 @@ function RecProductCard({
                 : 'opacity-0 z-0 pointer-events-none'
             }`}
           >
-            <Image
+            <ProductImage
               src={imgUrl}
               alt={`${product.name} - photo ${idx + 1}`}
               fill

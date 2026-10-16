@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import ProductImage from '@/components/ProductImage';
 import { Star, Heart } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
@@ -96,8 +97,8 @@ export default function RecentlyViewedStrip({ limit = 6 }: { limit?: number }) {
               </button>
 
               {/* Product Shoe Image */}
-              <Image
-                src={product.imageUrl || '/products/placeholder.svg'}
+              <ProductImage
+                src={product.imageUrl}
                 alt={product.name}
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"

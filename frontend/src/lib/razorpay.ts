@@ -114,3 +114,66 @@ export function verifyWebhookSignature({
     return false;
   }
 }
+
+export interface RazorpayRefundResult {
+  success: boolean;
+  refundId?: string;
+  status?: string;
+  amount?: number;
+  error?: string;
+}
+
+/**
+ * Initiates an automated refund through Razorpay API for UPI/online payments.
+ * Converts amount in rupees to paise and calls POST /v1/payments/{paymentId}/refund.
+ */
+export async function requestRazorpayRefund({
+  paymentId,
+  amountInRupees,
+  notes,
+}: {
+  paymentId: string;
+  amountInRupees: number;
+  notes?: Record<string, string>;
+}): Promise<RazorpayRefundResult> {
+  try {
+    const { keyId, keySecret } = getRazorpayKeys();
+    if (!keyId || !keySecret) {
+      return { success: false, error: 'Razorpay API credentials are not configured.' };
+    }
+    if (!paymentId) {
+      return { success: false, error: 'Missing Razorpay payment ID for refund.' };
+    }
+
+    const amountInPaise = Math.round(amountInRupees * 100);
+    const authHeader = `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString('base64')}`;
+
+    const res = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}/refund`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({
+        amount: amountInPaise,
+        notes: notes || {},
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      const errDesc = data.error?.description || data.error?.reason || 'Razorpay refund failed';
+      return { success: false, error: errDesc };
+    }
+
+    return {
+      success: true,
+      refundId: data.id,
+      status: data.status || 'processed',
+      amount: data.amount ? data.amount / 100 : amountInRupees,
+    };
+  } catch (err: any) {
+    console.error('Razorpay refund request exception:', err);
+    return { success: false, error: err.message || 'Refund request exception' };
+  }
+}

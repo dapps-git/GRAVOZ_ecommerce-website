@@ -369,15 +369,46 @@ function TrackOrderContent() {
             </Link>
           </div>
 
-          {/* ── CANCELLED ORDER BANNER ── */}
+          {/* ── CANCELLED ORDER & UPI REFUND BANNER ── */}
           {isCancelled && (
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex items-center gap-3 text-rose-800">
-              <XCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-              <div>
-                <h3 className="text-xs sm:text-sm font-bold">This Order Has Been Cancelled</h3>
-                <p className="text-[11px] text-rose-600 mt-0.5 font-normal">
-                  If payment was deducted online via UPI/Card, the refund will be credited back to your original bank account within 1-2 business days.
-                </p>
+            <div className="bg-white border border-[#E5E1DC] rounded-xl p-4 sm:p-5 shadow-2xs space-y-2">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0 mt-0.5">
+                  <XCircle className="w-4 h-4 text-rose-600" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <h3 className="text-xs sm:text-sm font-bold text-[#111111]">This Order Has Been Cancelled</h3>
+                    {order.paymentStatus === 'refund_initiated' || order.paymentStatus === 'refund_processing' ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                        Refund Initiated
+                      </span>
+                    ) : order.paymentStatus === 'refunded' ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Refunded
+                      </span>
+                    ) : order.paymentStatus === 'refund_failed' ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+                        Refund Action Required
+                      </span>
+                    ) : null}
+                  </div>
+                  {order.paymentMethod !== 'COD' ? (
+                    order.paymentStatus === 'refunded' ? (
+                      <p className="text-[11px] text-emerald-700 font-normal">
+                        Your refund of ₹{order.totalAmount?.toLocaleString('en-IN')} has been credited back to your original payment method.
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-slate-600 font-normal">
+                        Your UPI refund of ₹{order.totalAmount?.toLocaleString('en-IN')} has been initiated via Razorpay and will credit to your UPI-linked bank account within 2–7 business days.
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-[11px] text-slate-500 font-normal">
+                      This was a Cash on Delivery order. No payment was collected and no refund is required.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}

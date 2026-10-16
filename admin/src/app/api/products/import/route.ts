@@ -3,30 +3,11 @@ import { connectDB } from '@/lib/db';
 import { Product } from '@/models/Product';
 import { Category } from '@/models/Category';
 import { invalidateCache } from '@/lib/redis';
-import cloudinary from '@/lib/cloudinary';
+import cloudinary, { uploadUrlToCloudinary } from '@/lib/cloudinary';
 import * as XLSX from 'xlsx';
 
-const imageUploadCache = new Map<string, string>();
-
 async function uploadToCloudinaryIfNeeded(url: string): Promise<string> {
-  if (!url) return url;
-  if (url.includes('cloudinary.com')) return url;
-  if (imageUploadCache.has(url)) return imageUploadCache.get(url)!;
-
-  try {
-    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
-      const res = await cloudinary.uploader.upload(url, {
-        folder: 'gravoz/products',
-        format: 'webp',
-        quality: 'auto',
-      });
-      imageUploadCache.set(url, res.secure_url);
-      return res.secure_url;
-    }
-  } catch (err: any) {
-    console.warn('Auto Cloudinary upload warning for', url, err?.message);
-  }
-  return url;
+  return uploadUrlToCloudinary(url, 'gravoz/products');
 }
 
 function normalizeAndExtractUrls(rawVal: any): string[] {

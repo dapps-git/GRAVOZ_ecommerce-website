@@ -53,8 +53,14 @@ export interface IOrder extends Document {
   shippingFee?: number;
   discountAmount?: number;
   couponCode?: string;
-  totalAmount: number;
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentStatus:
+    | 'pending'
+    | 'paid'
+    | 'failed'
+    | 'refund_initiated'
+    | 'refund_processing'
+    | 'refunded'
+    | 'refund_failed';
   orderStatus:
     | 'ordered'
     | 'confirmed'
@@ -172,7 +178,15 @@ const OrderSchema: Schema<IOrder> = new Schema(
     totalAmount: { type: Number, required: true, min: 0 },
     paymentStatus: {
       type: String,
-      enum: ['pending', 'paid', 'failed', 'refunded'],
+      enum: [
+        'pending',
+        'paid',
+        'failed',
+        'refund_initiated',
+        'refund_processing',
+        'refunded',
+        'refund_failed',
+      ],
       default: 'pending',
       index: true,
     },

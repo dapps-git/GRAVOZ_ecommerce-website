@@ -5,6 +5,7 @@ import { Category } from '@/models/Category';
 import { Brand } from '@/models/Brand';
 import { Banner } from '@/models/Banner';
 import { invalidateCache } from '@/lib/redis';
+import { uploadUrlToCloudinary } from '@/lib/cloudinary';
 
 
 // GET /api/products (Rule 8, 9, 10, 12)
@@ -171,13 +172,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure at least 1 photo provided
-    const validImages = Array.isArray(images) && images.length > 0
-      ? images.map((img: any) => ({
-          url: typeof img === 'string' ? img : img.url,
-          alt: (typeof img === 'object' && img.alt) ? img.alt : `${name} photo`,
-        }))
+    // Ensure at least 1 photo provided & auto-upload any Google Drive/external images to Cloudinary
+    const rawImagesList = Array.isArray(images) && images.length > 0
+      ? images
       : [{ url: '/products/placeholder.svg', alt: `${name} photo` }];
+
+    const validImages = await Promise.all(
+      rawImagesList.map(async (img: any) => {
+        const rawUrl = typeof img === 'string' ? img : img.url;
+        const cUrl = await uploadUrlToCloudinary(rawUrl);
+        return {
+          url: cUrl,
+          alt: (typeof img === 'object' && img.alt) ? img.alt : `${name} photo`,
+        };
+      })
+    );
+
+    let processedColorVariants = colorVariants || [];
+    if (Array.isArray(colorVariants) && colorVariants.length > 0) {
+      processedColorVariants = await Promise.all(
+        colorVariants.map(async (v: any) => {
+          if (Array.isArray(v.images) && v.images.length > 0) {
+            const vImages = await Promise.all(
+              v.images.map(async (imgUrl: string) => uploadUrlToCloudinary(imgUrl))
+            );
+            return { ...v, images: vImages };
+          }
+          return v;
+        })
+      );
+    }
 
     const generatedSlug = (seo?.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')) + '-' + Date.now().toString().slice(-4);
     let finalSku = (inputSku && inputSku.trim()) ? inputSku.trim() : ('GRV-' + Math.random().toString(36).substring(2, 8).toUpperCase());
@@ -205,7 +229,7 @@ export async function POST(req: NextRequest) {
       sizes: sizes || ['6', '7', '8', '9', '10', '11'],
       sizeAvailability: sizeAvailability || [],
       colors: colors || ['Brown', 'Black', 'Tan'],
-      colorVariants: colorVariants || [],
+      colorVariants: processedColorVariants,
       material: material || '',
       ageRange: ageRange || '',
       occasion: occasion || '',

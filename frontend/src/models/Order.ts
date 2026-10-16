@@ -47,7 +47,14 @@ export interface IOrder extends Document {
   shippingFee: number;
   totalAmount: number;
   paymentMethod: 'COD' | 'UPI' | 'Card' | 'NetBanking' | 'Wallet' | 'Razorpay';
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentStatus:
+    | 'pending'
+    | 'paid'
+    | 'failed'
+    | 'refund_initiated'
+    | 'refund_processing'
+    | 'refunded'
+    | 'refund_failed';
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
   razorpaySignature?: string;
@@ -64,6 +71,13 @@ export interface IOrder extends Document {
     fee?: number;
     tax?: number;
     errorDescription?: string;
+    refundId?: string;
+    refundStatus?: string;
+    refundAmount?: number;
+    refundInitiatedAt?: Date;
+    refundedAt?: Date;
+    refundError?: string;
+    [key: string]: any;
   };
   orderStatus:
     | 'ordered'
@@ -180,7 +194,15 @@ const OrderSchema = new Schema<IOrder>(
     },
     paymentStatus: {
       type: String,
-      enum: ['pending', 'paid', 'failed', 'refunded'],
+      enum: [
+        'pending',
+        'paid',
+        'failed',
+        'refund_initiated',
+        'refund_processing',
+        'refunded',
+        'refund_failed',
+      ],
       default: 'pending',
       index: true,
     },

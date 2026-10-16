@@ -413,6 +413,83 @@ export default function OrderTrackingPage() {
           </div>
         )}
 
+        {/* ── CANCELLED ORDER & UPI REFUND STATUS BANNER ── */}
+        {isCancelled && (
+          <div className="p-4 sm:p-5 rounded-md border border-[#E5E1DC] bg-white shadow-2xs space-y-3 font-sansation">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0 mt-0.5">
+                <XCircle className="w-4 h-4 text-rose-600" />
+              </div>
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <h3 className="text-sm sm:text-base font-bold text-[#111111]">
+                    This Order Has Been Cancelled
+                  </h3>
+                  {order.paymentStatus === 'refund_initiated' || order.paymentStatus === 'refund_processing' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                      Refund Initiated
+                    </span>
+                  ) : order.paymentStatus === 'refunded' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Refunded
+                    </span>
+                  ) : order.paymentStatus === 'refund_failed' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+                      Refund Action Required
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                      Cancelled
+                    </span>
+                  )}
+                </div>
+
+                {/* Dynamic Refund Lifecycle Context */}
+                {order.paymentMethod !== 'COD' ? (
+                  order.paymentStatus === 'refunded' ? (
+                    <p className="text-xs text-emerald-800">
+                      Your refund of <span className="font-semibold">₹{order.totalAmount?.toLocaleString('en-IN')}</span> has been successfully credited back to your original payment method.
+                      {order.paymentDetails?.refundId && (
+                        <span className="block text-[11px] text-emerald-700 mt-0.5 font-mono">
+                          Razorpay Refund ID: {order.paymentDetails.refundId}
+                        </span>
+                      )}
+                    </p>
+                  ) : order.paymentStatus === 'refund_failed' ? (
+                    <p className="text-xs text-rose-700">
+                      The automated refund could not be completed by the bank gateway. Our customer support team is actively investigating and will credit the amount manually.
+                    </p>
+                  ) : (
+                    <div className="space-y-1.5 pt-1">
+                      <p className="text-xs text-slate-600">
+                        A full refund of <span className="font-bold text-[#111111]">₹{order.totalAmount?.toLocaleString('en-IN')}</span> has been initiated to your original UPI-linked account.
+                      </p>
+                      <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D9] rounded-md text-[11px] text-slate-600 space-y-1">
+                        <div className="flex items-center gap-1.5 font-semibold text-[#8B4A12]">
+                          <Clock className="w-3.5 h-3.5 text-[#8B4A12]" />
+                          <span>Estimated Time: 2–7 Business Days</span>
+                        </div>
+                        <p className="text-slate-500 text-[10.5px]">
+                          As per standard banking and NPCI UPI protocols, funds are routed back through your UPI app / bank provider.
+                          {order.paymentDetails?.refundId && (
+                            <span className="block mt-1 font-mono text-[10px] text-slate-600">
+                              Tracking ID: {order.paymentDetails.refundId}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    This was a Cash on Delivery order. No payment was collected and no refund is required.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── STANDARD DELIVERY STEPPER BAR (When Not In Return Flow) ── */}
         {!isCancelled && !isReturnFlow && (
           <div className="w-full pt-2 pb-6 border-b border-[#E5E1DC]">

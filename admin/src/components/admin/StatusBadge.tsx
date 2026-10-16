@@ -18,14 +18,18 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     archived: 'bg-slate-100 text-slate-600 border-slate-200',
     cancelled: 'bg-rose-50 text-rose-700 border-rose-200',
     failed: 'bg-rose-50 text-rose-700 border-rose-200',
-    refunded: 'bg-purple-50 text-purple-700 border-purple-200',
+    refund_initiated: 'bg-amber-50 text-amber-800 border-amber-300',
+    refund_processing: 'bg-sky-50 text-sky-800 border-sky-300',
+    refunded: 'bg-emerald-50 text-emerald-800 border-emerald-300',
+    refund_failed: 'bg-rose-50 text-rose-800 border-rose-300',
   };
 
   const style = statusStyles[normalized] || 'bg-slate-100 text-slate-600 border-slate-200';
+  const label = status.replace(/_/g, ' ');
 
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-semibold uppercase tracking-wider border ${style}`}>
-      ● {status}
+      ● {label}
     </span>
   );
 }

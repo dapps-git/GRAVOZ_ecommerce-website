@@ -7,6 +7,7 @@ import { Referral } from '@/models/Referral';
 import { ReturnRefund } from '@/models/ReturnRefund';
 import { getUserSession } from '@/lib/auth';
 import { syncReferralLifecycleOnStatusChange } from '@/lib/referral';
+import { requestRazorpayRefund } from '@/lib/razorpay';
 
 // GET /api/orders/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -96,6 +97,68 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
 
     order.orderStatus = status;
+
+    // Handle automated UPI / Razorpay refund if an online order is cancelled
+    if (status === 'cancelled') {
+      const isOnlinePaid = order.paymentMethod !== 'COD' && order.paymentStatus === 'paid';
+      const paymentId = order.razorpayPaymentId || (order as any).transactionId;
+      const alreadyRefundedOrInitiated =
+        order.paymentDetails?.refundId ||
+        order.paymentStatus === 'refund_initiated' ||
+        order.paymentStatus === 'refund_processing' ||
+        order.paymentStatus === 'refunded';
+
+      if (isOnlinePaid && paymentId && !alreadyRefundedOrInitiated) {
+        const refundResult = await requestRazorpayRefund({
+          paymentId,
+          amountInRupees: order.totalAmount,
+          notes: {
+            orderNumber: order.orderNumber,
+            reason: note || 'Order cancelled by customer before dispatch',
+          },
+        });
+
+        if (refundResult.success && refundResult.refundId) {
+          order.paymentStatus = 'refund_initiated';
+          if (!order.paymentDetails) order.paymentDetails = {};
+          order.paymentDetails.refundId = refundResult.refundId;
+          order.paymentDetails.refundStatus = refundResult.status || 'initiated';
+          order.paymentDetails.refundAmount = order.totalAmount;
+          order.paymentDetails.refundInitiatedAt = new Date();
+          order.markModified('paymentDetails');
+
+          if (!order.statusHistory) order.statusHistory = [];
+          order.statusHistory.push({
+            status: 'cancelled',
+            timestamp: new Date(),
+            location: location ? location.trim() : (order.currentLocation || ''),
+            note: `Order cancelled. UPI refund of ₹${order.totalAmount} initiated via Razorpay (Refund ID: ${refundResult.refundId}). Reversal to customer UPI-linked account typically takes 2–7 business days.`,
+          });
+        } else {
+          console.error('[Razorpay Refund] Error during cancellation:', refundResult.error);
+          order.paymentStatus = 'refund_failed';
+          if (!order.paymentDetails) order.paymentDetails = {};
+          order.paymentDetails.refundError = refundResult.error;
+          order.markModified('paymentDetails');
+
+          if (!order.statusHistory) order.statusHistory = [];
+          order.statusHistory.push({
+            status: 'cancelled',
+            timestamp: new Date(),
+            location: location ? location.trim() : (order.currentLocation || ''),
+            note: `Order cancelled. Online refund could not be automatically initiated: ${refundResult.error || 'Gateway issue'}. Store admin alerted for manual processing.`,
+          });
+        }
+      } else if (order.paymentMethod === 'COD') {
+        if (!order.statusHistory) order.statusHistory = [];
+        order.statusHistory.push({
+          status: 'cancelled',
+          timestamp: new Date(),
+          location: location ? location.trim() : (order.currentLocation || ''),
+          note: 'Order cancelled by customer. COD order — no monetary refund required.',
+        });
+      }
+    }
 
     // Handle referral discount restoration or reward/eligibility sync
     try {

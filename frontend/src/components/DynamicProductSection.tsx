@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import ProductImage from '@/components/ProductImage';
 import { Star, Heart } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
@@ -306,7 +307,7 @@ function DynamicGridCard({
                 : 'opacity-0 z-0 pointer-events-none'
             }`}
           >
-            <Image
+            <ProductImage
               src={imgUrl}
               alt={`${product.title} - photo ${idx + 1}`}
               fill
