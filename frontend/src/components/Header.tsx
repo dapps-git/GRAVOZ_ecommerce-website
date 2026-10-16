@@ -93,37 +93,37 @@ export default function Header() {
 
   return (
     <header className="w-full bg-white font-sans text-[#030303] border-b border-[#e8e2d8] sticky top-0 z-40">
-      {/* 1. Top Announcement Bar (#89591C Brown Background with Black Font) — Train Animation */}
-      <div className="bg-[#89591C] text-black text-[11px] sm:text-[12px] font-semibold py-2.5 sm:py-3 overflow-hidden tracking-[0.05em] uppercase border-b border-black/10 select-none shadow-2xs">
+      {/* 1. Top Announcement Bar (#89591C Brown Background with White Font & White Logos) — Train Animation */}
+      <div className="bg-[#89591C] text-white text-[11px] sm:text-[12px] font-medium py-2.5 sm:py-3 overflow-hidden tracking-[0.05em] uppercase border-b border-black/10 select-none shadow-2xs">
         <div className="animate-train items-center whitespace-nowrap">
           {[...ANNOUNCEMENT_TRAIN_ITEMS, ...ANNOUNCEMENT_TRAIN_ITEMS].map((item, idx) => (
             <div
               key={idx}
               className="flex items-center gap-3 sm:gap-4 px-6 shrink-0 group transition-opacity"
             >
-              <div className="text-black group-hover:scale-110 transition-transform flex-shrink-0 drop-shadow-xs">
+              <div className="text-white/95 group-hover:scale-110 transition-transform flex-shrink-0 drop-shadow-xs">
                 {item.type === 'oxford' ? (
                   <OxfordShoeIcon className="w-4 h-4" />
                 ) : (
                   <LoaferShoeIcon className="w-4 h-4" />
                 )}
               </div>
-              <span className="tracking-wider text-black font-semibold">{item.text}</span>
+              <span className="tracking-wider text-white font-medium">{item.text}</span>
               
-              <span className="text-black/40 text-[9px] px-1 select-none">◆</span>
+              <span className="text-white/45 text-[9px] px-1 select-none">◆</span>
 
-              {/* Brand Logo in small size passing through */}
+              {/* Brand Logo in small size passing through in pure white */}
               <div className="relative h-4 sm:h-5 w-14 sm:w-16 flex items-center justify-center shrink-0">
                 <Image
                   src={item.logo.src}
                   alt={item.logo.name}
                   fill
-                  className="object-contain"
+                  className="object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity"
                   sizes="64px"
                 />
               </div>
 
-              <span className="text-black/40 text-[9px] px-1 select-none">◆</span>
+              <span className="text-white/45 text-[9px] px-1 select-none">◆</span>
             </div>
           ))}
         </div>
