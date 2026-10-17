@@ -378,7 +378,7 @@ export default function OrderTrackingPage() {
               <FileText className="w-3.5 h-3.5 text-[#8A5B2A]" /> Invoice
             </Link>
             <a
-              href="mailto:gravozcontact@gmail.com"
+              href="mailto:gravozshoes@gmail.com"
               className="text-xs font-medium text-[#8A5B2A] hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>Need Help?</span>
@@ -514,19 +514,17 @@ export default function OrderTrackingPage() {
                     key={step.key}
                     className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[70px] sm:max-w-[110px]"
                   >
-                    <div
-                      className={`w-7 h-7 sm:w-9 sm:h-9 rounded-none flex items-center justify-center transition-all ${
-                        isCompleted
-                          ? 'bg-[#8A5B2A] text-white shadow-xs border border-[#8A5B2A]'
-                          : isActive
-                          ? 'bg-[#111111] text-white shadow-xs ring-2 sm:ring-3 ring-[#8A5B2A]/20 border border-[#111111]'
-                          : 'bg-white border border-[#E5E1DC] text-[#888888]'
-                      }`}
-                    >
+                    <div className="flex items-center justify-center p-1.5 bg-[#FAF7F3] transition-all">
                       {isCompleted ? (
-                        <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#8A5B2A] stroke-[2.5]" />
                       ) : (
-                        <StepIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <StepIcon
+                          className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                            isActive
+                              ? 'text-[#111111] stroke-[2.2]'
+                              : 'text-slate-300 stroke-[1.8]'
+                          }`}
+                        />
                       )}
                     </div>
                     <span

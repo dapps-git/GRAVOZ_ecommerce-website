@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'gravoz_ecommerce_super_secure_jwt_secret_key_2026_xyz!';
+const JWT_SECRET = process.env.JWT_SECRET || '';
 
 /**
  * Extract cookie value from request header

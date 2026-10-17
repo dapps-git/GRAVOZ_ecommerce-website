@@ -115,7 +115,7 @@ export default function GoogleSignInButton({
     if (isMobile) {
       // On mobile / in-app browsers, popups open blank or switch tabs.
       // Use direct same-tab OAuth redirect for 100% reliable flow without blank screens.
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.gravoz.com';
+      const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || '');
       const redirectUri = `${origin}/login`;
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
         clientId
@@ -143,7 +143,7 @@ export default function GoogleSignInButton({
     }
 
     // Desktop fallback: same-tab redirect
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.gravoz.com';
+    const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || '');
     const redirectUri = `${origin}/login`;
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
       clientId

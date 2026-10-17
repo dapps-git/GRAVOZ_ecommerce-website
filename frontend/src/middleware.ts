@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'gravoz_ecommerce_super_secure_jwt_secret_key_2026_xyz!';
+const JWT_SECRET = process.env.JWT_SECRET || '';
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
 const USER_TOKEN_COOKIE = process.env.USER_TOKEN_COOKIE_NAME || 'gravoz_user_token';

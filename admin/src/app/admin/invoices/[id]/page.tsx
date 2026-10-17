@@ -236,7 +236,7 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
         {/* Footer Note */}
         <div className="border-t border-[#e8e2d8] pt-6 text-center space-y-1 text-[11px] text-slate-500">
           <p className="font-semibold text-slate-700">Thank you for choosing GRAVOZ!</p>
-          <p>For questions or warranty assistance, contact gravozcontact@gmail.com</p>
+          <p>For questions or warranty assistance, contact gravozshoes@gmail.com | +91 9645319418</p>
           <p className="text-[10px] text-slate-400">This is a computer-generated tax invoice and requires no physical signature.</p>
         </div>
       </div>

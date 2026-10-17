@@ -132,17 +132,10 @@ export default function Header() {
       {/* 2. Utility Contact Bar (Desktop Only - Hidden on Mobile to eliminate clutter) */}
       <div className="hidden md:block bg-[#faf8f5] border-b border-[#e8e2d8] px-4 md:px-8 py-1.5 text-[11px] text-[#030303] font-normal tracking-[0.03em]">
         <div className="max-w-[1530px] w-full mx-auto flex items-center justify-between gap-4">
-          {/* Left Items: Language, Email, Phone */}
+          {/* Left Items: Email, Phone */}
           <div className="flex items-center gap-3.5 text-[#030303]">
-            <div className="flex items-center gap-1 cursor-pointer hover:text-[#89591C] transition-colors">
-              <span>English</span>
-              <ChevronDown className="w-3 h-3 text-[#555]" />
-            </div>
-
-            <span className="text-[#d8cebe]">|</span>
-
             <a
-              href="mailto:gravozcontact@gmail.com"
+              href="mailto:gravozshoes@gmail.com"
               className="flex items-center gap-1.5 hover:text-[#89591C] transition-colors"
             >
               <div className="w-3.5 h-3.5 relative flex-shrink-0">
@@ -154,17 +147,17 @@ export default function Header() {
                   className="object-contain"
                 />
               </div>
-              <span>gravozcontact@gmail.com</span>
+              <span>gravozshoes@gmail.com</span>
             </a>
 
             <span className="text-[#d8cebe]">|</span>
 
             <a
-              href="tel:+910000000000"
+              href="tel:+919645319418"
               className="flex items-center gap-1.5 hover:text-[#89591C] transition-colors"
             >
               <Phone className="w-3 h-3 text-[#89591C]" />
-              <span>+91 00000 000000</span>
+              <span>+91 9645319418</span>
             </a>
           </div>
 
@@ -339,36 +332,6 @@ export default function Header() {
             >
               DISCOVER PRODUCT
             </Link>
-            <Link
-              href="/products?audience=Men"
-              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
-            >
-              MEN
-            </Link>
-            <Link
-              href="/products?audience=Women"
-              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
-            >
-              WOMEN
-            </Link>
-            <Link
-              href="/products?audience=Kids"
-              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
-            >
-              KIDS
-            </Link>
-            <Link
-              href="/brands"
-              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
-            >
-              BRANDS
-            </Link>
-            <Link
-              href="/products?filter=color"
-              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
-            >
-              COLOR
-            </Link>
           </nav>
 
           <Link
@@ -429,51 +392,6 @@ export default function Header() {
                       <Sparkles className="w-4 h-4 text-[#89591C]" />
                       <span>DISCOVER ALL</span>
                     </span>
-                    <ChevronRight className="w-4 h-4 text-[#aaa]" />
-                  </Link>
-
-                  <Link
-                    href="/products?audience=Men"
-                    onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
-                  >
-                    <span>MEN FOOTWEAR</span>
-                    <ChevronRight className="w-4 h-4 text-[#aaa]" />
-                  </Link>
-
-                  <Link
-                    href="/products?audience=Women"
-                    onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
-                  >
-                    <span>WOMEN FOOTWEAR</span>
-                    <ChevronRight className="w-4 h-4 text-[#aaa]" />
-                  </Link>
-
-                  <Link
-                    href="/products?audience=Kids"
-                    onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
-                  >
-                    <span>KIDS & BABY SHOES</span>
-                    <ChevronRight className="w-4 h-4 text-[#aaa]" />
-                  </Link>
-
-                  <Link
-                    href="/brands"
-                    onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
-                  >
-                    <span>BRANDS</span>
-                    <ChevronRight className="w-4 h-4 text-[#aaa]" />
-                  </Link>
-
-                  <Link
-                    href="/products?filter=color"
-                    onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
-                  >
-                    <span>SHOP BY COLOR</span>
                     <ChevronRight className="w-4 h-4 text-[#aaa]" />
                   </Link>
 
@@ -544,7 +462,7 @@ export default function Header() {
               {/* Contact Info */}
               <div className="pt-2 text-[10px] text-[#666] space-y-1.5 border-t border-[#e8e2d8]/60">
                 <a
-                  href="mailto:gravozcontact@gmail.com"
+                  href="mailto:gravozshoes@gmail.com"
                   className="flex items-center gap-2 hover:text-[#89591C] transition-colors"
                 >
                   <Image
@@ -554,14 +472,14 @@ export default function Header() {
                     height={12}
                     className="object-contain"
                   />
-                  <span>gravozcontact@gmail.com</span>
+                  <span>gravozshoes@gmail.com</span>
                 </a>
                 <a
-                  href="tel:+910000000000"
+                  href="tel:+919645319418"
                   className="flex items-center gap-2 hover:text-[#89591C] transition-colors"
                 >
                   <Phone className="w-3 h-3 text-[#89591C]" />
-                  <span>+91 00000 000000</span>
+                  <span>+91 9645319418</span>
                 </a>
               </div>
             </div>

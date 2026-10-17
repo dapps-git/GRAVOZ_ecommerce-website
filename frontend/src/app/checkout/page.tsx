@@ -1468,7 +1468,7 @@ export default function CheckoutPage() {
                       We&apos;re here for you. Contact our support team anytime.
                     </p>
                     <p className="text-[11px] text-[#89591C] font-medium mt-0.5">
-                      gravozcontact@gmail.com | +91 00000 00000
+                      gravozshoes@gmail.com | +91 9645319418
                     </p>
                   </div>
                 </div>

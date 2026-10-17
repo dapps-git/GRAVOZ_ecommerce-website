@@ -271,7 +271,7 @@ function TrackOrderContent() {
         </div>
 
         <a
-          href="mailto:gravozcontact@gmail.com"
+          href="mailto:gravozshoes@gmail.com"
           className="text-xs font-bold text-[#89591C] hover:underline flex items-center gap-1 mt-1 cursor-pointer"
         >
           <span>Need Help?</span>
@@ -495,19 +495,15 @@ function TrackOrderContent() {
                       key={step.key}
                       className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[70px] sm:max-w-[110px]"
                     >
-                      <div
-                        className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${
-                          isCompleted
-                            ? 'bg-[#557244] text-white shadow-xs border border-[#557244]'
-                            : isActive
-                            ? 'bg-[#89591C] text-white shadow-xs ring-3 sm:ring-4 ring-[#89591C]/20 border border-[#89591C]'
-                            : 'bg-white border border-[#d8cebe] text-slate-400'
-                        }`}
-                      >
+                      <div className="flex items-center justify-center p-1.5 bg-white transition-all">
                         {isCompleted ? (
-                          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5]" />
+                          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#89591C] stroke-[2.5]" />
                         ) : (
-                          <StepIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                          <StepIcon
+                            className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                              isActive ? 'text-[#030303] stroke-[2.2]' : 'text-slate-300 stroke-[1.8]'
+                            }`}
+                          />
                         )}
                       </div>
 

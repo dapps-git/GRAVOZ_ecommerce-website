@@ -5,7 +5,7 @@ const SettingSchema = new mongoose.Schema(
     storeName: { type: String, default: 'GRAVOZ Footwear' },
     storeTagline: { type: String, default: 'Premium Handcrafted Footwear & Leather Collections' },
     contactEmail: { type: String, default: 'support@gravoz.com' },
-    contactPhone: { type: String, default: '+91 98765 43210' },
+    contactPhone: { type: String, default: '+91 9645319418 ' },
     gstinTaxId: { type: String, default: '32AAACL1902K1Z8' },
     currencySymbol: { type: String, default: '₹' },
     currencyCode: { type: String, default: 'INR' },

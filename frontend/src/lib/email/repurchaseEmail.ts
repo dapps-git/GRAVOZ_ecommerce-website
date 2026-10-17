@@ -31,7 +31,7 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
     type = '3_months',
   } = data;
 
-  const appUrl = data.appUrl || 'https://gravoz-ecommerce-website.vercel.app';
+  const appUrl = data.appUrl || process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
   const logoUrl = data.logoUrl || 'cid:gravoz-logo';
   const currentYear = new Date().getFullYear();
 
@@ -142,7 +142,7 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
                 <tr>
                   <td align="center" style="background-color: #fdfaf6; padding: 22px; border-bottom: 1px solid #ebdccb;">
                     <img 
-                      src="${productImage || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800'}" 
+                      src="${productImage || `${appUrl}/products/placeholder.svg`}" 
                       alt="${productName}" 
                       width="260" 
                       style="display: block; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #ebdccb;"

@@ -9,10 +9,10 @@ function generateOTP(): string {
 }
 
 async function sendOTPEmail(to: string, name: string, otp: string): Promise<void> {
-  const smtpEmail = process.env.SMTP_EMAIL || 'gravozshoes@gmail.com';
-  const smtpPassword = process.env.SMTP_PASSWORD || 'lhamhtgfhhspazkh';
+  const smtpEmail = process.env.SMTP_EMAIL || '';
+  const smtpPassword = process.env.SMTP_PASSWORD || '';
   const fromName = process.env.SMTP_FROM_NAME || 'GRAVOZ Store';
-  const appUrl = 'https://gravoz-ecommerce-website.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
   
   const logoPath = path.join(process.cwd(), 'public', 'gravoz-logo.png');
   const hasLocalLogo = fs.existsSync(logoPath);

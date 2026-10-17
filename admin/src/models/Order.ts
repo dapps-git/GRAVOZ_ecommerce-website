@@ -53,6 +53,7 @@ export interface IOrder extends Document {
   shippingFee?: number;
   discountAmount?: number;
   couponCode?: string;
+  totalAmount: number;
   paymentStatus:
     | 'pending'
     | 'paid'

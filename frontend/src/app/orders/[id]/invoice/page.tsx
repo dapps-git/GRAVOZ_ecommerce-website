@@ -129,7 +129,7 @@ export default function OrderInvoicePage() {
               Premium Handcrafted Footwear
             </p>
             <p className="text-[11px] text-slate-400 mt-1">
-              gravozcontact@gmail.com | +91 00000 000000
+              gravozshoes@gmail.com | +91 9645319418
             </p>
           </div>
 
