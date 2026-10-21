@@ -92,6 +92,57 @@ exports.placeOrder = async (req, res) => {
       await Cart.deleteOne({ userId: { $regex: customerEmail } });
     }
 
+    // Atomic product, size-level & color-variant stock decrement
+    try {
+      for (const itm of items) {
+        const pid = itm.productId || itm.id || itm._id;
+        if (pid && mongoose.Types.ObjectId.isValid(pid)) {
+          const qty = Number(itm.quantity || 1);
+          const itemSize = String(itm.size || '').trim();
+          const itemColor = String(itm.color || '').trim().toLowerCase();
+          const prodDoc = await Product.findById(pid);
+          if (prodDoc) {
+            prodDoc.stock = Math.max(0, (prodDoc.stock || 0) - qty);
+
+            if (itemSize && Array.isArray(prodDoc.sizeAvailability)) {
+              const sObj = prodDoc.sizeAvailability.find((s) => String(s.size).trim() === itemSize);
+              if (sObj) {
+                const currentStock = sObj.stock !== undefined ? sObj.stock : Math.max(0, (prodDoc.stock || 0));
+                sObj.stock = Math.max(0, currentStock - qty);
+                if (sObj.stock === 0) sObj.isAvailable = false;
+              }
+              prodDoc.markModified('sizeAvailability');
+            }
+
+            if (itemColor && Array.isArray(prodDoc.colorVariants)) {
+              const vObj = prodDoc.colorVariants.find(
+                (v) => String(v.name || '').trim().toLowerCase() === itemColor
+              );
+              if (vObj) {
+                const currentVStock = vObj.stock !== undefined ? vObj.stock : 10;
+                vObj.stock = Math.max(0, currentVStock - qty);
+                if (vObj.stock === 0) vObj.isAvailable = false;
+
+                if (itemSize && Array.isArray(vObj.sizes)) {
+                  const vsObj = vObj.sizes.find((s) => String(s.size).trim() === itemSize);
+                  if (vsObj) {
+                    const currentVSStock = vsObj.stock !== undefined ? vsObj.stock : 10;
+                    vsObj.stock = Math.max(0, currentVSStock - qty);
+                    if (vsObj.stock === 0) vsObj.isAvailable = false;
+                  }
+                }
+              }
+              prodDoc.markModified('colorVariants');
+            }
+
+            await prodDoc.save();
+          }
+        }
+      }
+    } catch (stockErr) {
+      console.warn('Backend stock decrement warning:', stockErr);
+    }
+
     res.status(201).json({ success: true, order });
   } catch (err) {
     console.error('Order creation error:', err);

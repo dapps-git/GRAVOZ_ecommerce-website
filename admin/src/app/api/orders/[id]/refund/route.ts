@@ -33,6 +33,12 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     const isCod = order.paymentMethod === 'COD';
     let refundResult: any = null;
 
+    // Determine refund amount (allows partial or full refund)
+    const requestedAmount = Number(body?.amount);
+    const refundAmount = !isNaN(requestedAmount) && requestedAmount > 0
+      ? Math.min(requestedAmount, order.totalAmount)
+      : order.totalAmount;
+
     if (!isCod) {
       // Online Payment Refund via Razorpay API (Reverses money back to customer's UPI VPA / Bank Account)
       const paymentId = order.razorpayPaymentId || order.transactionId;
@@ -50,8 +56,8 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
         return NextResponse.json({ error: 'Razorpay API credentials are not configured.' }, { status: 500 });
       }
 
-      // Convert total amount to paise (e.g. ₹1.00 = 100 paise)
-      const amountInPaise = Math.round(order.totalAmount * 100);
+      // Convert amount to paise (e.g. ₹1.00 = 100 paise)
+      const amountInPaise = Math.round(refundAmount * 100);
 
       const rzpRes = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}/refund`, {
         method: 'POST',
@@ -93,7 +99,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     if (!order.paymentDetails) order.paymentDetails = {};
     order.paymentDetails.refundId = refundId;
     order.paymentDetails.refundStatus = refundResult?.status || 'processed';
-    order.paymentDetails.refundAmount = order.totalAmount;
+    order.paymentDetails.refundAmount = refundAmount;
     order.paymentDetails.refundedAt = now;
     order.markModified('paymentDetails');
 
@@ -102,8 +108,8 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
       status: finalStatus,
       timestamp: now,
       note: isCod
-        ? `Cash / Manual refund marked as ${finalStatus === 'refund_initiated' ? 'Refund Initiated' : 'Refunded'} by admin.`
-        : `Razorpay UPI/Bank Refund (${refundId}) processed successfully. ₹${order.totalAmount} reversed directly to customer's bank account.`,
+        ? `Cash / Manual refund (₹${refundAmount}) marked as ${finalStatus === 'refund_initiated' ? 'Refund Initiated' : 'Refunded'} by admin.`
+        : `Razorpay UPI/Bank Refund (${refundId}) processed successfully. ₹${refundAmount} reversed directly to customer's bank account.`,
     });
 
     if (order.returnDetails) {
@@ -123,8 +129,8 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
       refundId,
       order,
       message: isCod
-        ? `Order marked as ${statusLabel} (Manual COD).`
-        : `✓ Refund of ₹${order.totalAmount} sent to customer's bank account via Razorpay! (${statusLabel} - Gateway ID: ${refundId})`,
+        ? `Order marked as ${statusLabel} (Manual COD - ₹${refundAmount}).`
+        : `✓ Refund of ₹${refundAmount} sent to customer's bank account via Razorpay! (${statusLabel} - Gateway ID: ${refundId})`,
     });
   } catch (error: any) {
     console.error('Refund processing error:', error);

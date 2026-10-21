@@ -97,9 +97,42 @@ export async function POST(req: NextRequest) {
       });
 
       // Atomic stock deduction (Rule 17)
-      await Product.findByIdAndUpdate(dbProduct._id, {
-        $inc: { stock: -item.quantity },
-      });
+      dbProduct.stock = Math.max(0, (dbProduct.stock || 0) - item.quantity);
+      const itemSize = String(item.size || '').trim();
+      const itemColor = String(item.color || '').trim().toLowerCase();
+
+      if (itemSize && Array.isArray(dbProduct.sizeAvailability)) {
+        const sObj = dbProduct.sizeAvailability.find((s: any) => String(s.size).trim() === itemSize);
+        if (sObj) {
+          const currentStock = sObj.stock !== undefined ? sObj.stock : Math.max(0, dbProduct.stock);
+          sObj.stock = Math.max(0, currentStock - item.quantity);
+          if (sObj.stock === 0) sObj.isAvailable = false;
+        }
+        dbProduct.markModified('sizeAvailability');
+      }
+
+      if (itemColor && Array.isArray(dbProduct.colorVariants)) {
+        const vObj = dbProduct.colorVariants.find(
+          (v: any) => String(v.name || '').trim().toLowerCase() === itemColor
+        );
+        if (vObj) {
+          const currentVStock = vObj.stock !== undefined ? vObj.stock : 10;
+          vObj.stock = Math.max(0, currentVStock - item.quantity);
+          if (vObj.stock === 0) vObj.isAvailable = false;
+
+          if (itemSize && Array.isArray(vObj.sizes)) {
+            const vsObj = vObj.sizes.find((s: any) => String(s.size).trim() === itemSize);
+            if (vsObj) {
+              const currentVSStock = vsObj.stock !== undefined ? vsObj.stock : 10;
+              vsObj.stock = Math.max(0, currentVSStock - item.quantity);
+              if (vsObj.stock === 0) vsObj.isAvailable = false;
+            }
+          }
+        }
+        dbProduct.markModified('colorVariants');
+      }
+
+      await dbProduct.save();
     }
 
     const tax = Math.round(calculatedSubtotal * 0.05 * 100) / 100;

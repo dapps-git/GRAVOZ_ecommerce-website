@@ -55,6 +55,7 @@ interface ColorVariantItem {
   colorCode: string;
   images: ProductImageItem[];
   sizes: ColorVariantSizeItem[];
+  stock?: number;
   isAvailable?: boolean;
 }
 
@@ -543,10 +544,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         allVariantImages.push({ url: '/products/placeholder.svg', alt: name });
       }
 
+      const parsedStock = stock !== '' && !isNaN(Number(stock)) ? Math.max(0, Math.floor(Number(stock))) : 50;
+
       const defaultSizeAvail = selectedSizes.map((s) => ({
         size: s,
-        isAvailable: true,
-        stock: Math.ceil(Number(stock) / (selectedSizes.length || 1)),
+        isAvailable: parsedStock > 0,
+        stock: parsedStock > 0 ? Math.ceil(parsedStock / (selectedSizes.length || 1)) : 0,
       }));
 
       const res = await fetch(`/api/products/${resolvedParams.id}`, {
@@ -565,7 +568,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           price: Number(price) || 1999,
           discountPrice: discountPrice ? Number(discountPrice) : undefined,
           gst: Number(gst) || 12,
-          stock: Number(stock) || 50,
+          stock: parsedStock,
           sizes: selectedSizes,
           sizeAvailability: defaultSizeAvail,
           colors: colorVariants.map((c) => c.name),
@@ -576,7 +579,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             images: c.images,
             imageUrl: c.images[0]?.url || '',
             sizes: c.sizes,
-            isAvailable: true,
+            stock: c.stock !== undefined ? c.stock : (parsedStock > 0 ? 10 : 0),
+            isAvailable: c.isAvailable !== false,
           })),
           images: allVariantImages,
           spotlightMockups,

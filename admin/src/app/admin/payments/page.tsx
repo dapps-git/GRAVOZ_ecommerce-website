@@ -13,6 +13,7 @@ interface PaymentLog {
   amount: number;
   currency: string;
   status: string;
+  refundId?: string;
   createdAt: string;
 }
 
@@ -25,16 +26,26 @@ export default function PaymentsPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.orders) {
-          const logs = data.orders.map((o: any) => ({
-            _id: o._id,
-            orderNumber: o.orderNumber,
-            transactionId: `TXN-${o.orderNumber}-GATEWAY`,
-            paymentGateway: o.paymentMethod || 'Stripe / Credit Card',
-            amount: o.totalAmount,
-            currency: 'INR',
-            status: o.paymentStatus || 'paid',
-            createdAt: o.createdAt,
-          }));
+          const logs = data.orders.map((o: any) => {
+            const rzpId = o.razorpayPaymentId || o.paymentDetails?.razorpayPaymentId || o.transactionId;
+            const refundId = o.paymentDetails?.refundId;
+            const isCod = o.paymentMethod === 'COD';
+            const gatewayName = isCod
+              ? 'Cash on Delivery (COD)'
+              : `Razorpay (${o.paymentDetails?.method ? o.paymentDetails.method.toUpperCase() : o.paymentMethod || 'UPI / Online'})`;
+
+            return {
+              _id: o._id,
+              orderNumber: o.orderNumber,
+              transactionId: rzpId || (isCod ? `COD-${o.orderNumber}` : `TXN-${o.orderNumber}`),
+              paymentGateway: gatewayName,
+              amount: o.totalAmount,
+              currency: 'INR',
+              status: o.paymentStatus || 'paid',
+              refundId,
+              createdAt: o.createdAt,
+            };
+          });
           setPayments(logs);
         }
       })
@@ -51,8 +62,11 @@ export default function PaymentsPage() {
             <CreditCard className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-bold text-slate-900 text-xs">{row.transactionId}</span>
+            <span className="font-bold text-slate-900 text-xs font-mono">{row.transactionId}</span>
             <div className="text-[10px] text-slate-400 font-normal">Order #{row.orderNumber}</div>
+            {row.refundId && (
+              <div className="text-[9px] text-rose-700 font-mono font-medium">Refund ID: {row.refundId}</div>
+            )}
           </div>
         </div>
       ),

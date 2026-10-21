@@ -81,6 +81,26 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
       );
     }
 
+    if (updatePayload.stock === 0) {
+      const existingDoc = await Product.findById(params.id);
+      if (existingDoc) {
+        if (!updatePayload.sizeAvailability && Array.isArray(existingDoc.sizeAvailability)) {
+          updatePayload.sizeAvailability = existingDoc.sizeAvailability.map((s: any) => ({
+            ...(s.toObject ? s.toObject() : s),
+            isAvailable: false,
+            stock: 0,
+          }));
+        }
+        if (!updatePayload.colorVariants && Array.isArray(existingDoc.colorVariants)) {
+          updatePayload.colorVariants = existingDoc.colorVariants.map((v: any) => ({
+            ...(v.toObject ? v.toObject() : v),
+            isAvailable: false,
+            stock: 0,
+          }));
+        }
+      }
+    }
+
     const updatedProduct: any = await Product.findByIdAndUpdate(params.id, { $set: updatePayload }, { new: true, runValidators: true });
 
     if (!updatedProduct) {

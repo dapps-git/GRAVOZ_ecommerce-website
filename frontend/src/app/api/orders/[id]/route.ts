@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Order } from '@/models/Order';
 import { Customer } from '@/models/Customer';
+import { Product } from '@/models/Product';
 import { Referral } from '@/models/Referral';
 import { ReturnRefund } from '@/models/ReturnRefund';
 import { getUserSession } from '@/lib/auth';
@@ -96,7 +97,59 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: 'Return can only be requested after delivery' }, { status: 400 });
     }
 
+    const previousOrderStatus = order.orderStatus;
     order.orderStatus = status;
+
+    // Restore inventory when order is cancelled
+    if (status === 'cancelled' && previousOrderStatus !== 'cancelled' && Array.isArray(order.items)) {
+      try {
+        for (const itm of order.items) {
+          const itemAny = itm as any;
+          const pid = itemAny.productId || itemAny.product || itemAny._id || itemAny.id;
+          if (pid && mongoose.Types.ObjectId.isValid(pid)) {
+            const qty = Number(itm.quantity || 1);
+            const itemSize = String(itm.size || '').trim();
+            const itemColor = String(itm.color || '').trim().toLowerCase();
+            const prodDoc = await Product.findById(pid);
+            if (prodDoc) {
+              prodDoc.stock = (prodDoc.stock || 0) + qty;
+
+              if (itemSize && Array.isArray(prodDoc.sizeAvailability)) {
+                const sObj = prodDoc.sizeAvailability.find((s: any) => String(s.size).trim() === itemSize);
+                if (sObj) {
+                  sObj.stock = (sObj.stock || 0) + qty;
+                  if (sObj.stock > 0) sObj.isAvailable = true;
+                }
+                prodDoc.markModified('sizeAvailability');
+              }
+
+              if (itemColor && Array.isArray(prodDoc.colorVariants)) {
+                const vObj = prodDoc.colorVariants.find(
+                  (v: any) => String(v.name || '').trim().toLowerCase() === itemColor
+                );
+                if (vObj) {
+                  vObj.stock = (vObj.stock !== undefined ? vObj.stock : 0) + qty;
+                  if (vObj.stock > 0) vObj.isAvailable = true;
+
+                  if (itemSize && Array.isArray(vObj.sizes)) {
+                    const vsObj = vObj.sizes.find((s: any) => String(s.size).trim() === itemSize);
+                    if (vsObj) {
+                      vsObj.stock = (vsObj.stock !== undefined ? vsObj.stock : 0) + qty;
+                      if (vsObj.stock > 0) vsObj.isAvailable = true;
+                    }
+                  }
+                }
+                prodDoc.markModified('colorVariants');
+              }
+
+              await prodDoc.save();
+            }
+          }
+        }
+      } catch (restockErr) {
+        console.warn('Order cancellation stock restore warning:', restockErr);
+      }
+    }
 
     // Handle automated UPI / Razorpay refund if an online order is cancelled
     if (status === 'cancelled') {

@@ -28,6 +28,25 @@ export async function PUT(req: NextRequest) {
         return sum + (v.stock !== undefined ? Number(v.stock) : 10);
       }, 0);
       product.stock = totalStock;
+
+      // Synchronize sizeAvailability based on totalStock
+      if (Array.isArray(product.sizeAvailability) && product.sizeAvailability.length > 0) {
+        if (totalStock === 0) {
+          product.sizeAvailability.forEach((s: any) => {
+            s.isAvailable = false;
+            s.stock = 0;
+          });
+        } else {
+          const perSize = Math.max(1, Math.ceil(totalStock / product.sizeAvailability.length));
+          product.sizeAvailability.forEach((s: any) => {
+            s.isAvailable = true;
+            s.stock = perSize;
+          });
+        }
+        product.markModified('sizeAvailability');
+      }
+      product.markModified('colorVariants');
+
       updatedProduct = await product.save();
     } else if (variantName) {
       // Toggle / edit a single variant by name
@@ -58,21 +77,107 @@ export async function PUT(req: NextRequest) {
         return sum + (v.stock !== undefined ? Number(v.stock) : 10);
       }, 0);
       product.stock = totalStock;
+
+      // Synchronize sizeAvailability based on totalStock
+      if (Array.isArray(product.sizeAvailability) && product.sizeAvailability.length > 0) {
+        if (totalStock === 0) {
+          product.sizeAvailability.forEach((s: any) => {
+            s.isAvailable = false;
+            s.stock = 0;
+          });
+        } else {
+          const perSize = Math.max(1, Math.ceil(totalStock / product.sizeAvailability.length));
+          product.sizeAvailability.forEach((s: any) => {
+            s.isAvailable = true;
+            s.stock = perSize;
+          });
+        }
+        product.markModified('sizeAvailability');
+      }
+      product.markModified('colorVariants');
+
       updatedProduct = await product.save();
     } else if (newStock !== undefined && typeof newStock === 'number') {
-      // Set absolute stock value
-      updatedProduct = await Product.findByIdAndUpdate(
-        productId,
-        { $set: { stock: Math.max(0, newStock) } },
-        { new: true }
-      );
+      const product = await Product.findById(productId);
+      if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+
+      const targetStock = Math.max(0, Math.floor(newStock));
+      product.stock = targetStock;
+
+      if (targetStock === 0) {
+        if (Array.isArray(product.sizeAvailability)) {
+          product.sizeAvailability.forEach((s: any) => {
+            s.isAvailable = false;
+            s.stock = 0;
+          });
+          product.markModified('sizeAvailability');
+        }
+        if (Array.isArray(product.colorVariants)) {
+          product.colorVariants.forEach((v: any) => {
+            v.isAvailable = false;
+            v.stock = 0;
+            if (Array.isArray(v.sizes)) {
+              v.sizes.forEach((vs: any) => {
+                vs.isAvailable = false;
+                vs.stock = 0;
+              });
+            }
+          });
+          product.markModified('colorVariants');
+        }
+      } else {
+        // Restock (> 0)
+        if (Array.isArray(product.sizeAvailability) && product.sizeAvailability.length > 0) {
+          const perSizeStock = Math.max(1, Math.ceil(targetStock / product.sizeAvailability.length));
+          product.sizeAvailability.forEach((s: any) => {
+            s.isAvailable = true;
+            s.stock = perSizeStock;
+          });
+          product.markModified('sizeAvailability');
+        }
+        if (Array.isArray(product.colorVariants) && product.colorVariants.length > 0) {
+          const perVariantStock = Math.max(1, Math.ceil(targetStock / product.colorVariants.length));
+          product.colorVariants.forEach((v: any) => {
+            v.isAvailable = true;
+            v.stock = perVariantStock;
+            if (Array.isArray(v.sizes) && v.sizes.length > 0) {
+              const perVSizeStock = Math.max(1, Math.ceil(perVariantStock / v.sizes.length));
+              v.sizes.forEach((vs: any) => {
+                vs.isAvailable = true;
+                vs.stock = perVSizeStock;
+              });
+            }
+          });
+          product.markModified('colorVariants');
+        }
+      }
+
+      updatedProduct = await product.save();
     } else if (stockChange !== undefined && typeof stockChange === 'number') {
-      // Atomic increment/decrement (Rule 17)
-      updatedProduct = await Product.findByIdAndUpdate(
-        productId,
-        { $inc: { stock: stockChange } },
-        { new: true }
-      );
+      const product = await Product.findById(productId);
+      if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+
+      const targetStock = Math.max(0, (product.stock || 0) + stockChange);
+      product.stock = targetStock;
+
+      if (targetStock === 0) {
+        if (Array.isArray(product.sizeAvailability)) {
+          product.sizeAvailability.forEach((s: any) => {
+            s.isAvailable = false;
+            s.stock = 0;
+          });
+          product.markModified('sizeAvailability');
+        }
+      } else if (Array.isArray(product.sizeAvailability) && product.sizeAvailability.length > 0) {
+        const perSizeStock = Math.max(1, Math.ceil(targetStock / product.sizeAvailability.length));
+        product.sizeAvailability.forEach((s: any) => {
+          s.isAvailable = true;
+          s.stock = perSizeStock;
+        });
+        product.markModified('sizeAvailability');
+      }
+
+      updatedProduct = await product.save();
     } else {
       return NextResponse.json({ error: 'Provide stockChange, newStock, or variant updates' }, { status: 400 });
     }

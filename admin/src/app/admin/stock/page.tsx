@@ -206,10 +206,10 @@ export default function StockPage() {
     );
 
     try {
-      const res = await fetch(`/api/products/${productId}`, {
+      const res = await fetch('/api/stock', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stock: finalStock }),
+        body: JSON.stringify({ productId, newStock: finalStock }),
       });
 
       if (!res.ok) {
