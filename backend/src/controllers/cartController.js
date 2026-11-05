@@ -10,9 +10,12 @@ const calcTotals = (items) => ({
 // ── GET /api/cart ─────────────────────────────────────────────────────────────
 exports.getCart = async (req, res) => {
   try {
-    const effectiveUserId = req.user?.userId || req.query.userId;
-    const filter = effectiveUserId ? { userId: effectiveUserId } : { guestId: req.query.guestId };
-    if (!filter.userId && !filter.guestId) {
+    // IDOR protection: only authenticated user's own token userId is trusted
+    const effectiveUserId = req.user?.userId;
+    const guestId = req.query.guestId;
+
+    const filter = effectiveUserId ? { userId: effectiveUserId } : (guestId ? { guestId } : null);
+    if (!filter) {
       return res.json({ success: true, items: [], subtotal: 0, count: 0 });
     }
 
@@ -28,7 +31,8 @@ exports.getCart = async (req, res) => {
 exports.addToCart = async (req, res) => {
   try {
     const { guestId, item } = req.body;
-    const effectiveUserId = req.user?.userId || req.body.userId;
+    const effectiveUserId = req.user?.userId;
+
     if (!item?.productId || !item?.size) {
       return res.status(400).json({ error: 'Product ID and size are required' });
     }
@@ -74,8 +78,10 @@ exports.addToCart = async (req, res) => {
 exports.updateCart = async (req, res) => {
   try {
     const { guestId, productId, size, quantity } = req.body;
-    const effectiveUserId = req.user?.userId || req.body.userId;
-    const filter = effectiveUserId ? { userId: effectiveUserId } : { guestId };
+    const effectiveUserId = req.user?.userId;
+
+    const filter = effectiveUserId ? { userId: effectiveUserId } : (guestId ? { guestId } : null);
+    if (!filter) return res.json({ success: true, items: [], subtotal: 0, count: 0 });
 
     const cart = await Cart.findOne(filter);
     if (!cart) return res.json({ success: true, items: [], subtotal: 0, count: 0 });
@@ -100,8 +106,10 @@ exports.updateCart = async (req, res) => {
 exports.deleteFromCart = async (req, res) => {
   try {
     const { guestId, productId, size, clearAll } = req.query;
-    const effectiveUserId = req.user?.userId || req.query.userId;
-    const filter = effectiveUserId ? { userId: effectiveUserId } : { guestId };
+    const effectiveUserId = req.user?.userId;
+
+    const filter = effectiveUserId ? { userId: effectiveUserId } : (guestId ? { guestId } : null);
+    if (!filter) return res.json({ success: true, items: [], subtotal: 0, count: 0 });
 
     const cart = await Cart.findOne(filter);
     if (!cart) return res.json({ success: true, items: [], subtotal: 0, count: 0 });

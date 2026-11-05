@@ -81,15 +81,23 @@ function AnimatedProductCard({
 }) {
   const images = product.images && product.images.length > 0 ? product.images : [product.imageUrl];
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [allowSubImages, setAllowSubImages] = useState(false);
 
-  // Auto-cycle through sub-images every 3 seconds
+  // Auto-cycle through sub-images every 3 seconds, delayed after initial page paint
   useEffect(() => {
     if (images.length <= 1) return;
+    const delayTimer = setTimeout(() => {
+      setAllowSubImages(true);
+    }, 1500);
+
     const timer = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % images.length);
     }, 3000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(delayTimer);
+      clearInterval(timer);
+    };
   }, [images.length]);
 
   return (
@@ -140,23 +148,28 @@ function AnimatedProductCard({
         </button>
 
         {/* Sub-images layer with smooth 3-second animated transition */}
-        {images.map((imgUrl, idx) => (
-          <div
-            key={`${imgUrl}-${idx}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${idx === currentIdx
-              ? 'opacity-100 z-10 pointer-events-auto'
-              : 'opacity-0 z-0 pointer-events-none'
-              }`}
-          >
-            <Image
-              src={imgUrl}
-              alt={`${product.title} - photo ${idx + 1}`}
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-        ))}
+        {images.map((imgUrl, idx) => {
+          // On initial paint, only load the first image to keep bandwidth clear for hero banners
+          if (idx > 0 && !allowSubImages) return null;
+          return (
+            <div
+              key={`${imgUrl}-${idx}`}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${idx === currentIdx
+                ? 'opacity-100 z-10 pointer-events-auto'
+                : 'opacity-0 z-0 pointer-events-none'
+                }`}
+            >
+              <Image
+                src={imgUrl}
+                alt={`${product.title} - photo ${idx + 1}`}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                loading={idx === 0 ? 'eager' : 'lazy'}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Card Meta (Title, Rating, Discount Price) */}
@@ -294,7 +307,7 @@ export default function StorefrontHomePage() {
   // ── Fetch banners + categories + products in parallel on mount ──────────────
   useEffect(() => {
     // 1. Banners API
-    fetch('/api/banners', { cache: 'no-store' })
+    fetch('/api/banners')
       .then((r) => r.json())
       .then((data) => {
         if (data?.banners) {
@@ -317,7 +330,7 @@ export default function StorefrontHomePage() {
       });
 
     // 2. Categories API for Homepage Category Grid
-    fetch('/api/categories', { cache: 'no-store' })
+    fetch('/api/categories')
       .then((r) => r.json())
       .then((data) => {
         const list = Array.isArray(data) ? data : data?.categories;
@@ -335,7 +348,7 @@ export default function StorefrontHomePage() {
       .catch(() => { });
 
     // 3. Products API (suggested for you — fetch up to 12 for carousel)
-    fetch('/api/products?limit=12&section=suggested', { cache: 'no-store' })
+    fetch('/api/products?limit=12&section=suggested')
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data?.products) && data.products.length > 0) {

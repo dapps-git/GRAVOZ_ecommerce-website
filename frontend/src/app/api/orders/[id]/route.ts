@@ -14,6 +14,7 @@ import { requestRazorpayRefund } from '@/lib/razorpay';
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const session = await getUserSession();
     await connectDB();
 
     let order = null;
@@ -28,7 +29,51 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, order });
+    // 1. Authenticated customer ownership check
+    if (session?.userId) {
+      const isOwner =
+        (order.customerId && String(order.customerId) === session.userId) ||
+        (order.customerEmail && order.customerEmail.toLowerCase().trim() === session.email.toLowerCase().trim());
+
+      if (!isOwner) {
+        return NextResponse.json({ error: 'You are not authorized to view this order.' }, { status: 403 });
+      }
+      return NextResponse.json({ success: true, order });
+    }
+
+    // 2. Unauthenticated verification via email or phone query
+    const { searchParams } = new URL(req.url);
+    const queryEmail = searchParams.get('email')?.toLowerCase().trim() || '';
+    const queryPhone = (searchParams.get('phone') || '').replace(/\D/g, '').slice(-10);
+
+    const orderPhone = (order.customerPhone || '').replace(/\D/g, '').slice(-10);
+    const orderEmail = (order.customerEmail || '').toLowerCase().trim();
+
+    const isMatch = (queryEmail && queryEmail === orderEmail) || (queryPhone && queryPhone === orderPhone);
+    if (isMatch) {
+      return NextResponse.json({ success: true, order });
+    }
+
+    // 3. If queried by exact human-readable orderNumber, return masked tracking view without leaking PII
+    if (order.orderNumber === id) {
+      const maskedOrder = {
+        ...order,
+        customerName: order.customerName ? order.customerName.charAt(0) + '***' : 'Customer',
+        customerEmail: order.customerEmail ? order.customerEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3') : '',
+        customerPhone: order.customerPhone ? '******' + order.customerPhone.slice(-4) : '',
+        shippingAddress: {
+          city: (order.shippingAddress as any)?.city || '',
+          state: (order.shippingAddress as any)?.state || '',
+          country: (order.shippingAddress as any)?.country || 'India',
+        },
+      };
+      return NextResponse.json({ success: true, order: maskedOrder, masked: true });
+    }
+
+    return NextResponse.json(
+      { error: 'Authentication required. Please log in to view this order.' },
+      { status: 401 }
+    );
   } catch (err: any) {
     console.error('Fetch single order error:', err);
     return NextResponse.json({ error: err.message || 'Failed to fetch order' }, { status: 500 });

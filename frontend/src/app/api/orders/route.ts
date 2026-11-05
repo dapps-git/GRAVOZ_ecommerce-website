@@ -65,9 +65,9 @@ export async function POST(req: NextRequest) {
       referralDiscountType,
     } = body;
 
-    // Determine secure customer email and ID (prefer verified session if present)
+    // Determine secure customer email and ID (only trust verified JWT session for customerId)
     const customerEmail = (session?.email || rawEmail || '').toLowerCase().trim();
-    const verifiedCustomerId = session?.userId || (customerId && mongoose.Types.ObjectId.isValid(customerId) ? customerId : undefined);
+    const verifiedCustomerId = session?.userId || undefined;
 
     if (!customerEmail || !items || !Array.isArray(items) || items.length === 0 || !shippingAddress) {
       return NextResponse.json({ error: 'Missing required order details' }, { status: 400 });

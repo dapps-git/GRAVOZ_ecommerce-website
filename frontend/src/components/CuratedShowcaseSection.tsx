@@ -40,6 +40,30 @@ interface CuratedShowcaseSectionProps {
   fallbackSubtitle?: string;
 }
 
+// Module-level deduplication cache so 4 instances share 1 single network request
+let sharedSectionsPromise: Promise<any> | null = null;
+let sharedSectionsCache: any = null;
+
+function fetchSharedHomeSections(): Promise<any> {
+  if (sharedSectionsCache) {
+    return Promise.resolve(sharedSectionsCache);
+  }
+  if (!sharedSectionsPromise) {
+    sharedSectionsPromise = fetch('/api/home-sections')
+      .then((r) => r.json())
+      .then((data) => {
+        sharedSectionsCache = data;
+        sharedSectionsPromise = null;
+        return data;
+      })
+      .catch((err) => {
+        sharedSectionsPromise = null;
+        throw err;
+      });
+  }
+  return sharedSectionsPromise;
+}
+
 export default function CuratedShowcaseSection({
   sectionKey,
   fallbackTitle = 'Best Sellers',
@@ -51,10 +75,9 @@ export default function CuratedShowcaseSection({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/home-sections')
-      .then((r) => r.json())
+    fetchSharedHomeSections()
       .then((data) => {
-        if (data.success && data.sectionsByKey?.[sectionKey]) {
+        if (data?.success && data.sectionsByKey?.[sectionKey]) {
           const sec = data.sectionsByKey[sectionKey];
           if (sec.title) setTitle(sec.title);
           if (Array.isArray(sec.items) && sec.items.length > 0) {

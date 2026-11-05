@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Cart, ICartItem } from '@/models/Cart';
+import { getUserSession } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getUserSession();
     const { searchParams } = new URL(req.url);
     const guestId = searchParams.get('guestId') || req.cookies.get('gravoz_guest_id')?.value;
 
-    if (!guestId) {
+    if (!session?.userId && !guestId) {
       return NextResponse.json({ success: true, items: [], subtotal: 0, count: 0 });
     }
 
     try {
       await connectDB();
-      const cart = await Cart.findOne({ guestId }).lean();
+      const query = session?.userId
+        ? { $or: [{ userId: session.userId }, ...(guestId ? [{ guestId }] : [])] }
+        : { guestId };
+
+      const cart = await Cart.findOne(query).lean();
       const items: ICartItem[] = cart?.items || [];
       const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const count = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -35,6 +41,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getUserSession();
     const body = await req.json();
     const { guestId, item } = body;
 
@@ -42,29 +49,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Product ID and size are required' }, { status: 400 });
     }
 
-    const effectiveGuestId = guestId || 'guest_' + Math.random().toString(36).substring(2, 12);
+    const effectiveGuestId = guestId || req.cookies.get('gravoz_guest_id')?.value || 'guest_' + Math.random().toString(36).substring(2, 12);
 
     try {
       await connectDB();
-      let cart = await Cart.findOne({ guestId: effectiveGuestId });
+      const query = session?.userId
+        ? { $or: [{ userId: session.userId }, { guestId: effectiveGuestId }] }
+        : { guestId: effectiveGuestId };
+
+      let cart = await Cart.findOne(query);
+
+      const cartItem: ICartItem = {
+        productId: item.productId,
+        title: item.title,
+        price: Number(item.price),
+        originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
+        size: item.size,
+        quantity: Number(item.quantity) || 1,
+        imageUrl: item.imageUrl || '/products/placeholder.svg',
+        color: item.color,
+      };
 
       if (!cart) {
         cart = new Cart({
+          userId: session?.userId ? (session.userId as any) : undefined,
           guestId: effectiveGuestId,
-          items: [
-            {
-              productId: item.productId,
-              title: item.title,
-              price: Number(item.price),
-              originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
-              size: item.size,
-              quantity: Number(item.quantity) || 1,
-              imageUrl: item.imageUrl || '/products/placeholder.svg',
-              color: item.color,
-            },
-          ],
+          items: [cartItem],
         });
       } else {
+        if (session?.userId && !cart.userId) {
+          cart.userId = session.userId as any;
+        }
+
         const existingIdx = cart.items.findIndex(
           (i) => i.productId === item.productId && i.size === item.size
         );
@@ -72,16 +88,7 @@ export async function POST(req: NextRequest) {
         if (existingIdx > -1) {
           cart.items[existingIdx].quantity += Number(item.quantity) || 1;
         } else {
-          cart.items.push({
-            productId: item.productId,
-            title: item.title,
-            price: Number(item.price),
-            originalPrice: item.originalPrice ? Number(item.originalPrice) : undefined,
-            size: item.size,
-            quantity: Number(item.quantity) || 1,
-            imageUrl: item.imageUrl || '/products/placeholder.svg',
-            color: item.color,
-          });
+          cart.items.push(cartItem);
         }
       }
 
@@ -105,7 +112,6 @@ export async function POST(req: NextRequest) {
 
       return response;
     } catch {
-      // In offline mode return payload back with success
       return NextResponse.json({
         success: true,
         items: [item],
@@ -122,6 +128,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const session = await getUserSession();
     const body = await req.json();
     const { guestId, productId, size, quantity } = body;
 
@@ -131,7 +138,11 @@ export async function PUT(req: NextRequest) {
 
     try {
       await connectDB();
-      const cart = await Cart.findOne({ guestId });
+      const query = session?.userId
+        ? { $or: [{ userId: session.userId }, ...(guestId ? [{ guestId }] : [])] }
+        : { guestId };
+
+      const cart = await Cart.findOne(query);
       if (!cart) {
         return NextResponse.json({ success: true, items: [], subtotal: 0, count: 0 });
       }
@@ -169,6 +180,7 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const session = await getUserSession();
     const { searchParams } = new URL(req.url);
     const guestId = searchParams.get('guestId') || req.cookies.get('gravoz_guest_id')?.value;
     const productId = searchParams.get('productId');
@@ -177,7 +189,11 @@ export async function DELETE(req: NextRequest) {
 
     try {
       await connectDB();
-      const cart = await Cart.findOne({ guestId });
+      const query = session?.userId
+        ? { $or: [{ userId: session.userId }, ...(guestId ? [{ guestId }] : [])] }
+        : { guestId };
+
+      const cart = await Cart.findOne(query);
       if (!cart) {
         return NextResponse.json({ success: true, items: [], subtotal: 0, count: 0 });
       }

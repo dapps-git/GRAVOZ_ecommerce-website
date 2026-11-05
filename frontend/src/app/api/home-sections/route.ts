@@ -93,40 +93,55 @@ async function buildItemsFromProducts(flagField: string, limit = 10) {
   }
 }
 
+let cachedHomeSectionsResponse: any = null;
+let lastHomeSectionsCacheTime = 0;
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds in-memory cache
+
 export async function GET(_req: NextRequest) {
   try {
+    const cacheHeaders = {
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+    };
+
+    const now = Date.now();
+    if (cachedHomeSectionsResponse && now - lastHomeSectionsCacheTime < CACHE_TTL_MS) {
+      return NextResponse.json(cachedHomeSectionsResponse, { headers: cacheHeaders });
+    }
+
     await connectDB();
 
     const sectionKeys = Object.keys(SECTION_FLAG_MAP);
-    const sections = [];
 
-    for (const key of sectionKeys) {
-      // 1. Try manually curated admin section first
-      let dbSection = await HomeSection.findOne({ sectionKey: key }).lean();
+    // Fetch all section documents in a single query
+    const dbSections = await HomeSection.find({ sectionKey: { $in: sectionKeys } }).lean();
+    const dbSectionMap = new Map((dbSections || []).map((s: any) => [s.sectionKey, s]));
 
-      // 2. Determine items to use: prefer manually set if they have imageUrls, else fall back to product flags
-      let items: any[] = [];
+    // Fetch products in parallel for all sections
+    const sections = await Promise.all(
+      sectionKeys.map(async (key) => {
+        const dbSection = dbSectionMap.get(key);
+        let items: any[] = [];
+        const manualItems = (dbSection as any)?.items ?? [];
+        const hasManualContent = manualItems.some((it: any) => it.imageUrl);
 
-      const manualItems = (dbSection as any)?.items ?? [];
-      const hasManualContent = manualItems.some((it: any) => it.imageUrl);
+        if (hasManualContent) {
+          items = manualItems;
+        } else {
+          // Auto-populate from product catalog using flags in parallel
+          items = await buildItemsFromProducts(SECTION_FLAG_MAP[key], 8);
+        }
 
-      if (hasManualContent) {
-        items = manualItems;
-      } else {
-        // Auto-populate from product catalog using isBestSeller / isTopSeller / isLatest / isFeatured flags
-        items = await buildItemsFromProducts(SECTION_FLAG_MAP[key], 10);
-      }
-
-      const defaults = SECTION_DEFAULTS[key];
-      sections.push({
-        sectionKey:   key,
-        title:        (dbSection as any)?.title    || defaults.title,
-        subtitle:     (dbSection as any)?.subtitle || defaults.subtitle,
-        isActive:     (dbSection as any)?.isActive ?? true,
-        displayOrder: (dbSection as any)?.displayOrder ?? defaults.displayOrder,
-        items,
-      });
-    }
+        const defaults = SECTION_DEFAULTS[key];
+        return {
+          sectionKey:   key,
+          title:        (dbSection as any)?.title    || defaults.title,
+          subtitle:     (dbSection as any)?.subtitle || defaults.subtitle,
+          isActive:     (dbSection as any)?.isActive ?? true,
+          displayOrder: (dbSection as any)?.displayOrder ?? defaults.displayOrder,
+          items,
+        };
+      })
+    );
 
     // Sort by displayOrder
     sections.sort((a, b) => a.displayOrder - b.displayOrder);
@@ -134,7 +149,11 @@ export async function GET(_req: NextRequest) {
     const sectionsByKey: Record<string, any> = {};
     sections.forEach((s) => { sectionsByKey[s.sectionKey] = s; });
 
-    return NextResponse.json({ success: true, sections, sectionsByKey });
+    const result = { success: true, sections, sectionsByKey };
+    cachedHomeSectionsResponse = result;
+    lastHomeSectionsCacheTime = Date.now();
+
+    return NextResponse.json(result, { headers: cacheHeaders });
   } catch (error: any) {
     console.error('Error fetching storefront home sections:', error);
     return NextResponse.json(

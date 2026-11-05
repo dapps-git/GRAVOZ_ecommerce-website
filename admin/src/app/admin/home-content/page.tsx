@@ -117,13 +117,12 @@ const PRESET_COLORS = [
 function Toast({ message, type }: { message: string; type: 'success' | 'error' }) {
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl text-white text-xs font-semibold animate-in slide-in-from-bottom-4 duration-300 ${
-        type === 'success' ? 'bg-[#557244]' : 'bg-rose-600'
-      }`}
+      className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl text-white text-xs font-semibold animate-in slide-in-from-bottom-4 duration-300 ${type === 'success' ? 'bg-[#557244]' : 'bg-rose-600'
+        }`}
     >
       {type === 'success'
         ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-        : <AlertCircle  className="w-4 h-4 flex-shrink-0" />}
+        : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
       {message}
     </div>
   );
@@ -442,13 +441,12 @@ function CardEditor({
                     key={sz}
                     type="button"
                     onClick={() => toggleSize(sz)}
-                    className={`min-w-[36px] h-8 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                      isSelected && isAvailable
+                    className={`min-w-[36px] h-8 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${isSelected && isAvailable
                         ? 'bg-[#030303] text-white shadow-xs'
                         : isSelected && !isAvailable
-                        ? 'bg-rose-100 text-rose-600 border border-rose-200 line-through opacity-70'
-                        : 'bg-white border border-[#e8e2d8] text-slate-700 hover:border-slate-400'
-                    }`}
+                          ? 'bg-rose-100 text-rose-600 border border-rose-200 line-through opacity-70'
+                          : 'bg-white border border-[#e8e2d8] text-slate-700 hover:border-slate-400'
+                      }`}
                   >
                     <span>{sz}</span>
                     {isSelected && isAvailable && <Check className="w-3 h-3 stroke-[3]" />}
@@ -464,11 +462,10 @@ function CardEditor({
                     key={s.size}
                     type="button"
                     onClick={() => toggleSize(s.size)}
-                    className={`min-w-[36px] h-8 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                      s.isAvailable
+                    className={`min-w-[36px] h-8 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${s.isAvailable
                         ? 'bg-[#89591C] text-white shadow-xs'
                         : 'bg-rose-100 text-rose-600 border border-rose-200 line-through opacity-70'
-                    }`}
+                      }`}
                   >
                     <span>{s.size}</span>
                     {s.isAvailable && <Check className="w-3 h-3 stroke-[3]" />}
@@ -514,11 +511,10 @@ function CardEditor({
                     key={preset.name}
                     type="button"
                     onClick={() => togglePresetColor(preset.name, preset.code)}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                      isSelected
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isSelected
                         ? 'bg-white border-2 border-[#030303] shadow-xs'
                         : 'bg-white border border-[#e8e2d8] text-slate-700 hover:border-slate-400'
-                    }`}
+                      }`}
                   >
                     <span
                       className="w-3.5 h-3.5 rounded-full border border-black/20 flex-shrink-0"
@@ -626,13 +622,12 @@ function PhotoSlot({
     <div className="space-y-1.5">
       {/* Preview / Upload box */}
       <div
-        className={`relative w-full aspect-[4/3] rounded-xl border-2 border-dashed overflow-hidden flex items-center justify-center transition-colors ${
-          url
+        className={`relative w-full aspect-[4/3] rounded-xl border-2 border-dashed overflow-hidden flex items-center justify-center transition-colors ${url
             ? 'border-transparent'
             : soft
-            ? 'border-[#d8d0c4] bg-[#fafaf8]'
-            : 'border-[#c9b8a0] bg-[#faf4ec]'
-        }`}
+              ? 'border-[#d8d0c4] bg-[#fafaf8]'
+              : 'border-[#c9b8a0] bg-[#faf4ec]'
+          }`}
       >
         {url ? (
           <>
@@ -676,13 +671,13 @@ function PhotoSlot({
 /* ─── Main Page ──────────────────────────────────────────────────────────── */
 
 export default function AdminHomeContentPage() {
-  const [sections, setSections]         = useState<HomeSectionData[]>([]);
-  const [activeKey, setActiveKey]       = useState<string>('best_sellers');
-  const [products, setProducts]         = useState<ProductOption[]>([]);
-  const [loading, setLoading]           = useState(true);
-  const [saving, setSaving]             = useState(false);
-  const [uploading, setUploading]       = useState<{ itemIdx: number; field: 'image' | 'inset' } | null>(null);
-  const [toast, setToast]               = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+  const [sections, setSections] = useState<HomeSectionData[]>([]);
+  const [activeKey, setActiveKey] = useState<string>('best_sellers');
+  const [products, setProducts] = useState<ProductOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState<{ itemIdx: number; field: 'image' | 'inset' } | null>(null);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type });
@@ -717,15 +712,15 @@ export default function AdminHomeContentPage() {
   useEffect(() => { load(); }, []);
 
   /* ── Helpers ── */
-  const activeMeta  = SECTIONS.find((s) => s.key === activeKey)!;
-  const ActiveIcon  = activeMeta.icon;
+  const activeMeta = SECTIONS.find((s) => s.key === activeKey)!;
+  const ActiveIcon = activeMeta.icon;
 
   const currentSection: HomeSectionData =
     sections.find((s) => s.sectionKey === activeKey) ?? {
       sectionKey: activeKey as any,
-      title:      activeMeta.label,
-      subtitle:   activeMeta.desc,
-      isActive:   true,
+      title: activeMeta.label,
+      subtitle: activeMeta.desc,
+      isActive: true,
       displayOrder: SECTIONS.findIndex((s) => s.key === activeKey) + 1,
       items: [],
     };
@@ -761,27 +756,27 @@ export default function AdminHomeContentPage() {
       items: [
         ...currentSection.items,
         {
-          id:           `item_${Date.now()}`,
-          title:        '',
-          description:  '',
-          price:        1399,
-          originalPrice:1429,
-          imageUrl:     '',
-          insetImageUrl:'',
-          sizes:        [
+          id: `item_${Date.now()}`,
+          title: '',
+          description: '',
+          price: 1399,
+          originalPrice: 1429,
+          imageUrl: '',
+          insetImageUrl: '',
+          sizes: [
             { size: '6', isAvailable: true },
             { size: '7', isAvailable: true },
             { size: '8', isAvailable: true },
             { size: '9', isAvailable: true },
             { size: '10', isAvailable: true },
           ],
-          colors:       [
+          colors: [
             { name: 'Black', colorCode: '#1a1a1a' },
             { name: 'Brown', colorCode: '#4a2c11' },
             { name: 'Tan', colorCode: '#c28b57' },
           ],
-          linkUrl:      '/products',
-          isAvailable:  true,
+          linkUrl: '/products',
+          isAvailable: true,
           displayOrder: currentSection.items.length,
         },
       ],
@@ -811,28 +806,28 @@ export default function AdminHomeContentPage() {
         name: c,
         colorCode:
           c.toLowerCase() === 'black' ? '#1a1a1a' :
-          c.toLowerCase() === 'brown' ? '#4a2c11' :
-          c.toLowerCase() === 'tan' ? '#c28b57' :
-          c.toLowerCase() === 'red' ? '#dc2626' :
-          c.toLowerCase() === 'olive' ? '#556b2f' :
-          c.toLowerCase() === 'pink' ? '#f4a6b8' :
-          c.toLowerCase() === 'white' ? '#f8f8f8' :
-          c.toLowerCase() === 'navy' ? '#1a2a40' : '#1a1a1a',
+            c.toLowerCase() === 'brown' ? '#4a2c11' :
+              c.toLowerCase() === 'tan' ? '#c28b57' :
+                c.toLowerCase() === 'red' ? '#dc2626' :
+                  c.toLowerCase() === 'olive' ? '#556b2f' :
+                    c.toLowerCase() === 'pink' ? '#f4a6b8' :
+                      c.toLowerCase() === 'white' ? '#f8f8f8' :
+                        c.toLowerCase() === 'navy' ? '#1a2a40' : '#1a1a1a',
       }));
     }
 
     const items = [...currentSection.items];
     items[itemIdx] = {
       ...items[itemIdx],
-      productId:     prod._id,
-      title:         prod.name,
-      description:   prod.description || items[itemIdx].description || '',
-      price:         prod.discountPrice || prod.price,
+      productId: prod._id,
+      title: prod.name,
+      description: prod.description || items[itemIdx].description || '',
+      price: prod.discountPrice || prod.price,
       originalPrice: prod.price !== (prod.discountPrice || prod.price) ? prod.price : undefined,
-      sizes:         prodSizes.length > 0 ? prodSizes : items[itemIdx].sizes,
-      colors:        prodColors.length > 0 ? prodColors : items[itemIdx].colors,
-      linkUrl:       `/products/${prod._id}`,
-      imageUrl:      items[itemIdx].imageUrl || img0,
+      sizes: prodSizes.length > 0 ? prodSizes : items[itemIdx].sizes,
+      colors: prodColors.length > 0 ? prodColors : items[itemIdx].colors,
+      linkUrl: `/products/${prod._id}`,
+      imageUrl: items[itemIdx].imageUrl || img0,
       insetImageUrl: items[itemIdx].insetImageUrl || img1,
     };
     update({ items });
@@ -852,7 +847,7 @@ export default function AdminHomeContentPage() {
       const form = new FormData();
       form.append('file', optimizedFile);
       form.append('alt', `${currentSection.title} card ${itemIdx + 1}`);
-      const res  = await fetch('/api/admin/upload', { method: 'POST', body: form });
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
       const data = await res.json();
       if (res.ok && data.url) {
         updateItem(itemIdx, field === 'image' ? 'imageUrl' : 'insetImageUrl', data.url);
@@ -871,10 +866,10 @@ export default function AdminHomeContentPage() {
   const save = async () => {
     setSaving(true);
     try {
-      const res  = await fetch('/api/home-sections', {
-        method:  'PUT',
+      const res = await fetch('/api/home-sections', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(currentSection),
+        body: JSON.stringify(currentSection),
       });
       const data = await res.json();
       data.success
@@ -934,20 +929,19 @@ export default function AdminHomeContentPage() {
       {/* ── Section Tabs ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {SECTIONS.map((sec) => {
-          const Icon   = sec.icon;
+          const Icon = sec.icon;
           const isActive = activeKey === sec.key;
-          const count  = sections.find((s) => s.sectionKey === sec.key)?.items?.length ?? 0;
+          const count = sections.find((s) => s.sectionKey === sec.key)?.items?.length ?? 0;
 
           return (
             <button
               key={sec.key}
               type="button"
               onClick={() => setActiveKey(sec.key)}
-              className={`flex flex-col items-start gap-1.5 p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer ${
-                isActive
+              className={`flex flex-col items-start gap-1.5 p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer ${isActive
                   ? 'shadow-sm scale-[1.01]'
                   : 'border-[#e8e2d8] bg-white hover:border-slate-300 hover:bg-slate-50'
-              }`}
+                }`}
               style={
                 isActive
                   ? { borderColor: sec.color, background: sec.bg }
@@ -1022,11 +1016,10 @@ export default function AdminHomeContentPage() {
           <button
             type="button"
             onClick={() => update({ isActive: !currentSection.isActive })}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer flex-shrink-0 ${
-              currentSection.isActive
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer flex-shrink-0 ${currentSection.isActive
                 ? 'bg-[#f0f5ec] border-[#b6d4a3] text-[#557244]'
                 : 'bg-slate-50 border-slate-200 text-slate-500'
-            }`}
+              }`}
           >
             {currentSection.isActive
               ? <><Eye className="w-3.5 h-3.5" /> Visible on Home</>

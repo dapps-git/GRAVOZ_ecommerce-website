@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const customerEmail = (session?.email || rawEmail || '').toLowerCase().trim();
-    const verifiedCustomerId = session?.userId || (customerId && mongoose.Types.ObjectId.isValid(customerId) ? customerId : undefined);
+    const verifiedCustomerId = session?.userId || undefined;
 
     if (!customerEmail || !items || !Array.isArray(items) || items.length === 0 || !shippingAddress) {
       return NextResponse.json({ error: 'Missing required order details' }, { status: 400 });

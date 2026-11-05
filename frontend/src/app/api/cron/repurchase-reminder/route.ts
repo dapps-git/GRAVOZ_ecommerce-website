@@ -16,6 +16,15 @@ export async function POST(req: NextRequest) {
 
 async function handleRepurchase(req: NextRequest) {
   try {
+    // Authorization check: Verify CRON_SECRET if configured
+    const cronSecret = process.env.CRON_SECRET;
+    const authHeader = req.headers.get('authorization') || '';
+    const providedSecret = req.headers.get('x-cron-secret') || (authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '');
+
+    if (cronSecret && providedSecret !== cronSecret) {
+      return NextResponse.json({ error: 'Unauthorized. Valid CRON_SECRET required.' }, { status: 401 });
+    }
+
     await connectDB();
 
     const { searchParams } = new URL(req.url);

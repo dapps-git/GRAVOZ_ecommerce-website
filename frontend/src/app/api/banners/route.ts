@@ -5,27 +5,43 @@ import { Product } from '@/models/Product';
 
 export const dynamic = 'force-dynamic';
 
+let cachedBanners: Record<string, any> | null = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds memory cache
+
 export async function GET(_req: NextRequest) {
   try {
     const cacheHeaders = {
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
     };
+
+    const now = Date.now();
+    if (cachedBanners && now - lastCacheTime < CACHE_TTL_MS) {
+      return NextResponse.json(
+        {
+          success: true,
+          banners: cachedBanners,
+        },
+        { headers: cacheHeaders }
+      );
+    }
 
     await connectDB();
 
-    // Clean up legacy duo showcase banner records from database
-    await Banner.deleteMany({
-      $or: [
-        { slot: { $in: ['duo_product_1', 'duo_product_2'] } },
-        { category: 'duo_showcase' },
-      ],
-    });
-
-    const dbBanners = await Banner.find({
-      isActive: true,
-      slot: { $nin: ['duo_product_1', 'duo_product_2'] },
-      category: { $ne: 'duo_showcase' },
-    }).lean();
+    const [dbBanners, spotlightProducts] = await Promise.all([
+      Banner.find({
+        isActive: true,
+        slot: { $nin: ['duo_product_1', 'duo_product_2'] },
+        category: { $ne: 'duo_showcase' },
+      }).lean(),
+      Product.find({
+        $or: [
+          { spotlightSlot: { $in: ['duo_product_1', 'duo_product_2'] } },
+          { featureInDuoSlot: { $in: ['duo_product_1', 'duo_product_2'] } },
+        ],
+        status: { $ne: 'archived' },
+      }).lean(),
+    ]);
 
     const bannerMap: Record<string, any> = {};
 
@@ -51,15 +67,6 @@ export async function GET(_req: NextRequest) {
         };
       }
     }
-
-    // Direct resolution from Product collection for products with spotlightSlot
-    const spotlightProducts = await Product.find({
-      $or: [
-        { spotlightSlot: { $in: ['duo_product_1', 'duo_product_2'] } },
-        { featureInDuoSlot: { $in: ['duo_product_1', 'duo_product_2'] } },
-      ],
-      status: { $ne: 'archived' },
-    }).lean();
 
     for (const p of spotlightProducts) {
       const slot = (p.spotlightSlot === 'duo_product_1' || p.spotlightSlot === 'duo_product_2')
@@ -90,6 +97,9 @@ export async function GET(_req: NextRequest) {
         isActive: true,
       };
     }
+
+    cachedBanners = bannerMap;
+    lastCacheTime = Date.now();
 
     return NextResponse.json(
       {

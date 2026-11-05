@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 const JWT_SECRET: string = process.env.JWT_SECRET || '';
 
@@ -35,7 +35,17 @@ export function signAdminRefreshToken(payload: AdminJwtPayload): string {
 
 export function verifyAdminToken(token: string): AdminJwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as unknown as AdminJwtPayload;
+    if (!token || !JWT_SECRET) return null;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const isAdmin = Boolean(
+      decoded && (decoded.adminId || decoded.role === 'admin' || decoded.role === 'superadmin')
+    );
+    if (!isAdmin) return null;
+    return {
+      adminId: String(decoded.adminId || decoded.id || decoded._id || 'admin'),
+      email: decoded.email ? String(decoded.email).toLowerCase().trim() : '',
+      role: decoded.role || 'admin',
+    };
   } catch {
     return null;
   }
@@ -43,15 +53,44 @@ export function verifyAdminToken(token: string): AdminJwtPayload | null {
 
 export async function getAdminSession(): Promise<AdminJwtPayload | null> {
   try {
+    // 1. Check Authorization header or middleware-forwarded admin headers
+    try {
+      const headerStore = await headers();
+      const authHeader = headerStore.get('authorization') || headerStore.get('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const bearerToken = authHeader.slice(7).trim();
+        const payload = verifyAdminToken(bearerToken);
+        if (payload) return payload;
+      }
+      const forwardedAdminId = headerStore.get('x-admin-id');
+      if (forwardedAdminId) {
+        return {
+          adminId: forwardedAdminId,
+          email: headerStore.get('x-admin-email') || '',
+          role: headerStore.get('x-admin-role') || 'admin',
+        };
+      }
+    } catch {
+      // Header check ignored if outside request context
+    }
+
+    // 2. Check cookies
     const cookieStore = await cookies();
-    const token = cookieStore.get(TOKEN_COOKIE_NAME)?.value;
+    const token =
+      cookieStore.get(TOKEN_COOKIE_NAME)?.value ||
+      cookieStore.get('gravoz_admin_token')?.value ||
+      cookieStore.get('admin_token')?.value;
+
     if (token) {
       const payload = verifyAdminToken(token);
       if (payload) return payload;
     }
 
-    // Try refresh token if access token is expired/missing
-    const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE_NAME)?.value;
+    // 3. Try refresh token if access token is expired/missing
+    const refreshToken =
+      cookieStore.get(REFRESH_TOKEN_COOKIE_NAME)?.value ||
+      cookieStore.get('gravoz_admin_refresh_token')?.value;
+
     if (refreshToken) {
       const payload = verifyAdminToken(refreshToken);
       if (payload) {

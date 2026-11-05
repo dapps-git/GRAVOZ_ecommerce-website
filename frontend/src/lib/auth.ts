@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 const JWT_SECRET: string = process.env.JWT_SECRET || '';
 
@@ -49,7 +49,18 @@ export function signUserRefreshToken(payload: UserJwtPayload): string {
 
 export function verifyUserToken(token: string): UserJwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as unknown as UserJwtPayload;
+    if (!token || !JWT_SECRET) return null;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    if (!decoded) return null;
+    const userId = decoded.userId || decoded.id || decoded._id;
+    if (!userId) return null;
+    return {
+      userId: String(userId),
+      email: decoded.email ? String(decoded.email).toLowerCase().trim() : '',
+      name: decoded.name || '',
+      role: decoded.role,
+      tier: decoded.tier,
+    };
   } catch {
     return null;
   }
@@ -57,15 +68,51 @@ export function verifyUserToken(token: string): UserJwtPayload | null {
 
 export async function getUserSession(): Promise<UserJwtPayload | null> {
   try {
+    // 1. Check Authorization Bearer header or custom header
+    try {
+      const headerStore = await headers();
+      const authHeader = headerStore.get('authorization') || headerStore.get('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const bearerToken = authHeader.slice(7).trim();
+        const payload = verifyUserToken(bearerToken);
+        if (payload) return payload;
+      }
+      const xAuth = headerStore.get('x-access-token') || headerStore.get('x-auth-token');
+      if (xAuth) {
+        const payload = verifyUserToken(xAuth.trim());
+        if (payload) return payload;
+      }
+      // Check middleware-forwarded verified user header
+      const forwardedUserId = headerStore.get('x-user-id');
+      if (forwardedUserId) {
+        return {
+          userId: forwardedUserId,
+          email: headerStore.get('x-user-email') || '',
+          name: headerStore.get('x-user-name') || '',
+          role: headerStore.get('x-user-role') || 'customer',
+        };
+      }
+    } catch {
+      // Header inspection ignored if context does not support headers
+    }
+
+    // 2. Check cookies
     const cookieStore = await cookies();
-    const token = cookieStore.get(USER_TOKEN_COOKIE_NAME)?.value;
+    const token =
+      cookieStore.get(USER_TOKEN_COOKIE_NAME)?.value ||
+      cookieStore.get('gravoz_user_token')?.value ||
+      cookieStore.get('token')?.value;
+
     if (token) {
       const payload = verifyUserToken(token);
       if (payload) return payload;
     }
 
-    // Try refresh token if access token is expired or missing
-    const refreshToken = cookieStore.get(USER_REFRESH_TOKEN_COOKIE_NAME)?.value;
+    // 3. Try refresh token if access token is expired or missing
+    const refreshToken =
+      cookieStore.get(USER_REFRESH_TOKEN_COOKIE_NAME)?.value ||
+      cookieStore.get('gravoz_user_refresh_token')?.value;
+
     if (refreshToken) {
       const payload = verifyUserToken(refreshToken);
       if (payload) {

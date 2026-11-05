@@ -80,11 +80,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 4. Resolve customer info
+    // 4. Resolve customer info (only trust verified JWT session for customerId)
     const customerEmail = (session?.email || rawEmail || '').toLowerCase().trim();
-    const verifiedCustomerId =
-      session?.userId ||
-      (customerId && mongoose.Types.ObjectId.isValid(customerId) ? customerId : undefined);
+    const verifiedCustomerId = session?.userId || undefined;
 
     const customerQuery = verifiedCustomerId
       ? { _id: verifiedCustomerId }
@@ -106,6 +104,13 @@ export async function POST(req: NextRequest) {
       try {
         paymentInfo = await razorpay.payments.fetch(razorpay_payment_id);
         if (paymentInfo) {
+          if (paymentInfo.status !== 'captured' && paymentInfo.status !== 'authorized') {
+            return NextResponse.json(
+              { error: `Payment transaction not completed. Current status: ${paymentInfo.status}` },
+              { status: 400 }
+            );
+          }
+
           paymentDetails = {
             ...paymentDetails,
             method: paymentInfo.method,

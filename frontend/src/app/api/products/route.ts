@@ -4,6 +4,20 @@ import { Product } from '@/models/Product';
 import { Category } from '@/models/Category';
 import { Brand } from '@/models/Brand';
 
+let cachedCategoryMap: Map<string, string> | null = null;
+let lastCatMapTime = 0;
+
+async function getCategoryMap(): Promise<Map<string, string>> {
+  const now = Date.now();
+  if (cachedCategoryMap && now - lastCatMapTime < 5 * 60 * 1000) {
+    return cachedCategoryMap;
+  }
+  const allCategories = await Category.find({}).select('name slug _id').lean();
+  cachedCategoryMap = new Map(allCategories.map((c: any) => [String(c._id), c.name]));
+  lastCatMapTime = now;
+  return cachedCategoryMap;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -73,16 +87,18 @@ export async function GET(req: NextRequest) {
       ]);
     }
 
-    // Fetch all categories for fallback ID resolution if needed
-    const allCategories = await Category.find({}).select('name slug _id').lean();
-    const catMap = new Map(allCategories.map((c: any) => [String(c._id), c.name]));
+    // Only fetch / resolve category map if any product actually has an unpopulated category ID
+    const needsCatMap = (dbProducts || []).some(
+      (p: any) => p.category && typeof p.category !== 'object'
+    );
+    const catMap = needsCatMap ? await getCategoryMap() : null;
 
     const formattedProducts = (dbProducts || []).map((p: any) => {
       let catName = 'Footwear';
       if (typeof p.category === 'object' && p.category !== null && p.category.name) {
         catName = p.category.name;
       } else if (p.category) {
-        catName = catMap.get(String(p.category)) || p.subCategory || 'Footwear';
+        catName = (catMap && catMap.get(String(p.category))) || p.subCategory || 'Footwear';
       } else if (p.subCategory) {
         catName = p.subCategory;
       }

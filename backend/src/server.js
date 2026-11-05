@@ -35,7 +35,13 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      req.rawBody = buf.toString('utf8');
+    },
+  })
+);
 app.use((_req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');

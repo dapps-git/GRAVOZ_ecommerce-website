@@ -3,9 +3,11 @@ const Wishlist = require('../models/Wishlist');
 // ── GET /api/wishlist ─────────────────────────────────────────────────────────
 exports.getWishlist = async (req, res) => {
   try {
-    const { guestId, userId } = req.query;
-    const filter = userId ? { userId } : { guestId };
-    if (!filter.userId && !filter.guestId) {
+    const { guestId } = req.query;
+    const effectiveUserId = req.user?.userId;
+
+    const filter = effectiveUserId ? { userId: effectiveUserId } : (guestId ? { guestId } : null);
+    if (!filter) {
       return res.json({ success: true, items: [], count: 0 });
     }
 
@@ -20,13 +22,15 @@ exports.getWishlist = async (req, res) => {
 // ── POST /api/wishlist (toggle) ───────────────────────────────────────────────
 exports.toggleWishlist = async (req, res) => {
   try {
-    const { guestId, userId, item } = req.body;
+    const { guestId, item } = req.body;
+    const effectiveUserId = req.user?.userId;
+
     if (!item?.productId) {
       return res.status(400).json({ error: 'Product ID is required' });
     }
 
-    const filter = userId
-      ? { userId }
+    const filter = effectiveUserId
+      ? { userId: effectiveUserId }
       : { guestId: guestId || 'guest_' + Math.random().toString(36).substring(2, 10) };
 
     let wishlist = await Wishlist.findOne(filter);
@@ -67,8 +71,11 @@ exports.toggleWishlist = async (req, res) => {
 // ── DELETE /api/wishlist ──────────────────────────────────────────────────────
 exports.deleteFromWishlist = async (req, res) => {
   try {
-    const { guestId, userId, productId, clearAll } = req.query;
-    const filter = userId ? { userId } : { guestId };
+    const { guestId, productId, clearAll } = req.query;
+    const effectiveUserId = req.user?.userId;
+
+    const filter = effectiveUserId ? { userId: effectiveUserId } : (guestId ? { guestId } : null);
+    if (!filter) return res.json({ success: true, items: [], count: 0 });
 
     const wishlist = await Wishlist.findOne(filter);
     if (!wishlist) return res.json({ success: true, items: [], count: 0 });

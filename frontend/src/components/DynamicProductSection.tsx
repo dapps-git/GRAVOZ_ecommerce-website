@@ -92,7 +92,7 @@ export default function DynamicProductSection({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/products?${filter}=true&limit=${limit}`, { cache: 'no-store' })
+    fetch(`/api/products?${filter}=true&limit=${limit}`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data?.products) && data.products.length > 0) {

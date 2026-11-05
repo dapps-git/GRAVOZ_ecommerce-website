@@ -114,7 +114,18 @@ export default function RecommendationStrip({
   ]);
 
   useEffect(() => {
-    fetchRecommendations();
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const handle = (window as any).requestIdleCallback(
+        () => {
+          fetchRecommendations();
+        },
+        { timeout: 1200 }
+      );
+      return () => (window as any).cancelIdleCallback(handle);
+    } else {
+      const timer = setTimeout(fetchRecommendations, 150);
+      return () => clearTimeout(timer);
+    }
   }, [fetchRecommendations]);
 
   const displayTitle = title || 'YOU MAY ALSO LIKE';

@@ -26,9 +26,11 @@ exports.getReviews = async (req, res) => {
 exports.submitReview = async (req, res) => {
   try {
     const {
-      productId, orderId, customerName, customerEmail,
-      rating, comment, images, videos,
+      productId, orderId, rating, comment, images, videos,
     } = req.body;
+
+    const customerEmail = (req.user?.email || req.body.customerEmail || '').toLowerCase().trim();
+    const customerName = req.user?.name || req.body.customerName || 'Customer';
 
     if (!productId || !customerEmail || !rating) {
       return res.status(400).json({
