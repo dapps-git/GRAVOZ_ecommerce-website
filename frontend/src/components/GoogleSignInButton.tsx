@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { loginWithGoogle, AuthUser } from '@/lib/auth-client';
 import { playSuccessSound } from '@/lib/sounds';
+import { getStoredAttribution, clearStoredAttribution } from '@/lib/affiliateAttribution';
 
 interface Props {
   onSuccess: (user: AuthUser) => void;
@@ -58,12 +59,17 @@ export default function GoogleSignInButton({
 
     if (setIsSubmittingRef.current) setIsSubmittingRef.current(true);
     try {
+      const attr = getStoredAttribution();
       const res = await loginWithGoogle({
         accessToken: tokenRes.access_token,
         referralCode: referralCodeRef.current,
+        influencerId: attr?.influencerId,
+        influencerName: attr?.influencerName,
+        affiliateCode: attr?.affiliateCode,
       });
 
       if (res.success && res.user) {
+        clearStoredAttribution();
         playSuccessSound();
         onSuccessRef.current(res.user);
       } else {

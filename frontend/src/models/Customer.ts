@@ -37,6 +37,9 @@ export interface ICustomer extends Document {
   firstPurchaseCompleted?: boolean;
   referredBy?: string;
   referralCodeUsed?: string;
+  influencerId?: mongoose.Types.ObjectId | string;
+  influencerName?: string;
+  influencerAssignedAt?: Date;
   referralDiscountBalance: number;
   hasUsedReferralDiscount: boolean;
   activityLogs: ICustomerActivityLog[];
@@ -87,6 +90,9 @@ const CustomerSchema = new Schema<ICustomer>(
     firstPurchaseCompleted: { type: Boolean, default: false },
     referredBy: { type: String, default: '', index: true },
     referralCodeUsed: { type: String, default: '' },
+    influencerId: { type: Schema.Types.ObjectId, ref: 'Influencer', default: null, index: true },
+    influencerName: { type: String, default: '' },
+    influencerAssignedAt: { type: Date, default: null },
     referralDiscountBalance: { type: Number, default: 0, min: 0 },
     hasUsedReferralDiscount: { type: Boolean, default: false },
     activityLogs: [ActivityLogSchema],

@@ -23,6 +23,8 @@ import {
   PackagePlus,
   Star,
   Share2,
+  Gift,
+  Award,
 } from 'lucide-react';
 
 const menuItems = [
@@ -33,7 +35,8 @@ const menuItems = [
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
   { name: 'Brands', href: '/admin/brands', icon: Tag },
   { name: 'Coupons', href: '/admin/coupons', icon: TicketPercent },
-  { name: 'Referrals & Affiliates', href: '/admin/referrals', icon: Share2 },
+  { name: 'Affiliate Marketing', href: '/admin/affiliates', icon: Award },
+  { name: 'Customer Referrals', href: '/admin/referrals', icon: Gift },
   { name: 'Add-Ons', href: '/admin/addons', icon: PackagePlus },
   { name: 'Users', href: '/admin/users', icon: UserCheck },
   { name: 'Customers', href: '/admin/customers', icon: Users },

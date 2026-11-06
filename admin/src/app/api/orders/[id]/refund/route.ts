@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Order } from '@/models/Order';
 import { getAdminSession } from '@/lib/auth';
+import { syncAffiliateCommissionOnOrderStatusChange } from '@/lib/affiliateCommission';
 
 export const dynamic = 'force-dynamic';
 
@@ -121,6 +122,16 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     }
 
     await order.save();
+
+    try {
+      await syncAffiliateCommissionOnOrderStatusChange(order._id, {
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+        reason: `Order refunded (Refund ID: ${refundId})`,
+      });
+    } catch (affErr) {
+      console.error('Affiliate sync error on order refund:', affErr);
+    }
 
     const statusLabel = finalStatus === 'refund_initiated' ? 'Refund Initiated' : 'Refund Completed';
 

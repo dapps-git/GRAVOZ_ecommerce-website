@@ -50,6 +50,17 @@ const OrderSchema = new mongoose.Schema(
     subtotal: { type: Number, required: true },
     discountAmount: { type: Number, default: 0 },
     couponCode: { type: String, default: '' },
+    influencerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Influencer', default: null, index: true },
+    influencerName: { type: String, default: '' },
+    commissionAmount: { type: Number, default: 0 },
+    commissionRate: { type: Number, default: 0 },
+    commissionType: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
+    commissionStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'paid', 'cancelled'],
+      default: 'pending',
+      index: true,
+    },
     shippingFee: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
     paymentMethod: {

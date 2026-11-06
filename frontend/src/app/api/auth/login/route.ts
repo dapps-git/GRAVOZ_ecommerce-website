@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
 import { comparePassword, signUserToken, signUserRefreshToken, setUserAuthCookie } from '@/lib/auth';
+import { findActiveInfluencer } from '@/lib/influencerHelper';
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { email, password } = body;
+    const { email, password, influencerId, influencerName, affiliateCode } = body;
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -37,6 +38,22 @@ export async function POST(req: NextRequest) {
     const isMatch = await comparePassword(password, customer.passwordHash);
     if (!isMatch) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
+    }
+
+    // ── First-Touch Influencer Attribution for existing customers ──
+    // If the customer already has an influencer assigned, do not overwrite it.
+    // If customer does not have an influencer assigned, attribute to active influencer.
+    if (!customer.influencerId && (influencerId || affiliateCode || influencerName)) {
+      const activeInfluencer = await findActiveInfluencer({
+        influencerId,
+        influencerName,
+        affiliateCode,
+      });
+      if (activeInfluencer) {
+        customer.influencerId = activeInfluencer._id;
+        customer.influencerName = activeInfluencer.name;
+        customer.influencerAssignedAt = new Date();
+      }
     }
 
     // Update last login

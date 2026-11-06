@@ -11,6 +11,7 @@ import { loginAccount, loginWithGoogle } from '@/lib/auth-client';
 import { useUser } from '@/context/UserContext';
 import { playSuccessSound } from '@/lib/sounds';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
+import { getStoredAttribution, clearStoredAttribution, captureAttributionFromUrl } from '@/lib/affiliateAttribution';
 
 function getSafeRedirect(raw: string | null): string {
   if (!raw) return '/';
@@ -50,7 +51,10 @@ function LoginContent() {
 
   useEffect(() => {
     router.prefetch(redirectPath);
-  }, [router, redirectPath]);
+    if (searchParams) {
+      captureAttributionFromUrl(searchParams);
+    }
+  }, [router, redirectPath, searchParams]);
 
   // Handle Google OAuth full-page redirect return on mobile (#access_token=...)
   useEffect(() => {
@@ -62,8 +66,15 @@ function LoginContent() {
       if (accessToken) {
         setIsSubmitting(true);
         window.history.replaceState(null, '', window.location.pathname + window.location.search);
-        loginWithGoogle({ accessToken }).then((res) => {
+        const attr = getStoredAttribution();
+        loginWithGoogle({
+          accessToken,
+          influencerId: attr?.influencerId,
+          influencerName: attr?.influencerName,
+          affiliateCode: attr?.affiliateCode,
+        }).then((res) => {
           if (res.success && res.user) {
+            clearStoredAttribution();
             playSuccessSound();
             updateUser({
               name: res.user.name,
@@ -90,8 +101,16 @@ function LoginContent() {
     if (!email.trim() || !password) { setErrorMessage('Please enter your email and password.'); return; }
     setIsSubmitting(true);
     try {
-      const res = await loginAccount({ email: email.trim(), password });
+      const attr = getStoredAttribution();
+      const res = await loginAccount({
+        email: email.trim(),
+        password,
+        influencerId: attr?.influencerId,
+        influencerName: attr?.influencerName,
+        affiliateCode: attr?.affiliateCode,
+      });
       if (res.success && res.user) {
+        clearStoredAttribution();
         updateUser({ name: res.user.name, email: res.user.email, phone: res.user.phone || '', avatarUrl: res.user.avatarUrl || null });
         playSuccessSound();
         router.push(redirectPath);
@@ -106,6 +125,7 @@ function LoginContent() {
   };
 
   const handleGoogleSuccess = (user: any) => {
+    clearStoredAttribution();
     updateUser({ name: user.name, email: user.email, phone: user.phone || '', avatarUrl: user.avatarUrl || null });
     window.location.replace('/');
   };

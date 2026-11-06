@@ -5,6 +5,7 @@ import { Order } from '@/models/Order';
 import { Product } from '@/models/Product';
 import { invalidateCache } from '@/lib/redis';
 import { syncReferralLifecycleOnStatusChange } from '@/lib/referral';
+import { syncAffiliateCommissionOnOrderStatusChange } from '@/lib/affiliateCommission';
 
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
@@ -117,6 +118,16 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
       } catch (refErr) {
         console.error('[REFERRAL] Lifecycle sync error in admin order PUT:', refErr);
         // Non-fatal — order update already saved
+      }
+
+      try {
+        await syncAffiliateCommissionOnOrderStatusChange(existingOrder._id, {
+          orderStatus: existingOrder.orderStatus,
+          paymentStatus: existingOrder.paymentStatus,
+          reason: note || `Admin updated order status to ${orderStatus}`,
+        });
+      } catch (affErr) {
+        console.error('Affiliate sync error in admin order PUT:', affErr);
       }
     }
 

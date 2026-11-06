@@ -3,12 +3,23 @@ import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
 import { Referral } from '@/models/Referral';
 import { hashPassword, signUserToken, signUserRefreshToken, setUserAuthCookie, generateReferralCode } from '@/lib/auth';
+import { findActiveInfluencer } from '@/lib/influencerHelper';
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { name, email, password, phone, referredBy, referralCode: inputCode } = body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      referredBy,
+      referralCode: inputCode,
+      influencerId,
+      influencerName,
+      affiliateCode,
+    } = body;
 
     // Validate inputs
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -80,6 +91,13 @@ export async function POST(req: NextRequest) {
     // Hash password with bcrypt
     const passwordHash = await hashPassword(password);
 
+    // Validate influencer attribution if provided
+    const activeInfluencer = await findActiveInfluencer({
+      influencerId,
+      influencerName,
+      affiliateCode,
+    });
+
     // Create customer: Referral link will ONLY be generated after their FIRST qualifying purchase of ₹999+
     const customer = await Customer.create({
       name: name.trim(),
@@ -93,6 +111,9 @@ export async function POST(req: NextRequest) {
       referralEligibleOrderId: null,
       referredBy: referrerCustomer ? referrerCustomer._id.toString() : '',
       referralCodeUsed: referrerCustomer ? referrerCustomer.referralCode : '',
+      influencerId: activeInfluencer ? activeInfluencer._id : null,
+      influencerName: activeInfluencer ? activeInfluencer.name : '',
+      influencerAssignedAt: activeInfluencer ? new Date() : null,
       referralDiscountBalance: 0,
       hasUsedReferralDiscount: false,
       rewardPoints: 50, // Welcome points

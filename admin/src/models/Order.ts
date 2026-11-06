@@ -53,6 +53,12 @@ export interface IOrder extends Document {
   shippingFee?: number;
   discountAmount?: number;
   couponCode?: string;
+  influencerId?: mongoose.Types.ObjectId | string;
+  influencerName?: string;
+  commissionAmount?: number;
+  commissionRate?: number;
+  commissionType?: 'percentage' | 'fixed';
+  commissionStatus?: 'pending' | 'approved' | 'paid' | 'cancelled';
   totalAmount: number;
   paymentStatus:
     | 'pending'
@@ -176,6 +182,17 @@ const OrderSchema: Schema<IOrder> = new Schema(
     shippingFee: { type: Number, default: 0 },
     discountAmount: { type: Number, default: 0 },
     couponCode: { type: String, default: '' },
+    influencerId: { type: Schema.Types.ObjectId, ref: 'Influencer', default: null, index: true },
+    influencerName: { type: String, default: '' },
+    commissionAmount: { type: Number, default: 0 },
+    commissionRate: { type: Number, default: 0 },
+    commissionType: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
+    commissionStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'paid', 'cancelled'],
+      default: 'pending',
+      index: true,
+    },
     totalAmount: { type: Number, required: true, min: 0 },
     paymentStatus: {
       type: String,
