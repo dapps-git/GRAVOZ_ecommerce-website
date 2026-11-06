@@ -10,11 +10,14 @@ import { requireAdmin } from '@/lib/api-guard';
 export const dynamic = 'force-dynamic';
 
 function getBaseWebsiteUrl(req?: NextRequest): string {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/+$/, '');
+  if (process.env.NEXT_PUBLIC_STORE_URL) {
+    return process.env.NEXT_PUBLIC_STORE_URL.replace(/\/+$/, '');
   }
-  if (process.env.SITE_URL) {
-    return process.env.SITE_URL.replace(/\/+$/, '');
+  if (process.env.CLIENT_URL) {
+    return process.env.CLIENT_URL.replace(/\/+$/, '');
+  }
+  if (process.env.STORE_URL) {
+    return process.env.STORE_URL.replace(/\/+$/, '');
   }
   return 'https://www.gravoz.com';
 }
