@@ -9,6 +9,7 @@ import { registerAccount, loginWithGoogle } from '@/lib/auth-client';
 import { useUser } from '@/context/UserContext';
 import { playSuccessSound } from '@/lib/sounds';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
+import { getStoredAttribution, clearStoredAttribution, captureAttributionFromUrl } from '@/lib/affiliateAttribution';
 
 function getSafeRedirect(raw: string | null): string {
   if (!raw) return '/';
@@ -108,7 +109,10 @@ function SignupContent() {
 
   useEffect(() => {
     router.prefetch(redirectPath);
-  }, [router, redirectPath]);
+    if (searchParams) {
+      captureAttributionFromUrl(searchParams);
+    }
+  }, [router, redirectPath, searchParams]);
 
   // Handle Google OAuth full-page redirect return on mobile (#access_token=...)
   useEffect(() => {
@@ -120,11 +124,16 @@ function SignupContent() {
       if (accessToken) {
         setIsSubmitting(true);
         window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        const attr = getStoredAttribution();
         loginWithGoogle({
           accessToken,
           referralCode: referralCode.trim() || undefined,
+          influencerId: attr?.influencerId,
+          influencerName: attr?.influencerName,
+          affiliateCode: attr?.affiliateCode,
         }).then((res) => {
           if (res.success && res.user) {
+            clearStoredAttribution();
             playSuccessSound();
             updateUser({
               name: res.user.name,
@@ -169,13 +178,18 @@ function SignupContent() {
     }
     setIsSubmitting(true);
     try {
+      const attr = getStoredAttribution();
       const res = await registerAccount({
         name: name.trim(),
         email: email.trim(),
         password,
         referralCode: referralCode.trim() || undefined,
+        influencerId: attr?.influencerId,
+        influencerName: attr?.influencerName,
+        affiliateCode: attr?.affiliateCode,
       });
       if (res.success && res.user) {
+        clearStoredAttribution();
         updateUser({
           name: res.user.name,
           email: res.user.email,
@@ -200,6 +214,7 @@ function SignupContent() {
   };
 
   const handleGoogleSuccess = (user: any) => {
+    clearStoredAttribution();
     updateUser({
       name: user.name,
       email: user.email,

@@ -6,6 +6,10 @@ const Coupon   = require('../models/Coupon');
 const Setting  = require('../models/Setting');
 const mongoose = require('mongoose');
 const {
+  calculateAndRecordAffiliateCommission,
+  syncAffiliateCommissionOnOrderStatusChange,
+} = require('../utils/affiliateCommission');
+const {
   getRazorpayInstance,
   getRazorpayKeys,
   verifyRazorpaySignature,
@@ -293,6 +297,17 @@ exports.placeOrder = async (req, res) => {
       ],
     });
 
+    // Generate affiliate commission if customer belongs to an influencer
+    try {
+      await calculateAndRecordAffiliateCommission({
+        order,
+        customerId,
+        customerEmail,
+      });
+    } catch (affErr) {
+      console.warn('Backend affiliate commission error:', affErr);
+    }
+
     // Update customer stats if authenticated
     if (customerId) {
       await Customer.findByIdAndUpdate(customerId, {
@@ -533,6 +548,16 @@ exports.updateOrderStatus = async (req, res) => {
     });
     await order.save();
 
+    try {
+      await syncAffiliateCommissionOnOrderStatusChange(order._id, {
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+        reason: note,
+      });
+    } catch (affErr) {
+      console.warn('Backend affiliate commission sync error:', affErr);
+    }
+
     res.json({ success: true, order });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -763,6 +788,17 @@ exports.verifyRazorpayPayment = async (req, res) => {
       ],
     });
 
+    // Generate affiliate commission if customer belongs to an influencer
+    try {
+      await calculateAndRecordAffiliateCommission({
+        order,
+        customerId,
+        customerEmail,
+      });
+    } catch (affErr) {
+      console.warn('Backend affiliate commission error (Razorpay):', affErr);
+    }
+
     if (customerId) {
       await Customer.findByIdAndUpdate(customerId, {
         $inc: { totalOrders: 1, totalSpent: paidAmountInRupees },
@@ -824,6 +860,16 @@ exports.handleRazorpayWebhook = async (req, res) => {
             note: `Payment automatically confirmed via Razorpay Webhook (${eventType})`,
           });
           await order.save();
+
+    try {
+      await syncAffiliateCommissionOnOrderStatusChange(order._id, {
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+        reason: note,
+      });
+    } catch (affErr) {
+      console.warn('Backend affiliate commission sync error:', affErr);
+    }
         }
       }
     } else if (eventType === 'payment.failed') {
@@ -839,6 +885,16 @@ exports.handleRazorpayWebhook = async (req, res) => {
             note: `Payment failed via Razorpay: ${paymentEntity.error_description || 'Unknown error'}`,
           });
           await order.save();
+
+    try {
+      await syncAffiliateCommissionOnOrderStatusChange(order._id, {
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+        reason: note,
+      });
+    } catch (affErr) {
+      console.warn('Backend affiliate commission sync error:', affErr);
+    }
         }
       }
     } else if (eventType === 'refund.processed') {
@@ -866,6 +922,16 @@ exports.handleRazorpayWebhook = async (req, res) => {
             note: `Refund of ₹${(refundEntity.amount / 100).toLocaleString('en-IN')} confirmed by Razorpay gateway (Refund ID: ${refundEntity.id}).`,
           });
           await order.save();
+
+    try {
+      await syncAffiliateCommissionOnOrderStatusChange(order._id, {
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+        reason: note,
+      });
+    } catch (affErr) {
+      console.warn('Backend affiliate commission sync error:', affErr);
+    }
         }
       }
     }

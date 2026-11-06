@@ -9,6 +9,7 @@ import { ReturnRefund } from '@/models/ReturnRefund';
 import { getUserSession } from '@/lib/auth';
 import { syncReferralLifecycleOnStatusChange } from '@/lib/referral';
 import { requestRazorpayRefund } from '@/lib/razorpay';
+import { syncAffiliateCommissionOnOrderStatusChange } from '@/lib/affiliateCommission';
 
 // GET /api/orders/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -311,6 +312,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     });
 
     await order.save();
+
+    try {
+      await syncAffiliateCommissionOnOrderStatusChange(order._id, {
+        orderStatus: status,
+        paymentStatus: order.paymentStatus,
+        reason: note || returnReason,
+      });
+    } catch (affErr) {
+      console.error('Affiliate sync error on customer order update:', affErr);
+    }
 
     return NextResponse.json({ success: true, order });
   } catch (err: any) {

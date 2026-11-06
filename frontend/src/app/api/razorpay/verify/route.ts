@@ -10,6 +10,7 @@ import { Coupon } from '@/models/Coupon';
 import { getUserSession } from '@/lib/auth';
 import { verifyRazorpaySignature, getRazorpayInstance } from '@/lib/razorpay';
 import { checkAndGrantReferralEligibility, processReferralRewardForReferrer } from '@/lib/referral';
+import { calculateAndRecordAffiliateCommission } from '@/lib/affiliateCommission';
 
 export const dynamic = 'force-dynamic';
 
@@ -193,6 +194,18 @@ export async function POST(req: NextRequest) {
         },
       ],
     });
+
+    // ── Generate Affiliate Marketing Commission ──
+    try {
+      await calculateAndRecordAffiliateCommission({
+        order: newOrder,
+        customer: orderingCustomer,
+        customerId: verifiedCustomerId || (orderingCustomer ? orderingCustomer._id : undefined),
+        customerEmail,
+      });
+    } catch (affErr) {
+      console.warn('Affiliate commission calculation error (Razorpay):', affErr);
+    }
 
     // 9. Update Referral States & Decrement Referrer Balance if Used
     try {

@@ -18,6 +18,7 @@ export interface AuthUser {
   referralCodeUsed?: string;
   tier: string;
   authProvider: string;
+  influencerId?: string;
   totalOrders?: number;
   totalSpent?: number;
   createdAt?: string;
@@ -39,11 +40,17 @@ export interface RegisterPayload {
   phone?: string;
   referralCode?: string;
   referredBy?: string;
+  influencerId?: string;
+  influencerName?: string;
+  affiliateCode?: string;
 }
 
 export interface LoginPayload {
   email: string;
   password: string;
+  influencerId?: string;
+  influencerName?: string;
+  affiliateCode?: string;
 }
 
 export interface GoogleAuthPayload {
@@ -54,6 +61,9 @@ export interface GoogleAuthPayload {
   name?: string;
   avatarUrl?: string;
   referralCode?: string;
+  influencerId?: string;
+  influencerName?: string;
+  affiliateCode?: string;
 }
 
 export interface ResetPasswordPayload {

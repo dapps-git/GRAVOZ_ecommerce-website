@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import { Customer } from '@/models/Customer';
 import { Referral } from '@/models/Referral';
 import { signUserToken, signUserRefreshToken, setUserAuthCookie, generateReferralCode } from '@/lib/auth';
+import { findActiveInfluencer } from '@/lib/influencerHelper';
 
 // Helper to decode JWT payload safely
 function decodeJwtPayload(token: string): Record<string, any> | null {
@@ -15,6 +16,7 @@ function decodeJwtPayload(token: string): Record<string, any> | null {
     return JSON.parse(jsonPayload);
   } catch {
     return null;
+                                                         
   }
 }
 
@@ -22,7 +24,18 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { credential, accessToken, googleId, email, name, avatarUrl, referralCode: inputRefCode } = body;
+    const {
+      credential,
+      accessToken,
+      googleId,
+      email,
+      name,
+      avatarUrl,
+      referralCode: inputRefCode,
+      influencerId,
+      influencerName,
+      affiliateCode,
+    } = body;
 
     let userEmail = email;
     let userName = name;
@@ -94,6 +107,19 @@ export async function POST(req: NextRequest) {
       if (userAvatar && !customer.avatarUrl) {
         customer.avatarUrl = userAvatar;
       }
+      // First-touch influencer attribution for existing customers without an assigned influencer
+      if (!customer.influencerId && (influencerId || affiliateCode || influencerName)) {
+        const activeInfluencer = await findActiveInfluencer({
+          influencerId,
+          influencerName,
+          affiliateCode,
+        });
+        if (activeInfluencer) {
+          customer.influencerId = activeInfluencer._id;
+          customer.influencerName = activeInfluencer.name;
+          customer.influencerAssignedAt = new Date();
+        }
+      }
       customer.isEmailVerified = true;
       customer.lastLogin = new Date();
       if (!customer.activityLogs) customer.activityLogs = [];
@@ -113,6 +139,12 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      const activeInfluencer = await findActiveInfluencer({
+        influencerId,
+        influencerName,
+        affiliateCode,
+      });
+
       customer = await Customer.create({
         name: userName || 'Customer',
         email: normalizedEmail,
@@ -125,6 +157,9 @@ export async function POST(req: NextRequest) {
         referralEligibleOrderId: null,
         referredBy: referrerCustomer ? referrerCustomer._id.toString() : '',
         referralCodeUsed: referrerCustomer ? referrerCustomer.referralCode : '',
+        influencerId: activeInfluencer ? activeInfluencer._id : null,
+        influencerName: activeInfluencer ? activeInfluencer.name : '',
+        influencerAssignedAt: activeInfluencer ? new Date() : null,
         referralDiscountBalance: 0,
         hasUsedReferralDiscount: false,
         rewardPoints: 50, // 50 Welcome bonus points

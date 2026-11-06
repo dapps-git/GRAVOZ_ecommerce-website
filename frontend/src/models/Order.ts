@@ -43,6 +43,12 @@ export interface IOrder extends Document {
   referralDiscountAmount?: number;
   referralDiscountType?: 'referred_first_order_15' | 'referrer_reward_100';
   referralCodeUsed?: string;
+  influencerId?: mongoose.Types.ObjectId | string;
+  influencerName?: string;
+  commissionAmount?: number;
+  commissionRate?: number;
+  commissionType?: 'percentage' | 'fixed';
+  commissionStatus?: 'pending' | 'approved' | 'paid' | 'cancelled';
   couponCode?: string;
   shippingFee: number;
   totalAmount: number;
@@ -184,6 +190,17 @@ const OrderSchema = new Schema<IOrder>(
     referralDiscountAmount: { type: Number, default: 0 },
     referralDiscountType: { type: String, default: null },
     referralCodeUsed: { type: String, default: '' },
+    influencerId: { type: Schema.Types.ObjectId, ref: 'Influencer', default: null, index: true },
+    influencerName: { type: String, default: '' },
+    commissionAmount: { type: Number, default: 0 },
+    commissionRate: { type: Number, default: 0 },
+    commissionType: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
+    commissionStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'paid', 'cancelled'],
+      default: 'pending',
+      index: true,
+    },
     couponCode: { type: String, default: '' },
     shippingFee: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
