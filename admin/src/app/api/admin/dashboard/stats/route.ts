@@ -37,11 +37,6 @@ export async function GET(req: NextRequest) {
     void Customer;
     void Referral;
 
-    const { searchParams } = new URL(req.url);
-    const range = searchParams.get('range') || 'monthly';
-    const fromParam = searchParams.get('from');
-    const toParam = searchParams.get('to');
-
     const now = new Date();
     let startDate = new Date();
 
