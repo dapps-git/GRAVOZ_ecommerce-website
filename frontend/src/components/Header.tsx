@@ -70,11 +70,11 @@ function LoaferShoeIcon({ className = 'w-4 h-4' }: { className?: string }) {
 }
 
 const ANNOUNCEMENT_TRAIN_ITEMS = [
-  { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford', logo: { name: 'Ellora', src: '/icons/logo1.webp' } },
-  { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
+  { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
+  { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer', logo: { name: 'Gravoz', src: '/gravoz-logo.png' } },
   { text: 'PREMIUM HANDCRAFTED LEATHER FOOTWEAR', type: 'oxford', logo: { name: 'Jackrob', src: '/icons/logo2.webp' } },
   { text: '6-MONTH HASSLE-FREE WARRANTY INCLUDED', type: 'loafer', logo: { name: 'Ellora', src: '/icons/logo1.webp' } },
-  { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
+  { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford', logo: { name: 'Gravoz', src: '/gravoz-logo.png' } },
   { text: 'STEP INTO LUXURY • STEP INTO SERCHER', type: 'loafer', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
 ];
 
