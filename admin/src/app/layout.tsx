@@ -6,6 +6,16 @@ export const metadata: Metadata = {
   title: 'SERCHER Admin | Store Management',
   description: 'SERCHER Handcrafted Footwear Store Management Panel',
   keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER'],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+  },
 };
 
 export const viewport: Viewport = {
