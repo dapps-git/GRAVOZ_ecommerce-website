@@ -12,17 +12,17 @@ export default function Footer() {
 
           {/* Brand column */}
           <div className="space-y-3.5 max-w-sm">
-            <div className="relative h-7 w-32">
+            <div className="relative h-8 w-36">
               <Image
-                src="/gravoz-logo.png"
-                alt="GRAVOZ Official Logo"
+                src="/sercher-logo.png"
+                alt="SERCHER Official Logo"
                 fill
                 className="object-contain object-left"
-                sizes="128px"
+                sizes="144px"
               />
             </div>
             <p className="font-sansation text-[11px] sm:text-xs leading-relaxed text-slate-600">
-              Premium leather footwear crafted with timeless style, exceptional comfort, and attention to every detail. Made for those who appreciate quality that lasts, from everyday essentials to refined classics. Step into quality. Step into Gravoz.
+              Premium leather footwear crafted with timeless style, exceptional comfort, and attention to every detail. Made for those who appreciate quality that lasts, from everyday essentials to refined classics. Step into quality. Step into Sercher.
             </p>
           </div>
 
@@ -87,7 +87,7 @@ export default function Footer() {
 
         {/* Copyright & Payment Badges */}
         <div className="mt-8 pt-6 border-t border-[#f0ece5] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-sansation">
-          <p>© 2026 Gravoz. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} SERCHER. All Rights Reserved.</p>
           <div className="flex items-center gap-3">
             <span className="font-semibold text-slate-700">PayPal</span>
             <span className="font-semibold text-blue-700">AMEX</span>

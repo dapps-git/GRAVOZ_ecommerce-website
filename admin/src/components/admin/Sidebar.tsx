@@ -65,20 +65,20 @@ export default function Sidebar() {
 
   return (
     <aside className="w-60 bg-white border-r border-[#e8e2d8] flex flex-col h-screen sticky top-0 flex-shrink-0 z-30 font-light overflow-hidden shadow-2xs">
-      {/* Brand Header with Official GRAVOZ Logo (Fixed) */}
+      {/* Brand Header with Official SERCHER Logo (Fixed) */}
       <div className="p-4 pb-3 border-b border-[#e8e2d8] flex-shrink-0 bg-white">
         <Link href="/admin/dashboard" className="block py-0.5">
           <Image
-            src="/gravoz-logo.png"
-            alt="GRAVOZ Brand Logo"
-            width={140}
-            height={34}
+            src="/sercher-logo.png"
+            alt="SERCHER Brand Logo"
+            width={160}
+            height={40}
             priority
-            className="h-8 w-auto object-contain"
+            className="h-9 w-auto object-contain"
           />
         </Link>
         <span className="text-[10px] text-[#89591C] font-semibold tracking-wider uppercase block mt-1">
-          Shoe Admin Suite
+          SERCHER Admin Suite
         </span>
       </div>
 

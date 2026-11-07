@@ -42,7 +42,7 @@ const RETURN_STEP_DEFINITIONS = [
   { key: 'under_review', label: 'Under Review', defaultDesc: 'Our quality team is reviewing your request.' },
   { key: 'approved', label: 'Return Accepted', defaultDesc: 'Return request accepted! Pickup will be scheduled.' },
   { key: 'pickup_scheduled', label: 'Pickup Scheduled', defaultDesc: 'Courier partner scheduled for parcel pickup.' },
-  { key: 'received', label: 'Received at Hub', defaultDesc: 'Item received and verified at GRAVOZ fulfillment center.' },
+  { key: 'received', label: 'Received at Hub', defaultDesc: 'Item received and verified at SERCHER fulfillment center.' },
   { key: 'refund_initiated', label: 'Refund Initiated', defaultDesc: 'Refund initiated back to original payment source.' },
   { key: 'refunded', label: 'Refunded', defaultDesc: 'Refund completed successfully to your bank account.' },
 ];

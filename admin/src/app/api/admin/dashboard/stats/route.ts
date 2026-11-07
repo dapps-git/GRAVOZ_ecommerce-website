@@ -7,8 +7,31 @@ import { ReturnRefund } from '@/models/ReturnRefund';
 import { Customer } from '@/models/Customer';
 import { Referral } from '@/models/Referral';
 
+interface StatsCacheEntry {
+  data: any;
+  expiry: number;
+}
+const statsCache = new Map<string, StatsCacheEntry>();
+const STATS_CACHE_TTL_MS = 60 * 1000;
+
 export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const range = searchParams.get('range') || 'monthly';
+    const fromParam = searchParams.get('from') || '';
+    const toParam = searchParams.get('to') || '';
+    const cacheKey = `${range}:${fromParam}:${toParam}`;
+
+    const nowTime = Date.now();
+    const hit = statsCache.get(cacheKey);
+    if (hit && nowTime < hit.expiry) {
+      return NextResponse.json(hit.data, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        },
+      });
+    }
+
     await connectDB();
     // Ensure models are registered
     void Customer;
@@ -268,7 +291,13 @@ export async function GET(req: NextRequest) {
       },
     };
 
-    return NextResponse.json(responseData);
+    statsCache.set(cacheKey, { data: responseData, expiry: nowTime + STATS_CACHE_TTL_MS });
+
+    return NextResponse.json(responseData, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+      },
+    });
   } catch (error: unknown) {
     const err = error as Error;
     return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });

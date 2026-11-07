@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Save, Store, Gift, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const [storeName, setStoreName] = useState('GRAVOZ Footwear');
+  const [storeName, setStoreName] = useState('SERCHER Footwear');
   const [storeTagline, setStoreTagline] = useState('Premium Handcrafted Footwear & Leather Collections');
   const [contactEmail, setContactEmail] = useState('support@gravoz.com');
   const [gstinTaxId, setGstinTaxId] = useState('32AAACL1902K1Z8');
@@ -120,7 +120,7 @@ export default function SettingsPage() {
                 required
                 value={storeName}
                 onChange={(e) => setStoreName(e.target.value)}
-                placeholder="e.g. GRAVOZ Footwear"
+                placeholder="e.g. SERCHER Footwear"
                 className="w-full bg-[#fcfdfd] border border-slate-200 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 font-medium focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition-colors"
               />
             </div>

@@ -22,7 +22,7 @@ export interface ISetting extends Document {
 
 const SettingSchema: Schema<ISetting> = new Schema(
   {
-    storeName: { type: String, default: 'GRAVOZ Footwear' },
+    storeName: { type: String, default: 'SERCHER Footwear' },
     storeTagline: { type: String, default: 'Premium Handcrafted Footwear & Leather Collections' },
     contactEmail: { type: String, default: 'support@gravoz.com' },
     contactPhone: { type: String, default: '+91 98765 43210' },
@@ -36,7 +36,7 @@ const SettingSchema: Schema<ISetting> = new Schema(
     referralRewardCredit: { type: Number, default: 100 },
     friendFirstOrderDiscountPercent: { type: Number, default: 15 },
     cloudinaryPreset: { type: String, default: 'gravoz_preset' },
-    bannerMessage: { type: String, default: 'Welcome to GRAVOZ - Handcrafted Footwear for Men, Women & Babies' },
+    bannerMessage: { type: String, default: 'Welcome to SERCHER - Handcrafted Footwear for Men, Women & Unisex' },
   },
   { timestamps: true }
 );

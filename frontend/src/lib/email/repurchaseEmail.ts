@@ -229,7 +229,7 @@ export async function sendRepurchaseEmail(payload: RepurchaseEmailPayload): Prom
 }> {
   const smtpEmail = process.env.SMTP_EMAIL;
   const smtpPassword = process.env.SMTP_PASSWORD;
-  const fromName = process.env.SMTP_FROM_NAME || 'GRAVOZ Store';
+  const fromName = process.env.SMTP_FROM_NAME || 'SERCHER Store';
 
   const html = generateRepurchaseEmailHtml(payload);
   const subject = payload.type === '4_months'

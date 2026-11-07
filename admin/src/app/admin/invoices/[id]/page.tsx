@@ -118,13 +118,18 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
         {/* Header */}
         <div className="flex items-start justify-between border-b border-[#e8e2d8] pb-6">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900 font-sansation">
-                GRAVOZ
-              </h1>
+            <div className="relative h-10 w-44 mb-1">
+              <Image
+                src="/sercher-logo.png"
+                alt="SERCHER"
+                fill
+                priority
+                className="object-contain object-left"
+                sizes="176px"
+              />
             </div>
             <p className="text-xs text-[#89591C] font-semibold tracking-wide uppercase">
-              Premium Shoes for Men, Women &amp; Babies
+              Premium Handcrafted Footwear for Men, Women &amp; Unisex
             </p>
             <p className="text-[11px] text-slate-400">
               Official Tax Invoice &amp; Purchase Receipt
@@ -235,7 +240,7 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
 
         {/* Footer Note */}
         <div className="border-t border-[#e8e2d8] pt-6 text-center space-y-1 text-[11px] text-slate-500">
-          <p className="font-semibold text-slate-700">Thank you for choosing GRAVOZ!</p>
+          <p className="font-semibold text-slate-700">Thank you for choosing SERCHER!</p>
           <p>For questions or warranty assistance, contact gravozshoes@gmail.com | +91 9645319418</p>
           <p className="text-[10px] text-slate-400">This is a computer-generated tax invoice and requires no physical signature.</p>
         </div>

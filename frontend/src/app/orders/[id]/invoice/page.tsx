@@ -122,10 +122,17 @@ export default function OrderInvoicePage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#ece7de] pb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-wider text-[#030303] uppercase" style={{ fontFamily: 'var(--font-playfair), Playfair Display, Georgia, serif' }}>
-              GRAVOZ
-            </h1>
-            <p className="text-[11px] text-slate-500 uppercase tracking-widest mt-0.5">
+            <div className="relative h-9 sm:h-10 w-36 sm:w-44 mb-1">
+              <Image
+                src="/sercher-logo.png"
+                alt="SERCHER"
+                fill
+                priority
+                className="object-contain object-left"
+                sizes="176px"
+              />
+            </div>
+            <p className="text-[11px] text-slate-500 uppercase tracking-widest mt-0.5 font-medium">
               Premium Handcrafted Footwear
             </p>
             <p className="text-[11px] text-slate-400 mt-1">
@@ -252,7 +259,7 @@ export default function OrderInvoicePage() {
             <span>•</span>
             <span>7-Day Easy Returns & Exchanges</span>
           </div>
-          <p>This is an authentic computer-generated tax invoice from GRAVOZ Footwear. No signature is required.</p>
+          <p>This is an authentic computer-generated tax invoice from SERCHER Footwear. No signature is required.</p>
           <p className="text-[10px] text-slate-400">© {new Date().getFullYear()} GRAVOZ Store. All rights reserved.</p>
         </div>
 

@@ -151,8 +151,8 @@ export default function ForgotPasswordPage() {
         {/* Brand Header */}
         <div className="flex flex-col items-center gap-1.5">
           <Link href="/">
-            <div className="relative h-9 w-44">
-              <Image src="/gravoz-logo.png" alt="GRAVOZ" fill priority className="object-contain" sizes="176px" />
+            <div className="relative h-10 w-44">
+              <Image src="/sercher-logo.png" alt="SERCHER" fill priority className="object-contain" sizes="176px" />
             </div>
           </Link>
           <p className="text-[9px] font-bold tracking-[0.25em] text-[#7a3e0b] uppercase font-sansation">

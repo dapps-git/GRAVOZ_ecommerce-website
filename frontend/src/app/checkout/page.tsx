@@ -728,13 +728,13 @@ export default function CheckoutPage() {
 
       // Step 2: Open Razorpay Standard Checkout Modal
       const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.gravoz.com';
-      const logoUrl = `${origin}/gravoz-logo.png`;
+      const logoUrl = `${origin}/sercher-logo.png`;
 
       const options = {
         key: rzpOrderData.keyId,
         amount: rzpOrderData.amount,
         currency: rzpOrderData.currency || 'INR',
-        name: 'GRAVOZ',
+        name: 'SERCHER',
         description: `Order Payment (${items.length} item${items.length > 1 ? 's' : ''})`,
         image: logoUrl,
         order_id: rzpOrderData.orderId,
@@ -1326,7 +1326,7 @@ export default function CheckoutPage() {
                 Order Placed Successfully!
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
-                Thank you for shopping with Gravoz. We have received your order and will send you an email confirmation with all the details.
+                Thank you for shopping with Sercher. We have received your order and will send you an email confirmation with all the details.
               </p>
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
                 <span className="inline-block bg-[#faf8f5] border border-[#e8e2d8] px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-700 shadow-2xs">

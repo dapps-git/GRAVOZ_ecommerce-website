@@ -12,7 +12,7 @@ export async function GET() {
 
     if (!settings) {
       await Setting.create({
-        storeName: 'GRAVOZ Footwear',
+        storeName: 'SERCHER Footwear',
         storeTagline: 'Premium Handcrafted Footwear & Leather Collections',
         contactEmail: 'support@gravoz.com',
         contactPhone: '+91 98765 43210',
@@ -32,7 +32,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       settings: {
-        storeName: s?.storeName || 'GRAVOZ Footwear',
+        storeName: s?.storeName || 'SERCHER Footwear',
         storeTagline: s?.storeTagline || 'Premium Handcrafted Footwear & Leather Collections',
         contactEmail: s?.contactEmail || 'support@gravoz.com',
         contactPhone: s?.contactPhone || '+91 98765 43210',
@@ -49,7 +49,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       settings: {
-        storeName: 'GRAVOZ Footwear',
+        storeName: 'SERCHER Footwear',
         storeTagline: 'Premium Handcrafted Footwear & Leather Collections',
         contactEmail: 'support@gravoz.com',
         gstinTaxId: '32AAACL1902K1Z8',

@@ -15,7 +15,7 @@ export async function GET() {
     let settings = await Setting.findOne().lean();
     if (!settings) {
       await Setting.create({
-        storeName: 'GRAVOZ Footwear',
+        storeName: 'SERCHER Footwear',
         storeTagline: 'Premium Handcrafted Footwear & Leather Collections',
         contactEmail: 'support@gravoz.com',
         contactPhone: '+91 98765 43210',
