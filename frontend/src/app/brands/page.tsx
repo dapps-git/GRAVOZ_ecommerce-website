@@ -5,28 +5,28 @@ import Footer from '@/components/Footer';
 import { ArrowRight, ShieldCheck, Sparkles, Award } from 'lucide-react';
 
 export const metadata = {
-  title: 'Our Brands & Collections | GRAVOZ Handcrafted Footwear',
-  description: 'Explore GRAVOZ premium handcrafted footwear collections and signature brand lines.',
+  title: 'Our Brands & Collections | SERCHER Handcrafted Footwear',
+  description: 'Explore SERCHER premium handcrafted footwear collections and signature brand lines.',
 };
 
 export default function BrandsPage() {
   const brandHighlights = [
     {
-      name: 'GRAVOZ Signature',
+      name: 'SERCHER Signature',
       tagline: 'Artisanal Genuine Leather Footwear',
       description: 'Handcrafted by master artisans with genuine leather, engineered for unmatched elegance and all-day comfort.',
       href: '/products?category=men',
       tag: 'FLAGSHIP',
     },
     {
-      name: 'GRAVOZ Comfort Pro',
+      name: 'SERCHER Comfort Pro',
       tagline: 'Ergonomic Cushioning & Support',
       description: 'Daily comfort footbeds with anti-fatigue memory insoles designed for long hours on your feet.',
       href: '/products?category=footwear',
       tag: 'BESTSELLER',
     },
     {
-      name: 'GRAVOZ Luxe Collection',
+      name: 'SERCHER Luxe Collection',
       tagline: 'Bespoke Evening & Formalwear',
       description: 'Hand-burnished leather oxfords, derbies, and monk straps designed for executive presence.',
       href: '/products',
@@ -43,7 +43,7 @@ export default function BrandsPage() {
         <div className="text-center space-y-3 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F6E9D7] border border-[#E5D2BA] text-[#8A5B2A] text-xs font-semibold tracking-wider uppercase">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>GRAVOZ ATELIER</span>
+            <span>SERCHER ATELIER</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#111111]">
             Our Brands &amp; Signature Lines

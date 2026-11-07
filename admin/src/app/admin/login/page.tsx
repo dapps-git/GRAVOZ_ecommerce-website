@@ -74,15 +74,15 @@ export default function AdminLoginPage() {
         <div className="lg:col-span-6 p-8 sm:p-12 md:p-14 flex flex-col justify-center bg-white relative">
           <div className="w-full max-w-sm mx-auto space-y-7">
             
-            {/* Centered GRAVOZ Logo */}
+            {/* Centered SERCHER Logo */}
             <div className="flex justify-center pb-2">
               <Image
-                src="/gravoz-logo.png"
-                alt="GRAVOZ Official Logo"
-                width={200}
-                height={50}
+                src="/sercher-logo.png"
+                alt="SERCHER Official Logo"
+                width={220}
+                height={55}
                 priority
-                className="h-11 w-auto object-contain"
+                className="h-12 w-auto object-contain"
               />
             </div>
 

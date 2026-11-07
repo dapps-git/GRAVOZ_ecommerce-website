@@ -251,8 +251,8 @@ function SignupContent() {
         {/* Brand Header */}
         <div className="flex flex-col items-center gap-1 text-center flex-shrink-0">
           <Link href="/" className="hover:opacity-95 transition-opacity">
-            <div className="relative h-7 sm:h-8 w-36 sm:w-40">
-              <Image src="/gravoz-logo.png" alt="GRAVOZ" fill priority className="object-contain drop-shadow-md" sizes="160px" />
+            <div className="relative h-8 sm:h-9 w-36 sm:w-40">
+              <Image src="/sercher-logo.png" alt="SERCHER" fill priority className="object-contain drop-shadow-md" sizes="160px" />
             </div>
           </Link>
           <p className="text-[8.5px] sm:text-[9px] font-bold tracking-[0.25em] text-[#7a3e0b] uppercase font-sansation">

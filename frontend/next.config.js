@@ -141,7 +141,18 @@ const nextConfig = {
             value: 'gravoz.com',
           },
         ],
-        destination: 'https://www.gravoz.com/:path*',
+        destination: 'https://www.searcherstore.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.gravoz.com',
+          },
+        ],
+        destination: 'https://www.searcherstore.com/:path*',
         permanent: true,
       },
     ];

@@ -6,9 +6,9 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: 'GRAVOZ | Premium Footwear for Men, Women & Babies',
-  description: 'Discover handcrafted luxury shoes for Men, Women, and Babies. Ergonomic arch support, breathable leather, and timeless elegance.',
-  keywords: ['shoes', 'men shoes', 'women shoes', 'baby shoes', 'leather footwear', 'GRAVOZ'],
+  title: 'SERCHER | Premium Handcrafted Footwear for Men, Women & Unisex',
+  description: 'Discover SERCHER handcrafted luxury shoes. Ergonomic arch support, breathable leather, and timeless elegance.',
+  keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER', 'sercher shoes'],
 };
 
 export const viewport: Viewport = {

@@ -3,9 +3,9 @@ import './globals.css';
 import ScrollToTop from '@/components/admin/ScrollToTop';
 
 export const metadata: Metadata = {
-  title: 'GRAVOZ Admin | Store Management',
-  description: 'GRAVOZ Handcrafted Footwear Store Management Panel',
-  keywords: ['shoes', 'men shoes', 'women shoes', 'baby shoes', 'leather footwear', 'GRAVOZ'],
+  title: 'SERCHER Admin | Store Management',
+  description: 'SERCHER Handcrafted Footwear Store Management Panel',
+  keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER'],
 };
 
 export const viewport: Viewport = {

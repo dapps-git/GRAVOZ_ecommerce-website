@@ -71,11 +71,11 @@ function LoaferShoeIcon({ className = 'w-4 h-4' }: { className?: string }) {
 
 const ANNOUNCEMENT_TRAIN_ITEMS = [
   { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford', logo: { name: 'Ellora', src: '/icons/logo1.webp' } },
-  { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer', logo: { name: 'Gravoz', src: '/icons/logo.webp' } },
+  { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
   { text: 'PREMIUM HANDCRAFTED LEATHER FOOTWEAR', type: 'oxford', logo: { name: 'Jackrob', src: '/icons/logo2.webp' } },
   { text: '6-MONTH HASSLE-FREE WARRANTY INCLUDED', type: 'loafer', logo: { name: 'Ellora', src: '/icons/logo1.webp' } },
-  { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford', logo: { name: 'Gravoz', src: '/icons/logo.webp' } },
-  { text: 'STEP INTO LUXURY • STEP INTO GRAVOZ', type: 'loafer', logo: { name: 'Jackrob', src: '/icons/logo2.webp' } },
+  { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
+  { text: 'STEP INTO LUXURY • STEP INTO SERCHER', type: 'loafer', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
 ];
 
 export default function Header() {
@@ -216,13 +216,22 @@ export default function Header() {
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* GRAVOZ Text Logo */}
+            {/* SERCHER Brand Logo */}
             <Link
               href="/"
-              className="text-[20px] sm:text-[24px] md:text-[26px] font-normal leading-none tracking-[0.04em] text-[#030303] uppercase hover:text-[#89591C] transition-colors select-none"
-              style={{ fontFamily: 'var(--font-playfair), Playfair Display, Georgia, serif' }}
+              className="flex items-center gap-2 select-none group"
+              aria-label="SERCHER"
             >
-              GRAVOZ
+              <div className="relative h-7 sm:h-8 md:h-9 w-28 sm:w-32 md:w-36">
+                <Image
+                  src="/sercher-logo.png"
+                  alt="SERCHER"
+                  fill
+                  priority
+                  className="object-contain object-left group-hover:opacity-90 transition-opacity"
+                  sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
+                />
+              </div>
             </Link>
           </div>
 
@@ -362,10 +371,19 @@ export default function Header() {
                 <Link
                   href="/"
                   onClick={closeMobileMenu}
-                  className="text-[20px] font-normal leading-none tracking-[0.03em] text-[#030303] uppercase"
-                  style={{ fontFamily: 'var(--font-playfair), Playfair Display, Georgia, serif' }}
+                  className="flex items-center gap-2 select-none"
+                  aria-label="SERCHER"
                 >
-                  GRAVOZ
+                  <div className="relative h-7 w-28">
+                    <Image
+                      src="/sercher-logo.png"
+                      alt="SERCHER"
+                      fill
+                      priority
+                      className="object-contain object-left"
+                      sizes="112px"
+                    />
+                  </div>
                 </Link>
                 <button
                   type="button"

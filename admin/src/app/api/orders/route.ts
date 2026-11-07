@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit;
 
     const orders = await Order.find(query)
+      .select('_id orderNumber customerName customerEmail customer totalAmount paymentMethod paymentStatus orderStatus createdAt items influencerName commissionStatus')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)

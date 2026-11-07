@@ -7,6 +7,13 @@ import { Brand } from '@/models/Brand';
 let cachedCategoryMap: Map<string, string> | null = null;
 let lastCatMapTime = 0;
 
+interface ProductsCacheEntry {
+  data: any;
+  expiry: number;
+}
+const productsQueryCache = new Map<string, ProductsCacheEntry>();
+const PRODUCTS_CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
 async function getCategoryMap(): Promise<Map<string, string>> {
   const now = Date.now();
   if (cachedCategoryMap && now - lastCatMapTime < 5 * 60 * 1000) {
@@ -35,6 +42,14 @@ export async function GET(req: NextRequest) {
     const cacheHeaders = {
       'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
     };
+
+    // Fast-path in-memory query cache for instant first paints
+    const cacheKey = searchParams.toString() || 'default';
+    const now = Date.now();
+    const hit = productsQueryCache.get(cacheKey);
+    if (hit && now < hit.expiry) {
+      return NextResponse.json(hit.data, { headers: cacheHeaders });
+    }
 
     await connectDB();
     const query: Record<string, any> = { status: 'active' };
@@ -107,24 +122,30 @@ export async function GET(req: NextRequest) {
         ...p,
         category: catName,
         categoryDetails: typeof p.category === 'object' ? p.category : null,
-        brand: typeof p.brand === 'object' && p.brand !== null ? (p.brand.name || 'GRAVOZ') : (p.brand || 'GRAVOZ'),
+        brand: typeof p.brand === 'object' && p.brand !== null ? (p.brand.name || 'SERCHER') : (p.brand || 'SERCHER'),
         brandDetails: typeof p.brand === 'object' ? p.brand : null,
       };
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        products: formattedProducts,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit) || 1,
-        },
+    const responsePayload = {
+      success: true,
+      products: formattedProducts,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
       },
-      { headers: cacheHeaders }
-    );
+    };
+
+    // Store in query cache (limit to 120 entries)
+    if (productsQueryCache.size > 120) {
+      const oldestKey = productsQueryCache.keys().next().value;
+      if (oldestKey) productsQueryCache.delete(oldestKey);
+    }
+    productsQueryCache.set(cacheKey, { data: responsePayload, expiry: now + PRODUCTS_CACHE_TTL_MS });
+
+    return NextResponse.json(responsePayload, { headers: cacheHeaders });
   } catch (error: unknown) {
     const err = error as Error;
     console.error('Fetch products error in /api/products:', err);

@@ -253,7 +253,7 @@ export default function CartPage() {
                       {/* Info & Details */}
                       <div className="flex-1 min-w-0 pr-7 sm:pr-8 space-y-1">
                         <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">
-                          GRAVOZ
+                          SERCHER
                         </span>
                         <Link
                           href={productLink}

@@ -19,6 +19,9 @@ const allowedOrigins = [
   process.env.ADMIN_URL,
   'http://localhost:3000',
   'http://localhost:3006',
+  'https://www.searcherstore.com',
+  'https://searcherstore.com',
+  'https://admin.searcherstore.com',
   'https://www.gravoz.com',
   'https://admin.gravoz.com',
 ].filter(Boolean);

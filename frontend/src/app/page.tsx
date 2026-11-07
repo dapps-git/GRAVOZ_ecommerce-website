@@ -209,9 +209,9 @@ function AnimatedProductCard({
 // ─── Fallback data ─────────────────────────────────────────────────────────
 
 const DEFAULT_CATEGORIES: CategoryCardData[] = [
-  { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/placeholder.svg' },
-  { key: 'men', title: 'Men', href: '/category/men', imageUrl: '/images/placeholder.svg' },
-  { key: 'kids', title: 'Kids', href: '/category/kids', imageUrl: '/images/placeholder.svg' },
+  { key: 'women', title: 'Women', href: '/category/women', imageUrl: '/images/banner2.webp' },
+  { key: 'men', title: 'Men', href: '/category/men', imageUrl: '/images/banner1.webp' },
+  { key: 'kids', title: 'Kids', href: '/category/kids', imageUrl: '/images/banner3.webp' },
 ];
 
 // ─── Page Component ───────────────────────────────────────────────────────────
@@ -219,11 +219,11 @@ const DEFAULT_CATEGORIES: CategoryCardData[] = [
 export default function StorefrontHomePage() {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [banners, setBanners] = useState<Record<string, any>>({});
-  const [bannerImageUrl, setBannerImageUrl] = useState<string>('/images/placeholder.svg');
-  const [bannerLoading, setBannerLoading] = useState<boolean>(true);
+  const [bannerImageUrl, setBannerImageUrl] = useState<string>('/images/banner.webp');
+  const [bannerLoading, setBannerLoading] = useState<boolean>(false);
 
   const [categoryCards, setCategoryCards] = useState<CategoryCardData[]>(DEFAULT_CATEGORIES);
-  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
+  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false);
 
   const [currentHeroSlide, setCurrentHeroSlide] = useState<number>(0);
 
@@ -863,13 +863,17 @@ export default function StorefrontHomePage() {
 
             {/* Brand column */}
             <div className="space-y-4 max-w-sm">
-              <div className="flex items-center gap-2">
-                <span className="font-sansation font-black text-2xl sm:text-3xl tracking-[0.08em] text-[#030303] uppercase">
-                  GRAVOZ
-                </span>
+              <div className="relative h-8 w-36">
+                <Image
+                  src="/sercher-logo.png"
+                  alt="SERCHER"
+                  fill
+                  className="object-contain object-left"
+                  sizes="144px"
+                />
               </div>
               <p className="font-sansation text-xs leading-relaxed text-slate-600">
-                Premium leather footwear crafted with timeless style, exceptional comfort, and attention to every detail. Made for those who appreciate quality that lasts, from everyday essentials to refined classics. Step into quality. Step into Gravoz.
+                Premium leather footwear crafted with timeless style, exceptional comfort, and attention to every detail. Made for those who appreciate quality that lasts, from everyday essentials to refined classics. Step into quality. Step into Sercher.
               </p>
             </div>
 
@@ -935,7 +939,7 @@ export default function StorefrontHomePage() {
 
           {/* Bottom Copyright & Payment Methods */}
           <div className="border-t border-[#e8e2d8] mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-sansation text-xs text-slate-500">
-            <p>© 2026 Gravoz. All Rights Reserved.</p>
+            <p>© {new Date().getFullYear()} SERCHER. All Rights Reserved.</p>
 
             {/* Payment Icons */}
             <div className="flex items-center gap-2 flex-wrap">

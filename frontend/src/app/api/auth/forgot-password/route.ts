@@ -11,7 +11,7 @@ function generateOTP(): string {
 async function sendOTPEmail(to: string, name: string, otp: string): Promise<void> {
   const smtpEmail = process.env.SMTP_EMAIL || '';
   const smtpPassword = process.env.SMTP_PASSWORD || '';
-  const fromName = process.env.SMTP_FROM_NAME || 'GRAVOZ Store';
+  const fromName = process.env.SMTP_FROM_NAME || 'SERCHER Store';
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
   
   const logoPath = path.join(process.cwd(), 'public', 'gravoz-logo.png');
@@ -31,7 +31,7 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
   await transporter.sendMail({
     from: `"${fromName}" <${smtpEmail}>`,
     to,
-    subject: `Your GRAVOZ Password Reset Code: ${otp}`,
+    subject: `Your SERCHER Password Reset Code: ${otp}`,
     attachments: hasLocalLogo
       ? [
           {
@@ -69,7 +69,7 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
                     <a href="${appUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
                       <img 
                         src="${logoSrc}" 
-                        alt="GRAVOZ" 
+                        alt="SERCHER" 
                         width="150" 
                         style="display: block; width: 150px; max-width: 100%; height: auto; margin: 0 auto; border: 0;"
                       />
@@ -110,7 +110,7 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
                 <tr>
                   <td style="background-color: #faf7f2; padding: 18px 28px; text-align: center; border-top: 1px solid #ebdccb;">
                     <p style="margin: 0; font-size: 10.5px; color: #999999; font-weight: 300;">
-                      © ${new Date().getFullYear()} GRAVOZ Footwear. All rights reserved.
+                      © ${new Date().getFullYear()} SERCHER Footwear. All rights reserved.
                     </p>
                   </td>
                 </tr>

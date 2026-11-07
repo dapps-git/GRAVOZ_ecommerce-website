@@ -19,7 +19,7 @@ function getBaseWebsiteUrl(req?: NextRequest): string {
   if (process.env.STORE_URL) {
     return process.env.STORE_URL.replace(/\/+$/, '');
   }
-  return 'https://www.gravoz.com';
+  return 'https://www.searcherstore.com';
 }
 
 function buildAffiliateUrl(baseUrl: string, influencer: { name: string; _id: any }): string {
