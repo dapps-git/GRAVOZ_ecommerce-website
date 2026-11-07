@@ -22,20 +22,43 @@ export async function syncAffiliateCommissionOnOrderStatusChange(
     const commission = await AffiliateCommission.findOne({ orderId });
     if (!commission) return;
 
+    // Fetch order to verify paymentMethod and current status
+    const order = await Order.findById(orderId).lean();
+    const effectivePaymentMethod = String((order && (order as any).paymentMethod) || '').trim().toUpperCase();
+    const effectiveOrderStatus = orderStatus || (order && (order as any).orderStatus) || '';
+    const effectivePaymentStatus = paymentStatus || (order && (order as any).paymentStatus) || '';
+    const isCOD = effectivePaymentMethod === 'COD';
+
     // If commission was already paid out, do not cancel unless refunded/returned
-    if (commission.status === 'paid' && orderStatus !== 'refunded' && orderStatus !== 'returned') {
+    if (commission.status === 'paid' && effectiveOrderStatus !== 'refunded' && effectiveOrderStatus !== 'returned') {
       return;
     }
 
     let newStatus: 'pending' | 'approved' | 'paid' | 'cancelled' | null = null;
 
-    if (orderStatus === 'cancelled' || paymentStatus === 'failed') {
+    if (effectiveOrderStatus === 'cancelled' || effectivePaymentStatus === 'failed') {
       newStatus = 'cancelled';
-    } else if (orderStatus === 'refunded' || orderStatus === 'returned' || paymentStatus === 'refunded') {
+    } else if (
+      effectiveOrderStatus === 'refunded' ||
+      effectiveOrderStatus === 'returned' ||
+      effectiveOrderStatus === 'return_received' ||
+      effectivePaymentStatus === 'refunded'
+    ) {
       newStatus = 'cancelled';
-    } else if (orderStatus === 'delivered' || paymentStatus === 'paid') {
-      if (commission.status === 'pending') {
+    } else if (isCOD) {
+      // Rule: For COD orders, benefits go to the influencer ONLY when product status is changed to 'delivered'
+      if (effectiveOrderStatus === 'delivered') {
         newStatus = 'approved';
+      } else {
+        // Any intermediate status (ordered, confirmed, processing, shipped, out_for_delivery) remains pending
+        newStatus = 'pending';
+      }
+    } else {
+      // For prepaid orders (Razorpay, UPI, Card)
+      if (effectiveOrderStatus === 'delivered' || effectivePaymentStatus === 'paid') {
+        if (commission.status === 'pending') {
+          newStatus = 'approved';
+        }
       }
     }
 

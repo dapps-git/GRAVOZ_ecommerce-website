@@ -46,9 +46,18 @@ async function calculateAndRecordAffiliateCommission({ order, customer, customer
     }
 
     let status = 'pending';
-    if (order.paymentStatus === 'paid' || order.orderStatus === 'delivered') {
-      status = 'approved';
-    } else if (order.paymentStatus === 'failed' || order.orderStatus === 'cancelled') {
+    const isCOD = String(order.paymentMethod || '').trim().toUpperCase() === 'COD';
+
+    if (isCOD) {
+      // Rule: For COD orders, benefits go to the influencer ONLY when product status is changed to 'delivered'
+      status = order.orderStatus === 'delivered' ? 'approved' : 'pending';
+    } else {
+      if (order.paymentStatus === 'paid' || order.orderStatus === 'delivered') {
+        status = 'approved';
+      }
+    }
+
+    if (order.paymentStatus === 'failed' || order.orderStatus === 'cancelled') {
       status = 'cancelled';
     }
 
@@ -96,18 +105,41 @@ async function syncAffiliateCommissionOnOrderStatusChange(orderId, { orderStatus
     const commission = await AffiliateCommission.findOne({ orderId });
     if (!commission) return;
 
-    if (commission.status === 'paid' && orderStatus !== 'refunded' && orderStatus !== 'returned') {
+    // Fetch order to verify paymentMethod and current status
+    const order = await Order.findById(orderId).lean();
+    const effectivePaymentMethod = String((order && order.paymentMethod) || '').trim().toUpperCase();
+    const effectiveOrderStatus = orderStatus || (order && order.orderStatus) || '';
+    const effectivePaymentStatus = paymentStatus || (order && order.paymentStatus) || '';
+    const isCOD = effectivePaymentMethod === 'COD';
+
+    if (commission.status === 'paid' && effectiveOrderStatus !== 'refunded' && effectiveOrderStatus !== 'returned') {
       return;
     }
 
     let newStatus = null;
-    if (orderStatus === 'cancelled' || paymentStatus === 'failed') {
+    if (effectiveOrderStatus === 'cancelled' || effectivePaymentStatus === 'failed') {
       newStatus = 'cancelled';
-    } else if (orderStatus === 'refunded' || orderStatus === 'returned' || paymentStatus === 'refunded') {
+    } else if (
+      effectiveOrderStatus === 'refunded' ||
+      effectiveOrderStatus === 'returned' ||
+      effectiveOrderStatus === 'return_received' ||
+      effectivePaymentStatus === 'refunded'
+    ) {
       newStatus = 'cancelled';
-    } else if (orderStatus === 'delivered' || paymentStatus === 'paid') {
-      if (commission.status === 'pending') {
+    } else if (isCOD) {
+      // Rule: For COD orders, benefits go to the influencer ONLY when product status is changed to 'delivered'
+      if (effectiveOrderStatus === 'delivered') {
         newStatus = 'approved';
+      } else {
+        // Any intermediate status (ordered, confirmed, processing, shipped, out_for_delivery) remains pending
+        newStatus = 'pending';
+      }
+    } else {
+      // For prepaid orders (Razorpay, UPI, Card)
+      if (effectiveOrderStatus === 'delivered' || effectivePaymentStatus === 'paid') {
+        if (commission.status === 'pending') {
+          newStatus = 'approved';
+        }
       }
     }
 
