@@ -225,6 +225,7 @@ export default function AdminAffiliatesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
+      const data = await res.json();
       if (res.ok) {
         // Refresh details and overview
         if (selectedInfluencerId) {
@@ -235,6 +236,8 @@ export default function AdminAffiliatesPage() {
           }
         }
         fetchAffiliates();
+      } else {
+        alert(data.error || 'Failed to update commission');
       }
     } catch (err) {
       console.error('Error updating commission status:', err);
@@ -928,6 +931,8 @@ export default function AdminAffiliatesPage() {
                         const comm = detailData.commissions.find((c) => c.orderNumber === ord.orderNumber);
                         const commStatus = comm?.status || ord.commissionStatus || 'pending';
                         const commAmount = comm?.commissionAmount ?? ord.commissionAmount ?? 0;
+                        const isCOD = String(ord.paymentMethod || '').trim().toUpperCase() === 'COD';
+                        const isCODUndelivered = isCOD && ord.orderStatus !== 'delivered';
 
                         return (
                           <div
@@ -938,6 +943,9 @@ export default function AdminAffiliatesPage() {
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-slate-800 text-sm">{ord.orderNumber}</span>
                                 <span className="text-slate-400 font-mono text-[11px]">{formatDate(ord.createdAt)}</span>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-100 text-slate-600">
+                                  {ord.paymentMethod || 'COD'}
+                                </span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <span
@@ -963,6 +971,7 @@ export default function AdminAffiliatesPage() {
                                   }`}
                                 >
                                   Commission: {commStatus}
+                                  {isCODUndelivered && commStatus === 'pending' ? ' (Pending Delivery)' : ''}
                                 </span>
                               </div>
                             </div>
@@ -989,23 +998,34 @@ export default function AdminAffiliatesPage() {
                                 {comm && commStatus !== 'paid' && commStatus !== 'cancelled' && (
                                   <div className="flex items-center gap-1.5 mt-1">
                                     {commStatus === 'pending' && (
+                                      isCODUndelivered ? (
+                                        <span
+                                          className="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded italic"
+                                          title="For Cash on Delivery, benefits unlock automatically when product status is changed to Delivered"
+                                        >
+                                          COD • Releases on delivery
+                                        </span>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          disabled={updatingCommId === comm._id}
+                                          onClick={() => handleUpdateCommissionStatus(comm._id, 'approved')}
+                                          className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold transition-colors"
+                                        >
+                                          Approve
+                                        </button>
+                                      )
+                                    )}
+                                    {!isCODUndelivered && (
                                       <button
                                         type="button"
                                         disabled={updatingCommId === comm._id}
-                                        onClick={() => handleUpdateCommissionStatus(comm._id, 'approved')}
-                                        className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold transition-colors"
+                                        onClick={() => handleUpdateCommissionStatus(comm._id, 'paid')}
+                                        className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-semibold transition-colors"
                                       >
-                                        Approve
+                                        Mark as Paid
                                       </button>
                                     )}
-                                    <button
-                                      type="button"
-                                      disabled={updatingCommId === comm._id}
-                                      onClick={() => handleUpdateCommissionStatus(comm._id, 'paid')}
-                                      className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-semibold transition-colors"
-                                    >
-                                      Mark as Paid
-                                    </button>
                                   </div>
                                 )}
                                 {commStatus === 'paid' && comm?.paidAt && (

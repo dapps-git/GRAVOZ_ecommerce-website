@@ -35,6 +35,21 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       return NextResponse.json({ error: 'Commission record not found' }, { status: 404 });
     }
 
+    // Safeguard: For COD orders, benefits go to the influencer only when product status is changed to delivered
+    if (status === 'approved' || status === 'paid') {
+      const order = await Order.findById(commission.orderId).lean();
+      const isCOD = String((order && (order as any).paymentMethod) || '').trim().toUpperCase() === 'COD';
+      if (isCOD && order && (order as any).orderStatus !== 'delivered') {
+        return NextResponse.json(
+          {
+            error:
+              'For Cash on Delivery (COD) orders, commission benefits can only be approved or paid after the product status is changed to "delivered".',
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     commission.status = status;
     if (notes) commission.notes = notes;
 
