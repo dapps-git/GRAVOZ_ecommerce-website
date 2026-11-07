@@ -727,7 +727,7 @@ export default function CheckoutPage() {
       }
 
       // Step 2: Open Razorpay Standard Checkout Modal
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.gravoz.com';
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.searcherstore.com';
       const logoUrl = `${origin}/sercher-logo.png`;
 
       const options = {
