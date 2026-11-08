@@ -14,7 +14,7 @@ export async function GET() {
       await Setting.create({
         storeName: 'SERCHER Footwear',
         storeTagline: 'Premium Handcrafted Footwear & Leather Collections',
-        contactEmail: 'support@gravoz.com',
+        contactEmail: 'support@searcherstore.com',
         contactPhone: '+91 98765 43210',
         gstinTaxId: '32AAACL1902K1Z8',
         currencySymbol: '₹',
@@ -51,7 +51,7 @@ export async function GET() {
       settings: {
         storeName: 'SERCHER Footwear',
         storeTagline: 'Premium Handcrafted Footwear & Leather Collections',
-        contactEmail: 'support@gravoz.com',
+        contactEmail: 'support@searcherstore.com',
         gstinTaxId: '32AAACL1902K1Z8',
         currencySymbol: '₹',
         freeShippingThreshold: 999,

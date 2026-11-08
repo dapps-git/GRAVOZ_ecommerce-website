@@ -10,16 +10,18 @@ import { requireAdmin } from '@/lib/api-guard';
 export const dynamic = 'force-dynamic';
 
 function getBaseWebsiteUrl(req?: NextRequest): string {
-  if (process.env.NEXT_PUBLIC_STORE_URL) {
-    return process.env.NEXT_PUBLIC_STORE_URL.replace(/\/+$/, '');
+  const storeUrl =
+    process.env.NEXT_PUBLIC_STORE_URL ||
+    process.env.CLIENT_URL ||
+    process.env.STORE_URL ||
+    'https://www.searcherstore.com';
+
+  const clean = storeUrl.replace(/\/+$/, '');
+  // Automatically replace legacy gravoz.com domain with searcherstore.com
+  if (clean.includes('gravoz.com')) {
+    return clean.replace(/gravoz\.com/g, 'searcherstore.com');
   }
-  if (process.env.CLIENT_URL) {
-    return process.env.CLIENT_URL.replace(/\/+$/, '');
-  }
-  if (process.env.STORE_URL) {
-    return process.env.STORE_URL.replace(/\/+$/, '');
-  }
-  return 'https://www.searcherstore.com';
+  return clean;
 }
 
 function buildAffiliateUrl(baseUrl: string, influencer: { name: string; _id: any }): string {

@@ -99,6 +99,11 @@ interface DetailCommission {
   createdAt: string;
 }
 
+function sanitizeLink(url?: string): string {
+  if (!url) return '';
+  return url.replace(/https?:\/\/(www\.)?gravoz\.com/gi, 'https://www.searcherstore.com');
+}
+
 export default function AdminAffiliatesPage() {
   const [loading, setLoading] = useState(true);
   const [influencers, setInfluencers] = useState<InfluencerItem[]>([]);
@@ -489,12 +494,12 @@ export default function AdminAffiliatesPage() {
                         <input
                           type="text"
                           readOnly
-                          value={inf.affiliateLink}
+                          value={sanitizeLink(inf.affiliateLink)}
                           className="text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1 truncate flex-1 text-slate-600 select-all"
                         />
                         <button
                           type="button"
-                          onClick={() => handleCopy(inf.affiliateLink, `link-${inf._id}`)}
+                          onClick={() => handleCopy(sanitizeLink(inf.affiliateLink), `link-${inf._id}`)}
                           className="px-2.5 py-1 text-xs rounded bg-[#89591C]/10 hover:bg-[#89591C] text-[#89591C] hover:text-white transition-all flex items-center gap-1 flex-shrink-0"
                           title="Copy Full Affiliate Link"
                         >
@@ -796,11 +801,11 @@ export default function AdminAffiliatesPage() {
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <LinkIcon className="w-4 h-4 text-[#89591C] shrink-0" />
                   <span className="font-semibold text-slate-700 whitespace-nowrap">Affiliate URL:</span>
-                  <span className="font-mono text-slate-600 truncate select-all">{detailData.influencer.affiliateLink}</span>
+                  <span className="font-mono text-slate-600 truncate select-all">{sanitizeLink(detailData.influencer.affiliateLink)}</span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleCopy(detailData.influencer.affiliateLink, 'drawer-link')}
+                  onClick={() => handleCopy(sanitizeLink(detailData.influencer.affiliateLink), 'drawer-link')}
                   className="px-3 py-1.5 rounded bg-[#89591C] hover:bg-[#724814] text-white text-xs font-medium flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
                 >
                   {copiedId === 'drawer-link' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}

@@ -24,7 +24,7 @@ const SettingSchema: Schema<ISetting> = new Schema(
   {
     storeName: { type: String, default: 'SERCHER Footwear' },
     storeTagline: { type: String, default: 'Premium Handcrafted Footwear & Leather Collections' },
-    contactEmail: { type: String, default: 'support@gravoz.com' },
+    contactEmail: { type: String, default: 'support@searcherstore.com' },
     contactPhone: { type: String, default: '+91 98765 43210' },
     gstinTaxId: { type: String, default: '32AAACL1902K1Z8' },
     currencySymbol: { type: String, default: '₹' },
