@@ -271,49 +271,11 @@ function RecProductCard({
         ))}
       </div>
 
-      {/* Card Meta (Title, Rating, Color Dots, Price) */}
+      {/* Card Meta (Title, Rating, Price) */}
       <div className="mt-2.5 space-y-1.5">
         <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
           {product.name}
         </h3>
-
-        {/* Available Color Dots */}
-        {product.colorVariants && product.colorVariants.length > 0 && (
-          <div className="flex items-center gap-1 pt-0.5">
-            {product.colorVariants.slice(0, 4).map((variant, idx) => {
-              const colorHex =
-                variant.colorCode ||
-                (variant.name.toLowerCase() === 'black'
-                  ? '#1a1a1a'
-                  : variant.name.toLowerCase() === 'brown'
-                  ? '#4a2c11'
-                  : variant.name.toLowerCase() === 'tan'
-                  ? '#c28b57'
-                  : variant.name.toLowerCase() === 'olive'
-                  ? '#556b2f'
-                  : variant.name.toLowerCase() === 'white'
-                  ? '#f3f3f3'
-                  : '#888888');
-              const isSelectedTaste =
-                contextProduct?.selectedColor &&
-                variant.name.toLowerCase() === contextProduct.selectedColor.toLowerCase();
-
-              return (
-                <span
-                  key={idx}
-                  title={variant.name}
-                  className={`w-2.5 h-2.5 rounded-full border ${
-                    isSelectedTaste ? 'border-[#89591C] ring-1 ring-[#89591C]' : 'border-black/20'
-                  }`}
-                  style={{ backgroundColor: colorHex }}
-                />
-              );
-            })}
-            {product.colorVariants.length > 4 && (
-              <span className="text-[9px] text-slate-400">+{product.colorVariants.length - 4}</span>
-            )}
-          </div>
-        )}
 
         {/* Star Rating */}
         {(() => {
