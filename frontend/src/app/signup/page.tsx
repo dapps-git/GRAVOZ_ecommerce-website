@@ -471,7 +471,10 @@ function SignupContent() {
           {/* Footer Login Link */}
           <p className="text-center text-[10.5px] sm:text-[11px] text-slate-600 font-sansation pt-0.5">
             Already have an account?{' '}
-            <Link href="/login" className="font-bold text-[#7a3e0b] hover:underline ml-0.5">
+            <Link
+              href={`/login${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`}
+              className="font-bold text-[#7a3e0b] hover:underline ml-0.5"
+            >
               Login
             </Link>
           </p>

@@ -11,6 +11,7 @@ import { getUserSession } from '@/lib/auth';
 import { verifyRazorpaySignature, getRazorpayInstance } from '@/lib/razorpay';
 import { checkAndGrantReferralEligibility, processReferralRewardForReferrer } from '@/lib/referral';
 import { calculateAndRecordAffiliateCommission } from '@/lib/affiliateCommission';
+import { findActiveInfluencer } from '@/lib/influencerHelper';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,26 @@ export async function POST(req: NextRequest) {
       shippingFee,
       totalAmount,
       paymentMethod,
+      influencerId: bodyInfluencerId,
+      influencerName: bodyInfluencerName,
+      affiliateCode: bodyAffiliateCode,
     } = body;
+
+    let targetInfluencerId = bodyInfluencerId;
+    let targetInfluencerName = bodyInfluencerName;
+    let targetAffiliateCode = bodyAffiliateCode;
+
+    if (!targetInfluencerId && !targetAffiliateCode) {
+      const cookieVal = req.cookies.get('gravoz_influencer_attribution')?.value;
+      if (cookieVal) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(cookieVal));
+          targetInfluencerId = parsed.influencerId;
+          targetInfluencerName = parsed.influencerName;
+          targetAffiliateCode = parsed.affiliateCode;
+        } catch {}
+      }
+    }
 
     // 1. Validate required Razorpay signature fields
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -90,6 +110,19 @@ export async function POST(req: NextRequest) {
       : { email: customerEmail };
 
     let orderingCustomer = await Customer.findOne(customerQuery);
+
+    const activeInfluencer = await findActiveInfluencer({
+      influencerId: targetInfluencerId || (orderingCustomer?.influencerId ? String(orderingCustomer.influencerId) : undefined),
+      influencerName: targetInfluencerName,
+      affiliateCode: targetAffiliateCode,
+    });
+
+    if (activeInfluencer && orderingCustomer && !orderingCustomer.influencerId) {
+      orderingCustomer.influencerId = activeInfluencer._id;
+      orderingCustomer.influencerName = activeInfluencer.name;
+      orderingCustomer.influencerAssignedAt = new Date();
+      await orderingCustomer.save();
+    }
 
     // 5. Fetch extended payment details from Razorpay SDK
     let paymentDetails: Record<string, any> = {
@@ -186,6 +219,9 @@ export async function POST(req: NextRequest) {
       paymentDetails,
       orderStatus: 'ordered',
       estimatedDelivery,
+      influencerId: activeInfluencer ? activeInfluencer._id : (orderingCustomer?.influencerId || null),
+      influencerName: activeInfluencer ? activeInfluencer.name : (orderingCustomer?.influencerName || ''),
+      influencerCode: activeInfluencer ? activeInfluencer.affiliateCode : '',
       statusHistory: [
         {
           status: 'ordered',

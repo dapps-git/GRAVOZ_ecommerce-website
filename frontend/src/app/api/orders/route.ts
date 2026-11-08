@@ -11,6 +11,7 @@ import { Setting } from '@/models/Setting';
 import { getUserSession } from '@/lib/auth';
 import { checkAndGrantReferralEligibility, processReferralRewardForReferrer } from '@/lib/referral';
 import { calculateAndRecordAffiliateCommission } from '@/lib/affiliateCommission';
+import { findActiveInfluencer } from '@/lib/influencerHelper';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,26 @@ export async function POST(req: NextRequest) {
       totalAmount,
       paymentMethod,
       referralDiscountType,
+      influencerId: bodyInfluencerId,
+      influencerName: bodyInfluencerName,
+      affiliateCode: bodyAffiliateCode,
     } = body;
+
+    let targetInfluencerId = bodyInfluencerId;
+    let targetInfluencerName = bodyInfluencerName;
+    let targetAffiliateCode = bodyAffiliateCode;
+
+    if (!targetInfluencerId && !targetAffiliateCode) {
+      const cookieVal = req.cookies.get('gravoz_influencer_attribution')?.value;
+      if (cookieVal) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(cookieVal));
+          targetInfluencerId = parsed.influencerId;
+          targetInfluencerName = parsed.influencerName;
+          targetAffiliateCode = parsed.affiliateCode;
+        } catch {}
+      }
+    }
 
     // Determine secure customer email and ID (only trust verified JWT session for customerId)
     const customerEmail = (session?.email || rawEmail || '').toLowerCase().trim();
@@ -145,6 +165,19 @@ export async function POST(req: NextRequest) {
       : { email: customerEmail };
 
     let orderingCustomer = await Customer.findOne(customerQuery);
+
+    const activeInfluencer = await findActiveInfluencer({
+      influencerId: targetInfluencerId || (orderingCustomer?.influencerId ? String(orderingCustomer.influencerId) : undefined),
+      influencerName: targetInfluencerName,
+      affiliateCode: targetAffiliateCode,
+    });
+
+    if (activeInfluencer && orderingCustomer && !orderingCustomer.influencerId) {
+      orderingCustomer.influencerId = activeInfluencer._id;
+      orderingCustomer.influencerName = activeInfluencer.name;
+      orderingCustomer.influencerAssignedAt = new Date();
+      await orderingCustomer.save();
+    }
 
     // ── Backend Validation of Coupon Discount (Server Source of Truth) ──
     let verifiedCouponDiscount = 0;
@@ -320,6 +353,9 @@ export async function POST(req: NextRequest) {
       paymentStatus,
       orderStatus: 'ordered',
       estimatedDelivery,
+      influencerId: activeInfluencer ? activeInfluencer._id : (orderingCustomer?.influencerId || null),
+      influencerName: activeInfluencer ? activeInfluencer.name : (orderingCustomer?.influencerName || ''),
+      influencerCode: activeInfluencer ? activeInfluencer.affiliateCode : '',
       statusHistory: [
         {
           status: 'ordered',

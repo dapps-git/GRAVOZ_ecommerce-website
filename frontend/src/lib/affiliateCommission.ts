@@ -44,13 +44,14 @@ export async function calculateAndRecordAffiliateCommission({
       }
     }
 
-    // Must have an associated influencer on customer record
-    if (!dbCustomer || !dbCustomer.influencerId) {
+    // Must have an associated influencer on customer record or on order
+    const targetInfluencerId = dbCustomer?.influencerId || order?.influencerId;
+    if (!targetInfluencerId) {
       return null;
     }
 
     // Fetch influencer configuration at time of order
-    const influencer = await Influencer.findById(dbCustomer.influencerId);
+    const influencer = await Influencer.findById(targetInfluencerId);
     if (!influencer) {
       return null;
     }

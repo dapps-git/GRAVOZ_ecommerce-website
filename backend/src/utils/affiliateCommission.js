@@ -23,9 +23,10 @@ async function calculateAndRecordAffiliateCommission({ order, customer, customer
       }
     }
 
-    if (!dbCustomer || !dbCustomer.influencerId) return null;
+    const targetInfluencerId = dbCustomer?.influencerId || order?.influencerId;
+    if (!targetInfluencerId) return null;
 
-    const influencer = await Influencer.findById(dbCustomer.influencerId);
+    const influencer = await Influencer.findById(targetInfluencerId);
     if (!influencer) return null;
 
     const rawSubtotal = Number(order.subtotal) || 0;
