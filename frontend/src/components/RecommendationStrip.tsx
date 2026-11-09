@@ -180,21 +180,8 @@ function RecProductCard({
   toggleWishlist: (item: any) => void;
   contextProduct?: ContextProduct;
 }) {
-  const images =
-    product.images && product.images.length > 0
-      ? product.images.map((i) => i.url)
-      : ['/products/placeholder.svg'];
-  const [currentIdx, setCurrentIdx] = useState(0);
-
-  // Auto-cycle through sub-images every 3 seconds (without dots)
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const timer = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % images.length);
-    }, 3000);
-
-    return () => clearInterval(timer);
-  }, [images.length]);
+  const mainImage = (product.images && product.images[0]?.url) || '/products/placeholder.svg';
+  const secondaryImage = product.images && product.images.length > 1 ? product.images[1]?.url : null;
 
   const productColors = [
     ...(product.colors || []),
@@ -225,7 +212,7 @@ function RecProductCard({
               title: product.name,
               price: product.price,
               originalPrice: product.originalPrice,
-              imageUrl: images[0] || '/products/placeholder.svg',
+              imageUrl: mainImage,
             });
           }}
           className="absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-white backdrop-blur-xs border border-white/80 shadow-xs flex items-center justify-center transition-all duration-200 active:scale-90 cursor-pointer"
@@ -250,25 +237,29 @@ function RecProductCard({
           </span>
         ) : null}
 
-        {/* Sub-images with smooth 3-second transition, NO dots */}
-        {images.map((imgUrl, idx) => (
-          <div
-            key={`${imgUrl}-${idx}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              idx === currentIdx
-                ? 'opacity-100 z-10 pointer-events-auto'
-                : 'opacity-0 z-0 pointer-events-none'
-            }`}
-          >
+        {/* Primary Image */}
+        <div className={`absolute inset-0 transition-opacity duration-300 ${secondaryImage ? 'group-hover:opacity-0' : ''}`}>
+          <ProductImage
+            src={mainImage}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+
+        {/* Secondary Image on Desktop Hover */}
+        {secondaryImage && (
+          <div className="hidden sm:block absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <ProductImage
-              src={imgUrl}
-              alt={`${product.name} - photo ${idx + 1}`}
+              src={secondaryImage}
+              alt={`${product.name} alternate view`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
               className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
             />
           </div>
-        ))}
+        )}
       </div>
 
       {/* Card Meta (Title, Rating, Price) */}

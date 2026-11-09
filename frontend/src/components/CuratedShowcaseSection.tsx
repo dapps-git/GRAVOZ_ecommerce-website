@@ -146,18 +146,8 @@ function CuratedCardItem({
   isInWishlist: (id: string) => boolean;
   toggleWishlist: (item: any) => void;
 }) {
-  const images = (item.images && item.images.length > 0)
-    ? item.images
-    : ([item.imageUrl, item.insetImageUrl].filter(Boolean) as string[]);
-  const [currentIdx, setCurrentIdx] = useState(0);
-
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const timer = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [images.length]);
+  const mainImage = item.imageUrl || (item.images && item.images[0]) || '/products/placeholder.svg';
+  const secondaryImage = item.insetImageUrl || (item.images && item.images.length > 1 ? item.images[1] : null);
 
   const href = item.linkUrl || (item.productId ? `/products/${item.productId}` : '/products');
   const discount = item.originalPrice && item.originalPrice > item.price
@@ -212,25 +202,29 @@ function CuratedCardItem({
           />
         </button>
 
-        {/* Sub-images layer with 3-second animated transition (no dots) */}
-        {images.map((imgUrl, idx) => (
-          <div
-            key={`${imgUrl}-${idx}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              idx === currentIdx
-                ? 'opacity-100 z-10 pointer-events-auto'
-                : 'opacity-0 z-0 pointer-events-none'
-            }`}
-          >
+        {/* Primary Image */}
+        <div className={`absolute inset-0 transition-opacity duration-300 ${secondaryImage ? 'group-hover:opacity-0' : ''}`}>
+          <ProductImage
+            src={mainImage}
+            alt={item.title}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+
+        {/* Secondary Image on Desktop Hover */}
+        {secondaryImage && (
+          <div className="hidden sm:block absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <ProductImage
-              src={imgUrl}
-              alt={`${item.title} - photo ${idx + 1}`}
+              src={secondaryImage}
+              alt={`${item.title} alternate view`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
               className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
             />
           </div>
-        ))}
+        )}
       </div>
 
       {/* Card Meta (Title, Rating, Discount Price) */}

@@ -49,11 +49,28 @@ export default function ProductImage({
   const normalized = normalizeImageUrl(src);
   const isInvalid = hasError || !normalized || normalized === '/products/placeholder.svg';
   const cleanSrc = isInvalid ? '/products/placeholder.svg' : normalized;
-  const isUnoptimized =
-    cleanSrc.startsWith('data:') ||
-    cleanSrc.endsWith('.svg') ||
-    cleanSrc.startsWith('http://') ||
-    cleanSrc.startsWith('https://');
+  const isSvgOrData = cleanSrc.startsWith('data:') || cleanSrc.endsWith('.svg');
+  
+  const isAllowedOptimizedHost = (() => {
+    if (cleanSrc.startsWith('/')) return true;
+    try {
+      const url = new URL(cleanSrc);
+      const host = url.hostname;
+      return (
+        host === 'res.cloudinary.com' ||
+        host.endsWith('.googleusercontent.com') ||
+        host === 'images.unsplash.com' ||
+        host === 'plus.unsplash.com' ||
+        host === 'images.pexels.com' ||
+        host === 'i.imgur.com' ||
+        host === 'localhost'
+      );
+    } catch {
+      return false;
+    }
+  })();
+
+  const isUnoptimized = isSvgOrData || !isAllowedOptimizedHost;
 
   return (
     <Image

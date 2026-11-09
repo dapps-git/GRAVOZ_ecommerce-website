@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER', 'sercher shoes'],
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
       { url: '/icon.png', type: 'image/png', sizes: '512x512' },
     ],
     apple: [
