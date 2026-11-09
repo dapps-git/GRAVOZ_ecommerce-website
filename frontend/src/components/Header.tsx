@@ -70,12 +70,12 @@ function LoaferShoeIcon({ className = 'w-4 h-4' }: { className?: string }) {
 }
 
 const ANNOUNCEMENT_TRAIN_ITEMS = [
-  { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
-  { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer', logo: { name: 'Gravoz', src: '/gravoz-logo.png' } },
+  { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford', logo: { name: 'Sercher', src: '/icons/sercher-white.png' } },
+  { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer', logo: { name: 'Gravoz', src: '/icons/gravoz-white.png' } },
   { text: 'PREMIUM HANDCRAFTED LEATHER FOOTWEAR', type: 'oxford', logo: { name: 'Jackrob', src: '/icons/logo2.webp' } },
   { text: '6-MONTH HASSLE-FREE WARRANTY INCLUDED', type: 'loafer', logo: { name: 'Ellora', src: '/icons/logo1.webp' } },
-  { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford', logo: { name: 'Gravoz', src: '/gravoz-logo.png' } },
-  { text: 'STEP INTO LUXURY • STEP INTO SERCHER', type: 'loafer', logo: { name: 'Sercher', src: '/sercher-logo.png' } },
+  { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford', logo: { name: 'Gravoz', src: '/icons/gravoz-white.png' } },
+  { text: 'STEP INTO LUXURY • STEP INTO SERCHER', type: 'loafer', logo: { name: 'Sercher', src: '/icons/sercher-white.png' } },
 ];
 
 export default function Header() {
@@ -92,7 +92,7 @@ export default function Header() {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className="w-full bg-white font-sans text-[#030303] border-b border-[#e8e2d8] sticky top-0 z-40">
+    <header className="w-full bg-white font-sans text-[#030303] border-b border-[#e8e2d8] relative z-40">
       {/* 1. Top Announcement Bar (#89591C Brown Background with White Font & White Logos) — Train Animation */}
       <div className="bg-[#89591C] text-white text-[11px] sm:text-[12px] font-medium py-2.5 sm:py-3 overflow-hidden tracking-[0.05em] uppercase border-b border-black/10 select-none shadow-2xs">
         <div className="animate-train items-center whitespace-nowrap">
@@ -118,7 +118,7 @@ export default function Header() {
                   src={item.logo.src}
                   alt={item.logo.name}
                   fill
-                  className="object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity"
+                  className="object-contain opacity-95 group-hover:opacity-100 transition-opacity"
                   sizes="64px"
                 />
               </div>

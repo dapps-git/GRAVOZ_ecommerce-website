@@ -45,6 +45,7 @@ import {
   parseAddressFromString,
   SavedAddress,
 } from '@/lib/addresses';
+import { getStoredAttribution } from '@/lib/affiliateAttribution';
 
 type CheckoutStep = 'cart' | 'address' | 'payment' | 'success';
 type PaymentMethodType = 'UPI' | 'Card' | 'NetBanking' | 'Wallet' | 'COD';
@@ -635,11 +636,16 @@ export default function CheckoutPage() {
       return;
     }
 
+    const attr = getStoredAttribution();
+
     const orderPayload = {
       customerId: (user as any)?._id || user?.id || '',
       customerEmail: effectiveEmail,
       customerName: activeAddress.name || user?.name || 'Customer',
       customerPhone: activeAddress.phone || user?.phone || '',
+      influencerId: attr?.influencerId || undefined,
+      influencerName: attr?.influencerName || undefined,
+      affiliateCode: attr?.affiliateCode || undefined,
       shippingAddress: {
         name: activeAddress.name || user?.name || 'Customer',
         phone: activeAddress.phone || user?.phone || '',
