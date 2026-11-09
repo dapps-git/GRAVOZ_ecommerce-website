@@ -8,27 +8,22 @@ export default function ScrollToTop() {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
 
-  // 1. Force instant scroll to top on every route / page change
+  // 1. Force instant scroll to top on every route / page change safely across Safari and all browsers
   useEffect(() => {
-    // Immediate scroll reset
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'instant' as ScrollBehavior,
-    });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
+    const resetScroll = () => {
+      try {
+        window.scrollTo(0, 0);
+      } catch {
+        // fallback
+      }
+      try {
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+      } catch {}
+    };
 
-    // Small delay fallback for dynamic content rendering
-    const timer = setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'instant' as ScrollBehavior,
-      });
-      if (document.documentElement) document.documentElement.scrollTop = 0;
-      if (document.body) document.body.scrollTop = 0;
-    }, 50);
+    resetScroll();
+    const timer = setTimeout(resetScroll, 50);
 
     return () => clearTimeout(timer);
   }, [pathname]);

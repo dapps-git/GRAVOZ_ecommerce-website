@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: 'SERCHER | Premium Handcrafted Footwear for Men, Women & Unisex',
   description: 'Discover SERCHER handcrafted luxury shoes. Ergonomic arch support, breathable leather, and timeless elegance.',
   keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER', 'sercher shoes'],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SERCHER',
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
@@ -24,8 +29,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  themeColor: '#89591C',
 };
 
 export default function RootLayout({

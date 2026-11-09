@@ -40,7 +40,10 @@ export default function BottomNav() {
   const isAccount = pathname.startsWith('/profile') || pathname.startsWith('/account');
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#e8e2d8] py-2 px-3 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.05)] lg:hidden">
+    <nav
+      style={{ WebkitBackdropFilter: 'blur(12px)' }}
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#e8e2d8] pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-3 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.05)] lg:hidden"
+    >
       {/* Home */}
       <Link
         href="/"

@@ -41,6 +41,8 @@ html {
   padding: 0;
   box-sizing: border-box;
   font-family: var(--font-poppins);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -59,6 +61,7 @@ body {
 *::after {
   box-sizing: inherit;
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 input,
@@ -233,5 +236,15 @@ svg {
 }
 
 /* ── Prevent iOS Safari auto-zoom when tapping inputs ── */
-/* Handled by viewport meta: maximum-scale=1, user-scalable=no in layout.tsx */
-/* No CSS override needed — font sizes are preserved as designed */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
