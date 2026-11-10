@@ -88,6 +88,18 @@ export default function Footer() {
         {/* Copyright & Payment Badges */}
         <div className="mt-8 pt-6 border-t border-[#f0ece5] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-sansation">
           <p>© {new Date().getFullYear()} SERCHER. All Rights Reserved.</p>
+
+        <p className="mt-2 text-xs opacity-75 text-center">
+          Powered by{" "}
+          <a
+            href="https://www.crevionads.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium underline hover:opacity-100 transition-opacity"
+          >
+            Crevion Ads
+          </a>
+        </p>
           <div className="flex items-center gap-3">
             <span className="font-semibold text-slate-700">PayPal</span>
             <span className="font-semibold text-blue-700">AMEX</span>
