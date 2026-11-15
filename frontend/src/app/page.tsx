@@ -441,35 +441,45 @@ export default function StorefrontHomePage() {
         {/* C. "Suggested for You" Products Section (Only displays when products exist in DB) */}
         {(productsLoading || products.length > 0) && (
           <section className="space-y-4 pt-2">
-            {/* Header Row: Centered title, arrows pinned right on desktop only */}
-            <div className="relative flex items-center justify-center">
-              <h2 className="font-poppins font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#111111] uppercase text-center px-4">
+            {/* Header Row: Centered title, View All & arrows pinned right */}
+            <div className="relative flex items-center justify-between sm:justify-center">
+              <h2 className="font-poppins font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#111111] uppercase text-center sm:px-4">
                 Suggested for You
               </h2>
-              {/* Circular Carousel Controls (< >) — pinned right (Desktop only to prevent mobile overlap) */}
-              <div className="hidden sm:flex absolute right-0 items-center gap-2">
-                <button
-                  type="button"
-                  aria-label="Previous Product"
-                  onClick={() => {
-                    const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
-                    setCarouselPage((p) => (p > 0 ? p - 1 : maxP));
-                  }}
-                  className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
+              {/* Controls + View All */}
+              <div className="flex sm:absolute sm:right-0 items-center gap-2 sm:gap-3">
+                <Link
+                  href="/products"
+                  className="group inline-flex items-center gap-1 font-sansation text-xs sm:text-[13px] font-medium text-[#030303] hover:text-[#89591C] transition-colors"
                 >
-                  <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Next Product"
-                  onClick={() => {
-                    const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
-                    setCarouselPage((p) => (p < maxP ? p + 1 : 0));
-                  }}
-                  className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
-                >
-                  <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
-                </button>
+                  <span className="underline underline-offset-4 decoration-[#e8e2d8] group-hover:decoration-[#89591C]">View All</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#89591C] group-hover:translate-x-1 transition-transform" />
+                </Link>
+                {/* Circular Carousel Controls (< >) — pinned right (Desktop only to prevent mobile overlap) */}
+                <div className="hidden sm:flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Previous Product"
+                    onClick={() => {
+                      const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
+                      setCarouselPage((p) => (p > 0 ? p - 1 : maxP));
+                    }}
+                    className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
+                  >
+                    <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next Product"
+                    onClick={() => {
+                      const maxP = Math.max(0, Math.ceil(products.length / 4) - 1);
+                      setCarouselPage((p) => (p < maxP ? p + 1 : 0));
+                    }}
+                    className="w-9 h-9 rounded-full border border-[#E5E1DC] flex items-center justify-center text-[#555555] hover:bg-[#FAF7F3] hover:border-[#8A5B2A] hover:text-[#8A5B2A] transition-all cursor-pointer bg-white shadow-2xs active:scale-95"
+                  >
+                    <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -488,6 +498,17 @@ export default function StorefrontHomePage() {
                     toggleWishlist={toggleWishlist}
                   />
                 ))}
+            </div>
+
+            {/* Mobile View All Button */}
+            <div className="flex justify-center pt-1 sm:hidden">
+              <Link
+                href="/products"
+                className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#e8e2d8] bg-white text-xs font-semibold text-slate-800 hover:text-[#89591C] hover:border-[#89591C] transition-all shadow-2xs"
+              >
+                <span>View All Products</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#89591C] group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
           </section>
         )}
