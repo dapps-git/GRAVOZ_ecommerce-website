@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ProductImage from '@/components/ProductImage';
-import { Star, Heart, Sparkles } from 'lucide-react';
+import { Star, Heart, Sparkles, ArrowRight } from 'lucide-react';
 import { extractSignals } from '@/lib/userBehavior';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
@@ -136,8 +136,8 @@ export default function RecommendationStrip({
 
   return (
     <section className="space-y-4 font-sansation pt-2">
-      {/* Centered Section Header */}
-      <div className="flex flex-col items-center justify-center text-center px-4 space-y-1">
+      {/* Centered Section Header with View All */}
+      <div className="relative flex flex-col items-center justify-center text-center px-4 space-y-1">
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-[#89591C]" />
           <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase">
@@ -151,6 +151,14 @@ export default function RecommendationStrip({
             Curated in <span className="font-semibold text-[#89591C]">{contextProduct.selectedColor}</span> & matching styles for your taste
           </p>
         ) : null}
+
+        <Link
+          href="/products"
+          className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 group inline-flex items-center gap-1 font-sansation text-xs sm:text-[13px] font-medium text-[#030303] hover:text-[#89591C] transition-colors mt-1 sm:mt-0"
+        >
+          <span className="underline underline-offset-4 decoration-[#e8e2d8] group-hover:decoration-[#89591C]">View All</span>
+          <ArrowRight className="w-3.5 h-3.5 text-[#89591C] group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
 
       {/* Product Cards Grid (4 in one row on desktop, rounded-none, bigger size) */}
@@ -164,6 +172,17 @@ export default function RecommendationStrip({
             contextProduct={contextProduct}
           />
         ))}
+      </div>
+
+      {/* Mobile View All Button */}
+      <div className="flex justify-center pt-1 sm:hidden">
+        <Link
+          href="/products"
+          className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#e8e2d8] bg-white text-xs font-semibold text-slate-800 hover:text-[#89591C] hover:border-[#89591C] transition-all shadow-2xs"
+        >
+          <span>View All Products</span>
+          <ArrowRight className="w-3.5 h-3.5 text-[#89591C] group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
     </section>
   );
