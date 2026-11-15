@@ -14,7 +14,7 @@ if (!envUri) {
     const envContent = fs.readFileSync(path.join(__dirname, '.env.local'), 'utf8');
     const match = envContent.match(/MONGODB_URI=(.*)/);
     if (match) envUri = match[1].trim();
-  } catch (e) {}
+  } catch (e) { }
 }
 
 const MONGODB_URI = envUri;
@@ -44,8 +44,8 @@ async function main() {
     (rawAdminPass?.startsWith('$2')
       ? rawAdminPass
       : rawAdminPass
-      ? await bcrypt.hash(rawAdminPass, 10)
-      : null);
+        ? await bcrypt.hash(rawAdminPass, 10)
+        : null);
 
   if (!passwordHash) {
     console.error('ADMIN_PASSWORD_HASH or ADMIN_PASSWORD required.');
@@ -66,7 +66,7 @@ async function main() {
       passwordHash,
       role: 'superadmin',
     });
-    console.log('✅ Admin created:', admin.email);
+    console.log(' Admin created:', admin.email);
   }
 
   await mongoose.disconnect();

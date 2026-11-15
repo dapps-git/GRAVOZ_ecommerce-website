@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
 
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '10', 10), 100);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 100);
     const targetAudience = searchParams.get('targetAudience'); // 'Men' | 'Women' | 'Babies'
     const categoryId = searchParams.get('categoryId');
     const brandId = searchParams.get('brandId');

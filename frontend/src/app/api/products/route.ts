@@ -28,7 +28,7 @@ async function getCategoryMap(): Promise<Map<string, string>> {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 100);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 500);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const targetAudience = searchParams.get('targetAudience') || searchParams.get('audience');
     const isBestSeller = searchParams.get('isBestSeller');
@@ -82,6 +82,7 @@ export async function GET(req: NextRequest) {
     try {
       [dbProducts, total] = await Promise.all([
         Product.find(query)
+          .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured rating reviewsCount createdAt')
           .populate({ path: 'category', select: 'name slug targetAudience', model: Category, strictPopulate: false })
           .populate({ path: 'brand', select: 'name slug logoUrl', model: Brand, strictPopulate: false })
           .sort({ createdAt: -1 })
@@ -94,6 +95,7 @@ export async function GET(req: NextRequest) {
       console.warn('Populate failed, retrying without populate:', popErr);
       [dbProducts, total] = await Promise.all([
         Product.find(query)
+          .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured rating reviewsCount createdAt')
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)

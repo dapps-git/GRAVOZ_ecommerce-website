@@ -79,9 +79,14 @@ export default function ProductsPage() {
 
   // Pagination & Filtering
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -759,12 +764,12 @@ export default function ProductsPage() {
               value={limit}
               onChange={(e) => {
                 setLimit(Number(e.target.value));
-                setCurrentPage(1);
+                handlePageChange(1);
               }}
               className="px-2.5 py-1.5 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-700 font-medium focus:outline-none cursor-pointer"
             >
-              <option value="10">10 per page</option>
               <option value="20">20 per page</option>
+              <option value="10">10 per page</option>
               <option value="50">50 per page</option>
             </select>
 
@@ -773,7 +778,7 @@ export default function ProductsPage() {
               <button
                 type="button"
                 disabled={currentPage <= 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
@@ -786,7 +791,7 @@ export default function ProductsPage() {
                   <button
                     key={pageNum}
                     type="button"
-                    onClick={() => setCurrentPage(pageNum)}
+                    onClick={() => handlePageChange(pageNum)}
                     className={`w-7 h-7 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
                       isCurrent
                         ? 'bg-[#89591C] text-white'
@@ -803,7 +808,7 @@ export default function ProductsPage() {
                   <span className="text-slate-400 px-1">...</span>
                   <button
                     type="button"
-                    onClick={() => setCurrentPage(totalPages)}
+                    onClick={() => handlePageChange(totalPages)}
                     className={`w-7 h-7 rounded-lg text-xs font-semibold flex items-center justify-center border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer`}
                   >
                     {totalPages}
@@ -814,7 +819,7 @@ export default function ProductsPage() {
               <button
                 type="button"
                 disabled={currentPage >= totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
