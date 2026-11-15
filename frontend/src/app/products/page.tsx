@@ -13,6 +13,7 @@ import {
   ChevronUp,
   Check,
   SlidersHorizontal,
+  ChevronLeft,
   ChevronRight,
   RotateCcw,
   X,
@@ -197,6 +198,30 @@ function ProductsContent() {
   const [priceRange, setPriceRange] = useState<number>(4000);
   const [sortBy, setSortBy] = useState<string>('popularity');
 
+  // Pagination State (20 items per page)
+  const ITEMS_PER_PAGE = 20;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Smooth scroll page change handler
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Reset pagination to page 1 whenever any filter or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    selectedCategory,
+    selectedAudience,
+    selectedBrands,
+    selectedSizes,
+    selectedColors,
+    priceRange,
+    sortBy,
+    qParam,
+  ]);
+
   // Accordion toggles
   const [categoriesOpen, setCategoriesOpen] = useState(true);
   const [brandOpen, setBrandOpen] = useState(true);
@@ -293,6 +318,7 @@ function ProductsContent() {
     setSelectedSizes([]);
     setSelectedColors([]);
     setPriceRange(4000);
+    setCurrentPage(1);
     router.push('/products');
   };
 
@@ -548,6 +574,12 @@ function ProductsContent() {
     sortBy,
   ]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
   const activeFiltersCount =
     (selectedCategory ? 1 : 0) +
     (selectedAudience ? 1 : 0) +
@@ -731,16 +763,80 @@ function ProductsContent() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 pb-20 lg:pb-8">
-              {filteredProducts.map((product) => (
-                <ListingProductCard
-                  key={product._id}
-                  product={product}
-                  isWishlisted={Boolean(wishlist[product._id])}
-                  onToggleWishlist={(e) => toggleWishlist(product._id, e)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 pb-8">
+                {paginatedProducts.map((product) => (
+                  <ListingProductCard
+                    key={product._id}
+                    product={product}
+                    isWishlisted={Boolean(wishlist[product._id])}
+                    onToggleWishlist={(e) => toggleWishlist(product._id, e)}
+                  />
+                ))}
+              </div>
+
+              {/* ── Modern Pagination (20 per page) ── */}
+              {totalPages > 1 && (
+                <div className="pt-6 pb-16 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#ece7de] mt-2">
+                  <div className="text-xs text-slate-600 font-medium">
+                    Showing <span className="font-semibold text-slate-900">{filteredProducts.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}</span> to{' '}
+                    <span className="font-semibold text-slate-900">{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</span> of{' '}
+                    <span className="font-semibold text-[#89591C]">{filteredProducts.length}</span> products
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {/* Previous Button */}
+                    <button
+                      type="button"
+                      disabled={currentPage <= 1}
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e8e2d8] bg-white text-xs font-semibold text-slate-700 hover:border-[#89591C] hover:text-[#89591C] disabled:opacity-40 disabled:hover:border-[#e8e2d8] disabled:hover:text-slate-700 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Prev</span>
+                    </button>
+
+                    {/* Page Numbers */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
+                      .map((pageNum, idx, visiblePages) => {
+                        const prevPage = visiblePages[idx - 1];
+                        const showEllipsis = prevPage && pageNum - prevPage > 1;
+
+                        return (
+                          <React.Fragment key={pageNum}>
+                            {showEllipsis && (
+                              <span className="px-1 text-xs text-slate-400 select-none">...</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handlePageChange(pageNum)}
+                              className={`min-w-[32px] h-8 px-2 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
+                                currentPage === pageNum
+                                  ? 'bg-[#89591C] text-white shadow-xs'
+                                  : 'border border-[#e8e2d8] bg-white text-slate-700 hover:border-[#89591C] hover:text-[#89591C]'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          </React.Fragment>
+                        );
+                      })}
+
+                    {/* Next Button */}
+                    <button
+                      type="button"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e8e2d8] bg-white text-xs font-semibold text-slate-700 hover:border-[#89591C] hover:text-[#89591C] disabled:opacity-40 disabled:hover:border-[#e8e2d8] disabled:hover:text-slate-700 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </section>
 
