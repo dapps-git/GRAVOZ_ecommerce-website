@@ -14,12 +14,12 @@ function getBaseWebsiteUrl(req?: NextRequest): string {
     process.env.NEXT_PUBLIC_STORE_URL ||
     process.env.CLIENT_URL ||
     process.env.STORE_URL ||
-    'https://www.searcherstore.com';
+    'https://www.sercherstore.com';
 
   const clean = storeUrl.replace(/\/+$/, '');
-  // Automatically replace legacy gravoz.com domain with searcherstore.com
-  if (clean.includes('gravoz.com')) {
-    return clean.replace(/gravoz\.com/g, 'searcherstore.com');
+  // Automatically replace legacy gravoz.com or searcherstore.com with sercherstore.com
+  if (clean.includes('gravoz.com') || clean.includes('searcherstore.com')) {
+    return clean.replace(/gravoz\.com|searcherstore\.com/g, 'sercherstore.com');
   }
   return clean;
 }

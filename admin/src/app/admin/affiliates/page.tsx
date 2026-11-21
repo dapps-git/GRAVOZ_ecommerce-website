@@ -101,7 +101,7 @@ interface DetailCommission {
 
 function sanitizeLink(url?: string): string {
   if (!url) return '';
-  return url.replace(/https?:\/\/(www\.)?gravoz\.com/gi, 'https://www.searcherstore.com');
+  return url.replace(/https?:\/\/(www\.)?(gravoz\.com|searcherstore\.com)/gi, 'https://www.sercherstore.com');
 }
 
 export default function AdminAffiliatesPage() {

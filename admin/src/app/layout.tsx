@@ -3,6 +3,7 @@ import './globals.css';
 import ScrollToTop from '@/components/admin/ScrollToTop';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://admin.sercherstore.com'),
   title: 'SERCHER Admin | Store Management',
   description: 'SERCHER Handcrafted Footwear Store Management Panel',
   keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER'],

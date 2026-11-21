@@ -6,6 +6,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.sercherstore.com'),
   title: 'SERCHER | Premium Handcrafted Footwear for Men, Women & Unisex',
   description: 'Discover SERCHER handcrafted luxury shoes. Ergonomic arch support, breathable leather, and timeless elegance.',
   keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER', 'sercher shoes'],
