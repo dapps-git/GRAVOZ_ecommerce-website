@@ -1,8 +1,9 @@
+import Header from '@/components/Header';
+
 export default function GlobalRouteLoading() {
   return (
     <div className="min-h-screen bg-[#F7F7F7]">
-      <div className="h-10 bg-[#F37021] w-full" />
-      <div className="h-16 bg-white border-b border-[#E5E5E5] w-full" />
+      <Header />
       <main className="max-w-[1240px] mx-auto px-4 sm:px-6 md:px-10 py-8 space-y-6 animate-pulse">
         <div className="h-7 w-48 rounded bg-slate-200/80" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -28,4 +29,3 @@ export default function GlobalRouteLoading() {
     </div>
   );
 }
-
