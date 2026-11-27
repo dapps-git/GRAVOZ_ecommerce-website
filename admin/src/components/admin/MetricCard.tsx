@@ -8,6 +8,7 @@ interface MetricCardProps {
   trend?: string;
   trendPositive?: boolean;
   color?: 'indigo' | 'emerald' | 'amber' | 'rose' | 'cyan' | 'bronze';
+  loading?: boolean;
 }
 
 export default function MetricCard({
@@ -18,6 +19,7 @@ export default function MetricCard({
   trend,
   trendPositive = true,
   color = 'bronze',
+  loading = false,
 }: MetricCardProps) {
   const colorMap = {
     bronze: 'bg-[#FFF3EB] text-[#F37021] border-[#E5E5E5]',
@@ -38,8 +40,17 @@ export default function MetricCard({
       </div>
 
       <div>
-        <h3 className="text-xl font-bold text-slate-900 tracking-tight">{value}</h3>
-        {subtitle && <p className="text-[11px] text-slate-500 font-normal mt-0.5">{subtitle}</p>}
+        {loading ? (
+          <div className="space-y-1.5 py-0.5 animate-pulse">
+            <div className="h-6 w-20 rounded bg-slate-200/80" />
+            {subtitle && <div className="h-2.5 w-24 rounded bg-slate-100" />}
+          </div>
+        ) : (
+          <>
+            <h3 className="text-xl font-bold text-slate-900 tracking-tight">{value}</h3>
+            {subtitle && <p className="text-[11px] text-slate-500 font-normal mt-0.5">{subtitle}</p>}
+          </>
+        )}
       </div>
 
       {trend && (

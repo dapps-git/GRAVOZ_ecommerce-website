@@ -20,6 +20,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { compressImage } from '@/lib/imageCompression';
+import { TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 interface CategoryItem {
   _id: string;
@@ -348,11 +349,7 @@ export default function CategoriesPage() {
 
             <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
-                    Loading Categories...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={6} cols={6} hasThumb />
               ) : filteredCategories.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">

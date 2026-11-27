@@ -7,6 +7,9 @@ import { Brand } from '@/models/Brand';
 import { Banner } from '@/models/Banner';
 import { Addon } from '@/models/Addon';
 
+const productDetailCache = new Map<string, { product: any; expiry: number }>();
+const DETAIL_CACHE_TTL_MS = 30 * 1000;
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -15,6 +18,15 @@ export async function GET(
     const { id } = await params;
     if (!id) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 });
+    }
+
+    const cacheHeaders = {
+      'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=300',
+    };
+    const now = Date.now();
+    const cachedHit = productDetailCache.get(id);
+    if (cachedHit && now < cachedHit.expiry) {
+      return NextResponse.json({ success: true, product: cachedHit.product }, { headers: cacheHeaders });
     }
 
     await connectDB();
@@ -205,15 +217,19 @@ export async function GET(
       },
     };
 
+    if (productDetailCache.size > 200) {
+      const oldestKey = productDetailCache.keys().next().value;
+      if (oldestKey) productDetailCache.delete(oldestKey);
+    }
+    productDetailCache.set(id, { product: formattedProduct, expiry: now + DETAIL_CACHE_TTL_MS });
+
     return NextResponse.json(
       {
         success: true,
         product: formattedProduct,
       },
       {
-        headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-        },
+        headers: cacheHeaders,
       }
     );
   } catch (error: any) {

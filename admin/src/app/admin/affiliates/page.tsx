@@ -25,6 +25,7 @@ import {
   Calendar,
   DollarSign,
 } from 'lucide-react';
+import { SkeletonBox, TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 interface InfluencerItem {
   _id: string;
@@ -320,7 +321,7 @@ export default function AdminAffiliatesPage() {
             <span className="text-xs font-medium uppercase tracking-wider">Total Influencers</span>
             <Award className="w-4 h-4 text-[#F37021]" />
           </div>
-          <div className="text-2xl font-bold text-slate-800">{stats?.totalInfluencers ?? 0}</div>
+          {loading ? <SkeletonBox className="h-7 w-14 my-1" /> : <div className="text-2xl font-bold text-slate-800">{stats?.totalInfluencers ?? 0}</div>}
           <div className="text-[11px] text-slate-400 mt-1">Active affiliate partners</div>
         </div>
 
@@ -329,7 +330,7 @@ export default function AdminAffiliatesPage() {
             <span className="text-xs font-medium uppercase tracking-wider">Associated Customers</span>
             <Users className="w-4 h-4 text-blue-600" />
           </div>
-          <div className="text-2xl font-bold text-slate-800">{stats?.totalAffiliateCustomers ?? 0}</div>
+          {loading ? <SkeletonBox className="h-7 w-14 my-1" /> : <div className="text-2xl font-bold text-slate-800">{stats?.totalAffiliateCustomers ?? 0}</div>}
           <div className="text-[11px] text-slate-400 mt-1">Customers assigned via links</div>
         </div>
 
@@ -338,7 +339,7 @@ export default function AdminAffiliatesPage() {
             <span className="text-xs font-medium uppercase tracking-wider">Affiliate Orders</span>
             <ShoppingCart className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-bold text-slate-800">{stats?.totalAffiliateOrders ?? 0}</div>
+          {loading ? <SkeletonBox className="h-7 w-14 my-1" /> : <div className="text-2xl font-bold text-slate-800">{stats?.totalAffiliateOrders ?? 0}</div>}
           <div className="text-[11px] text-slate-400 mt-1">Total attributed purchases</div>
         </div>
 
@@ -347,7 +348,7 @@ export default function AdminAffiliatesPage() {
             <span className="text-xs font-medium uppercase tracking-wider">Total Sales</span>
             <IndianRupee className="w-4 h-4 text-violet-600" />
           </div>
-          <div className="text-2xl font-bold text-slate-800">₹{(stats?.totalAffiliateSales ?? 0).toLocaleString('en-IN')}</div>
+          {loading ? <SkeletonBox className="h-7 w-20 my-1" /> : <div className="text-2xl font-bold text-slate-800">₹{(stats?.totalAffiliateSales ?? 0).toLocaleString('en-IN')}</div>}
           <div className="text-[11px] text-slate-400 mt-1">Gross revenue generated</div>
         </div>
       </div>
@@ -359,9 +360,13 @@ export default function AdminAffiliatesPage() {
             <span className="text-xs font-semibold uppercase tracking-wider">Pending Commission</span>
             <Clock className="w-4 h-4" />
           </div>
-          <div className="text-xl font-bold text-amber-900">
-            ₹{(stats?.totalPendingCommission ?? 0).toLocaleString('en-IN')}
-          </div>
+          {loading ? (
+            <SkeletonBox className="h-6 w-20 my-1" />
+          ) : (
+            <div className="text-xl font-bold text-amber-900">
+              ₹{(stats?.totalPendingCommission ?? 0).toLocaleString('en-IN')}
+            </div>
+          )}
           <p className="text-[11px] text-amber-700/80 mt-0.5">Awaiting delivery or return period</p>
         </div>
 
@@ -370,9 +375,13 @@ export default function AdminAffiliatesPage() {
             <span className="text-xs font-semibold uppercase tracking-wider">Approved Commission</span>
             <CheckCircle2 className="w-4 h-4" />
           </div>
-          <div className="text-xl font-bold text-blue-900">
-            ₹{(stats?.totalApprovedCommission ?? 0).toLocaleString('en-IN')}
-          </div>
+          {loading ? (
+            <SkeletonBox className="h-6 w-20 my-1" />
+          ) : (
+            <div className="text-xl font-bold text-blue-900">
+              ₹{(stats?.totalApprovedCommission ?? 0).toLocaleString('en-IN')}
+            </div>
+          )}
           <p className="text-[11px] text-blue-700/80 mt-0.5">Delivered & ready for payment</p>
         </div>
 
@@ -381,9 +390,13 @@ export default function AdminAffiliatesPage() {
             <span className="text-xs font-semibold uppercase tracking-wider">Paid Commission</span>
             <DollarSign className="w-4 h-4" />
           </div>
-          <div className="text-xl font-bold text-emerald-900">
-            ₹{(stats?.totalPaidCommission ?? 0).toLocaleString('en-IN')}
-          </div>
+          {loading ? (
+            <SkeletonBox className="h-6 w-20 my-1" />
+          ) : (
+            <div className="text-xl font-bold text-emerald-900">
+              ₹{(stats?.totalPaidCommission ?? 0).toLocaleString('en-IN')}
+            </div>
+          )}
           <p className="text-[11px] text-emerald-700/80 mt-0.5">Successfully disbursed to partners</p>
         </div>
       </div>
@@ -435,12 +448,7 @@ export default function AdminAffiliatesPage() {
             </thead>
             <tbody className="divide-y divide-[#E5E5E5]">
               {loading ? (
-                <tr>
-                  <td colSpan={10} className="py-12 text-center text-slate-400 text-sm">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#F37021] mb-2" />
-                    Loading affiliate influencers...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={6} cols={10} hasThumb />
               ) : filteredInfluencers.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="py-12 text-center text-slate-400 text-sm">
@@ -869,9 +877,12 @@ export default function AdminAffiliatesPage() {
             {/* Drawer Content Area */}
             <div className="flex-1 overflow-y-auto p-5">
               {detailLoading ? (
-                <div className="py-16 text-center text-slate-400">
-                  <RefreshCw className="w-7 h-7 animate-spin mx-auto text-[#F37021] mb-2" />
-                  Loading influencer customer & order breakdown...
+                <div className="border border-[#E5E5E5] rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-left text-xs">
+                    <tbody className="divide-y divide-[#EEEEEE]">
+                      <TableRowSkeletons rows={5} cols={6} hasThumb />
+                    </tbody>
+                  </table>
                 </div>
               ) : activeTab === 'customers' ? (
                 /* Tab 1: Associated Customers */

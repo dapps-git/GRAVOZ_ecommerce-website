@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Modal from '@/components/admin/Modal';
+import { SkeletonBox, TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 import {
   Users,
   Search,
@@ -123,22 +124,22 @@ export default function CustomersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Customers</span>
-          <span className="text-2xl font-bold text-slate-900 mt-1 block">{totalCustomers}</span>
+          {loading ? <SkeletonBox className="h-7 w-16 mt-1.5" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{totalCustomers}</span>}
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider block">Total Orders Placed</span>
-          <span className="text-2xl font-bold text-emerald-700 mt-1 block">{totalOrdersSum}</span>
+          {loading ? <SkeletonBox className="h-7 w-16 mt-1.5" /> : <span className="text-2xl font-bold text-emerald-700 mt-1 block">{totalOrdersSum}</span>}
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-[#F37021] uppercase tracking-wider block">Lifetime Total Revenue</span>
-          <span className="text-2xl font-bold text-[#F37021] mt-1 block">₹{totalRevenue.toLocaleString()}</span>
+          {loading ? <SkeletonBox className="h-7 w-24 mt-1.5" /> : <span className="text-2xl font-bold text-[#F37021] mt-1 block">₹{totalRevenue.toLocaleString()}</span>}
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-purple-600 uppercase tracking-wider block">Avg Order Value (AOV)</span>
-          <span className="text-2xl font-bold text-purple-700 mt-1 block">₹{avgOrderValue.toLocaleString()}</span>
+          {loading ? <SkeletonBox className="h-7 w-20 mt-1.5" /> : <span className="text-2xl font-bold text-purple-700 mt-1 block">₹{avgOrderValue.toLocaleString()}</span>}
         </div>
       </div>
 
@@ -184,11 +185,7 @@ export default function CustomersPage() {
             </thead>
             <tbody className="divide-y divide-[#EEEEEE] text-xs text-slate-800">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    Loading customers...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={7} cols={7} hasThumb />
               ) : customers.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-400">

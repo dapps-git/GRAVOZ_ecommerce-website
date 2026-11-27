@@ -236,17 +236,18 @@ export default function CartPage() {
                   >
                     {/* Top Row: Thumbnail + Product Info */}
                     <div className="flex items-start gap-3.5 sm:gap-4">
-                      {/* Product Thumbnail (Clickable to Product Details) */}
+                      {/* Product Thumbnail (Clean Image Without Grey Frame, Slightly Larger) */}
                       <Link
                         href={productLink}
-                        className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-md bg-[#F7F7F7] flex items-center justify-center overflow-hidden border border-[#EEEEEE] flex-shrink-0 hover:opacity-85 transition-opacity block cursor-pointer"
+                        className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-md bg-white flex items-center justify-center overflow-hidden flex-shrink-0 hover:opacity-90 transition-opacity block cursor-pointer"
                       >
                         <ProductImage
                           src={item.imageUrl}
                           alt={item.title}
                           fill
-                          sizes="(max-width: 640px) 100px, 120px"
-                          className="object-contain p-2"
+                          sizes="(max-width: 640px) 112px, 128px"
+                          optimizeWidth={400}
+                          className="object-cover object-center"
                         />
                       </Link>
 
@@ -573,6 +574,9 @@ export default function CartPage() {
                         return;
                       }
 
+                      if (typeof window !== 'undefined') {
+                        window.scrollTo(0, 0);
+                      }
                       if (!isLoggedIn) {
                         router.push('/login?redirect=/checkout');
                         return;

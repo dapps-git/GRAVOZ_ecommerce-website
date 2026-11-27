@@ -251,7 +251,7 @@ function DynamicGridCard({
     <Link
       href={product.href}
       onMouseEnter={() => { if (!hovered) setHovered(true); }}
-      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer"
+      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer active:scale-[0.99]"
     >
       {/* Product Image Card - aspect-square gives bigger size, rounded-md */}
       <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#F7F7F7]">
@@ -303,7 +303,7 @@ function DynamicGridCard({
         </button>
 
         {/* Primary Image */}
-        <div className={`absolute inset-0 transition-opacity duration-300 ${hasSecondary && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
+        <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${hasSecondary && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
           <ProductImage
             src={mainImage}
             alt={product.title}
@@ -317,7 +317,7 @@ function DynamicGridCard({
 
         {/* Secondary Image mounted lazily on Desktop Hover */}
         {hasSecondary && hovered && (
-          <div className={`hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
+          <div className={`pointer-events-none hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
             <ProductImage
               src={secondaryImage}
               alt={`${product.title} alternate view`}

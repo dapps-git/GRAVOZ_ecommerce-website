@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Modal from '@/components/admin/Modal';
+import { SkeletonBox, TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 import {
   UserCheck,
   Search,
@@ -174,22 +175,22 @@ export default function UsersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Registered Users</span>
-          <span className="text-2xl font-bold text-slate-900 mt-1 block">{totalUsers}</span>
+          {loading ? <SkeletonBox className="h-7 w-16 mt-1.5" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{totalUsers}</span>}
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider block">Active Accounts</span>
-          <span className="text-2xl font-bold text-emerald-700 mt-1 block">{activeUsers}</span>
+          {loading ? <SkeletonBox className="h-7 w-16 mt-1.5" /> : <span className="text-2xl font-bold text-emerald-700 mt-1 block">{activeUsers}</span>}
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-sky-600 uppercase tracking-wider block">Google OAuth Logins</span>
-          <span className="text-2xl font-bold text-sky-700 mt-1 block">{googleUsers}</span>
+          {loading ? <SkeletonBox className="h-7 w-16 mt-1.5" /> : <span className="text-2xl font-bold text-sky-700 mt-1 block">{googleUsers}</span>}
         </div>
 
         <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Email & Password Users</span>
-          <span className="text-2xl font-bold text-slate-900 mt-1 block">{emailUsers}</span>
+          {loading ? <SkeletonBox className="h-7 w-16 mt-1.5" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{emailUsers}</span>}
         </div>
       </div>
 
@@ -244,11 +245,7 @@ export default function UsersPage() {
             </thead>
             <tbody className="divide-y divide-[#EEEEEE] text-xs text-slate-800">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    Loading registered users...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={7} cols={7} hasThumb />
               ) : users.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-400">

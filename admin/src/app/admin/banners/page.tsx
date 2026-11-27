@@ -278,7 +278,18 @@ export default function AdminBannersPage() {
       {loading ? (
         <div className="grid grid-cols-1 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-lg p-6 animate-pulse h-64 border border-[#E5E5E5]" />
+            <div key={i} className="bg-white rounded-xl p-5 border border-[#E5E5E5] grid grid-cols-1 lg:grid-cols-12 gap-5 animate-pulse">
+              <div className="lg:col-span-5 aspect-[1816/866] rounded-lg bg-slate-200/80" />
+              <div className="lg:col-span-7 space-y-3">
+                <div className="h-4 w-40 rounded bg-slate-200/80" />
+                <div className="h-9 w-full rounded-lg bg-slate-100" />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="h-9 rounded-lg bg-slate-100" />
+                  <div className="h-9 rounded-lg bg-slate-100" />
+                </div>
+                <div className="h-9 w-32 rounded-lg bg-slate-200/80 ml-auto" />
+              </div>
+            </div>
           ))}
         </div>
       ) : (

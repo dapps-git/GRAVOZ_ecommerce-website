@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import MetricCard from '@/components/admin/MetricCard';
 import StatusBadge from '@/components/admin/StatusBadge';
+import { DashboardSkeleton } from '@/components/admin/AdminSkeletons';
 import Link from 'next/link';
 import {
   IndianRupee,
@@ -144,6 +145,25 @@ export default function DashboardPage() {
     ? Math.max(...stats.chartData.map((d) => d.revenue), 1000)
     : 1000;
 
+  if (loading && !stats) {
+    return (
+      <div className="space-y-5 font-sansation">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#E5E5E5] shadow-2xs">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-[#F37021]" /> Real-Time Analytics & Revenue
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Store performance, revenue insights in INR (₹), and fulfillment metrics
+            </p>
+          </div>
+          <div className="h-9 w-64 rounded-xl bg-slate-200/80 animate-pulse" />
+        </div>
+        <DashboardSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5 font-sansation">
       {/* Header & Date Range Filters */}
@@ -238,6 +258,7 @@ export default function DashboardPage() {
           icon={IndianRupee}
           color="bronze"
           trend="+18.4%"
+          loading={loading}
         />
         <MetricCard
           title="Orders Placed"
@@ -246,6 +267,7 @@ export default function DashboardPage() {
           icon={ShoppingCart}
           color="indigo"
           trend="+12%"
+          loading={loading}
         />
         <MetricCard
           title="Shoe Products"
@@ -253,6 +275,7 @@ export default function DashboardPage() {
           subtitle="Active catalog items"
           icon={ShoppingBag}
           color="cyan"
+          loading={loading}
         />
         <MetricCard
           title="Low Stock Warning"
@@ -260,6 +283,7 @@ export default function DashboardPage() {
           subtitle="Stock ≤ 5 pairs"
           icon={AlertTriangle}
           color={stats?.lowStockCount && stats.lowStockCount > 0 ? 'rose' : 'emerald'}
+          loading={loading}
         />
         <MetricCard
           title="Categories"
@@ -267,6 +291,7 @@ export default function DashboardPage() {
           subtitle="Men, Women, Babies"
           icon={FolderTree}
           color="amber"
+          loading={loading}
         />
         <MetricCard
           title="Pending Returns"
@@ -274,6 +299,7 @@ export default function DashboardPage() {
           subtitle="Refund requests"
           icon={RotateCcw}
           color="rose"
+          loading={loading}
         />
       </div>
 

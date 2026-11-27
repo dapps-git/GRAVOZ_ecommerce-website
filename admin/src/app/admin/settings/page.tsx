@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Save, Store, Gift, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { FormEditorSkeleton } from '@/components/admin/AdminSkeletons';
 
 export default function SettingsPage() {
   const [storeName, setStoreName] = useState('SERCHER Footwear');
@@ -102,6 +103,9 @@ export default function SettingsPage() {
         </div>
       )}
 
+      {loading ? (
+        <FormEditorSkeleton />
+      ) : (
       <form onSubmit={handleSave} className="space-y-6">
         {/* Card 1: General Store Information */}
         <div className="bg-white rounded-xl p-5 sm:p-7 border border-slate-200/80 shadow-xs space-y-5">
@@ -261,6 +265,7 @@ export default function SettingsPage() {
           </button>
         </div>
       </form>
+      )}
     </div>
   );
 }

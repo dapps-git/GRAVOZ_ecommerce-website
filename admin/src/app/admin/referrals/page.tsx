@@ -10,6 +10,7 @@ import {
   Clock,
   RefreshCw,
 } from 'lucide-react';
+import { SkeletonBox, TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 interface ReferralItem {
   _id: string;
@@ -142,9 +143,13 @@ export default function AdminReferralsPage() {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 LINKS GENERATED
               </span>
-              <span className="text-base font-bold text-slate-900 leading-tight block">
-                {stats?.totalReferralLinksGenerated ?? 0}
-              </span>
+              {loading ? (
+                <SkeletonBox className="h-5 w-12 mt-1" />
+              ) : (
+                <span className="text-base font-bold text-slate-900 leading-tight block">
+                  {stats?.totalReferralLinksGenerated ?? 0}
+                </span>
+              )}
             </div>
           </div>
 
@@ -157,9 +162,13 @@ export default function AdminReferralsPage() {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 FRIENDS REFERRED
               </span>
-              <span className="text-base font-bold text-slate-900 leading-tight block">
-                {stats?.totalReferredUsers ?? referrals.length ?? 0}
-              </span>
+              {loading ? (
+                <SkeletonBox className="h-5 w-12 mt-1" />
+              ) : (
+                <span className="text-base font-bold text-slate-900 leading-tight block">
+                  {stats?.totalReferredUsers ?? referrals.length ?? 0}
+                </span>
+              )}
             </div>
           </div>
 
@@ -172,9 +181,13 @@ export default function AdminReferralsPage() {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 COMPLETED ORDERS
               </span>
-              <span className="text-base font-bold text-emerald-700 leading-tight block">
-                {stats?.completedReferrals ?? 0}
-              </span>
+              {loading ? (
+                <SkeletonBox className="h-5 w-12 mt-1" />
+              ) : (
+                <span className="text-base font-bold text-emerald-700 leading-tight block">
+                  {stats?.completedReferrals ?? 0}
+                </span>
+              )}
             </div>
           </div>
 
@@ -187,9 +200,13 @@ export default function AdminReferralsPage() {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 ₹100 REWARDS ISSUED
               </span>
-              <span className="text-base font-bold text-emerald-700 leading-tight block">
-                ₹{(stats?.totalRewardsCredited ?? 0).toLocaleString()}
-              </span>
+              {loading ? (
+                <SkeletonBox className="h-5 w-16 mt-1" />
+              ) : (
+                <span className="text-base font-bold text-emerald-700 leading-tight block">
+                  ₹{(stats?.totalRewardsCredited ?? 0).toLocaleString()}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -211,12 +228,7 @@ export default function AdminReferralsPage() {
             </thead>
             <tbody className="divide-y divide-[#EEEEEE] text-xs text-slate-800">
               {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-16 text-center text-slate-400">
-                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#F37021]" />
-                    Loading referral activity...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={6} cols={6} hasThumb />
               ) : referrals.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-16 text-center text-slate-400">

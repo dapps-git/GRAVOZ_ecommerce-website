@@ -19,6 +19,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import Link from 'next/link';
+import { DetailPageSkeleton } from '@/components/admin/AdminSkeletons';
 
 export interface StatusHistoryItem {
   status: string;
@@ -203,7 +204,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-500 animate-pulse font-light">Loading Order Details...</div>;
+    return <DetailPageSkeleton showCards={2} />;
   }
 
   if (!order) {

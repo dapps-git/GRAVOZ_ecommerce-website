@@ -10,6 +10,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { compressImage } from '@/lib/imageCompression';
+import { CardGridSkeleton } from '@/components/admin/AdminSkeletons';
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -1055,6 +1056,11 @@ export default function AdminHomeContentPage() {
             </button>
           )}
         </div>
+
+        {/* Loading skeleton */}
+        {loading && (
+          <CardGridSkeleton count={4} gridClass="grid-cols-1 md:grid-cols-2" imageHeight="h-36" />
+        )}
 
         {/* Empty state */}
         {currentSection.items.length === 0 && !loading && (
