@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -9,6 +9,7 @@ import RecentlyViewedStrip from '@/components/RecentlyViewedStrip';
 import DynamicProductSection from '@/components/DynamicProductSection';
 import CuratedShowcaseSection from '@/components/CuratedShowcaseSection';
 import DuoSpotlightSection from '@/components/DuoSpotlightSection';
+import PaginationBar from '@/components/PaginationBar';
 import { ArrowRight, ChevronLeft, ChevronRight, Star, Truck, ShieldCheck, Leaf, Globe, Heart } from 'lucide-react';
 import { getProductRating } from '@/lib/ratingUtils';
 import { useWishlist } from '@/context/WishlistContext';
@@ -324,6 +325,23 @@ export default function HomeClient({ initialData }: { initialData: HomeInitialDa
   const [products, setProducts] = useState<ProductItem[]>(initialMappedProducts);
   const [productsLoading, setProductsLoading] = useState<boolean>(!initialData.hasServerData);
   const [carouselPage, setCarouselPage] = useState<number>(0);
+  const HOME_CATALOG_PER_PAGE = 20;
+  const [catalogPage, setCatalogPage] = useState<number>(1);
+  const catalogSectionRef = useRef<HTMLElement>(null);
+
+  const catalogTotalPages = Math.max(1, Math.ceil(products.length / HOME_CATALOG_PER_PAGE));
+  const safeCatalogPage = Math.min(Math.max(1, catalogPage), catalogTotalPages);
+  const paginatedCatalogProducts = useMemo(() => {
+    const startIdx = (safeCatalogPage - 1) * HOME_CATALOG_PER_PAGE;
+    return products.slice(startIdx, startIdx + HOME_CATALOG_PER_PAGE);
+  }, [products, safeCatalogPage]);
+
+  const handleCatalogPageChange = (newPage: number) => {
+    setCatalogPage(newPage);
+    if (catalogSectionRef.current) {
+      catalogSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const [shoeCategories, setShoeCategories] = useState<any[]>(
     initialData.shoeCategories && initialData.shoeCategories.length > 0
@@ -741,9 +759,9 @@ export default function HomeClient({ initialData }: { initialData: HomeInitialDa
           initialProducts={initialFeaturedProducts}
         />
 
-        {/* N. Complete Catalog Grid — Ensures all 27+ active products are visible on the storefront */}
+        {/* N. Complete Catalog Grid — 20 products per page with numbered pagination */}
         {products.length > 0 && (
-          <section className="space-y-4 pt-2">
+          <section ref={catalogSectionRef} className="space-y-4 pt-2 scroll-mt-20">
             <div className="relative flex items-center justify-between sm:justify-center">
               <h2 className="font-poppins font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#111111] uppercase text-center sm:px-4">
                 All Footwear Collection
@@ -762,7 +780,7 @@ export default function HomeClient({ initialData }: { initialData: HomeInitialDa
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-              {products.map((product, idx) => (
+              {paginatedCatalogProducts.map((product, idx) => (
                 <AnimatedProductCard
                   key={`catalog-${product.id}`}
                   product={product}
@@ -772,6 +790,15 @@ export default function HomeClient({ initialData }: { initialData: HomeInitialDa
                 />
               ))}
             </div>
+
+            <PaginationBar
+              currentPage={safeCatalogPage}
+              totalPages={catalogTotalPages}
+              totalCount={products.length}
+              itemsPerPage={HOME_CATALOG_PER_PAGE}
+              itemLabel="products"
+              onPageChange={handleCatalogPageChange}
+            />
           </section>
         )}
 

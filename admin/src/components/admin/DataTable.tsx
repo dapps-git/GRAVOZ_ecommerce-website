@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search } from 'lucide-react';
 import { TableRowSkeletons } from '@/components/admin/AdminSkeletons';
+import PaginationFooter from '@/components/admin/PaginationFooter';
 
 export interface Column<T> {
   header: string;
@@ -16,7 +17,10 @@ interface DataTableProps<T> {
   totalCount?: number;
   currentPage?: number;
   totalPages?: number;
+  limit?: number;
+  itemLabel?: string;
   onPageChange?: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
   onSearch?: (term: string) => void;
   searchPlaceholder?: string;
   loading?: boolean;
@@ -28,22 +32,32 @@ export default function DataTable<T extends { _id?: string | number; id?: string
   totalCount,
   currentPage = 1,
   totalPages = 1,
+  limit = 20,
+  itemLabel = 'results',
   onPageChange,
+  onLimitChange,
   onSearch,
   searchPlaceholder = 'Search records...',
   loading = false,
 }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
+  const onSearchRef = useRef(onSearch);
+  const lastSubmittedRef = useRef('');
+
+  useEffect(() => {
+    onSearchRef.current = onSearch;
+  }, [onSearch]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (onSearch) {
-        onSearch(searchTerm);
+      if (onSearchRef.current && searchTerm !== lastSubmittedRef.current) {
+        lastSubmittedRef.current = searchTerm;
+        onSearchRef.current(searchTerm);
       }
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [searchTerm, onSearch]);
+  }, [searchTerm]);
 
   return (
     <div className="bg-white rounded-md border border-[#E5E5E5] shadow-xs overflow-hidden font-light">
@@ -61,7 +75,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
             />
           </div>
           {totalCount !== undefined && (
-            <span className="text-[11px] text-slate-500 font-medium">Total: {totalCount} items</span>
+            <span className="text-[11px] text-slate-500 font-medium">Total: {totalCount} {itemLabel}</span>
           )}
         </div>
       )}
@@ -107,30 +121,17 @@ export default function DataTable<T extends { _id?: string | number; id?: string
       </div>
 
       {/* Pagination Footer */}
-      {onPageChange && totalPages > 1 && (
-        <div className="p-3 border-t border-[#E5E5E5] flex items-center justify-between bg-[#F7F7F7]">
-          <span className="text-[11px] text-slate-500 font-normal">
-            Page {currentPage} of {totalPages}
-          </span>
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(currentPage - 1)}
-              className="p-1 rounded-md bg-white border border-[#E5E5E5] text-slate-600 hover:text-[#F37021] hover:border-[#F37021] disabled:opacity-40 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(currentPage + 1)}
-              className="p-1 rounded-md bg-white border border-[#E5E5E5] text-slate-600 hover:text-[#F37021] hover:border-[#F37021] disabled:opacity-40 transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+      {onPageChange && (
+        <PaginationFooter
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount ?? data.length}
+          limit={limit}
+          itemCount={data.length}
+          itemLabel={itemLabel}
+          onPageChange={onPageChange}
+          onLimitChange={onLimitChange}
+        />
       )}
     </div>
   );

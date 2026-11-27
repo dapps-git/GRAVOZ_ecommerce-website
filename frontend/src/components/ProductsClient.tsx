@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PaginationBar from '@/components/PaginationBar';
 import {
   Star,
   Heart,
@@ -66,7 +67,7 @@ interface ProductsClientProps {
 }
 
 const MAX_PRICE_LIMIT = 10000;
-const ITEMS_PER_PAGE = 48;
+const ITEMS_PER_PAGE = 20;
 
 function ListingProductCard({
   product,
@@ -200,6 +201,7 @@ export default function ProductsClient({
   const audParam = searchParams.get('audience') || searchParams.get('gender') || '';
   const brandParam = searchParams.get('brand') || '';
   const qParam = searchParams.get('q') || searchParams.get('search') || '';
+  const urlPageParam = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
 
   const [products, setProducts] = useState<ProductItem[]>(initialProducts);
   const [dbCategories, setDbCategories] = useState<CategoryOption[]>(initialCategories);
@@ -214,14 +216,34 @@ export default function ProductsClient({
   const [priceRange, setPriceRange] = useState<number>(MAX_PRICE_LIMIT);
   const [sortBy, setSortBy] = useState<string>('popularity');
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(urlPageParam);
+  const didInitFilterResetRef = useRef(false);
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const handlePageChange = useCallback((newPage: number) => {
+    const targetPage = Math.max(1, newPage);
+    setCurrentPage(targetPage);
+    const params = new URLSearchParams(searchParams.toString());
+    if (targetPage <= 1) {
+      params.delete('page');
+    } else {
+      params.set('page', String(targetPage));
+    }
+    const qs = params.toString();
+    router.replace(`/products${qs ? `?${qs}` : ''}`, { scroll: false });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [router, searchParams]);
 
   useEffect(() => {
+    setCurrentPage(urlPageParam);
+  }, [urlPageParam]);
+
+  useEffect(() => {
+    if (!didInitFilterResetRef.current) {
+      didInitFilterResetRef.current = true;
+      return;
+    }
     setCurrentPage(1);
   }, [
     selectedCategory,
@@ -576,10 +598,11 @@ export default function ProductsClient({
   ]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
   const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
     return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredProducts, currentPage]);
+  }, [filteredProducts, safeCurrentPage]);
 
   const activeFiltersCount =
     (selectedCategory ? 1 : 0) +
@@ -755,61 +778,15 @@ export default function ProductsClient({
                 ))}
               </div>
 
-              {totalPages > 1 && (
-                <div className="pt-6 pb-16 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#E5E5E5] mt-2">
-                  <div className="text-xs text-slate-600 font-medium">
-                    Showing <span className="font-semibold text-slate-900">{filteredProducts.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}</span> to{' '}
-                    <span className="font-semibold text-slate-900">{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</span> of{' '}
-                    <span className="font-semibold text-[#F37021]">{filteredProducts.length}</span> products
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      disabled={currentPage <= 1}
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-semibold text-slate-700 hover:border-[#F37021] hover:text-[#F37021] disabled:opacity-40 disabled:hover:border-[#E5E5E5] disabled:hover:text-slate-700 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
-                    >
-                      <ChevronLeft className="w-3.5 h-3.5" />
-                      <span>Prev</span>
-                    </button>
-
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
-                      .map((pageNum, idx, visiblePages) => {
-                        const prevPage = visiblePages[idx - 1];
-                        const showEllipsis = prevPage && pageNum - prevPage > 1;
-
-                        return (
-                          <React.Fragment key={pageNum}>
-                            {showEllipsis && <span className="px-1 text-xs text-slate-400 select-none">...</span>}
-                            <button
-                              type="button"
-                              onClick={() => handlePageChange(pageNum)}
-                              className={`min-w-[32px] h-8 px-2 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
-                                currentPage === pageNum
-                                  ? 'bg-[#F37021] text-white shadow-xs'
-                                  : 'border border-[#E5E5E5] bg-white text-slate-700 hover:border-[#F37021] hover:text-[#F37021]'
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          </React.Fragment>
-                        );
-                      })}
-
-                    <button
-                      type="button"
-                      disabled={currentPage >= totalPages}
-                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-semibold text-slate-700 hover:border-[#F37021] hover:text-[#F37021] disabled:opacity-40 disabled:hover:border-[#E5E5E5] disabled:hover:text-slate-700 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs"
-                    >
-                      <span>Next</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              )}
+              <PaginationBar
+                currentPage={safeCurrentPage}
+                totalPages={totalPages}
+                totalCount={filteredProducts.length}
+                itemsPerPage={ITEMS_PER_PAGE}
+                itemLabel="products"
+                onPageChange={handlePageChange}
+                className="pt-6 pb-16 mt-2"
+              />
             </>
           )}
         </section>

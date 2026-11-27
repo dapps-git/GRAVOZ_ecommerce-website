@@ -23,34 +23,60 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(20);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setCurrentPage(newPage);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
+
+  const handleLimitChange = useCallback((newLimit: number) => {
+    setLimit(newLimit);
+    setCurrentPage(1);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
+
+  const handleSearch = useCallback((term: string) => {
+    setSearch(term);
+    setCurrentPage(1);
+  }, []);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: '10',
+        limit: limit.toString(),
       });
       if (statusFilter !== 'all') params.append('status', statusFilter);
-      if (search) params.append('search', search);
+      if (search.trim()) params.append('search', search.trim());
 
       const res = await fetch(`/api/orders?${params.toString()}`);
       const data = await res.json();
       if (res.ok) {
         setOrders(data.orders || []);
-        setTotalCount(data.pagination.total);
-        setTotalPages(data.pagination.totalPages);
+        const nextTotal = data.pagination?.total || 0;
+        const nextTotalPages = Math.max(1, data.pagination?.totalPages || 1);
+        setTotalCount(nextTotal);
+        setTotalPages(nextTotalPages);
+        if (currentPage > nextTotalPages) {
+          setCurrentPage(nextTotalPages);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch orders:', err);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, statusFilter, search]);
+  }, [currentPage, limit, statusFilter, search]);
 
   useEffect(() => {
     fetchOrders();
@@ -167,11 +193,11 @@ export default function OrdersPage() {
         totalCount={totalCount}
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={(p: number) => setCurrentPage(p)}
-        onSearch={(term: string) => {
-          setSearch(term);
-          setCurrentPage(1);
-        }}
+        limit={limit}
+        itemLabel="orders"
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
+        onSearch={handleSearch}
         searchPlaceholder="Search order number or customer email..."
         loading={loading}
       />

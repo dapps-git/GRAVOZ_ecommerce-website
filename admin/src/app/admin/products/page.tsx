@@ -16,8 +16,6 @@ import {
   FileText,
   AlertCircle,
   ShoppingBag,
-  ChevronLeft,
-  ChevronRight,
   RotateCcw,
   Upload,
   Download,
@@ -27,6 +25,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { SkeletonBox, TableRowSkeletons } from '@/components/admin/AdminSkeletons';
+import PaginationFooter from '@/components/admin/PaginationFooter';
 
 interface ProductItem {
   _id: string;
@@ -169,8 +168,13 @@ export default function ProductsPage() {
       if (res.ok && data) {
         setProducts(data.products || []);
         if (data.stats) setStats(data.stats);
-        setTotalCount(data.pagination?.total || 0);
-        setTotalPages(data.pagination?.totalPages || 1);
+        const nextTotal = data.pagination?.total || 0;
+        const nextTotalPages = Math.max(1, data.pagination?.totalPages || 1);
+        setTotalCount(nextTotal);
+        setTotalPages(nextTotalPages);
+        if (currentPage > nextTotalPages) {
+          setCurrentPage(nextTotalPages);
+        }
       }
     } catch (err: any) {
       console.error('Failed to fetch products:', typeof err === 'object' && err?.message ? err.message : String(err));
@@ -748,82 +752,20 @@ export default function ProductsPage() {
           </table>
         </div>
 
-        {/* ── Pagination Footer (Matches Figma) ── */}
-        <div className="p-3.5 border-t border-[#E5E5E5] bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
-          <div>
-            Showing {products.length > 0 ? (currentPage - 1) * limit + 1 : 0} to{' '}
-            {Math.min(currentPage * limit, totalCount)} of {totalCount} results
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Limit Selector */}
-            <select
-              value={limit}
-              onChange={(e) => {
-                setLimit(Number(e.target.value));
-                handlePageChange(1);
-              }}
-              className="px-2.5 py-1.5 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-700 font-medium focus:outline-none cursor-pointer"
-            >
-              <option value="20">20 per page</option>
-              <option value="10">10 per page</option>
-              <option value="50">50 per page</option>
-            </select>
-
-            {/* Pagination Controls */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                disabled={currentPage <= 1}
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                const pageNum = i + 1;
-                const isCurrent = currentPage === pageNum;
-                return (
-                  <button
-                    key={pageNum}
-                    type="button"
-                    onClick={() => handlePageChange(pageNum)}
-                    className={`w-7 h-7 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
-                      isCurrent
-                        ? 'bg-[#F37021] text-white'
-                        : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              {totalPages > 5 && (
-                <>
-                  <span className="text-slate-400 px-1">...</span>
-                  <button
-                    type="button"
-                    onClick={() => handlePageChange(totalPages)}
-                    className={`w-7 h-7 rounded-lg text-xs font-semibold flex items-center justify-center border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer`}
-                  >
-                    {totalPages}
-                  </button>
-                </>
-              )}
-
-              <button
-                type="button"
-                disabled={currentPage >= totalPages}
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* ── Pagination Footer ── */}
+        <PaginationFooter
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          limit={limit}
+          itemCount={products.length}
+          itemLabel="products"
+          onPageChange={handlePageChange}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            handlePageChange(1);
+          }}
+        />
       </div>
 
       {/* ── Bulk Import Excel/CSV Modal ── */}
