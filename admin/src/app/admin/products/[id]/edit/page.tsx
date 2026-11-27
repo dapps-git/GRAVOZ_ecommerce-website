@@ -25,6 +25,7 @@ import {
   RotateCcw,
   Check,
 } from 'lucide-react';
+import { FormEditorSkeleton } from '@/components/admin/AdminSkeletons';
 
 interface CategoryItem {
   _id: string;
@@ -678,11 +679,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   ];
 
   if (fetching) {
-    return (
-      <div className="min-h-[400px] flex items-center justify-center text-xs font-medium text-slate-500">
-        Loading Product Data...
-      </div>
-    );
+    return <FormEditorSkeleton />;
   }
 
   return (

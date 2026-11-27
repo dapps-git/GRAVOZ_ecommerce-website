@@ -1,1 +1,1 @@
-export { default } from '@/app/products/[id]/page';
+export { default, revalidate } from '@/app/products/[id]/page';

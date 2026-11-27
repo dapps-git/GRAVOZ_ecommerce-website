@@ -26,6 +26,7 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
+import { SkeletonBox, TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 interface ProductItem {
   _id: string;
@@ -370,7 +371,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Total Products</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.total || products.length}</span>
+            {loading ? <SkeletonBox className="h-7 w-14 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.total || products.length}</span>}
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">All time products</span>
           </div>
           <div className="w-10 h-10 rounded-full bg-[#F3F3F3] text-slate-600 flex items-center justify-center flex-shrink-0">
@@ -382,7 +383,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Active Products</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.active || products.filter((p) => p.status === 'active').length}</span>
+            {loading ? <SkeletonBox className="h-7 w-14 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.active || products.filter((p) => p.status === 'active').length}</span>}
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Published products</span>
           </div>
           <div className="w-10 h-10 rounded-full bg-[#edf7ee] text-emerald-600 flex items-center justify-center flex-shrink-0">
@@ -394,7 +395,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Draft Products</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.draft || 0}</span>
+            {loading ? <SkeletonBox className="h-7 w-14 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.draft || 0}</span>}
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Not published</span>
           </div>
           <div className="w-10 h-10 rounded-full bg-[#FFF3EB] text-amber-600 flex items-center justify-center flex-shrink-0">
@@ -406,7 +407,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Out of Stock</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.outOfStock || 0}</span>
+            {loading ? <SkeletonBox className="h-7 w-14 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.outOfStock || 0}</span>}
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Products out of stock</span>
           </div>
           <div className="w-10 h-10 rounded-full bg-[#fcedec] text-rose-600 flex items-center justify-center flex-shrink-0">
@@ -418,7 +419,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Low Stock</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.lowStock || 0}</span>
+            {loading ? <SkeletonBox className="h-7 w-14 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.lowStock || 0}</span>}
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Running low</span>
           </div>
           <div className="w-10 h-10 rounded-full bg-[#fef6eb] text-orange-600 flex items-center justify-center flex-shrink-0">
@@ -548,11 +549,7 @@ export default function ProductsPage() {
 
             <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
-                <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400 font-medium">
-                    Loading Products...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={8} cols={9} hasCheckbox hasThumb />
               ) : products.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="py-14 text-center space-y-2">

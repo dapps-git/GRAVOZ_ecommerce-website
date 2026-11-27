@@ -17,6 +17,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { compressImage } from '@/lib/imageCompression';
+import { TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 interface Addon {
   _id: string;
@@ -335,9 +336,22 @@ export default function AddonsPage() {
       {/* Table */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
         {loading ? (
-          <div className="p-12 text-center">
-            <RefreshCw className="w-6 h-6 text-slate-300 animate-spin mx-auto mb-3" />
-            <p className="text-sm text-slate-400">Loading add-ons...</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Add-On</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">SKU</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Applies To</th>
+                  <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <TableRowSkeletons rows={5} cols={6} hasThumb />
+              </tbody>
+            </table>
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center">

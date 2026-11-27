@@ -164,7 +164,13 @@ function CuratedCardItem({
   const secondaryImage = item.insetImageUrl || (item.images && item.images.length > 1 ? item.images[1] : null);
   const hasSecondary = Boolean(secondaryImage && secondaryImage !== mainImage);
 
-  const href = item.linkUrl || (item.productId ? `/products/${item.productId}` : '/products');
+  const cleanLinkUrl = typeof item.linkUrl === 'string' ? item.linkUrl.trim() : '';
+  const href =
+    cleanLinkUrl && cleanLinkUrl !== '#' && !cleanLinkUrl.includes('undefined')
+      ? cleanLinkUrl
+      : item.productId
+      ? `/products/${item.productId}`
+      : '/products';
   const discount = item.originalPrice && item.originalPrice > item.price
     ? Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)
     : 0;
@@ -173,19 +179,19 @@ function CuratedCardItem({
     <Link
       href={href}
       onMouseEnter={() => { if (!hovered) setHovered(true); }}
-      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer"
+      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer active:scale-[0.99]"
     >
       {/* Product Image Card - aspect-square gives bigger size, rounded-md */}
       <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#F7F7F7]">
         {/* Badge (Top Most Left if Best Seller / Discount) */}
         {discount > 0 ? (
-          <div className="absolute top-0 left-0 z-20">
+          <div className="absolute top-0 left-0 z-20 pointer-events-none">
             <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               {discount}% OFF
             </span>
           </div>
         ) : sectionKey === 'best_sellers' ? (
-          <div className="absolute top-0 left-0 z-20">
+          <div className="absolute top-0 left-0 z-20 pointer-events-none">
             <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               BEST SELLER
             </span>
@@ -219,7 +225,7 @@ function CuratedCardItem({
         </button>
 
         {/* Primary Image */}
-        <div className={`absolute inset-0 transition-opacity duration-300 ${hasSecondary && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
+        <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${hasSecondary && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
           <ProductImage
             src={mainImage}
             alt={item.title}
@@ -233,7 +239,7 @@ function CuratedCardItem({
 
         {/* Secondary Image mounted lazily on Desktop Hover */}
         {hasSecondary && hovered && (
-          <div className={`hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
+          <div className={`pointer-events-none hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
             <ProductImage
               src={secondaryImage}
               alt={`${item.title} alternate view`}

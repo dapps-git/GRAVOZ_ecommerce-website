@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import { Footprints, Printer, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import { DetailPageSkeleton } from '@/components/admin/AdminSkeletons';
 
 interface OrderItem {
   name: string;
@@ -63,7 +64,7 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
   }, [resolvedParams.id]);
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-400 animate-pulse">Loading invoice...</div>;
+    return <DetailPageSkeleton showCards={2} />;
   }
 
   if (!order) {

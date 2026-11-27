@@ -220,6 +220,17 @@ export default function CheckoutPage() {
   const [orderError, setOrderError] = useState('');
   const [redirectCountdown, setRedirectCountdown] = useState<number>(10);
 
+  // Scroll cleanly to top on mount and whenever advancing/returning across checkout steps
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    } catch {
+      // ignore
+    }
+  }, [currentStep]);
+
   // Auto-redirect to tracking order page after 10 seconds
   useEffect(() => {
     if (currentStep === 'success' && placedOrder) {
@@ -1658,13 +1669,13 @@ export default function CheckoutPage() {
                         return (
                           <div key={idx} className="py-3 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                              <Link href={prodHref} className="w-14 h-14 sm:w-16 sm:h-16 rounded-md bg-[#F7F7F7] p-1 border border-[#E5E5E5] overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
+                              <Link href={prodHref} className="w-16 h-16 sm:w-20 sm:h-20 rounded-md bg-white overflow-hidden flex-shrink-0 hover:opacity-85 transition-opacity block">
                                 <ProductImage
                                   src={item.imageUrl}
                                   alt={item.title}
-                                  width={64}
-                                  height={64}
-                                  className="w-full h-full object-cover rounded-md"
+                                  width={80}
+                                  height={80}
+                                  className="w-full h-full object-cover object-center"
                                 />
                               </Link>
                               <div className="space-y-1 min-w-0">

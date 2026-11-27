@@ -5,7 +5,7 @@ import { Category } from '@/models/Category';
 import { Brand } from '@/models/Brand';
 import { Banner } from '@/models/Banner';
 import { invalidateCache } from '@/lib/redis';
-import { uploadUrlToCloudinary } from '@/lib/cloudinary';
+import { uploadUrlToCloudinary, normalizeColorVariantsImages } from '@/lib/cloudinary';
 
 
 // GET /api/products (Rule 8, 9, 10, 12)
@@ -177,31 +177,27 @@ export async function POST(req: NextRequest) {
       ? images
       : [{ url: '/products/placeholder.svg', alt: `${name} photo` }];
 
-    const validImages = await Promise.all(
+    const uploadedImages = await Promise.all(
       rawImagesList.map(async (img: any) => {
-        const rawUrl = typeof img === 'string' ? img : img.url;
+        const rawUrl = typeof img === 'string' ? img : img?.url;
+        if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) return null;
         const cUrl = await uploadUrlToCloudinary(rawUrl);
+        if (!cUrl || !cUrl.trim()) return null;
         return {
-          url: cUrl,
-          alt: (typeof img === 'object' && img.alt) ? img.alt : `${name} photo`,
+          url: cUrl.trim(),
+          alt: (typeof img === 'object' && img?.alt) ? img.alt : `${name} photo`,
         };
       })
     );
-
-    let processedColorVariants = colorVariants || [];
-    if (Array.isArray(colorVariants) && colorVariants.length > 0) {
-      processedColorVariants = await Promise.all(
-        colorVariants.map(async (v: any) => {
-          if (Array.isArray(v.images) && v.images.length > 0) {
-            const vImages = await Promise.all(
-              v.images.map(async (imgUrl: string) => uploadUrlToCloudinary(imgUrl))
-            );
-            return { ...v, images: vImages };
-          }
-          return v;
-        })
-      );
+    const validImages = uploadedImages.filter(Boolean) as Array<{ url: string; alt: string }>;
+    if (validImages.length === 0) {
+      validImages.push({ url: '/products/placeholder.svg', alt: `${name} photo` });
     }
+
+    const processedColorVariants =
+      Array.isArray(colorVariants) && colorVariants.length > 0
+        ? await normalizeColorVariantsImages(colorVariants, name)
+        : [];
 
     const generatedSlug = (seo?.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')) + '-' + Date.now().toString().slice(-4);
     let finalSku = (inputSku && inputSku.trim()) ? inputSku.trim() : ('GRV-' + Math.random().toString(36).substring(2, 8).toUpperCase());

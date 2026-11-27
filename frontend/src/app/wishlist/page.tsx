@@ -12,7 +12,6 @@ import { useCart } from '@/context/CartContext';
 import {
   Heart,
   Star,
-  Trash2,
   ShoppingBag,
   ShieldCheck,
   RotateCcw,
@@ -122,17 +121,18 @@ export default function WishlistPage() {
                   key={item.productId}
                   className="bg-white rounded-md border border-[#E5E5E5] p-3.5 sm:p-4 shadow-2xs relative flex flex-row items-start sm:items-center gap-3.5 sm:gap-5 hover:shadow-md transition-all duration-300"
                 >
-                  {/* Product Image (Left Side - Clickable to Product Details) */}
+                  {/* Product Image (Left Side - Borderless Clean Image, Slightly Larger) */}
                   <Link
                     href={productLink}
-                    className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-md bg-[#F7F7F7] flex items-center justify-center overflow-hidden border border-[#EEEEEE] flex-shrink-0 hover:opacity-85 transition-opacity block cursor-pointer"
+                    className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-md bg-white flex items-center justify-center overflow-hidden flex-shrink-0 hover:opacity-90 transition-opacity block cursor-pointer"
                   >
                     <ProductImage
                       src={item.imageUrl}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 640px) 112px, 150px"
-                      className="object-contain p-2"
+                      sizes="(max-width: 640px) 128px, 160px"
+                      optimizeWidth={400}
+                      className="object-cover object-center"
                     />
                   </Link>
 
@@ -150,7 +150,7 @@ export default function WishlistPage() {
                   </button>
 
                   {/* Details & Actions (Right Side) */}
-                  <div className="flex-1 flex flex-col justify-between space-y-2.5 sm:space-y-3 min-w-0 pr-6 sm:pr-8">
+                  <div className="flex-1 flex flex-col justify-between space-y-2 sm:space-y-3 min-w-0 pr-6 sm:pr-8">
                     <div className="space-y-1">
                       <Link
                         href={productLink}
@@ -185,21 +185,20 @@ export default function WishlistPage() {
                     </div>
 
                     {/* Action Buttons Row */}
-                    <div className="flex items-center gap-2.5 pt-1 flex-wrap sm:flex-nowrap">
-                      {/* Remove Item Button */}
+                    <div className="flex items-center gap-2 pt-1 flex-nowrap">
+                      {/* Remove Item Button (No icon, compact, single-line text) */}
                       <button
                         type="button"
                         onClick={() => {
                           removeFromWishlist(item.productId);
                           showToast(`Removed ${item.title} from wishlist.`);
                         }}
-                        className="flex-1 sm:flex-none border border-[#E5E5E5] bg-white hover:bg-slate-50 text-[#111111] text-xs font-semibold px-3.5 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                        className="border border-[#E5E5E5] bg-white hover:bg-slate-50 text-[#111111] text-[10px] sm:text-xs font-medium px-2.5 sm:px-3.5 py-1.5 rounded-md flex items-center justify-center shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
                       >
-                        <Trash2 className="w-3.5 h-3.5 text-slate-700" />
                         <span>Remove Item</span>
                       </button>
 
-                      {/* Add to Cart Button */}
+                      {/* Add to Cart Button (Compact single-line text) */}
                       <button
                         type="button"
                         onClick={async () => {
@@ -215,11 +214,12 @@ export default function WishlistPage() {
                           });
                           await removeFromWishlist(item.productId);
                           showToast(`Moved ${item.title} to Cart! Redirecting...`);
+                          if (typeof window !== 'undefined') window.scrollTo(0, 0);
                           router.push('/cart');
                         }}
-                        className="flex-1 sm:flex-none bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold px-4 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                        className="bg-[#F37021] hover:bg-[#D95B10] text-white text-[10px] sm:text-xs font-semibold px-2.5 sm:px-4 py-1.5 rounded-md flex items-center justify-center gap-1 shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
                       >
-                        <ShoppingBag className="w-3.5 h-3.5 text-white" />
+                        <ShoppingBag className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white flex-shrink-0" />
                         <span>Add to Cart</span>
                       </button>
                     </div>

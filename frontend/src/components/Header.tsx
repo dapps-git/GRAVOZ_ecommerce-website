@@ -92,7 +92,8 @@ export default function Header() {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className="w-full bg-white font-sans text-[#030303] border-b border-[#E5E5E5] relative z-40">
+    <>
+      <header className="w-full bg-white font-sans text-[#030303] relative z-40">
       {/* 1. Top Announcement Bar (#F37021 Orange Background with White Font & White Logos) — Train Animation */}
       <div className="bg-[#F37021] text-white text-[11px] sm:text-[12px] font-medium py-2.5 sm:py-3 overflow-hidden tracking-[0.05em] uppercase border-b border-black/10 select-none shadow-2xs">
         <div className="animate-train items-center whitespace-nowrap">
@@ -199,9 +200,10 @@ export default function Header() {
           </div>
         </div>
       </div>
+      </header>
 
-      {/* 3. Main Brand Navbar (Clean Mobile & Desktop Bar) */}
-      <div className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 bg-white border-b border-[#E5E5E5]">
+      {/* 3. Main Brand Navbar (Sticky Only This Bar on Scroll) */}
+      <div className="sticky top-0 z-40 w-full px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 bg-white border-b border-[#E5E5E5] shadow-2xs">
         <div className="max-w-[1530px] w-full mx-auto flex items-center justify-between gap-4">
           
           {/* Mobile Left: Hamburger Menu Button & Brand Logo */}
@@ -332,7 +334,7 @@ export default function Header() {
       </div>
 
       {/* 4. Desktop Category Links Navbar (Desktop Only) */}
-      <div className="hidden md:block px-6 md:px-8 py-2.5 bg-white">
+      <div className="hidden md:block px-6 md:px-8 py-2.5 bg-white border-b border-[#E5E5E5]">
         <div className="max-w-[1530px] w-full mx-auto flex items-center justify-between gap-6">
           <nav className="flex items-center gap-6 lg:gap-8">
             <Link
@@ -504,6 +506,6 @@ export default function Header() {
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }

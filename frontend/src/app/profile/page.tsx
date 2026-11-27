@@ -337,7 +337,7 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between overflow-x-hidden selection:bg-[#F37021]/20 selection:text-[#F37021]">
+    <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between overflow-x-clip selection:bg-[#F37021]/20 selection:text-[#F37021]">
       <Header />
 
       <main className="flex-1 w-full max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-10">

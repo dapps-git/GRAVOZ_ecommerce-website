@@ -117,17 +117,17 @@ function AnimatedProductCard({
     <Link
       href={product.href || `/products/${product.id}`}
       onMouseEnter={() => { if (!hovered) setHovered(true); }}
-      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer"
+      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer active:scale-[0.99]"
     >
       <div className="relative aspect-square w-full rounded-none overflow-hidden bg-[#F7F7F7]">
         {product.noReturnRefundExchange ? (
-          <div className="absolute top-0 left-0 z-20">
+          <div className="absolute top-0 left-0 z-20 pointer-events-none">
             <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               FINAL SALE
             </span>
           </div>
         ) : (
-          <div className="absolute top-0 left-0 z-20">
+          <div className="absolute top-0 left-0 z-20 pointer-events-none">
             <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               BEST SELLER
             </span>
@@ -158,7 +158,7 @@ function AnimatedProductCard({
           />
         </button>
 
-        <div className={`absolute inset-0 transition-opacity duration-300 ${secondaryImage && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
+        <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${secondaryImage && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
           <Image
             src={mainImage}
             alt={product.title}
@@ -171,7 +171,7 @@ function AnimatedProductCard({
         </div>
 
         {secondaryImage && hovered && (
-          <div className={`hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
+          <div className={`pointer-events-none hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
             <Image
               src={secondaryImage}
               alt={`${product.title} alternate view`}

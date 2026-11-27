@@ -3,7 +3,7 @@ import { connectDB } from '@/lib/db';
 import { Product } from '@/models/Product';
 import { Banner } from '@/models/Banner';
 import { invalidateCache } from '@/lib/redis';
-import { uploadUrlToCloudinary } from '@/lib/cloudinary';
+import { uploadUrlToCloudinary, normalizeColorVariantsImages } from '@/lib/cloudinary';
 
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
@@ -55,30 +55,29 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Auto-upload any Google Drive or external images to Cloudinary
     if (Array.isArray(updatePayload.images) && updatePayload.images.length > 0) {
-      updatePayload.images = await Promise.all(
+      const cleanedImgs = await Promise.all(
         updatePayload.images.map(async (img: any) => {
-          const rawUrl = typeof img === 'string' ? img : img.url;
+          const rawUrl = typeof img === 'string' ? img : img?.url;
+          if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) return null;
           const cUrl = await uploadUrlToCloudinary(rawUrl);
+          if (!cUrl || !cUrl.trim()) return null;
           return {
-            url: cUrl,
-            alt: (typeof img === 'object' && img.alt) ? img.alt : `${updatePayload.name || 'Product'} photo`,
+            url: cUrl.trim(),
+            alt: (typeof img === 'object' && img?.alt) ? img.alt : `${updatePayload.name || 'Product'} photo`,
           };
         })
       );
+      updatePayload.images = cleanedImgs.filter(Boolean);
     }
 
-    if (Array.isArray(updatePayload.colorVariants) && updatePayload.colorVariants.length > 0) {
-      updatePayload.colorVariants = await Promise.all(
-        updatePayload.colorVariants.map(async (v: any) => {
-          if (Array.isArray(v.images) && v.images.length > 0) {
-            const vImages = await Promise.all(
-              v.images.map(async (imgUrl: string) => uploadUrlToCloudinary(imgUrl))
-            );
-            return { ...v, images: vImages };
-          }
-          return v;
-        })
-      );
+    if (Array.isArray(updatePayload.colorVariants)) {
+      updatePayload.colorVariants =
+        updatePayload.colorVariants.length > 0
+          ? await normalizeColorVariantsImages(
+              updatePayload.colorVariants,
+              updatePayload.name || 'Product'
+            )
+          : [];
     }
 
     if (updatePayload.stock === 0) {

@@ -25,6 +25,7 @@ import {
   ImageIcon,
   ArrowRight,
 } from 'lucide-react';
+import { TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 interface ReturnItem {
   _id: string;
@@ -287,11 +288,7 @@ export default function ReturnsPage() {
 
             <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
-                <tr>
-                  <td colSpan={7} className="py-14 text-center text-slate-400 font-medium">
-                    Loading Return Requests...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={6} cols={7} hasThumb />
               ) : paginatedReturns.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-16 text-center">

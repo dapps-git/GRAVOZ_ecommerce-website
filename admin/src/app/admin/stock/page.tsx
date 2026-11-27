@@ -27,6 +27,7 @@ import {
   RefreshCw,
   Palette,
 } from 'lucide-react';
+import { SkeletonBox, TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 interface StockProduct {
   _id: string;
@@ -316,7 +317,7 @@ export default function StockPage() {
         <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Total Products</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">{stockStats.totalProducts}</span>
+            {loading ? <SkeletonBox className="h-7 w-14 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{stockStats.totalProducts}</span>}
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">All products</span>
           </div>
           <div className="w-10 h-10 rounded-md bg-[#FFF3EB] text-[#F37021] flex items-center justify-center">
@@ -328,7 +329,7 @@ export default function StockPage() {
         <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Total Stock Units</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">{stockStats.totalUnits}</span>
+            {loading ? <SkeletonBox className="h-7 w-16 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-slate-900 mt-1 block">{stockStats.totalUnits}</span>}
             <span className="text-[10px] text-emerald-600 font-medium block mt-0.5">Available units</span>
           </div>
           <div className="w-10 h-10 rounded-md bg-[#edf7ee] text-emerald-700 flex items-center justify-center">
@@ -340,7 +341,7 @@ export default function StockPage() {
         <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Low Stock</span>
-            <span className="text-2xl font-bold text-orange-600 mt-1 block">{stockStats.lowStock}</span>
+            {loading ? <SkeletonBox className="h-7 w-12 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-orange-600 mt-1 block">{stockStats.lowStock}</span>}
             <span className="text-[10px] text-orange-600 font-medium block mt-0.5">≤ 10 items remaining</span>
           </div>
           <div className="w-10 h-10 rounded-md bg-[#fef6eb] text-orange-600 flex items-center justify-center">
@@ -352,7 +353,7 @@ export default function StockPage() {
         <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Out of Stock</span>
-            <span className="text-2xl font-bold text-rose-600 mt-1 block">{stockStats.outOfStock}</span>
+            {loading ? <SkeletonBox className="h-7 w-12 mt-1.5 mb-1" /> : <span className="text-2xl font-bold text-rose-600 mt-1 block">{stockStats.outOfStock}</span>}
             <span className="text-[10px] text-rose-600 font-medium block mt-0.5">0 items remaining</span>
           </div>
           <div className="w-10 h-10 rounded-md bg-[#fcedec] text-rose-600 flex items-center justify-center">
@@ -364,9 +365,13 @@ export default function StockPage() {
         <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Stock Value</span>
-            <span className="text-2xl font-bold text-slate-900 mt-1 block">
-              ₹{stockStats.inventoryValue.toLocaleString('en-IN')}
-            </span>
+            {loading ? (
+              <SkeletonBox className="h-7 w-20 mt-1.5 mb-1" />
+            ) : (
+              <span className="text-2xl font-bold text-slate-900 mt-1 block">
+                ₹{stockStats.inventoryValue.toLocaleString('en-IN')}
+              </span>
+            )}
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Estimated total</span>
           </div>
           <div className="w-10 h-10 rounded-md bg-[#FFF3EB] text-[#F37021] flex items-center justify-center">
@@ -471,11 +476,7 @@ export default function StockPage() {
 
             <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
-                <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400 font-medium">
-                    Loading Stock Data...
-                  </td>
-                </tr>
+                <TableRowSkeletons rows={8} cols={9} hasThumb />
               ) : products.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="py-12 text-center text-slate-400 font-medium">

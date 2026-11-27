@@ -129,3 +129,46 @@ export async function uploadUrlToCloudinary(
     return trimmed;
   }
 }
+
+/**
+ * Normalizes product colorVariants[].images so Mongoose [ProductImageSchema]
+ * always receives valid { url, alt } subdocuments and never raw or empty strings.
+ */
+export async function normalizeColorVariantsImages(
+  colorVariants: any[],
+  fallbackAlt: string = 'Product'
+): Promise<any[]> {
+  return Promise.all(
+    colorVariants.map(async (v: any) => {
+      const rawImgs = Array.isArray(v?.images) ? v.images : [];
+      const vImages: Array<{ url: string; alt: string; publicId?: string }> = [];
+
+      for (const img of rawImgs) {
+        const rawUrl = typeof img === 'string' ? img : img?.url;
+        if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) continue;
+        const cUrl = await uploadUrlToCloudinary(rawUrl);
+        if (!cUrl || !cUrl.trim()) continue;
+        vImages.push({
+          url: cUrl.trim(),
+          alt:
+            typeof img === 'object' && img?.alt
+              ? String(img.alt)
+              : `${fallbackAlt} ${v?.name || ''} photo`.trim(),
+          ...(typeof img === 'object' && img?.publicId ? { publicId: String(img.publicId) } : {}),
+        });
+      }
+
+      const fallbackImgUrl =
+        vImages[0]?.url ||
+        (v?.imageUrl && typeof v.imageUrl === 'string' && v.imageUrl.trim()
+          ? await uploadUrlToCloudinary(v.imageUrl)
+          : '');
+
+      return {
+        ...v,
+        imageUrl: fallbackImgUrl || '',
+        images: vImages,
+      };
+    })
+  );
+}

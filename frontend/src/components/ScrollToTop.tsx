@@ -31,16 +31,17 @@ export default function ScrollToTop() {
   // 2. Track scroll position for floating back-to-top button
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 320) {
+      if (window.scrollY > 200) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
 
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [pathname]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -56,7 +57,7 @@ export default function ScrollToTop() {
       type="button"
       onClick={scrollToTop}
       aria-label="Scroll to top"
-      className="fixed bottom-20 sm:bottom-8 right-4 sm:right-8 z-40 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#171717] hover:bg-[#F37021] text-white flex items-center justify-center shadow-2xl border border-white/20 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer animate-in fade-in slide-in-from-bottom-3"
+      className="fixed bottom-20 sm:bottom-8 right-4 sm:right-8 z-50 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#171717] hover:bg-[#F37021] text-white flex items-center justify-center shadow-2xl border border-white/20 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer animate-in fade-in slide-in-from-bottom-3"
       title="Back to Top"
     >
       <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 text-white stroke-[2.2]" />

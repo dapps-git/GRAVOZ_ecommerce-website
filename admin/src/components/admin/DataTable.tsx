@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TableRowSkeletons } from '@/components/admin/AdminSkeletons';
 
 export interface Column<T> {
   header: string;
@@ -79,11 +80,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
           </thead>
           <tbody className="divide-y divide-[#EEEEEE]">
             {loading ? (
-              <tr>
-                <td colSpan={columns.length} className="px-3.5 py-8 text-center text-slate-500 animate-pulse font-normal">
-                  Loading data...
-                </td>
-              </tr>
+              <TableRowSkeletons rows={7} cols={columns.length} hasThumb />
             ) : data.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-3.5 py-8 text-center text-slate-400 font-normal">
