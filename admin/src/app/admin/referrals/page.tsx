@@ -105,13 +105,13 @@ export default function AdminReferralsPage() {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="text-[#89591C]">
+              <div className="text-[#F37021]">
                 <Gift className="w-5 h-5" />
               </div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">
                 Referral Program &amp; Rewards Activity
               </h1>
-              <span className="px-2 py-0.5 rounded bg-[#f5ede3] text-[#89591C] font-bold text-[10px] uppercase tracking-wider border border-[#ebdccb]">
+              <span className="px-2 py-0.5 rounded bg-[#FFF3EB] text-[#F37021] font-bold text-[10px] uppercase tracking-wider border border-[#FAD4BC]">
                 LIVE REWARDS FEED
               </span>
             </div>
@@ -124,9 +124,9 @@ export default function AdminReferralsPage() {
             type="button"
             onClick={fetchReferrals}
             disabled={loading}
-            className="px-3 py-1.5 bg-white border border-[#e8e2d8] hover:bg-[#faf8f5] text-xs font-semibold text-slate-700 rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+            className="px-3 py-1.5 bg-white border border-[#E5E5E5] hover:bg-[#F7F7F7] text-xs font-semibold text-slate-700 rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#89591C] ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-[#F37021] ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
         </div>
@@ -134,8 +134,8 @@ export default function AdminReferralsPage() {
         {/* 4 Summary Metric Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Card 1: Referral Links Generated */}
-          <div className="px-4 py-3 bg-white rounded-xl border border-[#e8e2d8] shadow-2xs flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#faf8f5] text-[#89591C] border border-[#ebdccb] flex items-center justify-center flex-shrink-0">
+          <div className="px-4 py-3 bg-white rounded-xl border border-[#E5E5E5] shadow-2xs flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#F7F7F7] text-[#F37021] border border-[#FAD4BC] flex items-center justify-center flex-shrink-0">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
@@ -149,8 +149,8 @@ export default function AdminReferralsPage() {
           </div>
 
           {/* Card 2: Total Referrals */}
-          <div className="px-4 py-3 bg-white rounded-xl border border-[#e8e2d8] shadow-2xs flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#faf8f5] text-slate-600 border border-[#e8e2d8] flex items-center justify-center flex-shrink-0">
+          <div className="px-4 py-3 bg-white rounded-xl border border-[#E5E5E5] shadow-2xs flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#F7F7F7] text-slate-600 border border-[#E5E5E5] flex items-center justify-center flex-shrink-0">
               <Users className="w-4 h-4 text-slate-500" />
             </div>
             <div>
@@ -164,7 +164,7 @@ export default function AdminReferralsPage() {
           </div>
 
           {/* Card 3: Completed Referrals */}
-          <div className="px-4 py-3 bg-white rounded-xl border border-[#e8e2d8] shadow-2xs flex items-center gap-3">
+          <div className="px-4 py-3 bg-white rounded-xl border border-[#E5E5E5] shadow-2xs flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center flex-shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </div>
@@ -179,7 +179,7 @@ export default function AdminReferralsPage() {
           </div>
 
           {/* Card 4: ₹100 Rewards Credited */}
-          <div className="px-4 py-3 bg-white rounded-xl border border-[#e8e2d8] shadow-2xs flex items-center gap-3">
+          <div className="px-4 py-3 bg-white rounded-xl border border-[#E5E5E5] shadow-2xs flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center flex-shrink-0">
               <IndianRupee className="w-4 h-4" />
             </div>
@@ -196,11 +196,11 @@ export default function AdminReferralsPage() {
       </div>
 
       {/* Main Table Card */}
-      <div className="bg-white rounded-2xl border border-[#e8e2d8] overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#faf8f5]/80 border-b border-[#e8e2d8] text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              <tr className="bg-[#F7F7F7]/80 border-b border-[#E5E5E5] text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                 <th className="py-4 px-6">REFERRER USER (SHARED BY)</th>
                 <th className="py-4 px-5">REFERRER AMOUNT GOT</th>
                 <th className="py-4 px-6">REFERRED USER (FRIEND)</th>
@@ -209,11 +209,11 @@ export default function AdminReferralsPage() {
                 <th className="py-4 px-6 text-right">DATE</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0eae1] text-xs text-slate-800">
+            <tbody className="divide-y divide-[#EEEEEE] text-xs text-slate-800">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-16 text-center text-slate-400">
-                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#89591C]" />
+                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#F37021]" />
                     Loading referral activity...
                   </td>
                 </tr>
@@ -231,7 +231,7 @@ export default function AdminReferralsPage() {
                   const orderNum = ref.firstOrder?.orderNumber || ref.latestOrder?.orderNumber;
 
                   return (
-                    <tr key={ref._id} className="hover:bg-[#faf8f5]/60 transition-colors">
+                    <tr key={ref._id} className="hover:bg-[#F7F7F7]/60 transition-colors">
                       {/* Referrer User (Shared By) */}
                       <td className="py-4 px-6 align-top">
                         <div className="space-y-1">
@@ -241,7 +241,7 @@ export default function AdminReferralsPage() {
                           <span className="text-[11px] text-slate-400 block font-normal">
                             {ref.referrer?.email || 'N/A'}
                           </span>
-                          <div className="inline-block px-2 py-0.5 rounded bg-[#f5ede3] text-[#89591C] border border-[#ebdccb] text-[10px] font-mono font-semibold mt-1">
+                          <div className="inline-block px-2 py-0.5 rounded bg-[#FFF3EB] text-[#F37021] border border-[#FAD4BC] text-[10px] font-mono font-semibold mt-1">
                             Code: {ref.referralCode}
                           </div>
                         </div>

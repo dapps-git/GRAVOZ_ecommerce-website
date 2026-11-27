@@ -337,7 +337,7 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between overflow-x-hidden selection:bg-[#89591C]/20 selection:text-[#89591C]">
+    <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between overflow-x-hidden selection:bg-[#F37021]/20 selection:text-[#F37021]">
       <Header />
 
       <main className="flex-1 w-full max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-10">
@@ -348,13 +348,13 @@ export default function ProfilePage() {
             <h1 className="text-xl font-bold text-[#030303] tracking-tight font-sansation">
               User Profile
             </h1>
-            <span className="text-xs text-[#89591C] font-sansation font-bold bg-[#faf8f5] px-3 py-1 rounded-full border border-[#e8e2d8]">
+            <span className="text-xs text-[#F37021] font-sansation font-bold bg-[#F7F7F7] px-3 py-1 rounded-full border border-[#E5E5E5]">
               {sidebarItems.find(i => i.id === activeTab)?.label}
             </span>
           </div>
 
           {/* Icon-Only Responsive Tab Bar for Mobile (Overflow Hidden) */}
-          <div className="flex items-center justify-between gap-1 overflow-hidden pb-2 pt-1 border-b border-[#e8e2d8]">
+          <div className="flex items-center justify-between gap-1 overflow-hidden pb-2 pt-1 border-b border-[#E5E5E5]">
             {sidebarItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -367,8 +367,8 @@ export default function ProfilePage() {
                   aria-label={item.label}
                   className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-[#89591C] text-white shadow-sm ring-2 ring-[#89591C]/30 scale-105'
-                      : 'bg-[#faf8f5] text-slate-600 hover:text-black hover:bg-[#e8e2d8] border border-[#e8e2d8]'
+                      ? 'bg-[#F37021] text-white shadow-sm ring-2 ring-[#F37021]/30 scale-105'
+                      : 'bg-[#F7F7F7] text-slate-600 hover:text-black hover:bg-[#E5E5E5] border border-[#E5E5E5]'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -382,7 +382,7 @@ export default function ProfilePage() {
         <div className="flex flex-col md:flex-row gap-6 lg:gap-12 min-h-[580px]">
           
           {/* Desktop Left Sidebar */}
-          <aside className="hidden md:flex w-[260px] lg:w-[280px] flex-shrink-0 bg-[#faf9f6] rounded-2xl p-6 border border-[#ece8e1] flex-col justify-between self-start">
+          <aside className="hidden md:flex w-[260px] lg:w-[280px] flex-shrink-0 bg-[#F7F7F7] rounded-2xl p-6 border border-[#E5E5E5] flex-col justify-between self-start">
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-[#030303] tracking-tight font-sansation px-1">
                 User Profile
@@ -399,20 +399,20 @@ export default function ProfilePage() {
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs sm:text-sm font-medium transition-all font-sansation text-left group relative ${
                         isActive
-                          ? 'bg-white text-[#030303] font-bold shadow-2xs border border-[#e8e2d8]'
+                          ? 'bg-white text-[#030303] font-bold shadow-2xs border border-[#E5E5E5]'
                           : 'text-slate-600 hover:text-[#030303] hover:bg-white/60'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <Icon className={`w-4 h-4 transition-colors ${
-                          isActive ? 'text-[#89591C]' : 'text-slate-400 group-hover:text-slate-600'
+                          isActive ? 'text-[#F37021]' : 'text-slate-400 group-hover:text-slate-600'
                         }`} />
                         <span>{item.label}</span>
                       </div>
 
                       {/* Right vertical brown line for active item to match reference design */}
                       {isActive && (
-                        <span className="absolute right-0 top-2 bottom-2 w-1 rounded-l-full bg-[#89591C]" />
+                        <span className="absolute right-0 top-2 bottom-2 w-1 rounded-l-full bg-[#F37021]" />
                       )}
                     </button>
                   );
@@ -420,7 +420,7 @@ export default function ProfilePage() {
               </nav>
             </div>
 
-            <div className="pt-6 border-t border-[#eae5dc] mt-6">
+            <div className="pt-6 border-t border-[#E5E5E5] mt-6">
               <button
                 type="button"
                 onClick={async () => { await logout(); }}
@@ -442,7 +442,7 @@ export default function ProfilePage() {
                 {/* Avatar with Camera Overlay Badge */}
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <div className="relative group">
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f89530] flex items-center justify-center text-white overflow-hidden shadow-sm border-2 border-white ring-4 ring-[#faf9f6]">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#F37021] flex items-center justify-center text-white overflow-hidden shadow-sm border-2 border-white ring-4 ring-[#F7F7F7]">
                       {user?.avatarUrl ? (
                         <img
                           src={user.avatarUrl}
@@ -455,7 +455,7 @@ export default function ProfilePage() {
                       ) : (
                         /* Default Vector Avatar illustration matching reference image */
                         <svg className="w-20 h-20 sm:w-24 sm:h-24 text-white" viewBox="0 0 100 100" fill="none">
-                          <circle cx="50" cy="50" r="48" fill="#F97316" />
+                          <circle cx="50" cy="50" r="48" fill="#F37021" />
                           <path d="M50 42C56.6274 42 62 36.6274 62 30C62 23.3726 56.6274 18 50 18C43.3726 18 38 23.3726 38 30C38 36.6274 43.3726 42 50 42Z" fill="#1E293B" />
                           <path d="M50 45C36 45 26 55 26 68V82H74V68C74 55 64 45 50 45Z" fill="#334155" />
                           <path d="M47 45H53V62H47V45Z" fill="#E2E8F0" />
@@ -466,7 +466,7 @@ export default function ProfilePage() {
 
                     <label
                       htmlFor="avatar-upload"
-                      className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-[#e8e2d8] shadow-md flex items-center justify-center text-slate-600 hover:text-black hover:bg-slate-50 transition-colors cursor-pointer"
+                      className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-[#E5E5E5] shadow-md flex items-center justify-center text-slate-600 hover:text-black hover:bg-slate-50 transition-colors cursor-pointer"
                       title="Change Profile Photo"
                     >
                       <Camera className="w-4 h-4 text-slate-700" />
@@ -495,7 +495,7 @@ export default function ProfilePage() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Name"
-                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C] focus:ring-1 focus:ring-[#89591C]/20 transition-all font-sansation shadow-2xs"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#F37021] focus:ring-1 focus:ring-[#F37021]/20 transition-all font-sansation shadow-2xs"
                       required
                     />
                   </div>
@@ -509,7 +509,7 @@ export default function ProfilePage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email"
-                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C] focus:ring-1 focus:ring-[#89591C]/20 transition-all font-sansation shadow-2xs"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#F37021] focus:ring-1 focus:ring-[#F37021]/20 transition-all font-sansation shadow-2xs"
                       required
                     />
                   </div>
@@ -523,7 +523,7 @@ export default function ProfilePage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="Phone"
-                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C] focus:ring-1 focus:ring-[#89591C]/20 transition-all font-sansation shadow-2xs"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#F37021] focus:ring-1 focus:ring-[#F37021]/20 transition-all font-sansation shadow-2xs"
                     />
                   </div>
 
@@ -536,7 +536,7 @@ export default function ProfilePage() {
                       onChange={(e) => setAddress(e.target.value)}
                       placeholder="Enter your delivery address (House/Flat No., Street, City, State, PIN)..."
                       rows={4}
-                      className="w-full p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C] focus:ring-1 focus:ring-[#89591C]/20 transition-all font-sansation shadow-2xs resize-none"
+                      className="w-full p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#F37021] focus:ring-1 focus:ring-[#F37021]/20 transition-all font-sansation shadow-2xs resize-none"
                     />
                   </div>
 
@@ -569,22 +569,22 @@ export default function ProfilePage() {
                     <h3 className="text-lg font-bold text-[#030303] font-sansation">My Orders</h3>
                     <p className="text-xs text-slate-500 font-sansation">Track and manage your footwear orders</p>
                   </div>
-                  <span className="text-xs bg-[#faf8f5] border border-[#e8e2d8] px-3 py-1 rounded-none font-medium text-[#89591C] font-sansation">
+                  <span className="text-xs bg-[#F7F7F7] border border-[#E5E5E5] px-3 py-1 rounded-none font-medium text-[#F37021] font-sansation">
                     {orders.length} {orders.length === 1 ? 'Order' : 'Orders'}
                   </span>
                 </div>
 
                 {ordersLoading ? (
                   <div className="py-12 flex items-center justify-center text-slate-400">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#89591C]" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#F37021]" />
                   </div>
                 ) : orders.length === 0 ? (
-                  <div className="py-12 text-center space-y-3 bg-[#faf8f5] rounded-lg border border-[#e8e2d8]">
+                  <div className="py-12 text-center space-y-3 bg-[#F7F7F7] rounded-lg border border-[#E5E5E5]">
                     <Package className="w-10 h-10 text-slate-400 mx-auto" />
                     <p className="text-sm font-semibold text-slate-700">No orders placed yet</p>
                     <Link
                       href="/"
-                      className="inline-block px-5 py-2 bg-[#89591C] text-white text-xs font-bold rounded-none"
+                      className="inline-block px-5 py-2 bg-[#F37021] text-white text-xs font-bold rounded-none"
                     >
                       Start Shopping
                     </Link>
@@ -596,7 +596,7 @@ export default function ProfilePage() {
                       const isCancelled = ord.orderStatus === 'cancelled';
                       return (
                         <div key={ord._id} className="border border-[#e5e5e5] rounded-lg p-4 sm:p-5 space-y-4 shadow-2xs bg-white">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs font-sansation border-b border-[#f0ece5] pb-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 text-xs font-sansation border-b border-[#EEEEEE] pb-3">
                             <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 sm:gap-3 min-w-0">
                               <div>
                                 <span className="text-slate-400 text-[11px]">Order ID: </span>
@@ -611,7 +611,7 @@ export default function ProfilePage() {
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between sm:justify-end gap-2 flex-wrap pt-1 sm:pt-0 border-t sm:border-t-0 border-[#f5f2ed]">
+                            <div className="flex items-center justify-between sm:justify-end gap-2 flex-wrap pt-1 sm:pt-0 border-t sm:border-t-0 border-[#F2F2F2]">
                               {(() => {
                                 const st = ord.orderStatus;
                                 if (st === 'cancelled') {
@@ -653,21 +653,21 @@ export default function ProfilePage() {
                                 if (st === 'confirmed' || st === 'processing') {
                                   return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Confirmed</span>;
                                 }
-                                return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#FAF7F3] text-slate-700 border border-[#E5E1DC] capitalize">{st ? st.replace(/_/g, ' ') : 'Ordered'}</span>;
+                                return <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#F7F7F7] text-slate-700 border border-[#E5E5E5] capitalize">{st ? st.replace(/_/g, ' ') : 'Ordered'}</span>;
                               })()}
 
                               <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
                                 <Link
                                   href={`/orders/${ord._id}/invoice`}
                                   target="_blank"
-                                  className="px-2.5 sm:px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium rounded-md border border-[#E5E1DC] transition-colors flex items-center gap-1 cursor-pointer"
+                                  className="px-2.5 sm:px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium rounded-md border border-[#E5E5E5] transition-colors flex items-center gap-1 cursor-pointer"
                                   title="Download / Print Tax Invoice"
                                 >
-                                  <FileText className="w-3 h-3 text-[#8A5B2A]" /> Invoice
+                                  <FileText className="w-3 h-3 text-[#F37021]" /> Invoice
                                 </Link>
                                 <Link
                                   href={`/orders/${ord._id}`}
-                                  className="px-2.5 sm:px-3 py-1 bg-[#FAF7F3] hover:bg-[#F6E9D7]/50 text-[#8A5B2A] text-[11px] font-semibold rounded-md border border-[#E5E1DC] transition-colors"
+                                  className="px-2.5 sm:px-3 py-1 bg-[#F7F7F7] hover:bg-[#FFF3EB]/50 text-[#F37021] text-[11px] font-semibold rounded-md border border-[#E5E5E5] transition-colors"
                                 >
                                   Track / Manage
                                 </Link>
@@ -690,7 +690,7 @@ export default function ProfilePage() {
                                   <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                                     <Link
                                       href={prodHref}
-                                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-none bg-[#faf8f5] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block"
+                                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-none bg-[#F7F7F7] p-1 flex-shrink-0 border border-[#E5E5E5] overflow-hidden hover:opacity-85 transition-opacity block"
                                     >
                                       <ProductImage
                                         src={item.imageUrl}
@@ -703,21 +703,21 @@ export default function ProfilePage() {
                                     <div className="min-w-0 flex-1 space-y-0.5 font-sansation">
                                       <Link
                                         href={prodHref}
-                                        className="text-xs sm:text-sm font-semibold text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block"
+                                        className="text-xs sm:text-sm font-semibold text-[#030303] truncate hover:text-[#F37021] transition-colors block"
                                       >
                                         {item.name}
                                       </Link>
                                       <p className="text-[11px] text-slate-500">
                                         Size: {item.size} {item.color ? `• Color: ${item.color}` : ''} • Qty: {item.quantity}
                                       </p>
-                                      <span className="text-xs font-bold text-[#89591C]">₹{(item.price * item.quantity).toLocaleString()}</span>
+                                      <span className="text-xs font-bold text-[#F37021]">₹{(item.price * item.quantity).toLocaleString()}</span>
                                     </div>
                                   </div>
 
                                   {isDelivered && (
                                     existingReview ? (
-                                      <span className="flex-shrink-0 px-2.5 py-1 bg-[#8A5B2A]/10 text-[#8A5B2A] text-[11px] font-bold rounded-none border border-[#8A5B2A]/25 flex items-center gap-1">
-                                        <Star className="w-3 h-3 fill-[#8A5B2A] text-[#8A5B2A]" /> {existingReview.rating}.0 Reviewed
+                                      <span className="flex-shrink-0 px-2.5 py-1 bg-[#F37021]/10 text-[#F37021] text-[11px] font-bold rounded-none border border-[#F37021]/25 flex items-center gap-1">
+                                        <Star className="w-3 h-3 fill-[#F37021] text-[#F37021]" /> {existingReview.rating}.0 Reviewed
                                       </span>
                                     ) : (
                                       <button
@@ -730,7 +730,7 @@ export default function ProfilePage() {
                                           setReviewMedia([]);
                                           setReviewModalOpen(true);
                                         }}
-                                        className="flex-shrink-0 px-3 py-1.5 bg-[#89591C] hover:bg-[#724a17] text-white text-[11px] font-bold rounded-none transition-colors cursor-pointer flex items-center gap-1"
+                                        className="flex-shrink-0 px-3 py-1.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-[11px] font-bold rounded-none transition-colors cursor-pointer flex items-center gap-1"
                                       >
                                         <Star className="w-3 h-3 fill-white" /> Review
                                       </button>
@@ -783,7 +783,7 @@ export default function ProfilePage() {
                         <span className="text-xs text-slate-500">available</span>
                       </div>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#f0ece5] leading-relaxed">
+                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#EEEEEE] leading-relaxed">
                       Applied as ₹100 store discount on future footwear orders.
                     </p>
                   </div>
@@ -801,7 +801,7 @@ export default function ProfilePage() {
                         </span>
                       </div>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#f0ece5]">
+                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#EEEEEE]">
                       {referralData?.stats?.pendingReferrals ?? 0} pending first purchase
                     </p>
                   </div>
@@ -819,14 +819,14 @@ export default function ProfilePage() {
                         </span>
                       </div>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#f0ece5]">
+                    <p className="text-[11px] text-slate-500 mt-3 pt-3 border-t border-[#EEEEEE]">
                       Total ₹{referralData?.stats?.totalRewardsEarned ?? 0} earned to date
                     </p>
                   </div>
                 {/* Shareable Code & Link Box or Eligibility Unlock Card */}
                 {referralData?.referralEligible && (referralData?.referralCode || user?.referralCode) ? (
                   <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 shadow-2xs space-y-5">
-                    <div className="border-b border-[#f0ece5] pb-3">
+                    <div className="border-b border-[#EEEEEE] pb-3">
                       <h4 className="text-sm sm:text-base font-bold text-[#030303]">Share Your Referral</h4>
                       <p className="text-xs text-slate-500 mt-0.5">
                         Send your link or unique code directly to friends. Your code will give them 15% off their first footwear purchase.
@@ -835,7 +835,7 @@ export default function ProfilePage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                       {/* Unique Referral Code */}
-                      <div className="bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] flex flex-col justify-between space-y-3">
+                      <div className="bg-[#F7F7F7] p-4 rounded-xl border border-[#E5E5E5] flex flex-col justify-between space-y-3">
                         <div>
                           <label className="text-xs font-bold text-slate-700 block uppercase tracking-wider text-[11px]">
                             Your Referral Code
@@ -869,7 +869,7 @@ export default function ProfilePage() {
                       </div>
 
                       {/* Shareable Referral Link */}
-                      <div className="bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] flex flex-col justify-between space-y-3">
+                      <div className="bg-[#F7F7F7] p-4 rounded-xl border border-[#E5E5E5] flex flex-col justify-between space-y-3">
                         <div>
                           <label className="text-xs font-bold text-slate-700 block uppercase tracking-wider text-[11px]">
                             Your Shareable Link
@@ -933,9 +933,9 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-5 sm:p-6 space-y-3">
+                  <div className="bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl p-5 sm:p-6 space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[#89591C]/10 text-[#89591C] flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-9 h-9 rounded-full bg-[#F37021]/10 text-[#F37021] flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Gift className="w-5 h-5" />
                       </div>
                       <div className="space-y-1">
@@ -952,7 +952,7 @@ export default function ProfilePage() {
                     <div className="pt-2 flex justify-start">
                       <Link
                         href="/"
-                        className="px-5 py-2.5 bg-[#89591C] hover:bg-[#724a17] text-white text-xs font-bold rounded-lg transition-colors inline-block"
+                        className="px-5 py-2.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-lg transition-colors inline-block"
                       >
                         Shop Footwear (Min ₹999)
                       </Link>
@@ -998,8 +998,8 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Reward Policy Notice */}
-                  <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-lg p-3 text-[11px] text-slate-600 flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 text-[#89591C] flex-shrink-0 mt-0.5" />
+                  <div className="bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg p-3 text-[11px] text-slate-600 flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-[#F37021] flex-shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-slate-800">Cashback Policy:</span> Referral ₹100 cashback is redeemable at checkout on all standard returnable footwear. It cannot be applied to clearance items marked with <em>No Return • No Refund</em>.
                     </div>
@@ -1008,7 +1008,7 @@ export default function ProfilePage() {
 
                 {/* Referral Activity / History */}
                 <div className="bg-white border border-[#e5e5e5] rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#f0ece5] pb-3">
+                  <div className="flex items-center justify-between border-b border-[#EEEEEE] pb-3">
                     <div>
                       <h4 className="text-sm sm:text-base font-bold text-[#030303]">Referral Activity</h4>
                       <p className="text-xs text-slate-500 mt-0.5">Friends who registered using your referral code</p>
@@ -1017,7 +1017,7 @@ export default function ProfilePage() {
                   </div>
 
                   {referralData?.history && referralData.history.length > 0 ? (
-                    <div className="divide-y divide-[#f0ece5]">
+                    <div className="divide-y divide-[#EEEEEE]">
                       {referralData.history.map((item) => {
                         const isCompleted = item.status === 'completed';
                         const isCancelled = item.status === 'cancelled';
@@ -1084,7 +1084,7 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   <div className="p-3.5 sm:p-4 rounded-xl border border-[#e5e5e5] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-sansation bg-white">
                     <div className="flex items-center gap-3">
-                      <Clock className="w-4 h-4 text-[#89591C] flex-shrink-0" />
+                      <Clock className="w-4 h-4 text-[#F37021] flex-shrink-0" />
                       <span>Viewed <strong>Men’s Casual Comfort Sandals – WGP50020 Black</strong></span>
                     </div>
                     <span className="text-slate-400 text-[11px]">Today, 11:30 AM</span>
@@ -1110,7 +1110,7 @@ export default function ProfilePage() {
                   </div>
                   <Link
                     href="/wishlist"
-                    className="text-xs font-semibold text-[#c25e09] hover:underline flex items-center gap-1 font-sansation"
+                    className="text-xs font-semibold text-[#F37021] hover:underline flex items-center gap-1 font-sansation"
                   >
                     Go to Wishlist Page <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
@@ -1125,14 +1125,14 @@ export default function ProfilePage() {
                       return (
                         <div key={item.productId} className="p-3.5 rounded-lg border border-[#e5e5e5] flex items-center justify-between gap-3 bg-white">
                           <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <Link href={prodHref} className="w-14 h-14 rounded-none bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
+                            <Link href={prodHref} className="w-14 h-14 rounded-none bg-[#F2F2F2] p-1 flex-shrink-0 border border-[#E5E5E5] overflow-hidden hover:opacity-85 transition-opacity block">
                               <ProductImage src={item.imageUrl} alt={item.title} width={56} height={56} className="object-contain w-full h-full" />
                             </Link>
                             <div className="min-w-0 flex-1 font-sansation space-y-0.5">
-                              <Link href={prodHref} className="text-xs font-semibold text-[#030303] truncate hover:text-[#8A5B2A] transition-colors block">
+                              <Link href={prodHref} className="text-xs font-semibold text-[#030303] truncate hover:text-[#F37021] transition-colors block">
                                 {item.title}
                               </Link>
-                              <span className="text-xs font-bold text-[#c25e09]">₹{item.price}</span>
+                              <span className="text-xs font-bold text-[#F37021]">₹{item.price}</span>
                             </div>
                           </div>
 
@@ -1153,7 +1153,7 @@ export default function ProfilePage() {
                               showToast(`Moved ${item.title} to Cart! Redirecting...`);
                               router.push('/cart');
                             }}
-                            className="bg-[#c25e09] hover:bg-[#a04a05] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-md transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
+                            className="bg-[#F37021] hover:bg-[#D95B10] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-md transition-colors font-sansation whitespace-nowrap cursor-pointer flex-shrink-0"
                           >
                             Add to Cart
                           </button>
@@ -1175,7 +1175,7 @@ export default function ProfilePage() {
                   </div>
                   <Link
                     href="/cart"
-                    className="text-xs font-semibold text-[#c25e09] hover:underline flex items-center gap-1 font-sansation"
+                    className="text-xs font-semibold text-[#F37021] hover:underline flex items-center gap-1 font-sansation"
                   >
                     View Full Cart <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
@@ -1190,23 +1190,23 @@ export default function ProfilePage() {
                       return (
                         <div key={item.productId} className="p-3.5 rounded-lg border border-[#e5e5e5] flex items-center justify-between bg-white">
                           <div className="flex items-center gap-3">
-                            <Link href={prodHref} className="w-12 h-12 rounded-none bg-[#f2f0ed] p-1 flex-shrink-0 border border-[#eae6e1] overflow-hidden hover:opacity-85 transition-opacity block">
+                            <Link href={prodHref} className="w-12 h-12 rounded-none bg-[#F2F2F2] p-1 flex-shrink-0 border border-[#E5E5E5] overflow-hidden hover:opacity-85 transition-opacity block">
                               <ProductImage src={item.imageUrl} alt={item.title} width={48} height={48} className="object-contain w-full h-full" />
                             </Link>
                             <div>
-                              <Link href={prodHref} className="text-xs font-semibold text-[#030303] hover:text-[#8A5B2A] transition-colors block">
+                              <Link href={prodHref} className="text-xs font-semibold text-[#030303] hover:text-[#F37021] transition-colors block">
                                 {item.title}
                               </Link>
                               <p className="text-[11px] text-slate-400">Qty: {item.quantity}</p>
                             </div>
                           </div>
-                          <span className="text-xs font-bold text-[#c25e09]">₹{item.price * item.quantity}</span>
+                          <span className="text-xs font-bold text-[#F37021]">₹{item.price * item.quantity}</span>
                         </div>
                       );
                     })}
                     <div className="pt-3 border-t border-[#e5e5e5] flex items-center justify-between text-sm">
                       <span className="font-semibold text-slate-700">Subtotal:</span>
-                      <span className="font-bold text-[#c25e09]">₹{subtotal}</span>
+                      <span className="font-bold text-[#F37021]">₹{subtotal}</span>
                     </div>
                   </div>
                 )}
@@ -1220,8 +1220,8 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-bold text-[#030303] font-sansation">Return & Refund Requests</h3>
                   <p className="text-xs text-slate-500 font-sansation">Manage returns and check refund status</p>
                 </div>
-                <div className="p-6 rounded-xl border border-[#e5e5e5] bg-[#faf9f6] text-center space-y-3 font-sansation">
-                  <RotateCcw className="w-8 h-8 text-[#89591C] mx-auto" />
+                <div className="p-6 rounded-xl border border-[#e5e5e5] bg-[#F7F7F7] text-center space-y-3 font-sansation">
+                  <RotateCcw className="w-8 h-8 text-[#F37021] mx-auto" />
                   <h4 className="text-sm font-bold text-[#030303]">No Active Return Requests</h4>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     All Gravoz orders come with 7-day easy returns and a 6-month product warranty.
@@ -1243,14 +1243,14 @@ export default function ProfilePage() {
                       <h4 className="text-xs font-semibold text-[#030303]">Order & Shipping Alerts</h4>
                       <p className="text-[11px] text-slate-500">Get instant WhatsApp & SMS tracking notifications</p>
                     </div>
-                    <input type="checkbox" defaultChecked className="accent-[#c25e09] w-4 h-4 cursor-pointer" />
+                    <input type="checkbox" defaultChecked className="accent-[#F37021] w-4 h-4 cursor-pointer" />
                   </div>
                   <div className="flex items-center justify-between p-4 rounded-2xl border border-[#e5e5e5] bg-white">
                     <div>
                       <h4 className="text-xs font-semibold text-[#030303]">Exclusive Discounts & Offers</h4>
                       <p className="text-[11px] text-slate-500">Receive promo codes and new product drop announcements</p>
                     </div>
-                    <input type="checkbox" defaultChecked className="accent-[#c25e09] w-4 h-4 cursor-pointer" />
+                    <input type="checkbox" defaultChecked className="accent-[#F37021] w-4 h-4 cursor-pointer" />
                   </div>
                 </div>
               </div>
@@ -1275,7 +1275,7 @@ export default function ProfilePage() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="Current Password"
-                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#F37021]"
                       required
                     />
                   </div>
@@ -1285,7 +1285,7 @@ export default function ProfilePage() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="New Password"
-                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#F37021]"
                       required
                     />
                   </div>
@@ -1295,14 +1295,14 @@ export default function ProfilePage() {
                       value={confirmNewPassword}
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                       placeholder="Confirm New Password"
-                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#89591C]"
+                      className="w-full h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl border border-[#e5e5e5] bg-white text-sm text-[#030303] placeholder:text-slate-400 focus:outline-none focus:border-[#F37021]"
                       required
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={updatingPassword}
-                    className="w-full sm:w-auto bg-[#030303] hover:bg-[#89591C] disabled:bg-slate-300 text-white text-xs sm:text-sm font-semibold px-6 py-2.5 rounded-full transition-colors text-center cursor-pointer"
+                    className="w-full sm:w-auto bg-[#030303] hover:bg-[#F37021] disabled:bg-slate-300 text-white text-xs sm:text-sm font-semibold px-6 py-2.5 rounded-full transition-colors text-center cursor-pointer"
                   >
                     {updatingPassword ? 'Updating...' : 'Update Password'}
                   </button>
@@ -1322,7 +1322,7 @@ export default function ProfilePage() {
       {/* ── WRITE REVIEW MODAL ── */}
       {reviewModalOpen && reviewItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-none p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto font-sansation">
+          <div className="bg-white w-full max-w-md rounded-none p-5 sm:p-6 shadow-2xl border border-[#E5E5E5] relative max-h-[90vh] overflow-y-auto font-sansation">
             <button
               type="button"
               onClick={() => setReviewModalOpen(false)}
@@ -1335,8 +1335,8 @@ export default function ProfilePage() {
             <p className="text-xs text-slate-500 mt-0.5">{reviewItem.name}</p>
 
             {/* Product thumbnail */}
-            <div className="mt-3 flex items-center gap-3 p-2.5 bg-[#faf8f5] rounded-none border border-[#e8e2d8]">
-              <div className="w-12 h-12 rounded-none bg-white border border-[#e8e2d8] overflow-hidden flex-shrink-0">
+            <div className="mt-3 flex items-center gap-3 p-2.5 bg-[#F7F7F7] rounded-none border border-[#E5E5E5]">
+              <div className="w-12 h-12 rounded-none bg-white border border-[#E5E5E5] overflow-hidden flex-shrink-0">
                 <ProductImage
                   src={reviewItem.imageUrl}
                   alt={reviewItem.name}
@@ -1365,13 +1365,13 @@ export default function ProfilePage() {
                     <Star
                       className={`w-7 h-7 transition-colors ${
                         star <= reviewRating
-                          ? 'text-[#C19968] fill-[#C19968]'
+                          ? 'text-[#F37021] fill-[#F37021]'
                           : 'text-slate-300'
                       }`}
                     />
                   </button>
                 ))}
-                <span className="ml-2 text-xs font-bold text-[#89591C]">
+                <span className="ml-2 text-xs font-bold text-[#F37021]">
                   {reviewRating === 5 ? 'Excellent' : reviewRating === 4 ? 'Good' : reviewRating === 3 ? 'Average' : reviewRating === 2 ? 'Below Average' : 'Poor'}
                 </span>
               </div>
@@ -1387,7 +1387,7 @@ export default function ProfilePage() {
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="How was the fit, leather quality, and comfort?"
                 rows={3}
-                className="w-full p-3 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-none focus:outline-none focus:border-[#89591C] resize-none"
+                className="w-full p-3 text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-none focus:outline-none focus:border-[#F37021] resize-none"
               />
             </div>
 
@@ -1398,7 +1398,7 @@ export default function ProfilePage() {
               </label>
               <div className="flex flex-wrap gap-2 items-center">
                 {reviewMedia.map((m, idx) => (
-                  <div key={idx} className="relative w-14 h-14 rounded-none overflow-hidden border border-[#e8e2d8] bg-black">
+                  <div key={idx} className="relative w-14 h-14 rounded-none overflow-hidden border border-[#E5E5E5] bg-black">
                     {m.type === 'video' ? (
                       <video src={m.url} className="w-full h-full object-cover" />
                     ) : (
@@ -1415,9 +1415,9 @@ export default function ProfilePage() {
                 ))}
 
                 {reviewMedia.length < 4 && (
-                  <label className="w-14 h-14 rounded-none border-2 border-dashed border-[#d8cebe] hover:border-[#89591C] bg-[#faf8f5] flex flex-col items-center justify-center text-slate-400 hover:text-[#89591C] cursor-pointer transition-colors">
+                  <label className="w-14 h-14 rounded-none border-2 border-dashed border-[#D4D4D4] hover:border-[#F37021] bg-[#F7F7F7] flex flex-col items-center justify-center text-slate-400 hover:text-[#F37021] cursor-pointer transition-colors">
                     {uploadingMedia ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#89591C]" />
+                      <Loader2 className="w-4 h-4 animate-spin text-[#F37021]" />
                     ) : (
                       <>
                         <Upload className="w-4 h-4" />
@@ -1495,7 +1495,7 @@ export default function ProfilePage() {
                     setSubmittingReview(false);
                   }
                 }}
-                className="w-full py-3 bg-[#89591C] hover:bg-[#724a17] disabled:opacity-60 text-white text-xs font-bold rounded-none transition-colors cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#F37021] hover:bg-[#D95B10] disabled:opacity-60 text-white text-xs font-bold rounded-none transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
                 {submittingReview ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
@@ -1511,7 +1511,7 @@ export default function ProfilePage() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-none shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
-          <div className="w-5 h-5 rounded-none bg-[#89591C] flex items-center justify-center flex-shrink-0">
+          <div className="w-5 h-5 rounded-none bg-[#F37021] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>
           <span className="text-xs font-medium font-sansation">{toastMessage}</span>

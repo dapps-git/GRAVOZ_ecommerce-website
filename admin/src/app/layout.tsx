@@ -3,6 +3,7 @@ import './globals.css';
 import ScrollToTop from '@/components/admin/ScrollToTop';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://admin.sercherstore.com'),
   title: 'SERCHER Admin | Store Management',
   description: 'SERCHER Handcrafted Footwear Store Management Panel',
   keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER'],
@@ -33,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className="bg-[#faf8f5] text-[#1e293b] font-sans min-h-screen antialiased selection:bg-[#89591C] selection:text-white"
+        className="bg-[#f7f7f7] text-[#1e293b] font-sans min-h-screen antialiased selection:bg-[#F37021] selection:text-white"
         style={{ fontFamily: "'Montserrat', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
         suppressHydrationWarning
       >

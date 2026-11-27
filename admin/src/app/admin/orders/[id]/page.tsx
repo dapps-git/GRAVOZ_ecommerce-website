@@ -241,33 +241,33 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   return (
     <div className="max-w-4xl mx-auto space-y-6 font-sansation">
       <div className="flex items-center justify-between">
-        <Link href="/admin/orders" className="text-xs font-semibold text-slate-600 hover:text-[#89591C] flex items-center gap-1.5">
+        <Link href="/admin/orders" className="text-xs font-semibold text-slate-600 hover:text-[#F37021] flex items-center gap-1.5">
           <ArrowLeft className="w-4 h-4" /> Back to Orders
         </Link>
         <Link
           href={`/admin/invoices/${order._id}`}
-          className="px-4 py-2 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-2xl shadow-md shadow-[#89591C]/20 flex items-center gap-1.5"
+          className="px-4 py-2 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-2xl shadow-md shadow-[#F37021]/20 flex items-center gap-1.5"
         >
           <FileText className="w-4 h-4" /> View Invoice
         </Link>
       </div>
 
       {/* Header Banner */}
-      <div className="bg-white rounded-3xl p-6 border border-[#e8e2d8] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-3xl p-6 border border-[#E5E5E5] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-bold text-slate-900">{order.orderNumber}</h1>
             <StatusBadge status={order.orderStatus} />
             <StatusBadge status={(order.orderStatus === 'delivered' && order.paymentMethod === 'COD') ? 'paid' : (order.paymentStatus || 'pending')} />
             {order.currentLocation && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-[#FFF9F2] text-[#8B4A12] border border-[#F5C78E] px-2.5 py-1 rounded-full shadow-2xs">
-                <MapPin className="w-3.5 h-3.5 text-[#8B4A12]" />
+              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-[#FFF9F2] text-[#F37021] border border-[#F5C78E] px-2.5 py-1 rounded-full shadow-2xs">
+                <MapPin className="w-3.5 h-3.5 text-[#F37021]" />
                 <span>{order.currentLocation}</span>
               </span>
             )}
             {order.estimatedDelivery && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#FAF5EE] text-[#89591C] border border-[#d4af7a] px-3 py-1 rounded-full shadow-2xs">
-                <Calendar className="w-3.5 h-3.5 text-[#89591C]" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#FFF3EB] text-[#F37021] border border-[#F7B994] px-3 py-1 rounded-full shadow-2xs">
+                <Calendar className="w-3.5 h-3.5 text-[#F37021]" />
                 <span>Est. Delivery: {new Date(order.estimatedDelivery).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </span>
             )}
@@ -279,10 +279,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Dedicated Status & Location Update Manager */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#e8e2d8] shadow-sm space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e8e2d8] pb-3">
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#E5E5E5] shadow-sm space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E5E5E5] pb-3">
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-[#89591C]" />
+            <MapPin className="w-4 h-4 text-[#F37021]" />
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               Update Order Status &amp; Hub Location
             </h3>
@@ -301,7 +301,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               value={selectedStatus}
               disabled={updating}
               onChange={(e) => handleStatusChange(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#F37021]"
             >
               <option value="ordered">Ordered (Placed)</option>
               <option value="confirmed">Confirmed</option>
@@ -324,8 +324,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
           {selectedStatus === 'shipped' && (
             <div className="sm:col-span-3 space-y-1 animate-in fade-in duration-200">
-              <label className="block text-[11px] font-bold text-[#89591C] flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-[#89591C]" />
+              <label className="block text-[11px] font-bold text-[#F37021] flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-[#F37021]" />
                 <span>Approx. Delivery Date</span>
               </label>
               <input
@@ -333,7 +333,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 value={approxDeliveryDate}
                 disabled={updating}
                 onChange={(e) => setApproxDeliveryDate(e.target.value)}
-                className="w-full bg-[#FAF5EE] border-2 border-[#89591C]/50 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#89591C] focus:ring-1 focus:ring-[#89591C]"
+                className="w-full bg-[#FFF3EB] border-2 border-[#F37021]/50 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#F37021] focus:ring-1 focus:ring-[#F37021]"
               />
             </div>
           )}
@@ -348,7 +348,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               disabled={updating}
               onChange={(e) => setLocationInput(e.target.value)}
               placeholder="e.g. Mumbai Sorting Hub, Kochi Facility"
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -362,7 +362,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               disabled={updating}
               onChange={(e) => setStatusNote(e.target.value)}
               placeholder="e.g. Dispatched via Bluedart"
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -370,7 +370,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <button
               type="submit"
               disabled={updating}
-              className="w-full py-2 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-60 flex items-center justify-center gap-1"
+              className="w-full py-2 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-60 flex items-center justify-center gap-1"
             >
               {updating ? '...' : 'Save'}
             </button>
@@ -380,8 +380,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Customer & Shipping (1 Col) */}
-        <div className="bg-white rounded-3xl p-5 border border-[#e8e2d8] shadow-sm space-y-4">
-          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#e8e2d8] pb-2">
+        <div className="bg-white rounded-3xl p-5 border border-[#E5E5E5] shadow-sm space-y-4">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#E5E5E5] pb-2">
             Customer Information
           </h3>
           <div className="text-xs space-y-1">
@@ -390,7 +390,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <p className="text-slate-600 font-normal">{customerPhone}</p>
           </div>
 
-          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#e8e2d8] pb-2 pt-2">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#E5E5E5] pb-2 pt-2">
             Shipping Address
           </h3>
           <div className="text-xs text-slate-700 space-y-0.5 font-normal">
@@ -402,10 +402,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <p className="font-bold text-slate-900">{shippingAddr.country || 'India'}</p>
           </div>
 
-          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#e8e2d8] pb-2 pt-2">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#E5E5E5] pb-2 pt-2">
             Payment &amp; Transaction
           </h3>
-          <div className="text-xs space-y-1.5 bg-[#FAF8F5] p-3 rounded-xl border border-[#E8E1D9]">
+          <div className="text-xs space-y-1.5 bg-[#F7F7F7] p-3 rounded-xl border border-[#E5E5E5]">
             <div className="flex items-center justify-between">
               <span className="text-slate-500 font-medium">Method:</span>
               <span className="font-bold text-slate-900">
@@ -419,7 +419,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               <StatusBadge status={(order.orderStatus === 'delivered' && order.paymentMethod === 'COD') ? 'paid' : (order.paymentStatus || 'pending')} />
             </div>
             {(order as any).razorpayPaymentId && (
-              <div className="pt-1 border-t border-[#E8E1D9] text-[10px]">
+              <div className="pt-1 border-t border-[#E5E5E5] text-[10px]">
                 <span className="text-slate-500 block">Razorpay Payment ID:</span>
                 <span className="font-mono text-slate-800 break-all font-semibold">{(order as any).razorpayPaymentId}</span>
               </div>
@@ -495,11 +495,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             'returned',
             'return_rejected',
           ].includes(order.orderStatus) && (
-            <div className="pt-3 border-t border-[#e8e2d8] space-y-2">
-              <h3 className="text-xs font-bold text-[#89591C] uppercase tracking-wider">
+            <div className="pt-3 border-t border-[#E5E5E5] space-y-2">
+              <h3 className="text-xs font-bold text-[#F37021] uppercase tracking-wider">
                 Return &amp; Refund Request
               </h3>
-              <div className="p-3 bg-[#faf4ec] rounded-xl border border-[#e8d5b5] space-y-1.5 text-xs">
+              <div className="p-3 bg-[#FFF3EB] rounded-xl border border-[#FAD4BC] space-y-1.5 text-xs">
                 <div>
                   <span className="text-slate-500 block text-[10px] uppercase font-medium">Reason:</span>
                   <span className="font-bold text-slate-900">{order.returnDetails.reason}</span>
@@ -515,7 +515,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     <span className="text-slate-500 block text-[10px] uppercase font-medium mb-1">Photos:</span>
                     <div className="flex gap-2">
                       {order.returnDetails.images.map((img: string, i: number) => (
-                        <div key={i} className="w-12 h-12 rounded-lg border border-[#e8d5b5] overflow-hidden">
+                        <div key={i} className="w-12 h-12 rounded-lg border border-[#FAD4BC] overflow-hidden">
                           <img src={img} alt="Return photo" className="w-full h-full object-cover" />
                         </div>
                       ))}
@@ -528,16 +528,16 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         </div>
 
         {/* Itemized Order Breakdown (2 Cols) */}
-        <div className="md:col-span-2 bg-white rounded-3xl p-5 border border-[#e8e2d8] shadow-sm space-y-4">
-          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#e8e2d8] pb-2">
+        <div className="md:col-span-2 bg-white rounded-3xl p-5 border border-[#E5E5E5] shadow-sm space-y-4">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-[#E5E5E5] pb-2">
             Ordered Shoe Items ({order.items?.length || 0})
           </h3>
 
-          <div className="divide-y divide-[#f0ebd9]">
+          <div className="divide-y divide-[#EEEEEE]">
             {order.items?.map((item, idx) => (
               <div key={idx} className="py-3 flex items-center gap-3 text-xs">
                 {/* Product Thumbnail */}
-                <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#faf8f5] border border-[#e8e2d8] flex-shrink-0">
+                <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#F7F7F7] border border-[#E5E5E5] flex-shrink-0">
                   <Image
                     src={item.imageUrl || item.image || '/products/product1.webp'}
                     alt={item.name}
@@ -572,7 +572,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 : 0;
 
             return (
-              <div className="border-t border-[#e8e2d8] pt-3 space-y-1.5 text-xs text-slate-600 font-normal">
+              <div className="border-t border-[#E5E5E5] pt-3 space-y-1.5 text-xs text-slate-600 font-normal">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span className="text-slate-900 font-semibold">₹{rawSubtotal.toLocaleString('en-IN')}</span>
@@ -596,9 +596,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     <span className="text-emerald-700 font-semibold">FREE</span>
                   )}
                 </div>
-                <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-[#e8e2d8]">
+                <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-[#E5E5E5]">
                   <span>Total Amount</span>
-                  <span className="text-[#89591C]">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
+                  <span className="text-[#F37021]">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
                 </div>
               </div>
             );
@@ -638,27 +638,27 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
 
             {/* Refund Order Summary Details */}
-            <div className="bg-[#FAF8F5] border border-[#E8E1D9] rounded-xl p-4 space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+            <div className="bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl p-4 space-y-2 text-xs">
+              <div className="flex justify-between py-1 border-b border-[#E5E5E5]">
                 <span className="text-slate-500 font-medium">Order Number:</span>
                 <span className="font-bold text-slate-900 font-mono">{order.orderNumber}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+              <div className="flex justify-between py-1 border-b border-[#E5E5E5]">
                 <span className="text-slate-500 font-medium">Customer:</span>
                 <span className="font-semibold text-slate-900">{customerName}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+              <div className="flex justify-between py-1 border-b border-[#E5E5E5]">
                 <span className="text-slate-500 font-medium">Customer Email / Phone:</span>
                 <span className="text-slate-700">{customerEmail} • {customerPhone}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+              <div className="flex justify-between py-1 border-b border-[#E5E5E5]">
                 <span className="text-slate-500 font-medium">Payment Method:</span>
                 <span className="font-bold text-slate-900">
                   {order.paymentMethod === 'COD' ? 'Cash on Delivery (COD)' : `${order.paymentMethod || 'Online'} (UPI / Razorpay)`}
                 </span>
               </div>
               {(order as any).razorpayPaymentId && (
-                <div className="flex justify-between py-1 border-b border-[#E8E1D9]">
+                <div className="flex justify-between py-1 border-b border-[#E5E5E5]">
                   <span className="text-slate-500 font-medium">Razorpay Payment ID:</span>
                   <span className="font-mono text-slate-800 font-semibold text-[11px]">
                     {(order as any).razorpayPaymentId}
@@ -682,7 +682,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   onClick={() => setSelectedStatus('refund_initiated')}
                   className={`p-2.5 rounded-xl border text-left transition-all ${
                     selectedStatus === 'refund_initiated'
-                      ? 'border-[#89591C] bg-[#FAF4EC] text-[#89591C] font-bold shadow-xs'
+                      ? 'border-[#F37021] bg-[#FFF3EB] text-[#F37021] font-bold shadow-xs'
                       : 'border-slate-200 hover:border-slate-300 text-slate-700 font-medium'
                   }`}
                 >

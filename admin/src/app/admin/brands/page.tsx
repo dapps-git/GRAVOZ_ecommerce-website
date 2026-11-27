@@ -121,11 +121,11 @@ export default function BrandsPage() {
       header: 'Brand Name',
       accessor: (row) => (
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-[#faf8f5] overflow-hidden relative border border-[#e8e2d8] flex-shrink-0 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-md bg-[#F7F7F7] overflow-hidden relative border border-[#E5E5E5] flex-shrink-0 flex items-center justify-center">
             {row.logoUrl ? (
               <Image src={row.logoUrl} alt={row.name} fill sizes="36px" className="object-contain p-1" />
             ) : (
-              <Tag className="w-4 h-4 text-[#89591C]" />
+              <Tag className="w-4 h-4 text-[#F37021]" />
             )}
           </div>
           <div>
@@ -167,7 +167,7 @@ export default function BrandsPage() {
         <button
           type="button"
           onClick={() => openEditModal(row)}
-          className="text-xs font-semibold text-[#89591C] hover:underline cursor-pointer"
+          className="text-xs font-semibold text-[#F37021] hover:underline cursor-pointer"
         >
           Edit
         </button>
@@ -177,7 +177,7 @@ export default function BrandsPage() {
 
   return (
     <div className="space-y-4 font-sansation">
-      <div className="flex items-center justify-between gap-4 border-b border-[#e8e2d8] pb-3">
+      <div className="flex items-center justify-between gap-4 border-b border-[#E5E5E5] pb-3">
         <div>
           <h1 className="text-xl font-bold text-[#030303]">Footwear Brands</h1>
           <p className="text-xs text-slate-500 font-normal mt-0.5">Manage partner brands, brand discounts, and manufacturer information.</p>
@@ -185,7 +185,7 @@ export default function BrandsPage() {
         <button
           type="button"
           onClick={openCreateModal}
-          className="px-4 py-2 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+          className="px-4 py-2 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" /> Add Brand
         </button>
@@ -207,7 +207,7 @@ export default function BrandsPage() {
                 placeholder="e.g. Gravoz Artisans"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
 
@@ -223,7 +223,7 @@ export default function BrandsPage() {
                   placeholder="e.g. 10 for 10% OFF"
                   value={discountPercentage}
                   onChange={(e) => setDiscountPercentage(e.target.value)}
-                  className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl pl-3 pr-8 py-2 text-xs text-slate-900 font-bold focus:outline-none focus:border-[#89591C]"
+                  className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl pl-3 pr-8 py-2 text-xs text-slate-900 font-bold focus:outline-none focus:border-[#F37021]"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">%</span>
               </div>
@@ -239,7 +239,7 @@ export default function BrandsPage() {
               placeholder="https://..."
               value={logoUrl}
               onChange={(e) => setLogoUrl(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -252,22 +252,22 @@ export default function BrandsPage() {
               placeholder="Brand story and heritage..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-[#f0ece5]">
+          <div className="flex justify-end gap-2 pt-2 border-t border-[#EEEEEE]">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 rounded-xl border border-[#e8e2d8] text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-[#E5E5E5] text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 rounded-xl bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+              className="px-5 py-2 rounded-xl bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold cursor-pointer disabled:opacity-50"
             >
               {submitting ? 'Saving...' : 'Save Brand'}
             </button>

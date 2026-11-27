@@ -14,13 +14,13 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white border border-[#e8e2d8] rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl font-light">
-        <div className="p-4 border-b border-[#e8e2d8] flex items-center justify-between bg-[#faf8f5]">
+      <div className="bg-white border border-[#E5E5E5] rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl font-light">
+        <div className="p-4 border-b border-[#E5E5E5] flex items-center justify-between bg-[#F7F7F7]">
           <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">{title}</h3>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-[#faf4ec] transition-colors"
+            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-[#FFF3EB] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

@@ -100,13 +100,29 @@ const nextConfig = {
           },
         ],
       },
-      // API routes — no cache by default, Next.js handles per-route
+      // API routes — no cache by default, CORS headers enabled
       {
         source: '/api/:path*',
         headers: [
           {
             key: 'Cache-Control',
             value: 'no-store',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization',
           },
           // Security headers for API
           {
@@ -138,10 +154,21 @@ const nextConfig = {
         has: [
           {
             type: 'host',
+            value: 'sercherstore.com',
+          },
+        ],
+        destination: 'https://www.sercherstore.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
             value: 'gravoz.com',
           },
         ],
-        destination: 'https://www.searcherstore.com/:path*',
+        destination: 'https://www.sercherstore.com/:path*',
         permanent: true,
       },
       {
@@ -152,7 +179,29 @@ const nextConfig = {
             value: 'www.gravoz.com',
           },
         ],
-        destination: 'https://www.searcherstore.com/:path*',
+        destination: 'https://www.sercherstore.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'searcherstore.com',
+          },
+        ],
+        destination: 'https://www.sercherstore.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.searcherstore.com',
+          },
+        ],
+        destination: 'https://www.sercherstore.com/:path*',
         permanent: true,
       },
     ];

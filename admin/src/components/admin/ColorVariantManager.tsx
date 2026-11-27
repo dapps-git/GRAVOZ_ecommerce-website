@@ -235,11 +235,11 @@ export default function ColorVariantManager({
       </div>
 
       {/* Add Custom / Preset Colors */}
-      <div className="p-3.5 bg-[#faf8f5] rounded-2xl border border-[#e8e2d8] space-y-2.5">
+      <div className="p-3.5 bg-[#F7F7F7] rounded-2xl border border-[#E5E5E5] space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold text-slate-700">Quick Color Presets:</span>
           {/* Live Preview Pill */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-[#e8e2d8] shadow-2xs">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-[#E5E5E5] shadow-2xs">
             <span className="text-[10px] text-slate-400 font-medium">Live Preview:</span>
             <span
               className="w-3.5 h-3.5 rounded-full border border-black/20 shadow-xs transition-colors"
@@ -264,7 +264,7 @@ export default function ColorVariantManager({
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
                   isAdded
                     ? 'bg-slate-100 text-slate-400 opacity-60 cursor-not-allowed border-slate-200'
-                    : 'bg-white border-[#e8e2d8] text-slate-800 hover:border-[#89591C] hover:bg-[#faf4ec]'
+                    : 'bg-white border-[#E5E5E5] text-slate-800 hover:border-[#F37021] hover:bg-[#FFF3EB]'
                 }`}
               >
                 <span className="w-3 h-3 rounded-full border border-black/20 flex-shrink-0" style={{ backgroundColor: preset.code }} />
@@ -277,7 +277,7 @@ export default function ColorVariantManager({
         {/* Custom Color Creator with Live Hex Code Detection */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
           {/* Visual Color Wheel Picker */}
-          <div className="flex items-center gap-1.5 bg-white border border-[#e8e2d8] rounded-xl px-2 py-1 shadow-2xs">
+          <div className="flex items-center gap-1.5 bg-white border border-[#E5E5E5] rounded-xl px-2 py-1 shadow-2xs">
             <input
               type="color"
               aria-label="Pick color"
@@ -289,7 +289,7 @@ export default function ColorVariantManager({
           </div>
 
           {/* Hex Code Input with Live Preview */}
-          <div className="flex items-center gap-1.5 bg-white border border-[#e8e2d8] rounded-xl px-2.5 py-1.5 shadow-2xs">
+          <div className="flex items-center gap-1.5 bg-white border border-[#E5E5E5] rounded-xl px-2.5 py-1.5 shadow-2xs">
             <span
               className="w-3.5 h-3.5 rounded-full border border-black/20 flex-shrink-0 transition-colors"
               style={{ backgroundColor: customCode || '#1a1a1a' }}
@@ -310,7 +310,7 @@ export default function ColorVariantManager({
           </div>
 
           {/* Color Name Input */}
-          <div className="flex-1 min-w-[140px] bg-white border border-[#e8e2d8] rounded-xl px-2.5 py-1.5 shadow-2xs">
+          <div className="flex-1 min-w-[140px] bg-white border border-[#E5E5E5] rounded-xl px-2.5 py-1.5 shadow-2xs">
             <input
               type="text"
               placeholder="Color name (e.g. Mocha, Cherry Red)..."
@@ -330,7 +330,7 @@ export default function ColorVariantManager({
           <button
             type="button"
             onClick={() => addColor(customName, customCode)}
-            className="px-4 py-2 rounded-xl bg-[#89591C] hover:bg-[#724a17] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs hover:shadow-xs active:scale-95"
+            className="px-4 py-2 rounded-xl bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs hover:shadow-xs active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Color</span>
@@ -348,9 +348,9 @@ export default function ColorVariantManager({
             const canAddMore = varImages.length < MAX_COLOR_IMAGES;
 
             return (
-              <div key={item.id || variantIdx} className="p-4 bg-white rounded-2xl border border-[#e8e2d8] space-y-3.5 shadow-2xs">
+              <div key={item.id || variantIdx} className="p-4 bg-white rounded-2xl border border-[#E5E5E5] space-y-3.5 shadow-2xs">
                 {/* Color Header */}
-                <div className="flex items-center justify-between border-b border-[#f0ece5] pb-2.5">
+                <div className="flex items-center justify-between border-b border-[#EEEEEE] pb-2.5">
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full border border-black/20" style={{ backgroundColor: item.colorCode || '#000' }} />
                     <span className="text-sm font-bold text-slate-900">{item.name}</span>
@@ -371,10 +371,10 @@ export default function ColorVariantManager({
                   <span className="text-[11px] font-bold text-slate-700 block">Angle Photos ({item.name}):</span>
                   <div className="flex flex-wrap gap-2">
                     {varImages.map((img, imgIdx) => (
-                      <div key={imgIdx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#e8e2d8] bg-[#faf8f5] group flex-shrink-0">
+                      <div key={imgIdx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#E5E5E5] bg-[#F7F7F7] group flex-shrink-0">
                         <Image src={img.url} alt={img.alt} fill sizes="64px" className="object-cover" />
                         {imgIdx === 0 && (
-                          <span className="absolute bottom-0.5 left-0.5 text-[8px] bg-[#89591C] text-white px-1 rounded font-bold">Hero</span>
+                          <span className="absolute bottom-0.5 left-0.5 text-[8px] bg-[#F37021] text-white px-1 rounded font-bold">Hero</span>
                         )}
                         <button
                           type="button"
@@ -388,12 +388,12 @@ export default function ColorVariantManager({
 
                     {/* Upload slot */}
                     {canAddMore && (
-                      <label className="w-16 h-16 flex-shrink-0 rounded-xl border-2 border-dashed border-[#e8e2d8] hover:border-[#89591C] bg-[#faf8f5] hover:bg-[#f2ece2] flex flex-col items-center justify-center cursor-pointer transition-colors">
+                      <label className="w-16 h-16 flex-shrink-0 rounded-xl border-2 border-dashed border-[#E5E5E5] hover:border-[#F37021] bg-[#F7F7F7] hover:bg-[#EEEEEE] flex flex-col items-center justify-center cursor-pointer transition-colors">
                         {isUploadingNew ? (
-                          <span className="text-[9px] text-[#89591C] font-semibold animate-pulse text-center px-1">Uploading...</span>
+                          <span className="text-[9px] text-[#F37021] font-semibold animate-pulse text-center px-1">Uploading...</span>
                         ) : (
                           <>
-                            <Upload className="w-4 h-4 text-[#89591C] mb-0.5" />
+                            <Upload className="w-4 h-4 text-[#F37021] mb-0.5" />
                             <span className="text-[9px] font-bold text-slate-600">Upload</span>
                           </>
                         )}
@@ -410,7 +410,7 @@ export default function ColorVariantManager({
                   {/* URL Input Row */}
                   {canAddMore && (
                     <div className="flex items-center gap-2 pt-1">
-                      <div className="flex-1 flex items-center gap-1.5 bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-2.5 py-1.5">
+                      <div className="flex-1 flex items-center gap-1.5 bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-2.5 py-1.5">
                         <LinkIcon className="w-3 h-3 text-slate-400 flex-shrink-0" />
                         <input
                           type="text"
@@ -429,7 +429,7 @@ export default function ColorVariantManager({
                       <button
                         type="button"
                         onClick={() => handleAddUrl(variantIdx)}
-                        className="h-8 px-3 rounded-lg bg-[#89591C] hover:bg-[#724a17] text-white text-xs font-bold transition-colors cursor-pointer"
+                        className="h-8 px-3 rounded-lg bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold transition-colors cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
@@ -450,7 +450,7 @@ export default function ColorVariantManager({
                             onClick={() => handlePickPhoto(variantIdx, pImg.url)}
                             className={`text-[10px] px-2 py-0.5 rounded-lg border font-semibold transition-all ${
                               alreadyPicked
-                                ? 'bg-[#89591C] text-white border-[#89591C]'
+                                ? 'bg-[#F37021] text-white border-[#F37021]'
                                 : canAddMore
                                 ? 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 cursor-pointer'
                                 : 'bg-slate-50 text-slate-400 border-slate-100 cursor-not-allowed opacity-60'
@@ -465,7 +465,7 @@ export default function ColorVariantManager({
                 </div>
 
                 {/* 2. SIZES FOR THIS SPECIFIC COLOR */}
-                <div className="bg-[#faf8f5] rounded-xl p-3 border border-[#eee8de] space-y-2">
+                <div className="bg-[#F7F7F7] rounded-xl p-3 border border-[#EEEEEE] space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
                       <Ruler className="w-3.5 h-3.5 text-slate-500" />
@@ -490,7 +490,7 @@ export default function ColorVariantManager({
                               ? 'bg-[#557244] text-white shadow-2xs'
                               : isSelected && !isAvailable
                               ? 'bg-rose-100 text-rose-600 border border-rose-300 line-through'
-                              : 'bg-white border border-[#e8e2d8] text-slate-600 hover:border-slate-400'
+                              : 'bg-white border border-[#E5E5E5] text-slate-600 hover:border-slate-400'
                           }`}
                           title={
                             isSelected && isAvailable
@@ -516,7 +516,7 @@ export default function ColorVariantManager({
                           onClick={() => toggleSizeForVariant(variantIdx, s.size)}
                           className={`min-w-[36px] h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
                             s.isAvailable
-                              ? 'bg-[#89591C] text-white shadow-2xs'
+                              ? 'bg-[#F37021] text-white shadow-2xs'
                               : 'bg-rose-100 text-rose-600 border border-rose-300 line-through'
                           }`}
                         >
@@ -539,12 +539,12 @@ export default function ColorVariantManager({
                           addCustomSizeForVariant(variantIdx);
                         }
                       }}
-                      className="text-[11px] bg-white border border-[#e8e2d8] rounded-lg px-2.5 py-1 text-slate-800 focus:outline-none w-36"
+                      className="text-[11px] bg-white border border-[#E5E5E5] rounded-lg px-2.5 py-1 text-slate-800 focus:outline-none w-36"
                     />
                     <button
                       type="button"
                       onClick={() => addCustomSizeForVariant(variantIdx)}
-                      className="px-2.5 py-1 rounded-lg bg-white border border-[#e8e2d8] hover:bg-slate-50 text-slate-700 text-[11px] font-bold cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-white border border-[#E5E5E5] hover:bg-slate-50 text-slate-700 text-[11px] font-bold cursor-pointer"
                     >
                       + Add Size
                     </button>

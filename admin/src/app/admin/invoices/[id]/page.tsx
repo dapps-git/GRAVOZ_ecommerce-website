@@ -96,31 +96,31 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-4xl mx-auto space-y-6 print:m-0 print:p-0 print:max-w-none print:w-full font-sansation">
       {/* Top Controller Bar (Hidden on Print) */}
-      <div className="flex items-center justify-between print:hidden bg-white p-4 rounded-2xl border border-[#e8e2d8] shadow-2xs">
+      <div className="flex items-center justify-between print:hidden bg-white p-4 rounded-2xl border border-[#E5E5E5] shadow-2xs">
         <Link
           href="/admin/invoices"
-          className="text-xs font-semibold text-slate-600 hover:text-[#89591C] flex items-center gap-1.5 transition-colors"
+          className="text-xs font-semibold text-slate-600 hover:text-[#F37021] flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Invoices
         </Link>
         <button
           type="button"
           onClick={() => window.print()}
-          className="px-5 py-2.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-all"
+          className="px-5 py-2.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-all"
         >
           <Printer className="w-4 h-4" /> Print / Save as PDF
         </button>
       </div>
 
       {/* Printable Paper Document */}
-      <div className="printable-invoice-container bg-white text-slate-900 rounded-2xl p-8 sm:p-10 border border-[#e8e2d8] shadow-sm space-y-8 print:border-none print:shadow-none print:p-0 print:rounded-none">
+      <div className="printable-invoice-container bg-white text-slate-900 rounded-2xl p-8 sm:p-10 border border-[#E5E5E5] shadow-sm space-y-8 print:border-none print:shadow-none print:p-0 print:rounded-none">
         
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#e8e2d8] pb-6">
+        <div className="flex items-start justify-between border-b border-[#E5E5E5] pb-6">
           <div className="space-y-1">
             <div className="relative h-10 w-44 mb-1">
               <Image
-                src="/sercher-logo.png"
+                src="/sercher-brand-logo.png"
                 alt="SERCHER"
                 fill
                 priority
@@ -128,7 +128,7 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
                 sizes="176px"
               />
             </div>
-            <p className="text-xs text-[#89591C] font-semibold tracking-wide uppercase">
+            <p className="text-xs text-[#F37021] font-semibold tracking-wide uppercase">
               Premium Handcrafted Footwear for Men, Women &amp; Unisex
             </p>
             <p className="text-[11px] text-slate-400">
@@ -137,7 +137,7 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
           </div>
 
           <div className="text-right space-y-1">
-            <h2 className="text-xl font-bold text-[#89591C] uppercase tracking-wider">
+            <h2 className="text-xl font-bold text-[#F37021] uppercase tracking-wider">
               INVOICE
             </h2>
             <p className="text-xs font-bold text-slate-900 font-mono">
@@ -154,8 +154,8 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
 
         {/* Customer & Billed Address */}
         <div className="grid grid-cols-2 gap-8 text-xs">
-          <div className="space-y-1 bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] print:bg-transparent print:border-none print:p-0">
-            <h3 className="font-bold text-[#89591C] uppercase tracking-wider text-[11px]">
+          <div className="space-y-1 bg-[#F7F7F7] p-4 rounded-xl border border-[#E5E5E5] print:bg-transparent print:border-none print:p-0">
+            <h3 className="font-bold text-[#F37021] uppercase tracking-wider text-[11px]">
               Billed To:
             </h3>
             <p className="font-bold text-slate-900 text-sm">{customerName}</p>
@@ -163,8 +163,8 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
             <p className="text-slate-600">{customerPhone}</p>
           </div>
 
-          <div className="space-y-1 bg-[#faf8f5] p-4 rounded-xl border border-[#e8e2d8] text-right print:bg-transparent print:border-none print:p-0">
-            <h3 className="font-bold text-[#89591C] uppercase tracking-wider text-[11px]">
+          <div className="space-y-1 bg-[#F7F7F7] p-4 rounded-xl border border-[#E5E5E5] text-right print:bg-transparent print:border-none print:p-0">
+            <h3 className="font-bold text-[#F37021] uppercase tracking-wider text-[11px]">
               Shipping Address:
             </h3>
             <p className="text-slate-800 font-medium">{addrStreet}</p>
@@ -176,10 +176,10 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
         </div>
 
         {/* Items Table */}
-        <div className="border border-[#e8e2d8] rounded-xl overflow-hidden print:border-slate-300">
+        <div className="border border-[#E5E5E5] rounded-xl overflow-hidden print:border-slate-300">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-[#faf8f5] text-slate-800 font-bold uppercase border-b border-[#e8e2d8] print:bg-slate-100">
+              <tr className="bg-[#F7F7F7] text-slate-800 font-bold uppercase border-b border-[#E5E5E5] print:bg-slate-100">
                 <th className="py-3 px-4">Item Description</th>
                 <th className="py-3 px-4">Size &amp; Variant</th>
                 <th className="py-3 px-4 text-center">Qty</th>
@@ -187,7 +187,7 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
                 <th className="py-3 px-4 text-right">Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e8e2d8] print:divide-slate-200">
+            <tbody className="divide-y divide-[#E5E5E5] print:divide-slate-200">
               {(order.items || []).map((item, idx) => (
                 <tr key={idx}>
                   <td className="py-3.5 px-4 font-bold text-slate-900">{item.name}</td>
@@ -207,7 +207,7 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
 
         {/* Summary Totals */}
         <div className="flex justify-end pt-2">
-          <div className="w-72 space-y-2 text-xs text-slate-600 bg-[#faf8f5] p-5 rounded-2xl border border-[#e8e2d8] print:bg-transparent print:border-none print:p-0">
+          <div className="w-72 space-y-2 text-xs text-slate-600 bg-[#F7F7F7] p-5 rounded-2xl border border-[#E5E5E5] print:bg-transparent print:border-none print:p-0">
             <div className="flex justify-between">
               <span>Subtotal</span>
               <span className="font-semibold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
@@ -231,15 +231,15 @@ export default function PrintableInvoicePage({ params }: { params: Promise<{ id:
                 )}
               </span>
             </div>
-            <div className="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-[#e8e2d8]">
+            <div className="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-[#E5E5E5]">
               <span>Total Paid</span>
-              <span className="text-[#89591C]">₹{order.totalAmount.toLocaleString('en-IN')}</span>
+              <span className="text-[#F37021]">₹{order.totalAmount.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
 
         {/* Footer Note */}
-        <div className="border-t border-[#e8e2d8] pt-6 text-center space-y-1 text-[11px] text-slate-500">
+        <div className="border-t border-[#E5E5E5] pt-6 text-center space-y-1 text-[11px] text-slate-500">
           <p className="font-semibold text-slate-700">Thank you for choosing SERCHER!</p>
           <p>For questions or warranty assistance, contact gravozshoes@gmail.com | +91 9645319418</p>
           <p className="text-[10px] text-slate-400">This is a computer-generated tax invoice and requires no physical signature.</p>

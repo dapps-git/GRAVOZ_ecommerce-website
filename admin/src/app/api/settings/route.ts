@@ -17,7 +17,7 @@ export async function GET() {
       await Setting.create({
         storeName: 'SERCHER Footwear',
         storeTagline: 'Premium Handcrafted Footwear & Leather Collections',
-        contactEmail: 'support@searcherstore.com',
+        contactEmail: 'support@sercherstore.com',
         contactPhone: '+91 98765 43210',
         gstinTaxId: '32AAACL1902K1Z8',
         currencySymbol: '₹',

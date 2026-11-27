@@ -49,16 +49,18 @@ interface Props {
   layout?: 'grid' | 'list';
   /** Static fallback products (shown until DB returns data) */
   fallback?: MappedProduct[];
+  /** Server-side preloaded products */
+  initialProducts?: MappedProduct[];
 }
 
 function SkeletonCard() {
   return (
-    <div className="flex flex-col animate-pulse bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5">
-      <div className="w-full aspect-square rounded-none bg-[#ede9e2]" />
+    <div className="flex flex-col animate-pulse bg-white rounded-none border border-[#E5E5E5] p-3 sm:p-3.5">
+      <div className="w-full aspect-square rounded-none bg-[#EBEBEB]" />
       <div className="mt-2.5 space-y-2">
-        <div className="h-3 w-3/4 rounded-none bg-[#ddd8cf]" />
-        <div className="h-3 w-1/3 rounded-none bg-[#ddd8cf]" />
-        <div className="h-4 w-1/2 rounded-none bg-[#c9c3bc]" />
+        <div className="h-3 w-3/4 rounded-none bg-[#E0E0E0]" />
+        <div className="h-3 w-1/3 rounded-none bg-[#E0E0E0]" />
+        <div className="h-4 w-1/2 rounded-none bg-[#D0D0D0]" />
       </div>
     </div>
   );
@@ -66,12 +68,12 @@ function SkeletonCard() {
 
 function SkeletonListItem() {
   return (
-    <div className="flex items-center gap-4 p-4 rounded-xl border border-[#e8e2d8] bg-[#faf8f5] animate-pulse">
-      <div className="w-20 h-20 flex-shrink-0 rounded-xl bg-[#ede9e2]" />
+    <div className="flex items-center gap-4 p-4 rounded-xl border border-[#E5E5E5] bg-[#F7F7F7] animate-pulse">
+      <div className="w-20 h-20 flex-shrink-0 rounded-xl bg-[#EBEBEB]" />
       <div className="flex flex-col gap-2 flex-1">
-        <div className="h-2 w-16 rounded bg-[#ddd8cf]" />
-        <div className="h-3 w-32 rounded bg-[#ddd8cf]" />
-        <div className="h-3 w-20 rounded bg-[#c9c3bc]" />
+        <div className="h-2 w-16 rounded bg-[#E0E0E0]" />
+        <div className="h-3 w-32 rounded bg-[#E0E0E0]" />
+        <div className="h-3 w-20 rounded bg-[#D0D0D0]" />
       </div>
     </div>
   );
@@ -85,12 +87,19 @@ export default function DynamicProductSection({
   description,
   layout = 'grid',
   fallback = [],
+  initialProducts,
 }: Props) {
+  const hasInitial = Array.isArray(initialProducts);
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const [products, setProducts] = useState<MappedProduct[]>(fallback);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<MappedProduct[]>(hasInitial ? initialProducts : fallback);
+  const [loading, setLoading] = useState(!hasInitial);
 
   useEffect(() => {
+    if (hasInitial) {
+      setProducts(initialProducts);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     fetch(`/api/products?${filter}=true&limit=${limit}`)
       .then((r) => r.json())
@@ -117,7 +126,9 @@ export default function DynamicProductSection({
       })
       .catch(() => {/* keep fallback */})
       .finally(() => setLoading(false));
-  }, [filter, limit]);
+  }, [filter, limit, hasInitial, initialProducts]);
+
+  if (!loading && products.length === 0) return null;
 
   // Top Selling Layout: 2 items per row on laptop & desktop
   if (layout === 'list') {
@@ -130,13 +141,13 @@ export default function DynamicProductSection({
           </h2>
           <Link
             href="/products"
-            className="absolute right-0 font-sansation text-[13px] font-normal text-[#030303] underline underline-offset-2 hover:text-[#89591C] transition-colors"
+            className="absolute right-0 font-sansation text-[13px] font-normal text-[#030303] underline underline-offset-2 hover:text-[#F37021] transition-colors"
           >
             View All
           </Link>
         </div>
 
-        <hr className="border-[#e8e2d8]" />
+        <hr className="border-[#E5E5E5]" />
 
         {/* 2 items in 1 row on laptop / desktop view */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
@@ -146,9 +157,9 @@ export default function DynamicProductSection({
               <Link
                 key={p.id}
                 href={p.href}
-                className="flex items-center gap-4 p-3.5 sm:p-4 rounded-2xl bg-[#faf8f5] hover:bg-[#f3ece2] border border-[#e8e2d8] hover:border-slate-300 transition-all cursor-pointer group shadow-2xs"
+                className="flex items-center gap-4 p-3.5 sm:p-4 rounded-2xl bg-[#F7F7F7] hover:bg-[#F2F2F2] border border-[#E5E5E5] hover:border-slate-300 transition-all cursor-pointer group shadow-2xs"
               >
-                <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8]">
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-[#F3F3F3] border border-[#E5E5E5]">
                   <Image
                     src={p.imageUrl}
                     alt={p.title}
@@ -165,7 +176,7 @@ export default function DynamicProductSection({
                     {p.title}
                   </p>
                   <div className="flex items-baseline gap-2 pt-0.5">
-                    <span className="font-sansation font-bold text-xs sm:text-[14px] text-[#89591C]">
+                    <span className="font-sansation font-bold text-xs sm:text-[14px] text-[#F37021]">
                       ₹{p.price}
                     </span>
                     {p.originalPrice > p.price && (
@@ -188,7 +199,7 @@ export default function DynamicProductSection({
       {/* Header — clean centered uppercase font-light title */}
       <div className="flex flex-col items-center justify-center gap-1 text-center">
         {subLabel && (
-          <span className="text-[10px] uppercase tracking-widest font-semibold text-[#8A5B2A]">
+          <span className="text-[10px] uppercase tracking-widest font-semibold text-[#F37021]">
             {subLabel}
           </span>
         )}
@@ -226,8 +237,11 @@ function DynamicGridCard({
   isInWishlist: (id: string) => boolean;
   toggleWishlist: (item: any) => void;
 }) {
+  const [hovered, setHovered] = useState(false);
+  const [secondaryLoaded, setSecondaryLoaded] = useState(false);
   const mainImage = product.imageUrl || (product.images && product.images[0]) || '/products/placeholder.svg';
   const secondaryImage = product.images && product.images.length > 1 ? product.images[1] : null;
+  const hasSecondary = Boolean(secondaryImage && secondaryImage !== mainImage);
 
   const discount = product.originalPrice > product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -236,26 +250,27 @@ function DynamicGridCard({
   return (
     <Link
       href={product.href}
-      className="group bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+      onMouseEnter={() => { if (!hovered) setHovered(true); }}
+      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer"
     >
       {/* Product Image Card - aspect-square gives bigger size, rounded-md */}
-      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#faf8f5]">
+      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#F7F7F7]">
         {/* Badge if present (top most left) */}
         {discount > 0 ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               {discount}% OFF
             </span>
           </div>
         ) : (product as any).badge ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               {(product as any).badge}
             </span>
           </div>
         ) : (product as any).isBestSeller ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               BEST SELLER
             </span>
           </div>
@@ -288,24 +303,29 @@ function DynamicGridCard({
         </button>
 
         {/* Primary Image */}
-        <div className={`absolute inset-0 transition-opacity duration-300 ${secondaryImage ? 'group-hover:opacity-0' : ''}`}>
+        <div className={`absolute inset-0 transition-opacity duration-300 ${hasSecondary && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
           <ProductImage
             src={mainImage}
             alt={product.title}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
+            optimizeWidth={500}
+            loading="lazy"
             className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
           />
         </div>
 
-        {/* Secondary Image on Desktop Hover */}
-        {secondaryImage && (
-          <div className="hidden sm:block absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Secondary Image mounted lazily on Desktop Hover */}
+        {hasSecondary && hovered && (
+          <div className={`hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
             <ProductImage
               src={secondaryImage}
               alt={`${product.title} alternate view`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
+              optimizeWidth={500}
+              loading="eager"
+              onLoad={() => setSecondaryLoaded(true)}
               className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
             />
           </div>
@@ -314,7 +334,7 @@ function DynamicGridCard({
 
       {/* Card Meta (Title, Rating, Discount Price) */}
       <div className="mt-2.5 space-y-1">
-        <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+        <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#F37021] transition-colors leading-tight">
           {product.title}
         </h3>
 
@@ -323,7 +343,7 @@ function DynamicGridCard({
           const { rating, reviewsCount } = getProductRating(product);
           return (
             <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 font-normal">
-              <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+              <Star className="w-3.5 h-3.5 text-[#F37021] fill-[#F37021]" strokeWidth={1.5} />
               <span className="font-normal text-slate-700">{rating.toFixed(1)}</span>
               <span className="text-slate-400 font-light">
                 ({reviewsCount})
@@ -334,7 +354,7 @@ function DynamicGridCard({
 
         {/* Price with Discount */}
         <div className="flex items-baseline gap-1.5 pt-0.5">
-          <span className="text-xs sm:text-sm font-medium text-[#89591C]">
+          <span className="text-xs sm:text-sm font-medium text-[#F37021]">
             ₹{product.price}
           </span>
           {product.originalPrice > product.price && (

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 let cachedBanners: Record<string, any> | null = null;
 let lastCacheTime = 0;
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds memory cache
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds memory cache
 
 export async function GET(_req: NextRequest) {
   try {
@@ -33,14 +33,18 @@ export async function GET(_req: NextRequest) {
         isActive: true,
         slot: { $nin: ['duo_product_1', 'duo_product_2'] },
         category: { $ne: 'duo_showcase' },
-      }).lean(),
+      })
+        .select('slot name title subtitle description imageUrl thumbnailUrl lifestyleUrl price originalPrice productId linkUrl sizes colors aspectRatio isActive')
+        .lean(),
       Product.find({
         $or: [
           { spotlightSlot: { $in: ['duo_product_1', 'duo_product_2'] } },
           { featureInDuoSlot: { $in: ['duo_product_1', 'duo_product_2'] } },
         ],
         status: { $ne: 'archived' },
-      }).lean(),
+      })
+        .select('name slug price discountPrice images sizes colors spotlightSlot featureInDuoSlot spotlightMockups')
+        .lean(),
     ]);
 
     const bannerMap: Record<string, any> = {};

@@ -86,7 +86,7 @@ export default function ImageUploader({ images = [], onChange, maxPhotos = 6 }: 
         {images.map((img, index) => (
           <div
             key={index}
-            className="relative aspect-square rounded-xl bg-white border border-[#e8e2d8] overflow-hidden group shadow-2xs flex items-center justify-center"
+            className="relative aspect-square rounded-xl bg-white border border-[#E5E5E5] overflow-hidden group shadow-2xs flex items-center justify-center"
           >
             <Image
               src={img.url}
@@ -96,7 +96,7 @@ export default function ImageUploader({ images = [], onChange, maxPhotos = 6 }: 
               className="object-contain p-1"
             />
             {index === 0 && (
-              <span className="absolute top-1.5 left-1.5 bg-[#89591C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-xs">
+              <span className="absolute top-1.5 left-1.5 bg-[#F37021] text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-xs">
                 Main
               </span>
             )}
@@ -113,12 +113,12 @@ export default function ImageUploader({ images = [], onChange, maxPhotos = 6 }: 
 
         {/* Upload slot button if under max */}
         {images.length < maxPhotos && (
-          <label className="aspect-square rounded-xl bg-[#faf8f5] hover:bg-[#f2ece2] border-2 border-dashed border-[#e8e2d8] hover:border-[#89591C] flex flex-col items-center justify-center cursor-pointer transition-colors p-2 text-center shadow-2xs">
+          <label className="aspect-square rounded-xl bg-[#F7F7F7] hover:bg-[#EEEEEE] border-2 border-dashed border-[#E5E5E5] hover:border-[#F37021] flex flex-col items-center justify-center cursor-pointer transition-colors p-2 text-center shadow-2xs">
             {uploadingIndex === images.length ? (
-              <span className="text-[11px] text-[#89591C] font-semibold animate-pulse">Uploading...</span>
+              <span className="text-[11px] text-[#F37021] font-semibold animate-pulse">Uploading...</span>
             ) : (
               <>
-                <Upload className="w-6 h-6 text-[#89591C] mb-1" />
+                <Upload className="w-6 h-6 text-[#F37021] mb-1" />
                 <span className="text-[11px] font-bold text-slate-700">+ Upload File</span>
                 <input
                   type="file"
@@ -135,7 +135,7 @@ export default function ImageUploader({ images = [], onChange, maxPhotos = 6 }: 
       {/* Quick URL Input */}
       {images.length < maxPhotos && (
         <div className="flex items-center gap-2 pt-1">
-          <div className="flex-1 flex items-center gap-2 bg-white border border-[#e8e2d8] rounded-xl px-3 py-1.5">
+          <div className="flex-1 flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-1.5">
             <LinkIcon className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
             <input
               type="text"
@@ -154,7 +154,7 @@ export default function ImageUploader({ images = [], onChange, maxPhotos = 6 }: 
           <button
             type="button"
             onClick={handleAddUrl}
-            className="h-9 px-4 rounded-xl bg-[#89591C] hover:bg-[#724a17] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+            className="h-9 px-4 rounded-xl bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
           >
             <Plus className="w-3.5 h-3.5" /> Add
           </button>

@@ -147,10 +147,10 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5 font-sansation">
       {/* Header & Date Range Filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#e8e2d8] shadow-2xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#E5E5E5] shadow-2xs">
         <div>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-[#89591C]" /> Real-Time Analytics & Revenue
+            <TrendingUp className="w-5 h-5 text-[#F37021]" /> Real-Time Analytics & Revenue
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Store performance, revenue insights in INR (₹), and fulfillment metrics
@@ -159,13 +159,13 @@ export default function DashboardPage() {
 
         {/* Date Filter Tabs */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center bg-[#faf8f5] p-1 rounded-xl border border-[#e8e2d8]">
+          <div className="flex items-center bg-[#F7F7F7] p-1 rounded-xl border border-[#E5E5E5]">
             <button
               type="button"
               onClick={() => setDateRange('weekly')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 dateRange === 'weekly'
-                  ? 'bg-[#89591C] text-white shadow-2xs'
+                  ? 'bg-[#F37021] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -176,7 +176,7 @@ export default function DashboardPage() {
               onClick={() => setDateRange('monthly')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 dateRange === 'monthly'
-                  ? 'bg-[#89591C] text-white shadow-2xs'
+                  ? 'bg-[#F37021] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -187,7 +187,7 @@ export default function DashboardPage() {
               onClick={() => setDateRange('custom')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 dateRange === 'custom'
-                  ? 'bg-[#89591C] text-white shadow-2xs'
+                  ? 'bg-[#F37021] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -201,19 +201,19 @@ export default function DashboardPage() {
                 type="date"
                 value={customFrom}
                 onChange={(e) => setCustomFrom(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-white border border-[#e8e2d8] rounded-xl text-slate-700"
+                className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E5E5] rounded-xl text-slate-700"
               />
               <span className="text-xs text-slate-400">to</span>
               <input
                 type="date"
                 value={customTo}
                 onChange={(e) => setCustomTo(e.target.value)}
-                className="px-2.5 py-1.5 text-xs bg-white border border-[#e8e2d8] rounded-xl text-slate-700"
+                className="px-2.5 py-1.5 text-xs bg-white border border-[#E5E5E5] rounded-xl text-slate-700"
               />
               <button
                 type="button"
                 onClick={fetchStats}
-                className="px-3 py-1.5 bg-[#89591C] text-white text-xs font-bold rounded-xl cursor-pointer"
+                className="px-3 py-1.5 bg-[#F37021] text-white text-xs font-bold rounded-xl cursor-pointer"
               >
                 Apply
               </button>
@@ -222,7 +222,7 @@ export default function DashboardPage() {
 
           <Link
             href="/admin/products/new"
-            className="px-3.5 py-2 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5"
+            className="px-3.5 py-2 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5"
           >
             + Add New Shoe
           </Link>
@@ -280,7 +280,7 @@ export default function DashboardPage() {
       {/* ── CHARTS SECTION ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left: Revenue Trend Chart (2 cols) */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-[#e8e2d8] shadow-2xs space-y-4">
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-[#E5E5E5] shadow-2xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-slate-900">Revenue Timeline (INR ₹)</h3>
@@ -290,14 +290,14 @@ export default function DashboardPage() {
             </div>
             <div className="text-right">
               <span className="text-[11px] text-slate-400 font-semibold block">Total Period Revenue</span>
-              <span className="text-lg font-bold text-[#89591C]">₹{stats?.totalRevenue?.toLocaleString('en-IN')}</span>
+              <span className="text-lg font-bold text-[#F37021]">₹{stats?.totalRevenue?.toLocaleString('en-IN')}</span>
             </div>
           </div>
 
           {/* Bar Chart Representation */}
           {stats?.chartData && stats.chartData.length > 0 ? (
             <div className="pt-4">
-              <div className="h-48 flex items-end gap-2 sm:gap-3 border-b border-[#e8e2d8] pb-2">
+              <div className="h-48 flex items-end gap-2 sm:gap-3 border-b border-[#E5E5E5] pb-2">
                 {stats.chartData.map((point, i) => {
                   const heightPct = Math.max(8, Math.round((point.revenue / maxChartRevenue) * 100));
                   return (
@@ -308,7 +308,7 @@ export default function DashboardPage() {
                       </div>
                       <div
                         style={{ height: `${heightPct}%` }}
-                        className="w-full max-w-[28px] bg-gradient-to-t from-[#89591C] to-[#d49955] rounded-t-md hover:brightness-110 transition-all cursor-pointer"
+                        className="w-full max-w-[28px] bg-gradient-to-t from-[#F37021] to-[#FF9D5C] rounded-t-md hover:brightness-110 transition-all cursor-pointer"
                       />
                       <span className="text-[9px] text-slate-400 truncate max-w-full font-mono">
                         {point.date.slice(5)}
@@ -326,11 +326,11 @@ export default function DashboardPage() {
         </div>
 
         {/* Right: Round / Donut Shaped Order Status Chart (1 col) */}
-        <div className="bg-white rounded-2xl p-5 border border-[#e8e2d8] shadow-2xs space-y-4">
+        <div className="bg-white rounded-2xl p-5 border border-[#E5E5E5] shadow-2xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                <PieChartIcon className="w-4 h-4 text-[#89591C]" /> Fulfillment Status
+                <PieChartIcon className="w-4 h-4 text-[#F37021]" /> Fulfillment Status
               </h3>
               <p className="text-[11px] text-slate-500 font-normal">Order lifecycle breakdown</p>
             </div>
@@ -343,7 +343,7 @@ export default function DashboardPage() {
                 cx="85"
                 cy="85"
                 r={radius}
-                stroke="#f1ebe3"
+                stroke="#EAEAEA"
                 strokeWidth="18"
                 fill="transparent"
               />
@@ -425,7 +425,7 @@ export default function DashboardPage() {
       {/* Main Grid: Recent Orders & Low Stock Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Recent Orders (2 Cols) */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-[#e8e2d8] shadow-2xs space-y-3">
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-[#E5E5E5] shadow-2xs space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-slate-900">Recent Customer Orders</h3>
@@ -433,7 +433,7 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/admin/orders"
-              className="text-xs font-semibold text-[#89591C] hover:underline flex items-center gap-1"
+              className="text-xs font-semibold text-[#F37021] hover:underline flex items-center gap-1"
             >
               View All Orders <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
@@ -441,7 +441,7 @@ export default function DashboardPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-700">
-              <thead className="text-slate-600 font-semibold uppercase tracking-wider border-b border-[#e8e2d8] bg-[#faf8f5]">
+              <thead className="text-slate-600 font-semibold uppercase tracking-wider border-b border-[#E5E5E5] bg-[#F7F7F7]">
                 <tr>
                   <th className="py-2.5 px-3">Order #</th>
                   <th className="py-2.5 px-3">Customer</th>
@@ -450,7 +450,7 @@ export default function DashboardPage() {
                   <th className="py-2.5 px-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0ebd9]">
+              <tbody className="divide-y divide-[#EEEEEE]">
                 {stats?.recentOrders?.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-6 text-center text-slate-400 font-normal">
@@ -462,8 +462,8 @@ export default function DashboardPage() {
                     const name = order.customerName || order.customer?.name || order.shippingAddress?.name || 'Customer';
                     const email = order.customerEmail || order.customer?.email || '';
                     return (
-                      <tr key={order._id} className="hover:bg-[#faf4ec]/60 transition-colors">
-                        <td className="py-2.5 px-3 font-bold text-[#89591C]">{order.orderNumber}</td>
+                      <tr key={order._id} className="hover:bg-[#FFF3EB]/60 transition-colors">
+                        <td className="py-2.5 px-3 font-bold text-[#F37021]">{order.orderNumber}</td>
                         <td className="py-2.5 px-3">
                           <div className="font-semibold text-slate-900">{name}</div>
                           <div className="text-[10px] text-slate-400">{email}</div>
@@ -475,7 +475,7 @@ export default function DashboardPage() {
                         <td className="py-2.5 px-3 text-right">
                           <Link
                             href={`/admin/orders/${order._id}`}
-                            className="text-xs font-semibold text-slate-600 hover:text-[#89591C] underline"
+                            className="text-xs font-semibold text-slate-600 hover:text-[#F37021] underline"
                           >
                             Details
                           </Link>
@@ -490,15 +490,15 @@ export default function DashboardPage() {
         </div>
 
         {/* Low Stock Alerts (1 Col) */}
-        <div className="bg-white rounded-2xl p-5 border border-[#e8e2d8] shadow-2xs space-y-3">
+        <div className="bg-white rounded-2xl p-5 border border-[#E5E5E5] shadow-2xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <Boxes className="w-4 h-4 text-[#89591C]" />
+              <Boxes className="w-4 h-4 text-[#F37021]" />
               <h3 className="text-sm font-bold text-slate-900">Low Stock Watch</h3>
             </div>
             <Link
               href="/admin/stock"
-              className="text-xs font-semibold text-[#89591C] hover:underline"
+              className="text-xs font-semibold text-[#F37021] hover:underline"
             >
               Stock Control
             </Link>
@@ -511,7 +511,7 @@ export default function DashboardPage() {
               stats?.lowStockItems?.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-2.5 flex items-center justify-between"
+                  className="bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl p-2.5 flex items-center justify-between"
                 >
                   <div>
                     <h4 className="text-xs font-bold text-slate-900">{item.name}</h4>
@@ -532,14 +532,14 @@ export default function DashboardPage() {
       </div>
 
       {/* ── REFERRAL PROGRAM & REWARDS TRACKING SECTION ── */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#e8e2d8] shadow-2xs space-y-4">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5E5] shadow-2xs space-y-4">
         {/* Header with Stats Summary Chips */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#f0eae1] pb-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#EEEEEE] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <Gift className="w-5 h-5 text-[#89591C]" />
+              <Gift className="w-5 h-5 text-[#F37021]" />
               <h3 className="text-base font-bold text-slate-900">Referral Program &amp; Rewards Activity</h3>
-              <span className="px-2 py-0.5 text-[10px] font-bold bg-[#FAF4EC] text-[#89591C] border border-[#EBDCC9] rounded-full uppercase tracking-wider">
+              <span className="px-2 py-0.5 text-[10px] font-bold bg-[#FFF3EB] text-[#F37021] border border-[#FAD4BC] rounded-full uppercase tracking-wider">
                 Live Rewards Feed
               </span>
             </div>
@@ -550,8 +550,8 @@ export default function DashboardPage() {
 
           {/* Quick Stat Chips */}
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#89591C]" />
+            <div className="px-3 py-1.5 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] flex items-center gap-2">
+              <Users className="w-4 h-4 text-[#F37021]" />
               <div>
                 <span className="text-[10px] text-slate-400 font-semibold uppercase block">Total Referrals</span>
                 <span className="text-xs font-bold text-slate-900">
@@ -560,7 +560,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] flex items-center gap-2">
+            <div className="px-3 py-1.5 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] flex items-center gap-2">
               <IndianRupee className="w-4 h-4 text-emerald-600" />
               <div>
                 <span className="text-[10px] text-slate-400 font-semibold uppercase block">Referrer Rewards</span>
@@ -570,7 +570,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] flex items-center gap-2">
+            <div className="px-3 py-1.5 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-600" />
               <div>
                 <span className="text-[10px] text-slate-400 font-semibold uppercase block">Friend Benefit</span>
@@ -583,7 +583,7 @@ export default function DashboardPage() {
         {/* Referrals Detailed Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-700">
-            <thead className="text-slate-600 font-semibold uppercase tracking-wider border-b border-[#e8e2d8] bg-[#faf8f5]">
+            <thead className="text-slate-600 font-semibold uppercase tracking-wider border-b border-[#E5E5E5] bg-[#F7F7F7]">
               <tr>
                 <th className="py-2.5 px-3">Referrer User (Shared By)</th>
                 <th className="py-2.5 px-3">Referrer Amount Got</th>
@@ -593,7 +593,7 @@ export default function DashboardPage() {
                 <th className="py-2.5 px-3 text-right">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0ebd9]">
+            <tbody className="divide-y divide-[#EEEEEE]">
               {!stats?.referralStats?.recentReferrals || stats.referralStats.recentReferrals.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-slate-400 font-normal">
@@ -606,13 +606,13 @@ export default function DashboardPage() {
                 </tr>
               ) : (
                 stats.referralStats.recentReferrals.map((ref) => (
-                  <tr key={ref.id} className="hover:bg-[#faf4ec]/60 transition-colors">
+                  <tr key={ref.id} className="hover:bg-[#FFF3EB]/60 transition-colors">
                     {/* Referrer Column */}
                     <td className="py-3 px-3">
                       <div className="font-bold text-slate-900">{ref.referrerName}</div>
                       <div className="text-[11px] text-slate-400">{ref.referrerEmail}</div>
                       {ref.referrerCode && (
-                        <span className="inline-block mt-0.5 font-mono text-[10px] font-semibold px-1.5 py-0.2 bg-[#FAF4EC] text-[#89591C] border border-[#EBDCC9] rounded">
+                        <span className="inline-block mt-0.5 font-mono text-[10px] font-semibold px-1.5 py-0.2 bg-[#FFF3EB] text-[#F37021] border border-[#FAD4BC] rounded">
                           Code: {ref.referrerCode}
                         </span>
                       )}
@@ -648,7 +648,7 @@ export default function DashboardPage() {
 
                     {/* Referred User Benefit Got */}
                     <td className="py-3 px-3">
-                      <div className="font-bold text-[#89591C]">
+                      <div className="font-bold text-[#F37021]">
                         {ref.referredDiscountBenefit || '15% OFF First Order'}
                       </div>
                       <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 ${

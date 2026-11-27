@@ -45,18 +45,18 @@ export default function DataTable<T extends { _id?: string | number; id?: string
   }, [searchTerm, onSearch]);
 
   return (
-    <div className="bg-white rounded-md border border-[#e8e2d8] shadow-xs overflow-hidden font-light">
+    <div className="bg-white rounded-md border border-[#E5E5E5] shadow-xs overflow-hidden font-light">
       {/* Search Header */}
       {onSearch && (
-        <div className="p-3 border-b border-[#e8e2d8] flex items-center justify-between gap-3 bg-[#faf8f5]">
+        <div className="p-3 border-b border-[#E5E5E5] flex items-center justify-between gap-3 bg-[#F7F7F7]">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-3.5 h-3.5 text-[#89591C] absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-[#F37021] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-[#e8e2d8] rounded-md pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-white border border-[#E5E5E5] rounded-md pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#F37021]"
             />
           </div>
           {totalCount !== undefined && (
@@ -68,7 +68,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs text-slate-700">
-          <thead className="bg-[#faf8f5] text-slate-600 font-semibold uppercase tracking-wider border-b border-[#e8e2d8]">
+          <thead className="bg-[#F7F7F7] text-slate-600 font-semibold uppercase tracking-wider border-b border-[#E5E5E5]">
             <tr>
               {columns.map((col, idx) => (
                 <th key={idx} className={`px-3.5 py-2.5 ${col.className || ''}`}>
@@ -77,7 +77,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#f0ebd9]">
+          <tbody className="divide-y divide-[#EEEEEE]">
             {loading ? (
               <tr>
                 <td colSpan={columns.length} className="px-3.5 py-8 text-center text-slate-500 animate-pulse font-normal">
@@ -92,7 +92,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
               </tr>
             ) : (
               data.map((row, rowIdx) => (
-                <tr key={row._id || row.id || rowIdx} className="hover:bg-[#faf4ec]/60 transition-colors">
+                <tr key={row._id || row.id || rowIdx} className="hover:bg-[#FFF3EB]/60 transition-colors">
                   {columns.map((col, colIdx) => (
                     <td key={colIdx} className={`px-3.5 py-2.5 ${col.className || ''}`}>
                       {typeof col.accessor === 'function'
@@ -111,7 +111,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
 
       {/* Pagination Footer */}
       {onPageChange && totalPages > 1 && (
-        <div className="p-3 border-t border-[#e8e2d8] flex items-center justify-between bg-[#faf8f5]">
+        <div className="p-3 border-t border-[#E5E5E5] flex items-center justify-between bg-[#F7F7F7]">
           <span className="text-[11px] text-slate-500 font-normal">
             Page {currentPage} of {totalPages}
           </span>
@@ -120,7 +120,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
               type="button"
               disabled={currentPage <= 1}
               onClick={() => onPageChange(currentPage - 1)}
-              className="p-1 rounded-md bg-white border border-[#e8e2d8] text-slate-600 hover:text-[#89591C] hover:border-[#89591C] disabled:opacity-40 transition-colors"
+              className="p-1 rounded-md bg-white border border-[#E5E5E5] text-slate-600 hover:text-[#F37021] hover:border-[#F37021] disabled:opacity-40 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -128,7 +128,7 @@ export default function DataTable<T extends { _id?: string | number; id?: string
               type="button"
               disabled={currentPage >= totalPages}
               onClick={() => onPageChange(currentPage + 1)}
-              className="p-1 rounded-md bg-white border border-[#e8e2d8] text-slate-600 hover:text-[#89591C] hover:border-[#89591C] disabled:opacity-40 transition-colors"
+              className="p-1 rounded-md bg-white border border-[#E5E5E5] text-slate-600 hover:text-[#F37021] hover:border-[#F37021] disabled:opacity-40 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

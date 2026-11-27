@@ -6,6 +6,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.sercherstore.com'),
   title: 'SERCHER | Premium Handcrafted Footwear for Men, Women & Unisex',
   description: 'Discover SERCHER handcrafted luxury shoes. Ergonomic arch support, breathable leather, and timeless elegance.',
   keywords: ['shoes', 'men shoes', 'women shoes', 'unisex shoes', 'leather footwear', 'SERCHER', 'sercher shoes'],
@@ -30,7 +31,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#89591C',
+  themeColor: '#F37021',
 };
 
 export default function RootLayout({
@@ -40,7 +41,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-[#FAF7F3] text-[#111111] min-h-screen antialiased selection:bg-[#8A5B2A] selection:text-white font-poppins" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
+      <body className="bg-[#F7F7F7] text-[#111111] min-h-screen antialiased selection:bg-[#F37021] selection:text-white font-poppins" suppressHydrationWarning>
         <Providers>
           <Suspense fallback={null}>
             <ScrollToTop />

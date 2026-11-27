@@ -12,7 +12,7 @@ interface ProductsCacheEntry {
   expiry: number;
 }
 const productsQueryCache = new Map<string, ProductsCacheEntry>();
-const PRODUCTS_CACHE_TTL_MS = 60 * 1000; // 60 seconds
+const PRODUCTS_CACHE_TTL_MS = 30 * 1000; // 30 seconds
 
 async function getCategoryMap(): Promise<Map<string, string>> {
   const now = Date.now();
@@ -28,7 +28,7 @@ async function getCategoryMap(): Promise<Map<string, string>> {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 500);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const targetAudience = searchParams.get('targetAudience') || searchParams.get('audience');
     const isBestSeller = searchParams.get('isBestSeller');
@@ -79,10 +79,12 @@ export async function GET(req: NextRequest) {
     let dbProducts: any[] = [];
     let total = 0;
 
+    const productSelect = 'name slug sku targetAudience category brand subCategory images colors colorVariants.name colorVariants.colorCode sizes price discountPrice stock isBestSeller isFeatured rating reviewsCount noReturnRefundExchange createdAt';
+
     try {
       [dbProducts, total] = await Promise.all([
         Product.find(query)
-          .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured rating reviewsCount createdAt')
+          .select(productSelect)
           .populate({ path: 'category', select: 'name slug targetAudience', model: Category, strictPopulate: false })
           .populate({ path: 'brand', select: 'name slug logoUrl', model: Brand, strictPopulate: false })
           .sort({ createdAt: -1 })
@@ -95,7 +97,7 @@ export async function GET(req: NextRequest) {
       console.warn('Populate failed, retrying without populate:', popErr);
       [dbProducts, total] = await Promise.all([
         Product.find(query)
-          .select('name slug sku targetAudience category brand subCategory images colors colorVariants sizes price discountPrice stock isBestSeller isFeatured rating reviewsCount createdAt')
+          .select(productSelect)
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit)
@@ -122,6 +124,7 @@ export async function GET(req: NextRequest) {
 
       return {
         ...p,
+        images: Array.isArray(p.images) ? p.images.slice(0, 2) : [],
         category: catName,
         categoryDetails: typeof p.category === 'object' ? p.category : null,
         brand: typeof p.brand === 'object' && p.brand !== null ? (p.brand.name || 'SERCHER') : (p.brand || 'SERCHER'),

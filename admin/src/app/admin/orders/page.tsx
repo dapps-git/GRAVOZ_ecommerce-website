@@ -61,11 +61,11 @@ export default function OrdersPage() {
       header: 'Order Reference',
       accessor: (row: OrderItem) => (
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-md bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8]">
+          <div className="p-1.5 rounded-md bg-[#FFF3EB] text-[#F37021] border border-[#E5E5E5]">
             <ShoppingCart className="w-4 h-4" />
           </div>
           <div>
-            <Link href={`/admin/orders/${row._id}`} className="font-bold text-[#89591C] text-xs hover:underline">
+            <Link href={`/admin/orders/${row._id}`} className="font-bold text-[#F37021] text-xs hover:underline">
               {row.orderNumber}
             </Link>
             <div className="text-[10px] text-slate-400 font-normal">{new Date(row.createdAt).toLocaleDateString('en-IN')}</div>
@@ -123,13 +123,13 @@ export default function OrdersPage() {
         <div className="flex items-center gap-1.5">
           <Link
             href={`/admin/orders/${row._id}`}
-            className="px-2.5 py-1 bg-[#faf8f5] hover:bg-[#faf4ec] text-xs font-semibold text-slate-700 rounded-md flex items-center gap-1 border border-[#e8e2d8]"
+            className="px-2.5 py-1 bg-[#F7F7F7] hover:bg-[#FFF3EB] text-xs font-semibold text-slate-700 rounded-md flex items-center gap-1 border border-[#E5E5E5]"
           >
             <Eye className="w-3.5 h-3.5" /> Details
           </Link>
           <Link
             href={`/admin/invoices/${row._id}`}
-            className="px-2.5 py-1 bg-[#89591C] hover:bg-[#724816] text-xs font-semibold text-white rounded-md flex items-center gap-1 shadow-xs"
+            className="px-2.5 py-1 bg-[#F37021] hover:bg-[#D95B10] text-xs font-semibold text-white rounded-md flex items-center gap-1 shadow-xs"
           >
             <FileText className="w-3.5 h-3.5" /> Invoice
           </Link>
@@ -141,7 +141,7 @@ export default function OrdersPage() {
   return (
     <div className="space-y-4 font-light">
       {/* Filter Tabs Header */}
-      <div className="flex items-center gap-1.5 border-b border-[#e8e2d8] pb-3 overflow-x-auto">
+      <div className="flex items-center gap-1.5 border-b border-[#E5E5E5] pb-3 overflow-x-auto">
         {['all', 'ordered', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'return_requested'].map((tab) => (
           <button
             key={tab}
@@ -152,8 +152,8 @@ export default function OrdersPage() {
             }}
             className={`px-3 py-1 rounded-md text-xs font-medium transition-all capitalize ${
               statusFilter === tab
-                ? 'bg-[#89591C] text-white shadow-xs font-semibold'
-                : 'bg-white text-slate-600 hover:text-[#89591C] border border-[#e8e2d8]'
+                ? 'bg-[#F37021] text-white shadow-xs font-semibold'
+                : 'bg-white text-slate-600 hover:text-[#F37021] border border-[#E5E5E5]'
             }`}
           >
             {tab.replace(/_/g, ' ')}

@@ -73,8 +73,8 @@ export default function SizeManager({ sizes = [], onChange }: SizeManagerProps) 
                 onClick={() => toggleSize(size)}
                 className={`w-11 h-10 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                   isSelected
-                    ? 'bg-[#89591C] text-white shadow-xs'
-                    : 'bg-white border border-[#e8e2d8] text-slate-700 hover:border-slate-400'
+                    ? 'bg-[#F37021] text-white shadow-xs'
+                    : 'bg-white border border-[#E5E5E5] text-slate-700 hover:border-slate-400'
                 }`}
               >
                 {size}
@@ -95,12 +95,12 @@ export default function SizeManager({ sizes = [], onChange }: SizeManagerProps) 
                   handleAddCustom();
                 }
               }}
-              className="w-16 h-10 bg-white border border-[#e8e2d8] rounded-xl px-2 text-center text-xs text-slate-800 focus:outline-none focus:border-[#89591C]"
+              className="w-16 h-10 bg-white border border-[#E5E5E5] rounded-xl px-2 text-center text-xs text-slate-800 focus:outline-none focus:border-[#F37021]"
             />
             <button
               type="button"
               onClick={() => handleAddCustom()}
-              className="h-10 px-3 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-[#89591C] transition-colors cursor-pointer flex items-center gap-1"
+              className="h-10 px-3 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-[#F37021] transition-colors cursor-pointer flex items-center gap-1"
             >
               <Plus className="w-3.5 h-3.5" /> Add
             </button>
@@ -110,7 +110,7 @@ export default function SizeManager({ sizes = [], onChange }: SizeManagerProps) 
 
       {/* Selected sizes with In Stock / Out of Stock toggle */}
       {sizes.length > 0 && (
-        <div className="border-t border-[#f0eae1] pt-3 space-y-2">
+        <div className="border-t border-[#EEEEEE] pt-3 space-y-2">
           <p className="text-[11px] text-slate-500">Tap a size below to mark it In Stock or Out of Stock:</p>
           <div className="flex flex-wrap gap-2">
             {sizes.map((item) => (

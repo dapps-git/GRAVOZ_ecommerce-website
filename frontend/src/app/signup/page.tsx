@@ -230,7 +230,7 @@ function SignupContent() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-3 sm:p-4 relative overflow-y-auto bg-[#120e0a]">
+    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center p-3 sm:p-4 relative overflow-y-auto bg-[#0A0A0A]">
 
       {/* Background — fixed cover */}
       <div className="fixed inset-0 z-0">
@@ -252,18 +252,18 @@ function SignupContent() {
         <div className="flex flex-col items-center gap-1 text-center flex-shrink-0">
           <Link href="/" className="hover:opacity-95 transition-opacity">
             <div className="relative h-8 sm:h-9 w-36 sm:w-40">
-              <Image src="/sercher-logo.png" alt="SERCHER" fill priority className="object-contain drop-shadow-md" sizes="160px" />
+              <Image src="/sercher-brand-logo.png" alt="SERCHER" fill priority className="object-contain drop-shadow-md" sizes="160px" />
             </div>
           </Link>
-          <p className="text-[8.5px] sm:text-[9px] font-bold tracking-[0.25em] text-[#7a3e0b] uppercase font-sansation">
+          <p className="text-[8.5px] sm:text-[9px] font-bold tracking-[0.25em] text-[#F37021] uppercase font-sansation">
             PREMIUM HANDCRAFTED FOOTWEAR
           </p>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="w-8 sm:w-10 h-px bg-[#7a3e0b]/40" />
-            <div className="w-2 h-2 rotate-45 border border-[#7a3e0b]/60 flex items-center justify-center">
-              <div className="w-0.5 h-0.5 bg-[#7a3e0b]" />
+            <span className="w-8 sm:w-10 h-px bg-[#F37021]/40" />
+            <div className="w-2 h-2 rotate-45 border border-[#F37021]/60 flex items-center justify-center">
+              <div className="w-0.5 h-0.5 bg-[#F37021]" />
             </div>
-            <span className="w-8 sm:w-10 h-px bg-[#7a3e0b]/40" />
+            <span className="w-8 sm:w-10 h-px bg-[#F37021]/40" />
           </div>
         </div>
 
@@ -272,7 +272,7 @@ function SignupContent() {
 
           {/* Heading */}
           <div className="text-center">
-            <h1 className="text-base sm:text-lg font-semibold text-[#7a3e0b] tracking-tight font-sansation">
+            <h1 className="text-base sm:text-lg font-semibold text-[#F37021] tracking-tight font-sansation">
               Create Account
             </h1>
             <p className="text-[10px] text-slate-500 mt-0.5 font-sansation">
@@ -294,7 +294,7 @@ function SignupContent() {
             {/* Row 1: Full Name */}
             <div className="flex flex-col gap-0.5">
               <label className="text-[10px] sm:text-[11px] font-semibold text-slate-700">Name *</label>
-              <div className="flex items-center gap-2 border border-[#ddd6cc] bg-[#faf9f7] px-2.5 py-1.5 sm:py-2 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all rounded-none">
+              <div className="flex items-center gap-2 border border-[#DCDCDC] bg-[#F8F8F8] px-2.5 py-1.5 sm:py-2 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all rounded-none">
                 <User className="w-3 h-3 text-slate-400 flex-shrink-0" />
                 <input
                   type="text"
@@ -310,7 +310,7 @@ function SignupContent() {
             {/* Row 2: Email */}
             <div className="flex flex-col gap-0.5">
               <label className="text-[10px] sm:text-[11px] font-semibold text-slate-700">Email *</label>
-              <div className="flex items-center gap-2 border border-[#ddd6cc] bg-[#faf9f7] px-2.5 py-1.5 sm:py-2 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all rounded-none">
+              <div className="flex items-center gap-2 border border-[#DCDCDC] bg-[#F8F8F8] px-2.5 py-1.5 sm:py-2 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all rounded-none">
                 <Mail className="w-3 h-3 text-slate-400 flex-shrink-0" />
                 <input
                   type="email"
@@ -327,7 +327,7 @@ function SignupContent() {
             <div className="grid grid-cols-2 gap-2">
               <div className="flex flex-col gap-0.5">
                 <label className="text-[10px] sm:text-[11px] font-semibold text-slate-700">Password *</label>
-                <div className="relative flex items-center gap-1.5 border border-[#ddd6cc] bg-[#faf9f7] px-2 py-1.5 sm:py-2 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all rounded-none">
+                <div className="relative flex items-center gap-1.5 border border-[#DCDCDC] bg-[#F8F8F8] px-2 py-1.5 sm:py-2 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all rounded-none">
                   <Lock className="w-3 h-3 text-slate-400 flex-shrink-0" />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -350,7 +350,7 @@ function SignupContent() {
 
               <div className="flex flex-col gap-0.5">
                 <label className="text-[10px] sm:text-[11px] font-semibold text-slate-700">Confirm *</label>
-                <div className="relative flex items-center gap-1.5 border border-[#ddd6cc] bg-[#faf9f7] px-2 py-1.5 sm:py-2 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all rounded-none">
+                <div className="relative flex items-center gap-1.5 border border-[#DCDCDC] bg-[#F8F8F8] px-2 py-1.5 sm:py-2 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all rounded-none">
                   <Lock className="w-3 h-3 text-slate-400 flex-shrink-0" />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -378,7 +378,7 @@ function SignupContent() {
                 <button
                   type="button"
                   onClick={() => setShowReferralInput(true)}
-                  className="text-[10px] sm:text-[11px] font-medium text-[#7a3e0b] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+                  className="text-[10px] sm:text-[11px] font-medium text-[#F37021] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Gift className="w-3 h-3" />
                   <span>Have a referral code? (Get 15% OFF)</span>
@@ -406,7 +406,7 @@ function SignupContent() {
                       </button>
                     )}
                   </div>
-                  <div className="relative flex items-center gap-2 border border-[#ddd6cc] bg-[#faf9f7] px-2.5 py-1.5 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all rounded-none">
+                  <div className="relative flex items-center gap-2 border border-[#DCDCDC] bg-[#F8F8F8] px-2.5 py-1.5 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all rounded-none">
                     <Gift className="w-3 h-3 text-slate-400 flex-shrink-0" />
                     <input
                       type="text"
@@ -436,7 +436,7 @@ function SignupContent() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2 sm:py-2.5 mt-1 bg-[#7a3e0b] hover:bg-[#633209] disabled:opacity-60 text-white text-[10.5px] sm:text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer font-sansation flex items-center justify-center gap-1.5 rounded-none"
+              className="w-full py-2 sm:py-2.5 mt-1 bg-[#F37021] hover:bg-[#D95B10] disabled:opacity-60 text-white text-[10.5px] sm:text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer font-sansation flex items-center justify-center gap-1.5 rounded-none"
             >
               {isSubmitting ? (
                 <>
@@ -451,9 +451,9 @@ function SignupContent() {
 
           {/* OR Divider */}
           <div className="flex items-center gap-2.5 my-0.5">
-            <span className="flex-1 h-px bg-[#e0d9d0]" />
+            <span className="flex-1 h-px bg-[#E2E2E2]" />
             <span className="text-[9px] font-semibold text-slate-400 font-sansation tracking-wider">OR</span>
-            <span className="flex-1 h-px bg-[#e0d9d0]" />
+            <span className="flex-1 h-px bg-[#E2E2E2]" />
           </div>
 
           {/* Google Sign In */}
@@ -473,7 +473,7 @@ function SignupContent() {
             Already have an account?{' '}
             <Link
               href={`/login${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`}
-              className="font-bold text-[#7a3e0b] hover:underline ml-0.5"
+              className="font-bold text-[#F37021] hover:underline ml-0.5"
             >
               Login
             </Link>
@@ -485,7 +485,7 @@ function SignupContent() {
       {/* Toast */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-4 sm:right-4 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-3.5 py-2 shadow-2xl flex items-center gap-2 border border-white/10 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-3 duration-300 font-sansation rounded-none text-[10.5px] max-w-[90vw] sm:max-w-md">
-          <div className="w-3.5 h-3.5 bg-[#7a3e0b] flex items-center justify-center flex-shrink-0">
+          <div className="w-3.5 h-3.5 bg-[#F37021] flex items-center justify-center flex-shrink-0">
             <Check className="w-2 h-2 text-white" />
           </div>
           <span>{toastMessage}</span>
@@ -497,7 +497,7 @@ function SignupContent() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#faf8f5] flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#89591C] border-t-transparent animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#F7F7F7] flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#F37021] border-t-transparent animate-spin" /></div>}>
       <SignupContent />
     </Suspense>
   );

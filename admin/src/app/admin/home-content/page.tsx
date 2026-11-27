@@ -70,8 +70,8 @@ const SECTIONS = [
     label: 'Best Sellers',
     desc: 'Your top-rated, most purchased products',
     icon: Star,
-    color: '#89591C',
-    bg: '#faf4ec',
+    color: '#F37021',
+    bg: '#FFF3EB',
   },
   {
     key: 'top_selling',
@@ -213,10 +213,10 @@ function CardEditor({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e8e2d8] overflow-hidden shadow-2xs">
+    <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-2xs">
       {/* Card Header — always visible */}
       <div
-        className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none hover:bg-[#faf8f5] transition-colors"
+        className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none hover:bg-[#F7F7F7] transition-colors"
         onClick={() => setExpanded((p) => !p)}
       >
         {/* Drag handle visual */}
@@ -231,7 +231,7 @@ function CardEditor({
         </div>
 
         {/* Preview thumb */}
-        <div className="w-10 h-10 rounded-xl overflow-hidden border border-[#e8e2d8] bg-[#f4f2ee] flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl overflow-hidden border border-[#E5E5E5] bg-[#F3F3F3] flex-shrink-0">
           {item.imageUrl ? (
             <Image src={item.imageUrl} alt="thumb" width={40} height={40} className="object-cover w-full h-full" />
           ) : (
@@ -291,11 +291,11 @@ function CardEditor({
 
       {/* Expandable body */}
       {expanded && (
-        <div className="border-t border-[#f0ece5] px-4 py-4 space-y-4">
+        <div className="border-t border-[#EEEEEE] px-4 py-4 space-y-4">
 
           {/* Step 1 — Pick from catalog (optional shortcut) */}
           {products.length > 0 && (
-            <div className="bg-[#faf8f5] rounded-xl p-3 space-y-1.5 border border-[#eee8de]">
+            <div className="bg-[#F7F7F7] rounded-xl p-3 space-y-1.5 border border-[#EEEEEE]">
               <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
                 <Package className="w-3.5 h-3.5 text-slate-500" />
                 Auto-fill from Product Catalog <span className="font-normal text-slate-400">(optional)</span>
@@ -303,7 +303,7 @@ function CardEditor({
               <select
                 value={item.productId || ''}
                 onChange={(e) => onPickProduct(e.target.value)}
-                className="w-full text-xs bg-white border border-[#e8e2d8] rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-400 cursor-pointer"
+                className="w-full text-xs bg-white border border-[#E5E5E5] rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-400 cursor-pointer"
               >
                 <option value="">— Choose a product to auto-fill title, description, price, sizes, colors &amp; images —</option>
                 {products.map((p) => (
@@ -363,7 +363,7 @@ function CardEditor({
                   value={item.title}
                   onChange={(e) => onUpdate('title', e.target.value)}
                   placeholder="e.g. Men's Casual Comfort Sandals"
-                  className="w-full text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 font-medium"
+                  className="w-full text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-slate-400 font-medium"
                 />
               </div>
 
@@ -378,7 +378,7 @@ function CardEditor({
                   value={item.description || ''}
                   onChange={(e) => onUpdate('description', e.target.value)}
                   placeholder="Brief description of materials, comfort features, or occasion..."
-                  className="w-full text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-2.5 text-slate-900 focus:outline-none focus:border-slate-400"
+                  className="w-full text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl p-2.5 text-slate-900 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
@@ -389,7 +389,7 @@ function CardEditor({
                   value={item.price}
                   onChange={(e) => onUpdate('price', Number(e.target.value))}
                   placeholder="1399"
-                  className="w-full text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-slate-400"
+                  className="w-full text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-slate-400"
                 />
               </div>
 
@@ -400,7 +400,7 @@ function CardEditor({
                   value={item.originalPrice || ''}
                   onChange={(e) => onUpdate('originalPrice', e.target.value ? Number(e.target.value) : undefined)}
                   placeholder="1429 (for strikethrough)"
-                  className="w-full text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-slate-500 focus:outline-none focus:border-slate-400"
+                  className="w-full text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-slate-500 focus:outline-none focus:border-slate-400"
                 />
               </div>
 
@@ -413,14 +413,14 @@ function CardEditor({
                   value={item.linkUrl || ''}
                   onChange={(e) => onUpdate('linkUrl', e.target.value)}
                   placeholder="/products/your-product-id"
-                  className="w-full text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:border-slate-400 font-mono"
+                  className="w-full text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:border-slate-400 font-mono"
                 />
               </div>
             </div>
           </div>
 
           {/* Step 4 — Size Selection */}
-          <div className="bg-[#faf8f5] rounded-xl p-3.5 border border-[#eee8de] space-y-2.5">
+          <div className="bg-[#F7F7F7] rounded-xl p-3.5 border border-[#EEEEEE] space-y-2.5">
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
                 <Ruler className="w-3.5 h-3.5 text-slate-500" />
@@ -445,7 +445,7 @@ function CardEditor({
                         ? 'bg-[#030303] text-white shadow-xs'
                         : isSelected && !isAvailable
                           ? 'bg-rose-100 text-rose-600 border border-rose-200 line-through opacity-70'
-                          : 'bg-white border border-[#e8e2d8] text-slate-700 hover:border-slate-400'
+                          : 'bg-white border border-[#E5E5E5] text-slate-700 hover:border-slate-400'
                       }`}
                   >
                     <span>{sz}</span>
@@ -463,7 +463,7 @@ function CardEditor({
                     type="button"
                     onClick={() => toggleSize(s.size)}
                     className={`min-w-[36px] h-8 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${s.isAvailable
-                        ? 'bg-[#89591C] text-white shadow-xs'
+                        ? 'bg-[#F37021] text-white shadow-xs'
                         : 'bg-rose-100 text-rose-600 border border-rose-200 line-through opacity-70'
                       }`}
                   >
@@ -480,12 +480,12 @@ function CardEditor({
                 value={customSizeInput}
                 onChange={(e) => setCustomSizeInput(e.target.value)}
                 placeholder="Custom size (e.g. 12, S, M)..."
-                className="text-[11px] bg-white border border-[#e8e2d8] rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none w-48"
+                className="text-[11px] bg-white border border-[#E5E5E5] rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none w-48"
               />
               <button
                 type="button"
                 onClick={addCustomSize}
-                className="px-3 py-1.5 rounded-lg bg-white border border-[#e8e2d8] hover:bg-slate-50 text-slate-700 text-[11px] font-bold cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-white border border-[#E5E5E5] hover:bg-slate-50 text-slate-700 text-[11px] font-bold cursor-pointer"
               >
                 + Add Size
               </button>
@@ -493,7 +493,7 @@ function CardEditor({
           </div>
 
           {/* Step 5 — Color Options */}
-          <div className="bg-[#faf8f5] rounded-xl p-3.5 border border-[#eee8de] space-y-3">
+          <div className="bg-[#F7F7F7] rounded-xl p-3.5 border border-[#EEEEEE] space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
                 <Palette className="w-3.5 h-3.5 text-slate-500" />
@@ -513,7 +513,7 @@ function CardEditor({
                     onClick={() => togglePresetColor(preset.name, preset.code)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isSelected
                         ? 'bg-white border-2 border-[#030303] shadow-xs'
-                        : 'bg-white border border-[#e8e2d8] text-slate-700 hover:border-slate-400'
+                        : 'bg-white border border-[#E5E5E5] text-slate-700 hover:border-slate-400'
                       }`}
                   >
                     <span
@@ -529,12 +529,12 @@ function CardEditor({
 
             {/* Selected colors active list */}
             {currentColors.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[#f0ece5]">
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[#EEEEEE]">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mr-1">Active:</span>
                 {currentColors.map((c) => (
                   <span
                     key={c.name}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-[#e8e2d8] text-xs font-medium text-slate-800 shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-[#E5E5E5] text-xs font-medium text-slate-800 shadow-2xs"
                   >
                     <span
                       className="w-3 h-3 rounded-full border border-black/20"
@@ -560,11 +560,11 @@ function CardEditor({
                 value={customColorName}
                 onChange={(e) => setCustomColorName(e.target.value)}
                 placeholder="Color name (e.g. Cherry Red)..."
-                className="text-[11px] bg-white border border-[#e8e2d8] rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none w-44"
+                className="text-[11px] bg-white border border-[#E5E5E5] rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none w-44"
               />
 
               {/* Color Code + Visual Wheel + Live Preview */}
-              <div className="flex items-center gap-1.5 bg-white border border-[#e8e2d8] rounded-lg px-2 py-1">
+              <div className="flex items-center gap-1.5 bg-white border border-[#E5E5E5] rounded-lg px-2 py-1">
                 <input
                   type="color"
                   value={customColorCode.startsWith('#') ? customColorCode : '#000000'}
@@ -592,7 +592,7 @@ function CardEditor({
               <button
                 type="button"
                 onClick={addCustomColor}
-                className="px-3 py-1.5 rounded-lg bg-[#89591C] hover:bg-[#724a17] text-white text-[11px] font-bold cursor-pointer transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-[#F37021] hover:bg-[#D95B10] text-white text-[11px] font-bold cursor-pointer transition-colors"
               >
                 + Add Color
               </button>
@@ -625,8 +625,8 @@ function PhotoSlot({
         className={`relative w-full aspect-[4/3] rounded-xl border-2 border-dashed overflow-hidden flex items-center justify-center transition-colors ${url
             ? 'border-transparent'
             : soft
-              ? 'border-[#d8d0c4] bg-[#fafaf8]'
-              : 'border-[#c9b8a0] bg-[#faf4ec]'
+              ? 'border-[#D4D4D4] bg-[#F8F8F8]'
+              : 'border-[#F7B994] bg-[#FFF3EB]'
           }`}
       >
         {url ? (
@@ -639,12 +639,12 @@ function PhotoSlot({
             </label>
           </>
         ) : (
-          <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-[#f5ede0]/50 transition-colors px-2 text-center gap-1">
+          <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-[#FFEADF]/50 transition-colors px-2 text-center gap-1">
             {isUploading ? (
-              <span className="text-[10px] font-bold text-[#89591C] animate-pulse">Uploading…</span>
+              <span className="text-[10px] font-bold text-[#F37021] animate-pulse">Uploading…</span>
             ) : (
               <>
-                <Upload className={`w-5 h-5 mb-0.5 ${soft ? 'text-slate-400' : 'text-[#89591C]'}`} />
+                <Upload className={`w-5 h-5 mb-0.5 ${soft ? 'text-slate-400' : 'text-[#F37021]'}`} />
                 <span className={`text-[10px] font-semibold ${soft ? 'text-slate-500' : 'text-slate-700'}`}>
                   Click to upload
                 </span>
@@ -662,7 +662,7 @@ function PhotoSlot({
         value={url}
         onChange={(e) => onUrlChange(e.target.value)}
         placeholder="Or paste image URL…"
-        className="w-full text-[10px] bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-2.5 py-1.5 text-slate-600 focus:outline-none placeholder:text-slate-300 font-mono"
+        className="w-full text-[10px] bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-2.5 py-1.5 text-slate-600 focus:outline-none placeholder:text-slate-300 font-mono"
       />
     </div>
   );
@@ -891,10 +891,10 @@ export default function AdminHomeContentPage() {
       {toast && <Toast message={toast.msg} type={toast.type} />}
 
       {/* ── Page Title ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e8e2d8] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5E5] pb-5">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-[#faf4ec] border border-[#edd9b4]">
-            <LayoutGrid className="w-5 h-5 text-[#89591C]" />
+          <div className="p-2.5 rounded-xl bg-[#FFF3EB] border border-[#FAD4BC]">
+            <LayoutGrid className="w-5 h-5 text-[#F37021]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-[#030303]">Homepage Content Sections</h1>
@@ -908,7 +908,7 @@ export default function AdminHomeContentPage() {
           <button
             type="button"
             onClick={load}
-            className="p-2.5 rounded-xl border border-[#e8e2d8] bg-white hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
+            className="p-2.5 rounded-xl border border-[#E5E5E5] bg-white hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -918,7 +918,7 @@ export default function AdminHomeContentPage() {
             type="button"
             onClick={save}
             disabled={saving}
-            className="px-5 py-2.5 rounded-xl bg-[#89591C] hover:bg-[#724a17] text-white text-xs font-bold transition-all flex items-center gap-2 shadow-sm disabled:opacity-60 cursor-pointer active:scale-95"
+            className="px-5 py-2.5 rounded-xl bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold transition-all flex items-center gap-2 shadow-sm disabled:opacity-60 cursor-pointer active:scale-95"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving…' : `Save "${currentSection.title}"`}
@@ -940,7 +940,7 @@ export default function AdminHomeContentPage() {
               onClick={() => setActiveKey(sec.key)}
               className={`flex flex-col items-start gap-1.5 p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer ${isActive
                   ? 'shadow-sm scale-[1.01]'
-                  : 'border-[#e8e2d8] bg-white hover:border-slate-300 hover:bg-slate-50'
+                  : 'border-[#E5E5E5] bg-white hover:border-slate-300 hover:bg-slate-50'
                 }`}
               style={
                 isActive
@@ -984,7 +984,7 @@ export default function AdminHomeContentPage() {
       <div className="space-y-4">
 
         {/* Section settings bar */}
-        <div className="bg-white rounded-2xl border border-[#e8e2d8] p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center shadow-2xs">
+        <div className="bg-white rounded-2xl border border-[#E5E5E5] p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center shadow-2xs">
           <div
             className="flex items-center gap-2 flex-shrink-0 px-3 py-2 rounded-xl"
             style={{ background: activeMeta.bg }}
@@ -1001,14 +1001,14 @@ export default function AdminHomeContentPage() {
               value={currentSection.title}
               onChange={(e) => update({ title: e.target.value })}
               placeholder="Section heading shown on home page"
-              className="w-full text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
+              className="w-full text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
             />
             <input
               type="text"
               value={currentSection.subtitle || ''}
               onChange={(e) => update({ subtitle: e.target.value })}
               placeholder="Optional subtitle / tagline"
-              className="w-full text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-slate-500 focus:outline-none"
+              className="w-full text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-slate-500 focus:outline-none"
             />
           </div>
 
@@ -1028,7 +1028,7 @@ export default function AdminHomeContentPage() {
         </div>
 
         {/* How it works tip */}
-        <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-[#faf8f5] border border-[#eee8de] text-[11px] text-slate-600">
+        <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-[#F7F7F7] border border-[#EEEEEE] text-[11px] text-slate-600">
           <span className="text-base leading-none mt-0.5">💡</span>
           <span>
             Each card lets you specify the <strong>main lifestyle photo</strong>, <strong>floating inset thumbnail</strong>, <strong>description</strong>, <strong>size options</strong>, and <strong>color swatches</strong> with live color circle previews. Auto-filling from the catalog will automatically pull all details into the card!
@@ -1058,7 +1058,7 @@ export default function AdminHomeContentPage() {
 
         {/* Empty state */}
         {currentSection.items.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center py-14 rounded-2xl border-2 border-dashed border-[#e8e2d8] bg-[#faf8f5] gap-3 text-center">
+          <div className="flex flex-col items-center justify-center py-14 rounded-2xl border-2 border-dashed border-[#E5E5E5] bg-[#F7F7F7] gap-3 text-center">
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center"
               style={{ background: activeMeta.bg }}

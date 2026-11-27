@@ -70,12 +70,12 @@ function LoaferShoeIcon({ className = 'w-4 h-4' }: { className?: string }) {
 }
 
 const ANNOUNCEMENT_TRAIN_ITEMS = [
-  { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford', logo: { name: 'Sercher', src: '/icons/sercher-white.png' } },
+  { text: '100% FREE SHIPPING ALL OVER INDIA', type: 'oxford', logo: { name: 'Sercher', src: '/icons/sercher-brand-white.png' } },
   { text: 'WELCOME SALE IS LIVE NOW • EXTRA ₹100 OFF', type: 'loafer', logo: { name: 'Gravoz', src: '/icons/gravoz-white.png' } },
   { text: 'PREMIUM HANDCRAFTED LEATHER FOOTWEAR', type: 'oxford', logo: { name: 'Jackrob', src: '/icons/logo2.webp' } },
   { text: '6-MONTH HASSLE-FREE WARRANTY INCLUDED', type: 'loafer', logo: { name: 'Ellora', src: '/icons/logo1.webp' } },
   { text: 'CASH ON DELIVERY & EASY DOORSTEP RETURNS', type: 'oxford', logo: { name: 'Gravoz', src: '/icons/gravoz-white.png' } },
-  { text: 'STEP INTO LUXURY • STEP INTO SERCHER', type: 'loafer', logo: { name: 'Sercher', src: '/icons/sercher-white.png' } },
+  { text: 'STEP INTO LUXURY • STEP INTO SERCHER', type: 'loafer', logo: { name: 'Sercher', src: '/icons/sercher-brand-white.png' } },
 ];
 
 export default function Header() {
@@ -92,9 +92,9 @@ export default function Header() {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className="w-full bg-white font-sans text-[#030303] border-b border-[#e8e2d8] relative z-40">
-      {/* 1. Top Announcement Bar (#89591C Brown Background with White Font & White Logos) — Train Animation */}
-      <div className="bg-[#89591C] text-white text-[11px] sm:text-[12px] font-medium py-2.5 sm:py-3 overflow-hidden tracking-[0.05em] uppercase border-b border-black/10 select-none shadow-2xs">
+    <header className="w-full bg-white font-sans text-[#030303] border-b border-[#E5E5E5] relative z-40">
+      {/* 1. Top Announcement Bar (#F37021 Orange Background with White Font & White Logos) — Train Animation */}
+      <div className="bg-[#F37021] text-white text-[11px] sm:text-[12px] font-medium py-2.5 sm:py-3 overflow-hidden tracking-[0.05em] uppercase border-b border-black/10 select-none shadow-2xs">
         <div className="animate-train items-center whitespace-nowrap">
           {[...ANNOUNCEMENT_TRAIN_ITEMS, ...ANNOUNCEMENT_TRAIN_ITEMS].map((item, idx) => (
             <div
@@ -130,13 +130,13 @@ export default function Header() {
       </div>
 
       {/* 2. Utility Contact Bar (Desktop Only - Hidden on Mobile to eliminate clutter) */}
-      <div className="hidden md:block bg-[#faf8f5] border-b border-[#e8e2d8] px-4 md:px-8 py-1.5 text-[11px] text-[#030303] font-normal tracking-[0.03em]">
+      <div className="hidden md:block bg-[#F7F7F7] border-b border-[#E5E5E5] px-4 md:px-8 py-1.5 text-[11px] text-[#030303] font-normal tracking-[0.03em]">
         <div className="max-w-[1530px] w-full mx-auto flex items-center justify-between gap-4">
           {/* Left Items: Email, Phone */}
           <div className="flex items-center gap-3.5 text-[#030303]">
             <a
               href="mailto:gravozshoes@gmail.com"
-              className="flex items-center gap-1.5 hover:text-[#89591C] transition-colors"
+              className="flex items-center gap-1.5 hover:text-[#F37021] transition-colors"
             >
               <div className="w-3.5 h-3.5 relative flex-shrink-0">
                 <Image
@@ -150,13 +150,13 @@ export default function Header() {
               <span>gravozshoes@gmail.com</span>
             </a>
 
-            <span className="text-[#d8cebe]">|</span>
+            <span className="text-[#D4D4D4]">|</span>
 
             <a
               href="tel:+919645319418"
-              className="flex items-center gap-1.5 hover:text-[#89591C] transition-colors"
+              className="flex items-center gap-1.5 hover:text-[#F37021] transition-colors"
             >
-              <Phone className="w-3 h-3 text-[#89591C]" />
+              <Phone className="w-3 h-3 text-[#F37021]" />
               <span>+91 9645319418</span>
             </a>
           </div>
@@ -165,11 +165,11 @@ export default function Header() {
           <div className="flex items-center gap-3.5 uppercase font-medium tracking-[0.03em] text-[#030303]">
             {isLoggedIn && user ? (
               <>
-                <Link href="/profile" className="flex items-center gap-1 hover:text-[#89591C] transition-colors font-bold text-[#89591C]">
-                  <UserCheck className="w-3 h-3 text-[#89591C]" />
+                <Link href="/profile" className="flex items-center gap-1 hover:text-[#F37021] transition-colors font-bold text-[#F37021]">
+                  <UserCheck className="w-3 h-3 text-[#F37021]" />
                   <span>HI, {(user?.name || 'USER').split(' ')[0].toUpperCase()}</span>
                 </Link>
-                <span className="text-[#d8cebe]">|</span>
+                <span className="text-[#D4D4D4]">|</span>
                 <button
                   type="button"
                   onClick={async (e) => {
@@ -183,15 +183,15 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/signup" className="flex items-center gap-1 hover:text-[#89591C] transition-colors">
-                  <UserCheck className="w-3 h-3 text-[#89591C]" />
+                <Link href="/signup" className="flex items-center gap-1 hover:text-[#F37021] transition-colors">
+                  <UserCheck className="w-3 h-3 text-[#F37021]" />
                   <span>REGISTER</span>
                 </Link>
 
-                <span className="text-[#d8cebe]">|</span>
+                <span className="text-[#D4D4D4]">|</span>
 
-                <Link href="/login" className="flex items-center gap-1 hover:text-[#89591C] transition-colors">
-                  <LogIn className="w-3 h-3 text-[#89591C]" />
+                <Link href="/login" className="flex items-center gap-1 hover:text-[#F37021] transition-colors">
+                  <LogIn className="w-3 h-3 text-[#F37021]" />
                   <span>LOGIN</span>
                 </Link>
               </>
@@ -201,7 +201,7 @@ export default function Header() {
       </div>
 
       {/* 3. Main Brand Navbar (Clean Mobile & Desktop Bar) */}
-      <div className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 bg-white border-b border-[#e8e2d8]">
+      <div className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 bg-white border-b border-[#E5E5E5]">
         <div className="max-w-[1530px] w-full mx-auto flex items-center justify-between gap-4">
           
           {/* Mobile Left: Hamburger Menu Button & Brand Logo */}
@@ -211,7 +211,7 @@ export default function Header() {
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open Navigation Menu"
-              className="md:hidden p-1.5 -ml-1.5 text-[#030303] hover:text-[#89591C] transition-colors rounded-md focus:outline-none"
+              className="md:hidden p-1.5 -ml-1.5 text-[#030303] hover:text-[#F37021] transition-colors rounded-md focus:outline-none"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -224,7 +224,7 @@ export default function Header() {
             >
               <div className="relative h-7 sm:h-8 md:h-9 w-28 sm:w-32 md:w-36">
                 <Image
-                  src="/sercher-logo.png"
+                  src="/sercher-brand-logo.png"
                   alt="SERCHER"
                   fill
                   priority
@@ -243,7 +243,7 @@ export default function Header() {
             {/* Wishlist Icon */}
             <Link 
               href="/wishlist" 
-              className="relative p-1 text-[#030303] hover:text-[#89591C] transition-colors"
+              className="relative p-1 text-[#030303] hover:text-[#F37021] transition-colors"
               aria-label="Wishlist"
             >
               <Image
@@ -254,7 +254,7 @@ export default function Header() {
                 className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
               />
               {mounted && wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#89591C] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center animate-in zoom-in-50 duration-200">
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#F37021] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center animate-in zoom-in-50 duration-200">
                   {wishlistCount}
                 </span>
               )}
@@ -263,7 +263,7 @@ export default function Header() {
             {/* Cart Icon */}
             <Link 
               href="/cart" 
-              className="relative p-1 text-[#030303] hover:text-[#89591C] transition-colors"
+              className="relative p-1 text-[#030303] hover:text-[#F37021] transition-colors"
               aria-label="Shopping Cart"
             >
               <Image
@@ -274,7 +274,7 @@ export default function Header() {
                 className="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain"
               />
               {mounted && cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#89591C] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#F37021] text-white text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -283,13 +283,13 @@ export default function Header() {
             {/* Profile Icon / Avatar */}
             <Link 
               href={isLoggedIn ? "/profile" : "/login"} 
-              className="relative flex items-center justify-center p-1 text-[#030303] hover:text-[#89591C] transition-colors"
+              className="relative flex items-center justify-center p-1 text-[#030303] hover:text-[#F37021] transition-colors"
               aria-label="User Account"
               title={isLoggedIn && user?.name ? `Profile (${user.name})` : 'Log In'}
             >
               {isLoggedIn ? (
                 user?.avatarUrl ? (
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden border border-[#89591C]/50 shadow-2xs bg-[#faf8f5]">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full overflow-hidden border border-[#F37021]/50 shadow-2xs bg-[#F7F7F7]">
                     {/* Use standard img with onError fallback for base64 / blob / external URLs */}
                     <img
                       src={user.avatarUrl}
@@ -299,13 +299,13 @@ export default function Header() {
                         (e.currentTarget as HTMLElement).style.display = 'none';
                         const parent = (e.currentTarget as HTMLElement).parentElement;
                         if (parent) {
-                          parent.innerHTML = `<span class="w-full h-full flex items-center justify-center text-[10px] font-bold text-white bg-[#89591C]">${(user?.name || 'U').charAt(0).toUpperCase()}</span>`;
+                          parent.innerHTML = `<span class="w-full h-full flex items-center justify-center text-[10px] font-bold text-white bg-[#F37021]">${(user?.name || 'U').charAt(0).toUpperCase()}</span>`;
                         }
                       }}
                     />
                   </div>
                 ) : user?.name ? (
-                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#89591C] text-white text-[10px] sm:text-[11px] font-bold flex items-center justify-center shadow-2xs">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#F37021] text-white text-[10px] sm:text-[11px] font-bold flex items-center justify-center shadow-2xs">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                 ) : (
@@ -337,7 +337,7 @@ export default function Header() {
           <nav className="flex items-center gap-6 lg:gap-8">
             <Link
               href="/products"
-              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
+              className="text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#F37021] transition-colors whitespace-nowrap"
             >
               DISCOVER PRODUCT
             </Link>
@@ -345,9 +345,9 @@ export default function Header() {
 
           <Link
             href="/track-order"
-            className="flex items-center gap-1.5 text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#89591C] transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 text-[12px] lg:text-[13px] font-medium tracking-[0.04em] uppercase text-[#030303] hover:text-[#F37021] transition-colors whitespace-nowrap"
           >
-            <Package className="w-3.5 h-3.5 text-[#89591C]" />
+            <Package className="w-3.5 h-3.5 text-[#F37021]" />
             <span>TRACK ORDER</span>
           </Link>
         </div>
@@ -367,7 +367,7 @@ export default function Header() {
           <div className="fixed inset-y-0 left-0 max-w-[300px] w-[85%] bg-white shadow-2xl z-50 flex flex-col justify-between overflow-y-auto">
             {/* Drawer Header */}
             <div>
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8e2d8] bg-[#faf8f5]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E5E5] bg-[#F7F7F7]">
                 <Link
                   href="/"
                   onClick={closeMobileMenu}
@@ -376,7 +376,7 @@ export default function Header() {
                 >
                   <div className="relative h-7 w-28">
                     <Image
-                      src="/sercher-logo.png"
+                      src="/sercher-brand-logo.png"
                       alt="SERCHER"
                       fill
                       priority
@@ -404,10 +404,10 @@ export default function Header() {
                   <Link
                     href="/products"
                     onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
+                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#F7F7F7] hover:text-[#F37021] rounded-lg transition-colors"
                   >
                     <span className="flex items-center gap-2.5">
-                      <Sparkles className="w-4 h-4 text-[#89591C]" />
+                      <Sparkles className="w-4 h-4 text-[#F37021]" />
                       <span>DISCOVER ALL</span>
                     </span>
                     <ChevronRight className="w-4 h-4 text-[#aaa]" />
@@ -416,10 +416,10 @@ export default function Header() {
                   <Link
                     href="/track-order"
                     onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#faf8f5] hover:text-[#89591C] rounded-lg transition-colors"
+                    className="flex items-center justify-between px-3 py-2.5 text-xs font-medium text-[#030303] hover:bg-[#F7F7F7] hover:text-[#F37021] rounded-lg transition-colors"
                   >
                     <span className="flex items-center gap-2.5">
-                      <Package className="w-4 h-4 text-[#89591C]" />
+                      <Package className="w-4 h-4 text-[#F37021]" />
                       <span>TRACK YOUR ORDER</span>
                     </span>
                     <ChevronRight className="w-4 h-4 text-[#aaa]" />
@@ -429,7 +429,7 @@ export default function Header() {
             </div>
 
             {/* Drawer Bottom Actions: Auth & Contact */}
-            <div className="p-4 border-t border-[#e8e2d8] bg-[#faf8f5] space-y-3">
+            <div className="p-4 border-t border-[#E5E5E5] bg-[#F7F7F7] space-y-3">
               {/* Login / Register Buttons */}
               <div className="grid grid-cols-2 gap-2">
                 {isLoggedIn && user ? (
@@ -437,7 +437,7 @@ export default function Header() {
                     <Link
                       href="/profile"
                       onClick={closeMobileMenu}
-                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-white bg-[#89591C] rounded-md hover:bg-[#724a17] transition-colors"
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-white bg-[#F37021] rounded-md hover:bg-[#D95B10] transition-colors"
                     >
                       <UserCheck className="w-3.5 h-3.5" />
                       <span>MY PROFILE</span>
@@ -460,7 +460,7 @@ export default function Header() {
                     <Link
                       href="/login"
                       onClick={closeMobileMenu}
-                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-white bg-[#030303] rounded-md hover:bg-[#89591C] transition-colors"
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-white bg-[#030303] rounded-md hover:bg-[#F37021] transition-colors"
                     >
                       <LogIn className="w-3.5 h-3.5" />
                       <span>LOGIN</span>
@@ -468,9 +468,9 @@ export default function Header() {
                     <Link
                       href="/signup"
                       onClick={closeMobileMenu}
-                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-[#030303] bg-white border border-[#e8e2d8] rounded-md hover:border-[#89591C] transition-colors"
+                      className="flex items-center justify-center gap-1.5 py-2 px-3 text-[11px] font-semibold text-[#030303] bg-white border border-[#E5E5E5] rounded-md hover:border-[#F37021] transition-colors"
                     >
-                      <UserCheck className="w-3.5 h-3.5 text-[#89591C]" />
+                      <UserCheck className="w-3.5 h-3.5 text-[#F37021]" />
                       <span>SIGN UP</span>
                     </Link>
                   </>
@@ -478,10 +478,10 @@ export default function Header() {
               </div>
 
               {/* Contact Info */}
-              <div className="pt-2 text-[10px] text-[#666] space-y-1.5 border-t border-[#e8e2d8]/60">
+              <div className="pt-2 text-[10px] text-[#666] space-y-1.5 border-t border-[#E5E5E5]/60">
                 <a
                   href="mailto:gravozshoes@gmail.com"
-                  className="flex items-center gap-2 hover:text-[#89591C] transition-colors"
+                  className="flex items-center gap-2 hover:text-[#F37021] transition-colors"
                 >
                   <Image
                     src="/icons/email.webp"
@@ -494,9 +494,9 @@ export default function Header() {
                 </a>
                 <a
                   href="tel:+919645319418"
-                  className="flex items-center gap-2 hover:text-[#89591C] transition-colors"
+                  className="flex items-center gap-2 hover:text-[#F37021] transition-colors"
                 >
-                  <Phone className="w-3 h-3 text-[#89591C]" />
+                  <Phone className="w-3 h-3 text-[#F37021]" />
                   <span>+91 9645319418</span>
                 </a>
               </div>

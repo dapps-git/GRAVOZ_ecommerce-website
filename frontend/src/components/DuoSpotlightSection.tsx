@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { ShoppingCart, Check } from 'lucide-react';
+import { optimizeCloudinaryUrl, isDirectCdnUrl } from '@/lib/cloudinaryUrl';
 
 export interface DuoProductData {
   slot: string;
@@ -61,9 +62,9 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
   };
 
   const renderProductSpotlight = (product: DuoProductData, defaultTitle: string) => {
-    const mainImg = product.imageUrl || '/products/placeholder.svg';
-    const thumbImg = product.thumbnailUrl || product.imageUrl || '/products/placeholder.svg';
-    const lifeImg = product.lifestyleUrl || product.imageUrl || '/products/placeholder.svg';
+    const mainImg = optimizeCloudinaryUrl(product.imageUrl || '/products/placeholder.svg', 700);
+    const thumbImg = optimizeCloudinaryUrl(product.thumbnailUrl || product.imageUrl || '/products/placeholder.svg', 240);
+    const lifeImg = optimizeCloudinaryUrl(product.lifestyleUrl || product.imageUrl || '/products/placeholder.svg', 700);
     const href =
       product.linkUrl && product.linkUrl !== '/products' && !product.linkUrl.includes('undefined')
         ? product.linkUrl
@@ -78,11 +79,12 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
         <Link href={href} className="group grid grid-cols-2 gap-2.5 sm:gap-3 cursor-pointer">
 
           {/* Card 1 — Main photo + floating inset thumb */}
-          <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#f0ede8] border border-[#e8e2d8] shadow-sm group-hover:shadow-md transition-all duration-300">
+          <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#F3F3F3] border border-[#E5E5E5] shadow-sm group-hover:shadow-md transition-all duration-300">
             <Image
               src={mainImg}
               alt={`${product.title || defaultTitle} – main`}
               fill
+              unoptimized={isDirectCdnUrl(mainImg)}
               sizes="(max-width: 768px) 45vw, 22vw"
               className="object-cover object-center group-hover:scale-[1.04] transition-transform duration-700"
             />
@@ -94,6 +96,7 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
                     src={thumbImg}
                     alt="angle view"
                     fill
+                    unoptimized={isDirectCdnUrl(thumbImg)}
                     sizes="60px"
                     className="object-cover object-center"
                   />
@@ -103,11 +106,12 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
           </div>
 
           {/* Card 2 — Tall lifestyle photo */}
-          <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#f0ede8] border border-[#e8e2d8] shadow-sm group-hover:shadow-md transition-all duration-300">
+          <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#F3F3F3] border border-[#E5E5E5] shadow-sm group-hover:shadow-md transition-all duration-300">
             <Image
               src={lifeImg}
               alt={`${product.title || defaultTitle} – lifestyle`}
               fill
+              unoptimized={isDirectCdnUrl(lifeImg)}
               sizes="(max-width: 768px) 45vw, 22vw"
               className="object-cover object-center group-hover:scale-[1.04] transition-transform duration-700"
             />
@@ -117,11 +121,11 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
         {/* ── Product info ── */}
         <div className="space-y-1.5">
           <Link href={href} className="group block">
-            <p className="text-[12px] sm:text-[13px] font-normal text-[#1a1a1a] leading-snug truncate group-hover:text-[#89591C] transition-colors">
+            <p className="text-[12px] sm:text-[13px] font-normal text-[#1a1a1a] leading-snug truncate group-hover:text-[#F37021] transition-colors">
               {product.title || defaultTitle}
             </p>
             <div className="flex items-baseline gap-2 pt-0.5">
-              <span className="text-[12px] sm:text-[13px] font-bold text-[#89591C]">
+              <span className="text-[12px] sm:text-[13px] font-bold text-[#F37021]">
                 ₹{product.price || 1399}
               </span>
               {product.originalPrice && product.originalPrice > (product.price || 0) && (
@@ -143,8 +147,8 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
               text-[12px] sm:text-[13px] font-semibold
               transition-all duration-200 cursor-pointer
               ${isAdding
-                ? 'bg-[#89591C] text-white'
-                : 'bg-[#111111] hover:bg-[#89591C] text-white active:scale-[0.99]'}
+                ? 'bg-[#F37021] text-white'
+                : 'bg-[#111111] hover:bg-[#F37021] text-white active:scale-[0.99]'}
             `}
           >
             {isAdding ? (
@@ -169,7 +173,7 @@ export default function DuoSpotlightSection({ product1, product2 }: Props) {
       {/* Toast */}
       {toastMsg && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#111111] text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 border border-white/10 animate-in slide-in-from-bottom-4 duration-200">
-          <Check className="w-3.5 h-3.5 text-[#89591C] flex-shrink-0" />
+          <Check className="w-3.5 h-3.5 text-[#F37021] flex-shrink-0" />
           {toastMsg}
         </div>
       )}

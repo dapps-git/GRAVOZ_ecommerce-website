@@ -198,7 +198,7 @@ export default function AdminCouponsPage() {
       header: 'Coupon Code',
       accessor: (row) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#faf4ec] text-[#89591C] font-bold text-xs flex items-center justify-center border border-[#e8e2d8]">
+          <div className="w-8 h-8 rounded-lg bg-[#FFF3EB] text-[#F37021] font-bold text-xs flex items-center justify-center border border-[#E5E5E5]">
             <TicketPercent className="w-4 h-4" />
           </div>
           <div>
@@ -207,7 +207,7 @@ export default function AdminCouponsPage() {
                 {row.code}
               </span>
               {row.firstOrderOnly && (
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#fcf4e8] text-[#89591C] border border-[#e8d8be]">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF3EB] text-[#F37021] border border-[#FAD4BC]">
                   1st Order Only
                 </span>
               )}
@@ -243,7 +243,7 @@ export default function AdminCouponsPage() {
       header: 'Usage',
       accessor: (row) => (
         <div className="text-xs text-slate-700">
-          <span className="font-bold text-[#89591C]">{row.usedCount || 0}</span>
+          <span className="font-bold text-[#F37021]">{row.usedCount || 0}</span>
           <span className="text-slate-400 font-normal"> / {row.totalUsageLimit} uses</span>
         </div>
       ),
@@ -284,7 +284,7 @@ export default function AdminCouponsPage() {
           <button
             type="button"
             onClick={() => openEditModal(row)}
-            className="p-1.5 rounded-md bg-[#faf8f5] text-slate-700 hover:text-[#89591C] hover:bg-[#faf4ec] border border-[#e8e2d8] transition-colors cursor-pointer"
+            className="p-1.5 rounded-md bg-[#F7F7F7] text-slate-700 hover:text-[#F37021] hover:bg-[#FFF3EB] border border-[#E5E5E5] transition-colors cursor-pointer"
             title="Edit coupon"
           >
             <Edit2 className="w-3.5 h-3.5" />
@@ -308,7 +308,7 @@ export default function AdminCouponsPage() {
       {toast && (
         <div
           className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-md shadow-2xl flex items-center gap-3 text-white text-xs font-semibold animate-in slide-in-from-bottom-4 duration-200 ${
-            toast.type === 'success' ? 'bg-[#89591C]' : 'bg-rose-600'
+            toast.type === 'success' ? 'bg-[#F37021]' : 'bg-rose-600'
           }`}
         >
           {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -332,7 +332,7 @@ export default function AdminCouponsPage() {
           <button
             type="button"
             onClick={openCreateModal}
-            className="h-9 px-4 rounded-md bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
+            className="h-9 px-4 rounded-md bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Coupon</span>
@@ -341,7 +341,7 @@ export default function AdminCouponsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-[#e8e2d8] rounded-lg overflow-hidden shadow-2xs">
+      <div className="bg-white border border-[#E5E5E5] rounded-lg overflow-hidden shadow-2xs">
         <DataTable
           columns={columns}
           data={coupons}
@@ -372,7 +372,7 @@ export default function AdminCouponsPage() {
                 placeholder="GRAVOZ10"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                className="w-full uppercase font-mono tracking-wider bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full uppercase font-mono tracking-wider bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
 
@@ -383,7 +383,7 @@ export default function AdminCouponsPage() {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as any)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               >
                 <option value="percentage">Percentage (%) Discount</option>
                 <option value="fixed_amount">Flat Fixed Amount (₹) OFF</option>
@@ -406,7 +406,7 @@ export default function AdminCouponsPage() {
                 placeholder={type === 'percentage' ? '10' : '200'}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs font-bold text-[#89591C] focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs font-bold text-[#F37021] focus:outline-none focus:border-[#F37021]"
               />
             </div>
 
@@ -420,7 +420,7 @@ export default function AdminCouponsPage() {
                 placeholder="999"
                 value={minPurchaseAmount}
                 onChange={(e) => setMinPurchaseAmount(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
 
@@ -434,7 +434,7 @@ export default function AdminCouponsPage() {
                 placeholder="500"
                 value={maxDiscountAmount}
                 onChange={(e) => setMaxDiscountAmount(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
           </div>
@@ -449,7 +449,7 @@ export default function AdminCouponsPage() {
               placeholder="e.g. Get 10% OFF on all orders above ₹999"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -464,7 +464,7 @@ export default function AdminCouponsPage() {
                 required
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
 
@@ -478,7 +478,7 @@ export default function AdminCouponsPage() {
                 placeholder="100"
                 value={totalUsageLimit}
                 onChange={(e) => setTotalUsageLimit(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
 
@@ -492,19 +492,19 @@ export default function AdminCouponsPage() {
                 placeholder="1"
                 value={usageLimitPerCustomer}
                 onChange={(e) => setUsageLimitPerCustomer(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
           </div>
 
           {/* First Order / Welcome Offer Checkbox */}
-          <div className="p-3 bg-[#faf4ec] rounded-xl border border-[#e8d8be] flex items-start gap-2.5">
+          <div className="p-3 bg-[#FFF3EB] rounded-xl border border-[#FAD4BC] flex items-start gap-2.5">
             <input
               type="checkbox"
               id="couponFirstOrder"
               checked={firstOrderOnly}
               onChange={(e) => setFirstOrderOnly(e.target.checked)}
-              className="mt-0.5 w-4 h-4 text-[#89591C] rounded border-slate-300 focus:ring-[#89591C] cursor-pointer"
+              className="mt-0.5 w-4 h-4 text-[#F37021] rounded border-slate-300 focus:ring-[#F37021] cursor-pointer"
             />
             <div>
               <label htmlFor="couponFirstOrder" className="text-xs font-bold text-slate-900 cursor-pointer block">
@@ -523,7 +523,7 @@ export default function AdminCouponsPage() {
               id="couponActive"
               checked={isActive}
               onChange={(e) => setIsActive(e.target.checked)}
-              className="w-4 h-4 text-[#89591C] rounded border-slate-300 focus:ring-[#89591C]"
+              className="w-4 h-4 text-[#F37021] rounded border-slate-300 focus:ring-[#F37021]"
             />
             <label htmlFor="couponActive" className="text-xs font-semibold text-slate-700 cursor-pointer">
               Active &amp; Available for Storefront Checkout
@@ -531,7 +531,7 @@ export default function AdminCouponsPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#e8e2d8]">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5E5]">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
@@ -542,7 +542,7 @@ export default function AdminCouponsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 rounded-xl bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-60"
+              className="px-5 py-2 rounded-xl bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-60"
             >
               {submitting ? 'Saving...' : editingCoupon ? 'Save Changes' : 'Create Coupon'}
             </button>

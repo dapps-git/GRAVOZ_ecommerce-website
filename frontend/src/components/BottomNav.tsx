@@ -42,12 +42,12 @@ export default function BottomNav() {
   return (
     <nav
       style={{ WebkitBackdropFilter: 'blur(12px)' }}
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#e8e2d8] pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-3 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.05)] lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#E5E5E5] pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-3 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.05)] lg:hidden"
     >
       {/* Home */}
       <Link
         href="/"
-        className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isHome ? 'text-[#89591C] font-semibold' : 'text-slate-500 hover:text-slate-900'
+        className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isHome ? 'text-[#F37021] font-semibold' : 'text-slate-500 hover:text-slate-900'
           }`}
       >
         <Home className={`w-4 h-4 ${isHome ? 'stroke-[2.5]' : 'stroke-2'}`} />
@@ -57,7 +57,7 @@ export default function BottomNav() {
       {/* Categories */}
       <Link
         href="/products"
-        className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isCategories ? 'text-[#89591C] font-semibold' : 'text-slate-500 hover:text-slate-900'
+        className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isCategories ? 'text-[#F37021] font-semibold' : 'text-slate-500 hover:text-slate-900'
           }`}
       >
         <LayoutGrid className={`w-4 h-4 ${isCategories ? 'stroke-[2.5]' : 'stroke-2'}`} />
@@ -67,13 +67,13 @@ export default function BottomNav() {
       {/* Wishlist */}
       <Link
         href="/wishlist"
-        className={`relative flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isWishlist ? 'text-[#89591C] font-semibold' : 'text-slate-500 hover:text-slate-900'
+        className={`relative flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isWishlist ? 'text-[#F37021] font-semibold' : 'text-slate-500 hover:text-slate-900'
           }`}
       >
         <div className="relative">
-          <Heart className={`w-4 h-4 ${isWishlist ? 'stroke-[2.5] fill-[#89591C]' : 'stroke-2'}`} />
+          <Heart className={`w-4 h-4 ${isWishlist ? 'stroke-[2.5] fill-[#F37021]' : 'stroke-2'}`} />
           {mounted && wishlistCount > 0 && (
-            <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 rounded-full bg-[#68421A] text-white text-[8px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 rounded-full bg-[#D95B10] text-white text-[8px] font-bold flex items-center justify-center">
               {wishlistCount}
             </span>
           )}
@@ -84,13 +84,13 @@ export default function BottomNav() {
       {/* Cart */}
       <Link
         href="/cart"
-        className={`relative flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isCart ? 'text-[#89591C] font-semibold' : 'text-slate-500 hover:text-slate-900'
+        className={`relative flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isCart ? 'text-[#F37021] font-semibold' : 'text-slate-500 hover:text-slate-900'
           }`}
       >
         <div className="relative">
           <ShoppingBag className={`w-4 h-4 ${isCart ? 'stroke-[2.5]' : 'stroke-2'}`} />
           {mounted && cartCount > 0 && (
-            <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 rounded-full bg-[#68421A] text-white text-[8px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1.5 -right-2 w-3.5 h-3.5 rounded-full bg-[#D95B10] text-white text-[8px] font-bold flex items-center justify-center">
               {cartCount}
             </span>
           )}
@@ -101,7 +101,7 @@ export default function BottomNav() {
       {/* Account */}
       <Link
         href={isLoggedIn ? '/profile' : '/login'}
-        className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isAccount ? 'text-[#89591C] font-semibold' : 'text-slate-500 hover:text-slate-900'
+        className={`flex flex-col items-center gap-1 text-[10px] font-medium transition-colors ${isAccount ? 'text-[#F37021] font-semibold' : 'text-slate-500 hover:text-slate-900'
           }`}
       >
         <User className={`w-4 h-4 ${isAccount ? 'stroke-[2.5]' : 'stroke-2'}`} />
