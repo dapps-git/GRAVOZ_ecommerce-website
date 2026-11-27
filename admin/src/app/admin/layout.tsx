@@ -10,11 +10,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // If on login page, render clean full-screen layout without admin sidebar/header
   if (pathname === '/admin/login') {
-    return <div className="min-h-screen bg-[#faf8f5] text-slate-800 font-sans">{children}</div>;
+    return <div className="min-h-screen bg-[#f7f7f7] text-slate-800 font-sans">{children}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] flex font-sans text-slate-800 print:bg-white print:block">
+    <div className="min-h-screen bg-[#f7f7f7] flex font-sans text-slate-800 print:bg-white print:block">
       <div className="print:hidden">
         <Sidebar />
       </div>

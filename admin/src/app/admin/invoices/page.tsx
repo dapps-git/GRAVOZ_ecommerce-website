@@ -34,7 +34,7 @@ export default function InvoicesPage() {
       header: 'Invoice #',
       accessor: (row: InvoiceOrder) => (
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-md bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8]">
+          <div className="p-1.5 rounded-md bg-[#FFF3EB] text-[#F37021] border border-[#E5E5E5]">
             <FileText className="w-4 h-4" />
           </div>
           <div>
@@ -66,7 +66,7 @@ export default function InvoicesPage() {
       accessor: (row: InvoiceOrder) => (
         <Link
           href={`/admin/invoices/${row._id}`}
-          className="px-3 py-1 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-md flex items-center gap-1.5 shadow-xs"
+          className="px-3 py-1 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-md flex items-center gap-1.5 shadow-xs"
         >
           <Printer className="w-3.5 h-3.5" /> View / Print PDF
         </Link>
@@ -76,7 +76,7 @@ export default function InvoicesPage() {
 
   return (
     <div className="space-y-4 font-light">
-      <div className="border-b border-[#e8e2d8] pb-3">
+      <div className="border-b border-[#E5E5E5] pb-3">
         <p className="text-xs text-slate-500 font-normal">Generate, view, and print official GRAVOZ store invoices</p>
       </div>
 

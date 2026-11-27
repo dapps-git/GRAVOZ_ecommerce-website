@@ -209,10 +209,10 @@ export default function OrderTrackingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAF7F3] flex flex-col font-poppins">
+      <div className="min-h-screen bg-[#F7F7F7] flex flex-col font-poppins">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-[#8A5B2A] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#F37021] animate-spin" />
         </div>
         <Footer />
       </div>
@@ -221,7 +221,7 @@ export default function OrderTrackingPage() {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-[#FAF7F3] flex flex-col font-poppins">
+      <div className="min-h-screen bg-[#F7F7F7] flex flex-col font-poppins">
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-4 py-12">
           <XCircle className="w-12 h-12 text-rose-400" />
@@ -229,7 +229,7 @@ export default function OrderTrackingPage() {
           <button
             type="button"
             onClick={() => router.push('/profile?tab=orders')}
-            className="px-6 py-2.5 bg-[#8A5B2A] text-white text-xs font-medium rounded-lg cursor-pointer"
+            className="px-6 py-2.5 bg-[#F37021] text-white text-xs font-medium rounded-lg cursor-pointer"
           >
             View My Orders
           </button>
@@ -355,7 +355,7 @@ export default function OrderTrackingPage() {
   const isPhotoPromptReason = selectedReason === 'Product Damaged' || selectedReason === 'Received Wrong Product';
 
   return (
-    <div className="min-h-screen bg-[#FAF7F3] text-[#111111] font-poppins flex flex-col justify-between selection:bg-[#8A5B2A] selection:text-white">
+    <div className="min-h-screen bg-[#F7F7F7] text-[#111111] font-poppins flex flex-col justify-between selection:bg-[#F37021] selection:text-white">
       <Header />
 
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
@@ -373,13 +373,13 @@ export default function OrderTrackingPage() {
             <Link
               href={`/orders/${order._id}/invoice`}
               target="_blank"
-              className="text-xs font-semibold text-slate-700 hover:text-[#8A5B2A] bg-white border border-[#E5E1DC] px-3 py-1.5 rounded-none shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="text-xs font-semibold text-slate-700 hover:text-[#F37021] bg-white border border-[#E5E5E5] px-3 py-1.5 rounded-none shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <FileText className="w-3.5 h-3.5 text-[#8A5B2A]" /> Invoice
+              <FileText className="w-3.5 h-3.5 text-[#F37021]" /> Invoice
             </Link>
             <a
               href="mailto:gravozshoes@gmail.com"
-              className="text-xs font-medium text-[#8A5B2A] hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-xs font-medium text-[#F37021] hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>Need Help?</span>
             </a>
@@ -388,10 +388,10 @@ export default function OrderTrackingPage() {
 
         {/* Estimated Delivery Banner if set by Admin */}
         {order.estimatedDelivery && !isCancelled && order.orderStatus !== 'delivered' && (
-          <div className="p-3.5 sm:p-4 bg-white border border-[#E5E1DC] rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+          <div className="p-3.5 sm:p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#FAF5EE] border border-[#d4af7a]/40 text-[#8A5B2A] flex items-center justify-center shrink-0">
-                <Calendar className="w-4 h-4 text-[#8A5B2A]" />
+              <div className="w-9 h-9 rounded-full bg-[#FFF3EB] border border-[#F7B994]/40 text-[#F37021] flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4 text-[#F37021]" />
               </div>
               <div>
                 <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-slate-500 font-medium block">
@@ -407,7 +407,7 @@ export default function OrderTrackingPage() {
                 </p>
               </div>
             </div>
-            <span className="text-[11px] font-medium text-[#8A5B2A] bg-[#FAF7F3] border border-[#E5E1DC] px-2.5 py-1 rounded-md">
+            <span className="text-[11px] font-medium text-[#F37021] bg-[#F7F7F7] border border-[#E5E5E5] px-2.5 py-1 rounded-md">
               On Schedule
             </span>
           </div>
@@ -415,7 +415,7 @@ export default function OrderTrackingPage() {
 
         {/* ── CANCELLED ORDER & UPI REFUND STATUS BANNER ── */}
         {isCancelled && (
-          <div className="p-4 sm:p-5 rounded-md border border-[#E5E1DC] bg-white shadow-2xs space-y-3 font-sansation">
+          <div className="p-4 sm:p-5 rounded-md border border-[#E5E5E5] bg-white shadow-2xs space-y-3 font-sansation">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0 mt-0.5">
                 <XCircle className="w-4 h-4 text-rose-600" />
@@ -464,9 +464,9 @@ export default function OrderTrackingPage() {
                       <p className="text-xs text-slate-600">
                         A full refund of <span className="font-bold text-[#111111]">₹{order.totalAmount?.toLocaleString('en-IN')}</span> has been initiated to your original UPI-linked account.
                       </p>
-                      <div className="p-3 bg-[#FAF8F5] border border-[#E8E1D9] rounded-md text-[11px] text-slate-600 space-y-1">
-                        <div className="flex items-center gap-1.5 font-semibold text-[#8B4A12]">
-                          <Clock className="w-3.5 h-3.5 text-[#8B4A12]" />
+                      <div className="p-3 bg-[#F7F7F7] border border-[#E5E5E5] rounded-md text-[11px] text-slate-600 space-y-1">
+                        <div className="flex items-center gap-1.5 font-semibold text-[#F37021]">
+                          <Clock className="w-3.5 h-3.5 text-[#F37021]" />
                           <span>Estimated Time: 2–7 Business Days</span>
                         </div>
                         <p className="text-slate-500 text-[10.5px]">
@@ -492,11 +492,11 @@ export default function OrderTrackingPage() {
 
         {/* ── STANDARD DELIVERY STEPPER BAR (When Not In Return Flow) ── */}
         {!isCancelled && !isReturnFlow && (
-          <div className="w-full pt-2 pb-6 border-b border-[#E5E1DC]">
+          <div className="w-full pt-2 pb-6 border-b border-[#E5E5E5]">
             <div className="relative flex items-start justify-between">
-              <div className="absolute top-3.5 sm:top-4.5 left-4 right-4 h-[2px] bg-[#E5E1DC] z-0">
+              <div className="absolute top-3.5 sm:top-4.5 left-4 right-4 h-[2px] bg-[#E5E5E5] z-0">
                 <div
-                  className="h-full bg-[#8A5B2A] transition-all duration-500"
+                  className="h-full bg-[#F37021] transition-all duration-500"
                   style={{
                     width: `${(activeStepIdx / (STEP_DEFINITIONS.length - 1)) * 100}%`,
                   }}
@@ -514,9 +514,9 @@ export default function OrderTrackingPage() {
                     key={step.key}
                     className="flex flex-col items-center relative z-10 text-center flex-1 max-w-[70px] sm:max-w-[110px]"
                   >
-                    <div className="flex items-center justify-center p-1.5 bg-[#FAF7F3] transition-all">
+                    <div className="flex items-center justify-center p-1.5 bg-[#F7F7F7] transition-all">
                       {isCompleted ? (
-                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#8A5B2A] stroke-[2.5]" />
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#F37021] stroke-[2.5]" />
                       ) : (
                         <StepIcon
                           className={`w-4 h-4 sm:w-5 sm:h-5 ${
@@ -560,9 +560,9 @@ export default function OrderTrackingPage() {
 
             {/* Current Hub Location Banner if available */}
             {order.currentLocation && (
-              <div className="mt-4 px-3.5 py-2 bg-white border border-[#E5E1DC] rounded-none flex items-center justify-between text-xs">
+              <div className="mt-4 px-3.5 py-2 bg-white border border-[#E5E5E5] rounded-none flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5 text-slate-600">
-                  <MapPin className="w-3.5 h-3.5 text-[#8A5B2A]" />
+                  <MapPin className="w-3.5 h-3.5 text-[#F37021]" />
                   <span>Current Hub Location:</span>
                   <strong className="text-[#111111] font-medium">{order.currentLocation}</strong>
                 </div>
@@ -574,16 +574,16 @@ export default function OrderTrackingPage() {
 
         {/* ── RETURN LIFECYCLE STEPPER (When in Return Flow) ── */}
         {isReturnFlow && !isReturnRejected && (
-          <div className="w-full p-5 bg-white border border-[#E5E1DC] rounded-none shadow-2xs space-y-4">
+          <div className="w-full p-5 bg-white border border-[#E5E5E5] rounded-none shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-[#8A5B2A]" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#8A5B2A]">
+                <RotateCcw className="w-4 h-4 text-[#F37021]" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#F37021]">
                   Return & Refund Progress
                 </span>
               </div>
               <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-none ${
-                activeReturnStepIdx >= 2 ? 'bg-[#E8F8EE] text-[#22C55E]' : 'bg-[#FAF7F3] text-[#8A5B2A] border border-[#E5E1DC]'
+                activeReturnStepIdx >= 2 ? 'bg-[#E8F8EE] text-[#22C55E]' : 'bg-[#F7F7F7] text-[#F37021] border border-[#E5E5E5]'
               }`}>
                 {RETURN_STEP_DEFINITIONS[activeReturnStepIdx]?.label}
               </span>
@@ -591,9 +591,9 @@ export default function OrderTrackingPage() {
 
             {/* Step Nodes */}
             <div className="relative flex items-start justify-between pt-2">
-              <div className="absolute top-3.5 left-3 right-3 h-[2px] bg-[#E5E1DC] z-0">
+              <div className="absolute top-3.5 left-3 right-3 h-[2px] bg-[#E5E5E5] z-0">
                 <div
-                  className="h-full bg-[#8A5B2A] transition-all duration-500"
+                  className="h-full bg-[#F37021] transition-all duration-500"
                   style={{
                     width: `${(activeReturnStepIdx / (RETURN_STEP_DEFINITIONS.length - 1)) * 100}%`,
                   }}
@@ -609,10 +609,10 @@ export default function OrderTrackingPage() {
                     <div
                       className={`w-6 h-6 sm:w-7 sm:h-7 rounded-none flex items-center justify-center text-[10px] font-medium transition-all ${
                         isCompleted
-                          ? 'bg-[#8A5B2A] text-white'
+                          ? 'bg-[#F37021] text-white'
                           : isActive
-                          ? 'bg-[#111111] text-white ring-2 ring-[#8A5B2A]/30'
-                          : 'bg-white border border-[#E5E1DC] text-[#888888]'
+                          ? 'bg-[#111111] text-white ring-2 ring-[#F37021]/30'
+                          : 'bg-white border border-[#E5E5E5] text-[#888888]'
                       }`}
                     >
                       {isCompleted ? <Check className="w-3 h-3 stroke-[2.5]" /> : i + 1}
@@ -631,7 +631,7 @@ export default function OrderTrackingPage() {
 
         {/* ── RETURN STATUS BANNER / ACCEPTANCE CALLOUT ── */}
         {isReturnFlow && (
-          <div className="p-4 sm:p-5 rounded-none border shadow-2xs space-y-3 bg-white border-[#E5E1DC]">
+          <div className="p-4 sm:p-5 rounded-none border shadow-2xs space-y-3 bg-white border-[#E5E5E5]">
             {activeReturnStepIdx === 2 || returnStatus === 'approved' || orderStatus === 'return_approved' ? (
               /* SPECIFIC USER REQUIREMENT: Show return request accepted */
               <div className="flex items-start gap-3 text-emerald-800 bg-emerald-50 border border-emerald-200 p-3.5 rounded-none">
@@ -654,8 +654,8 @@ export default function OrderTrackingPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-start gap-3 text-amber-800 bg-[#FAF7F3] border border-[#E5E1DC] p-3.5 rounded-none">
-                <RotateCcw className="w-5 h-5 text-[#8A5B2A] flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 text-amber-800 bg-[#F7F7F7] border border-[#E5E5E5] p-3.5 rounded-none">
+                <RotateCcw className="w-5 h-5 text-[#F37021] flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="text-sm font-semibold text-[#111111]">{RETURN_STEP_DEFINITIONS[activeReturnStepIdx]?.label}</h3>
                   <p className="text-xs text-[#555555] mt-0.5">
@@ -667,10 +667,10 @@ export default function OrderTrackingPage() {
 
             {/* Customer Return Details Submitted */}
             {order.returnDetails && order.returnDetails.reason && (
-              <div className="pt-2 text-xs space-y-1.5 border-t border-[#E5E1DC]/60">
+              <div className="pt-2 text-xs space-y-1.5 border-t border-[#E5E5E5]/60">
                 <div className="flex items-center gap-2">
                   <span className="text-[#888888]">Reason for return:</span>
-                  <span className="font-semibold text-[#111111] bg-[#FAF7F3] px-2 py-0.5 rounded-none border border-[#E5E1DC]">
+                  <span className="font-semibold text-[#111111] bg-[#F7F7F7] px-2 py-0.5 rounded-none border border-[#E5E5E5]">
                     {order.returnDetails.reason}
                   </span>
                 </div>
@@ -685,7 +685,7 @@ export default function OrderTrackingPage() {
                     <span className="text-[#888888] block mb-1">Evidence Photos:</span>
                     <div className="flex items-center gap-2">
                       {order.returnDetails.images.map((img: string, idx: number) => (
-                        <div key={idx} className="relative w-14 h-14 rounded-none overflow-hidden border border-[#E5E1DC] bg-[#FAF7F3]">
+                        <div key={idx} className="relative w-14 h-14 rounded-none overflow-hidden border border-[#E5E5E5] bg-[#F7F7F7]">
                           <img src={img} alt="Return evidence" className="w-full h-full object-cover" />
                         </div>
                       ))}
@@ -698,9 +698,9 @@ export default function OrderTrackingPage() {
         )}
 
         {/* ── ORDER SUMMARY CARD ── */}
-        <div className="bg-white border border-[#E5E1DC] rounded-none p-5 space-y-4 shadow-2xs">
+        <div className="bg-white border border-[#E5E5E5] rounded-none p-5 space-y-4 shadow-2xs">
           <h3 className="text-sm font-semibold text-[#111111]">Items in this Order</h3>
-          <div className="divide-y divide-[#E5E1DC]/60">
+          <div className="divide-y divide-[#E5E5E5]/60">
             {order.items?.map((item: any, idx: number) => {
               const prodHref = `/products/${item.productId || item.product || item.slug || item._id}`;
               return (
@@ -708,7 +708,7 @@ export default function OrderTrackingPage() {
                   <div className="flex items-center gap-3 min-w-0">
                     <Link
                       href={prodHref}
-                      className="relative w-14 h-14 rounded-none bg-[#FAF7F3] border border-[#E5E1DC] flex-shrink-0 overflow-hidden hover:opacity-85 transition-opacity block p-1"
+                      className="relative w-14 h-14 rounded-none bg-[#F7F7F7] border border-[#E5E5E5] flex-shrink-0 overflow-hidden hover:opacity-85 transition-opacity block p-1"
                     >
                       <ProductImage
                         src={item.imageUrl}
@@ -721,7 +721,7 @@ export default function OrderTrackingPage() {
                     <div className="min-w-0">
                       <Link
                         href={prodHref}
-                        className="text-xs sm:text-sm font-medium text-[#111111] truncate hover:text-[#8A5B2A] transition-colors block"
+                        className="text-xs sm:text-sm font-medium text-[#111111] truncate hover:text-[#F37021] transition-colors block"
                       >
                         {item.name}
                       </Link>
@@ -743,15 +743,15 @@ export default function OrderTrackingPage() {
             })}
           </div>
 
-          <div className="pt-2 border-t border-[#E5E1DC] flex justify-between items-center text-sm font-semibold">
+          <div className="pt-2 border-t border-[#E5E5E5] flex justify-between items-center text-sm font-semibold">
             <span className="text-[#555555]">Total Order Amount:</span>
-            <span className="text-[#8A5B2A] text-base">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
+            <span className="text-[#F37021] text-base">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
           </div>
         </div>
 
         {/* Action feedback message */}
         {actionMsg && (
-          <div className="p-3.5 bg-[#FAF7F3] border border-[#8A5B2A]/30 rounded-none text-xs font-medium text-[#8A5B2A] text-center">
+          <div className="p-3.5 bg-[#F7F7F7] border border-[#F37021]/30 rounded-none text-xs font-medium text-[#F37021] text-center">
             {actionMsg}
           </div>
         )}
@@ -761,7 +761,7 @@ export default function OrderTrackingPage() {
           <button
             type="button"
             onClick={() => router.push('/profile?tab=orders')}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#555555] hover:text-[#8A5B2A] cursor-pointer transition-colors"
+            className="inline-flex items-center gap-1 text-xs font-medium text-[#555555] hover:text-[#F37021] cursor-pointer transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to My Orders
           </button>
@@ -787,7 +787,7 @@ export default function OrderTrackingPage() {
                 <button
                   type="button"
                   onClick={() => setShowReturnModal(true)}
-                  className="px-4 py-2 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-none transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-medium text-white bg-[#F37021] hover:bg-[#D95B10] rounded-none transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Request Return & Refund
@@ -802,9 +802,9 @@ export default function OrderTrackingPage() {
       {/* ── RETURN & REFUND REQUEST MODAL ── */}
       {showReturnModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white border border-[#E5E1DC] rounded-none max-w-lg w-full p-5 sm:p-6 shadow-xl space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-[#E5E5E5] rounded-none max-w-lg w-full p-5 sm:p-6 shadow-xl space-y-5 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-[#E5E1DC] pb-3">
+            <div className="flex items-start justify-between border-b border-[#E5E5E5] pb-3">
               <div>
                 <h3 className="text-base font-semibold text-[#111111]">Request Return & Refund</h3>
                 <p className="text-xs text-[#555555] mt-0.5">Please choose a reason for returning this order</p>
@@ -831,8 +831,8 @@ export default function OrderTrackingPage() {
                       key={reason}
                       className={`flex items-center gap-3 p-3 rounded-none border cursor-pointer transition-all ${
                         selectedReason === reason
-                          ? 'border-[#8A5B2A] bg-[#FAF7F3] text-[#111111] font-medium'
-                          : 'border-[#E5E1DC] bg-white text-[#555555] hover:border-[#8A5B2A]/40'
+                          ? 'border-[#F37021] bg-[#F7F7F7] text-[#111111] font-medium'
+                          : 'border-[#E5E5E5] bg-white text-[#555555] hover:border-[#F37021]/40'
                       }`}
                     >
                       <input
@@ -844,7 +844,7 @@ export default function OrderTrackingPage() {
                           setSelectedReason(reason);
                           setImageError('');
                         }}
-                        className="accent-[#8A5B2A] w-4 h-4 cursor-pointer"
+                        className="accent-[#F37021] w-4 h-4 cursor-pointer"
                       />
                       <span className="text-xs sm:text-sm">{reason}</span>
                     </label>
@@ -864,7 +864,7 @@ export default function OrderTrackingPage() {
                     placeholder="Please tell us more about your reason..."
                     rows={3}
                     required
-                    className="w-full p-3 rounded-none border border-[#E5E1DC] bg-[#FAF7F3] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#8A5B2A] focus:ring-1 focus:ring-[#8A5B2A]/20 transition-all resize-none"
+                    className="w-full p-3 rounded-none border border-[#E5E5E5] bg-[#F7F7F7] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#F37021] focus:ring-1 focus:ring-[#F37021]/20 transition-all resize-none"
                   />
                 </div>
               ) : (
@@ -877,7 +877,7 @@ export default function OrderTrackingPage() {
                     onChange={(e) => setReturnDescription(e.target.value)}
                     placeholder="Provide additional details if any..."
                     rows={2}
-                    className="w-full p-3 rounded-none border border-[#E5E1DC] bg-[#FAF7F3] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#8A5B2A] focus:ring-1 focus:ring-[#8A5B2A]/20 transition-all resize-none"
+                    className="w-full p-3 rounded-none border border-[#E5E5E5] bg-[#F7F7F7] text-xs sm:text-sm text-[#111111] placeholder:text-[#888888] focus:outline-none focus:border-[#F37021] focus:ring-1 focus:ring-[#F37021]/20 transition-all resize-none"
                   />
                 </div>
               )}
@@ -895,7 +895,7 @@ export default function OrderTrackingPage() {
                 {returnImages.length > 0 && (
                   <div className="flex items-center gap-2.5">
                     {returnImages.map((img, idx) => (
-                      <div key={idx} className="relative w-16 h-16 rounded-none overflow-hidden border border-[#E5E1DC] group">
+                      <div key={idx} className="relative w-16 h-16 rounded-none overflow-hidden border border-[#E5E5E5] group">
                         <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -910,8 +910,8 @@ export default function OrderTrackingPage() {
                 )}
 
                 {returnImages.length < 3 && (
-                  <label className="flex flex-col items-center justify-center p-4 rounded-none border border-dashed border-[#E5E1DC] hover:border-[#8A5B2A] bg-[#FAF7F3] cursor-pointer transition-colors text-center">
-                    <Upload className="w-5 h-5 text-[#8A5B2A] mb-1" />
+                  <label className="flex flex-col items-center justify-center p-4 rounded-none border border-dashed border-[#E5E5E5] hover:border-[#F37021] bg-[#F7F7F7] cursor-pointer transition-colors text-center">
+                    <Upload className="w-5 h-5 text-[#F37021] mb-1" />
                     <span className="text-xs font-medium text-[#111111]">Click to attach photos</span>
                     <span className="text-[10px] text-[#888888]">PNG, JPG up to 5MB</span>
                     <input
@@ -930,7 +930,7 @@ export default function OrderTrackingPage() {
               )}
 
               {/* Modal Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E1DC]">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E5E5]">
                 <button
                   type="button"
                   onClick={() => setShowReturnModal(false)}
@@ -941,7 +941,7 @@ export default function OrderTrackingPage() {
                 <button
                   type="submit"
                   disabled={submittingReturn}
-                  className="px-5 py-2.5 text-xs font-medium text-white bg-[#8A5B2A] hover:bg-[#68421A] rounded-none transition-colors cursor-pointer disabled:opacity-60 flex items-center gap-1.5 shadow-2xs"
+                  className="px-5 py-2.5 text-xs font-medium text-white bg-[#F37021] hover:bg-[#D95B10] rounded-none transition-colors cursor-pointer disabled:opacity-60 flex items-center gap-1.5 shadow-2xs"
                 >
                   {submittingReturn && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Submit Return Request</span>

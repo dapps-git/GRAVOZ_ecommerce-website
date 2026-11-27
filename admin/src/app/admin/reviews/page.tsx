@@ -159,8 +159,8 @@ export default function AdminReviewsPage() {
       header: 'Product',
       accessor: (row) => (
         <div className="flex items-center gap-2.5 max-w-xs">
-          <div className="w-8 h-8 rounded-md bg-[#faf8f5] border border-[#e8e2d8] flex items-center justify-center flex-shrink-0 text-slate-400">
-            <ShoppingBag className="w-4 h-4 text-[#89591C]" />
+          <div className="w-8 h-8 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] flex items-center justify-center flex-shrink-0 text-slate-400">
+            <ShoppingBag className="w-4 h-4 text-[#F37021]" />
           </div>
           <div className="min-w-0">
             <p className="font-bold text-slate-900 text-xs truncate">
@@ -183,12 +183,12 @@ export default function AdminReviewsPage() {
     {
       header: 'Rating',
       accessor: (row) => (
-        <div className="flex items-center gap-1 text-[#89591C]">
+        <div className="flex items-center gap-1 text-[#F37021]">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
               className={`w-3.5 h-3.5 ${
-                i < row.rating ? 'fill-[#89591C] text-[#89591C]' : 'text-slate-200'
+                i < row.rating ? 'fill-[#F37021] text-[#F37021]' : 'text-slate-200'
               }`}
             />
           ))}
@@ -253,7 +253,7 @@ export default function AdminReviewsPage() {
 
   return (
     <div className="space-y-4 font-light">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e8e2d8] pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5E5] pb-3">
         <div>
           <h1 className="text-lg font-bold text-slate-900">Product Reviews Management</h1>
           <p className="text-xs text-slate-500 font-normal">
@@ -266,7 +266,7 @@ export default function AdminReviewsPage() {
           <select
             value={filterProductId}
             onChange={(e) => setFilterProductId(e.target.value)}
-            className="bg-white border border-[#e8e2d8] rounded-md px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-[#89591C]"
+            className="bg-white border border-[#E5E5E5] rounded-md px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-[#F37021]"
           >
             <option value="">All Products ({reviews.length})</option>
             {products.map((p) => (
@@ -279,7 +279,7 @@ export default function AdminReviewsPage() {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-1.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-md shadow-xs flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-1.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-md shadow-xs flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Add Review
           </button>
@@ -297,7 +297,7 @@ export default function AdminReviewsPage() {
               required
               value={selectedProductId}
               onChange={(e) => setSelectedProductId(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             >
               <option value="">-- Choose a Product --</option>
               {products.map((p) => (
@@ -317,7 +317,7 @@ export default function AdminReviewsPage() {
                 placeholder="e.g. Rahul Sharma"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
             <div>
@@ -328,7 +328,7 @@ export default function AdminReviewsPage() {
                 placeholder="e.g. rahul@example.com"
                 value={customerEmail}
                 onChange={(e) => setCustomerEmail(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               />
             </div>
           </div>
@@ -339,7 +339,7 @@ export default function AdminReviewsPage() {
               <select
                 value={rating}
                 onChange={(e) => setRating(e.target.value)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               >
                 <option value="5">5 Stars (Excellent)</option>
                 <option value="4">4 Stars (Very Good)</option>
@@ -353,7 +353,7 @@ export default function AdminReviewsPage() {
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as any)}
-                className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
               >
                 <option value="approved">Approved (Visible immediately)</option>
                 <option value="pending">Pending</option>
@@ -369,14 +369,14 @@ export default function AdminReviewsPage() {
               placeholder="The shoes are extremely comfortable and the craftsmanship is top-notch."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2.5 bg-[#89591C] hover:bg-[#724816] text-white font-bold text-xs rounded-md shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="w-full py-2.5 bg-[#F37021] hover:bg-[#D95B10] text-white font-bold text-xs rounded-md shadow-xs transition-colors cursor-pointer disabled:opacity-50"
           >
             {submitting ? 'Saving Review...' : 'Add Review'}
           </button>

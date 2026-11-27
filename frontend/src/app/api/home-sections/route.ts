@@ -30,6 +30,7 @@ const SECTION_DEFAULTS: Record<string, { title: string; subtitle: string; displa
 async function buildItemsFromProducts(flagField: string, limit = 10) {
   try {
     const products = await Product.find({ [flagField]: true, status: 'active' })
+      .select('name slug price discountPrice images sizeAvailability sizes colorVariants.name colorVariants.colorCode colors stock createdAt')
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
@@ -95,7 +96,7 @@ async function buildItemsFromProducts(flagField: string, limit = 10) {
 
 let cachedHomeSectionsResponse: any = null;
 let lastHomeSectionsCacheTime = 0;
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds in-memory cache
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds in-memory cache
 
 export async function GET(_req: NextRequest) {
   try {

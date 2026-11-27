@@ -105,9 +105,9 @@ export default function TestimonialsPage() {
     {
       header: 'Rating',
       accessor: (row) => (
-        <div className="flex items-center gap-1 text-[#89591C]">
+        <div className="flex items-center gap-1 text-[#F37021]">
           {Array.from({ length: row.rating }).map((_, i) => (
-            <Star key={i} className="w-3.5 h-3.5 fill-[#89591C]" />
+            <Star key={i} className="w-3.5 h-3.5 fill-[#F37021]" />
           ))}
         </div>
       ),
@@ -137,12 +137,12 @@ export default function TestimonialsPage() {
 
   return (
     <div className="space-y-4 font-light">
-      <div className="flex items-center justify-between gap-4 border-b border-[#e8e2d8] pb-3">
+      <div className="flex items-center justify-between gap-4 border-b border-[#E5E5E5] pb-3">
         <p className="text-xs text-slate-500 font-normal">Moderate customer ratings and review highlights</p>
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="px-3.5 py-1.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold rounded-md shadow-xs flex items-center gap-1.5"
+          className="px-3.5 py-1.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold rounded-md shadow-xs flex items-center gap-1.5"
         >
           <Plus className="w-4 h-4" /> Add Testimonial
         </button>
@@ -160,7 +160,7 @@ export default function TestimonialsPage() {
               placeholder="e.g. David Miller"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -171,7 +171,7 @@ export default function TestimonialsPage() {
               placeholder="e.g. Verified Runner"
               value={roleOrLocation}
               onChange={(e) => setRoleOrLocation(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -180,7 +180,7 @@ export default function TestimonialsPage() {
             <select
               value={rating}
               onChange={(e) => setRating(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             >
               <option value="5">5 Stars (Excellent)</option>
               <option value="4">4 Stars (Very Good)</option>
@@ -196,14 +196,14 @@ export default function TestimonialsPage() {
               placeholder="GRAVOZ shoes are extremely comfortable and stylish!"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2.5 bg-[#89591C] hover:bg-[#724816] text-white font-bold text-xs rounded-md shadow-xs"
+            className="w-full py-2.5 bg-[#F37021] hover:bg-[#D95B10] text-white font-bold text-xs rounded-md shadow-xs"
           >
             {submitting ? 'Saving...' : 'Add Testimonial'}
           </button>

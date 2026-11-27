@@ -58,7 +58,7 @@ export default function PaymentsPage() {
       header: 'Transaction ID',
       accessor: (row: PaymentLog) => (
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-md bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8]">
+          <div className="p-1.5 rounded-md bg-[#FFF3EB] text-[#F37021] border border-[#E5E5E5]">
             <CreditCard className="w-4 h-4" />
           </div>
           <div>
@@ -78,7 +78,7 @@ export default function PaymentsPage() {
     {
       header: 'Amount Paid',
       accessor: (row: PaymentLog) => (
-        <span className="font-extrabold text-[#89591C] text-xs">
+        <span className="font-extrabold text-[#F37021] text-xs">
           ₹{(row.amount || 0).toLocaleString('en-IN')} {row.currency}
         </span>
       ),
@@ -97,7 +97,7 @@ export default function PaymentsPage() {
 
   return (
     <div className="space-y-4 font-light">
-      <div className="flex items-center justify-between gap-4 border-b border-[#e8e2d8] pb-3">
+      <div className="flex items-center justify-between gap-4 border-b border-[#E5E5E5] pb-3">
         <p className="text-xs text-slate-500 font-normal">Real-time payment gateway transaction audit logs & verification</p>
         <div className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <ShieldCheck className="w-4 h-4 text-emerald-600" /> Gateway Secure

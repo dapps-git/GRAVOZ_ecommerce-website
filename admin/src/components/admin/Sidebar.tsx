@@ -64,12 +64,12 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-60 bg-white border-r border-[#e8e2d8] flex flex-col h-screen sticky top-0 flex-shrink-0 z-30 font-light overflow-hidden shadow-2xs">
+    <aside className="w-60 bg-white border-r border-[#E5E5E5] flex flex-col h-screen sticky top-0 flex-shrink-0 z-30 font-light overflow-hidden shadow-2xs">
       {/* Brand Header with Official SERCHER Logo (Fixed) */}
-      <div className="p-4 pb-3 border-b border-[#e8e2d8] flex-shrink-0 bg-white">
+      <div className="p-4 pb-3 border-b border-[#E5E5E5] flex-shrink-0 bg-white">
         <Link href="/admin/dashboard" className="block py-0.5">
           <Image
-            src="/sercher-logo.png"
+            src="/sercher-brand-logo.png"
             alt="SERCHER Brand Logo"
             width={160}
             height={40}
@@ -77,7 +77,7 @@ export default function Sidebar() {
             className="h-9 w-auto object-contain"
           />
         </Link>
-        <span className="text-[10px] text-[#89591C] font-semibold tracking-wider uppercase block mt-1">
+        <span className="text-[10px] text-[#F37021] font-semibold tracking-wider uppercase block mt-1">
           SERCHER Admin Suite
         </span>
       </div>
@@ -95,11 +95,11 @@ export default function Sidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all ${
                   isActive
-                    ? 'bg-[#89591C] text-white font-semibold shadow-xs'
-                    : 'text-slate-700 hover:bg-[#faf4ec] hover:text-[#89591C] font-normal'
+                    ? 'bg-[#F37021] text-white font-semibold shadow-xs'
+                    : 'text-slate-700 hover:bg-[#FFF3EB] hover:text-[#F37021] font-normal'
                 }`}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#89591C]'}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#F37021]'}`} />
                 <span className="truncate">{item.name}</span>
               </Link>
             );
@@ -108,11 +108,11 @@ export default function Sidebar() {
       </div>
 
       {/* Sidebar Footer: Fixed Logout Button */}
-      <div className="p-3 border-t border-[#e8e2d8] bg-[#faf8f5] flex-shrink-0">
+      <div className="p-3 border-t border-[#E5E5E5] bg-[#F7F7F7] flex-shrink-0">
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-[#89591C] hover:bg-[#724816] text-white rounded-md text-xs font-bold transition-all shadow-xs cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-[#F37021] hover:bg-[#D95B10] text-white rounded-md text-xs font-bold transition-all shadow-xs cursor-pointer"
         >
           <LogOut className="w-4 h-4 text-white flex-shrink-0" />
           <span>Logout</span>

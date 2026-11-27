@@ -203,9 +203,9 @@ export default function ReturnsPage() {
         <div>
           <button
             type="button"
-            className="h-9 px-4 rounded-md border border-[#89591C]/30 bg-[#faf4ec] text-[#89591C] text-xs font-semibold flex items-center gap-1.5 shadow-2xs hover:bg-[#f6ead9] transition-colors cursor-pointer"
+            className="h-9 px-4 rounded-md border border-[#F37021]/30 bg-[#FFF3EB] text-[#F37021] text-xs font-semibold flex items-center gap-1.5 shadow-2xs hover:bg-[#FFE6D5] transition-colors cursor-pointer"
           >
-            <ShieldCheck className="w-4 h-4 text-[#89591C]" />
+            <ShieldCheck className="w-4 h-4 text-[#F37021]" />
             <span>Return Control Policy</span>
           </button>
         </div>
@@ -235,8 +235,8 @@ export default function ReturnsPage() {
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'bg-[#89591C] text-white shadow-2xs'
-                  : 'bg-white border border-[#e8e2d8] text-slate-700 hover:bg-[#faf8f5]'
+                  ? 'bg-[#F37021] text-white shadow-2xs'
+                  : 'bg-white border border-[#E5E5E5] text-slate-700 hover:bg-[#F7F7F7]'
               }`}
             >
               <span>{tab.label}</span>
@@ -253,7 +253,7 @@ export default function ReturnsPage() {
       </div>
 
       {/* ── Search Bar ── */}
-      <div className="bg-white rounded-lg border border-[#e8e2d8] p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-lg border border-[#E5E5E5] p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -264,17 +264,17 @@ export default function ReturnsPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-3 py-1.5 rounded-md bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#89591C]"
+            className="w-full pl-9 pr-3 py-1.5 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#F37021]"
           />
         </div>
       </div>
 
       {/* ── Table Container ── */}
-      <div className="bg-white rounded-lg border border-[#e8e2d8] overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-lg border border-[#E5E5E5] overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#ece7de] bg-[#faf8f5] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+              <tr className="border-b border-[#E5E5E5] bg-[#F7F7F7] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                 <th className="py-3.5 pl-4 pr-3">Order Ref</th>
                 <th className="py-3.5 px-3">Customer</th>
                 <th className="py-3.5 px-3">Reason</th>
@@ -285,7 +285,7 @@ export default function ReturnsPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-[#f0eae1] text-xs">
+            <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
                 <tr>
                   <td colSpan={7} className="py-14 text-center text-slate-400 font-medium">
@@ -296,7 +296,7 @@ export default function ReturnsPage() {
                 <tr>
                   <td colSpan={7} className="py-16 text-center">
                     <div className="max-w-xs mx-auto space-y-2.5">
-                      <div className="w-12 h-12 rounded-full bg-[#fceddc] text-[#89591C] flex items-center justify-center mx-auto shadow-2xs">
+                      <div className="w-12 h-12 rounded-full bg-[#FFEADF] text-[#F37021] flex items-center justify-center mx-auto shadow-2xs">
                         <Package className="w-6 h-6" />
                       </div>
                       <h4 className="font-bold text-slate-900 text-sm">No return requests found</h4>
@@ -314,7 +314,7 @@ export default function ReturnsPage() {
                   };
 
                   return (
-                    <tr key={item._id} className="hover:bg-[#faf8f5]/80 transition-colors">
+                    <tr key={item._id} className="hover:bg-[#F7F7F7]/80 transition-colors">
                       {/* Order Reference */}
                       <td className="py-3.5 pl-4 pr-3 whitespace-nowrap">
                         <span className="font-bold font-mono text-slate-900 text-xs block">{item.orderNumber}</span>
@@ -331,7 +331,7 @@ export default function ReturnsPage() {
 
                       {/* Reason & Notes */}
                       <td className="py-3.5 px-3 max-w-[200px]">
-                        <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-[#faf4ec] text-[#89591C] border border-[#e8d5b5]">
+                        <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-[#FFF3EB] text-[#F37021] border border-[#FAD4BC]">
                           {item.reason}
                         </span>
                         {item.description && (
@@ -479,7 +479,7 @@ export default function ReturnsPage() {
         </div>
 
         {/* ── Pagination Footer ── */}
-        <div className="p-3.5 border-t border-[#ece7de] bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+        <div className="p-3.5 border-t border-[#E5E5E5] bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
           <div>
             Showing <span className="font-semibold">{paginatedReturns.length}</span> of <span className="font-semibold">{totalResults}</span> requests
           </div>
@@ -488,7 +488,7 @@ export default function ReturnsPage() {
               type="button"
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="p-1 rounded border border-[#e8e2d8] hover:bg-[#faf8f5] disabled:opacity-40 cursor-pointer"
+              className="p-1 rounded border border-[#E5E5E5] hover:bg-[#F7F7F7] disabled:opacity-40 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -497,7 +497,7 @@ export default function ReturnsPage() {
               type="button"
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="p-1 rounded border border-[#e8e2d8] hover:bg-[#faf8f5] disabled:opacity-40 cursor-pointer"
+              className="p-1 rounded border border-[#E5E5E5] hover:bg-[#F7F7F7] disabled:opacity-40 cursor-pointer"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -508,13 +508,13 @@ export default function ReturnsPage() {
       {/* ── RETURN DETAILS & MANAGEMENT MODAL ── */}
       {selectedReturn && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white border border-[#e8e2d8] rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-[#E5E5E5] rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-[#e8e2d8] pb-4">
+            <div className="flex items-start justify-between border-b border-[#E5E5E5] pb-4">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-bold text-slate-900">Return Request Details</h3>
-                  <span className="text-xs font-mono font-semibold text-[#89591C] bg-[#faf4ec] px-2 py-0.5 rounded border border-[#e8d5b5]">
+                  <span className="text-xs font-mono font-semibold text-[#F37021] bg-[#FFF3EB] px-2 py-0.5 rounded border border-[#FAD4BC]">
                     #{selectedReturn.orderNumber}
                   </span>
                 </div>
@@ -533,17 +533,17 @@ export default function ReturnsPage() {
 
             {/* Customer & Return Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="p-3.5 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-1">
+              <div className="p-3.5 bg-[#F7F7F7] rounded-xl border border-[#E5E5E5] space-y-1">
                 <span className="text-slate-400 font-medium block uppercase text-[10px]">Customer Information</span>
                 <p className="font-bold text-slate-900 text-sm">{selectedReturn.customerName}</p>
                 <p className="text-slate-600">{selectedReturn.customerEmail}</p>
                 {selectedReturn.customerPhone && <p className="text-slate-600">{selectedReturn.customerPhone}</p>}
               </div>
 
-              <div className="p-3.5 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-1">
+              <div className="p-3.5 bg-[#F7F7F7] rounded-xl border border-[#E5E5E5] space-y-1">
                 <span className="text-slate-400 font-medium block uppercase text-[10px]">Refund Details</span>
                 <p className="font-bold text-slate-900 text-sm">
-                  Amount: <span className="text-[#89591C]">₹{selectedReturn.refundAmount?.toLocaleString('en-IN')}</span>
+                  Amount: <span className="text-[#F37021]">₹{selectedReturn.refundAmount?.toLocaleString('en-IN')}</span>
                 </p>
                 <p className="text-slate-600">
                   Current Status:{' '}
@@ -555,17 +555,17 @@ export default function ReturnsPage() {
             </div>
 
             {/* Reason & Description */}
-            <div className="p-4 bg-white border border-[#e8e2d8] rounded-xl space-y-2 text-xs">
+            <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl space-y-2 text-xs">
               <div className="flex items-center gap-2">
                 <span className="text-slate-400 font-medium uppercase text-[10px]">Reason:</span>
-                <span className="font-bold text-[#89591C] bg-[#faf4ec] px-2.5 py-0.5 rounded border border-[#e8d5b5]">
+                <span className="font-bold text-[#F37021] bg-[#FFF3EB] px-2.5 py-0.5 rounded border border-[#FAD4BC]">
                   {selectedReturn.reason}
                 </span>
               </div>
               {selectedReturn.description ? (
                 <div>
                   <span className="text-slate-400 font-medium uppercase text-[10px] block mb-1">Customer Description:</span>
-                  <p className="text-slate-800 bg-[#faf8f5] p-2.5 rounded border border-[#e8e2d8] leading-relaxed">
+                  <p className="text-slate-800 bg-[#F7F7F7] p-2.5 rounded border border-[#E5E5E5] leading-relaxed">
                     {selectedReturn.description}
                   </p>
                 </div>
@@ -583,7 +583,7 @@ export default function ReturnsPage() {
                     <div
                       key={idx}
                       onClick={() => setPreviewImage(img)}
-                      className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#e8e2d8] cursor-pointer hover:ring-2 hover:ring-[#89591C] transition-all"
+                      className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#E5E5E5] cursor-pointer hover:ring-2 hover:ring-[#F37021] transition-all"
                     >
                       <img src={img} alt={`Evidence ${idx + 1}`} className="w-full h-full object-cover" />
                     </div>
@@ -600,12 +600,12 @@ export default function ReturnsPage() {
                 onChange={(e) => setAdminNoteInput(e.target.value)}
                 placeholder="Add internal notes or explain rejection reason to customer..."
                 rows={2}
-                className="w-full p-3 rounded-xl border border-[#e8e2d8] bg-[#faf8f5] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#89591C]"
+                className="w-full p-3 rounded-xl border border-[#E5E5E5] bg-[#F7F7F7] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#F37021]"
               />
             </div>
 
             {/* Lifecycle Status Stepper Changer */}
-            <div className="space-y-2 text-xs pt-2 border-t border-[#e8e2d8]">
+            <div className="space-y-2 text-xs pt-2 border-t border-[#E5E5E5]">
               <span className="font-semibold text-slate-700 block uppercase text-[10px]">Change Lifecycle Status:</span>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -668,11 +668,11 @@ export default function ReturnsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-between pt-3 border-t border-[#e8e2d8]">
+            <div className="flex items-center justify-between pt-3 border-t border-[#E5E5E5]">
               {selectedReturn.order ? (
                 <Link
                   href={`/admin/orders/${selectedReturn.order._id}`}
-                  className="inline-flex items-center gap-1 text-xs text-[#89591C] hover:underline font-semibold"
+                  className="inline-flex items-center gap-1 text-xs text-[#F37021] hover:underline font-semibold"
                 >
                   <span>Open Full Order</span>
                   <ExternalLink className="w-3.5 h-3.5" />

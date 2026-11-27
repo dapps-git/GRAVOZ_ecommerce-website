@@ -152,10 +152,10 @@ export default function ForgotPasswordPage() {
         <div className="flex flex-col items-center gap-1.5">
           <Link href="/">
             <div className="relative h-10 w-44">
-              <Image src="/sercher-logo.png" alt="SERCHER" fill priority className="object-contain" sizes="176px" />
+              <Image src="/sercher-brand-logo.png" alt="SERCHER" fill priority className="object-contain" sizes="176px" />
             </div>
           </Link>
-          <p className="text-[9px] font-bold tracking-[0.25em] text-[#7a3e0b] uppercase font-sansation">
+          <p className="text-[9px] font-bold tracking-[0.25em] text-[#F37021] uppercase font-sansation">
             PREMIUM HANDCRAFTED FOOTWEAR
           </p>
         </div>
@@ -163,7 +163,7 @@ export default function ForgotPasswordPage() {
         {/* Form Card */}
         <div className="bg-white/95 backdrop-blur-md shadow-2xl border border-white/60 px-8 py-7 flex flex-col gap-4">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-[#7a3e0b]">
+            <h1 className="text-xl font-bold text-[#F37021]">
               {step === 'email' ? 'Forgot Password?' : 'Enter OTP & New Password'}
             </h1>
             <p className="text-[11px] text-slate-500 mt-1">
@@ -200,7 +200,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSendOtp} className="flex flex-col gap-3.5">
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-semibold text-slate-700">Your Email Address</label>
-                <div className="flex items-center gap-2.5 border border-[#ddd6cc] bg-[#faf9f7] px-3 py-2.5 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all">
+                <div className="flex items-center gap-2.5 border border-[#DCDCDC] bg-[#F8F8F8] px-3 py-2.5 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all">
                   <Mail className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                   <input
                     type="email"
@@ -216,13 +216,13 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 bg-[#7a3e0b] hover:bg-[#633209] disabled:opacity-60 text-white text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer"
+                className="w-full py-3 bg-[#F37021] hover:bg-[#D95B10] disabled:opacity-60 text-white text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer"
               >
                 {isSubmitting ? 'SENDING OTP...' : 'SEND OTP CODE'}
               </button>
 
               <div className="text-center pt-1">
-                <Link href="/login" className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-[#7a3e0b]">
+                <Link href="/login" className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-[#F37021]">
                   <ArrowLeft className="w-3 h-3" /> Back to Login
                 </Link>
               </div>
@@ -238,12 +238,12 @@ export default function ForgotPasswordPage() {
                     type="button"
                     onClick={handleResendOtp}
                     disabled={countdown > 0 || isSubmitting}
-                    className="text-[10.5px] font-semibold text-[#7a3e0b] hover:underline disabled:opacity-50 disabled:no-underline"
+                    className="text-[10.5px] font-semibold text-[#F37021] hover:underline disabled:opacity-50 disabled:no-underline"
                   >
                     {countdown > 0 ? `Resend in ${countdown}s` : 'Resend OTP'}
                   </button>
                 </div>
-                <div className="flex items-center gap-2.5 border border-[#ddd6cc] bg-[#faf9f7] px-3 py-2.5 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all">
+                <div className="flex items-center gap-2.5 border border-[#DCDCDC] bg-[#F8F8F8] px-3 py-2.5 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all">
                   <KeyRound className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                   <input
                     type="text"
@@ -260,7 +260,7 @@ export default function ForgotPasswordPage() {
               {/* New Password */}
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-semibold text-slate-700">New Password</label>
-                <div className="relative flex items-center gap-2.5 border border-[#ddd6cc] bg-[#faf9f7] px-3 py-2.5 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all">
+                <div className="relative flex items-center gap-2.5 border border-[#DCDCDC] bg-[#F8F8F8] px-3 py-2.5 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all">
                   <Lock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -284,7 +284,7 @@ export default function ForgotPasswordPage() {
               {/* Confirm Password */}
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] font-semibold text-slate-700">Confirm New Password</label>
-                <div className="flex items-center gap-2.5 border border-[#ddd6cc] bg-[#faf9f7] px-3 py-2.5 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all">
+                <div className="flex items-center gap-2.5 border border-[#DCDCDC] bg-[#F8F8F8] px-3 py-2.5 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all">
                   <Lock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -300,7 +300,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 mt-1 bg-[#7a3e0b] hover:bg-[#633209] disabled:opacity-60 text-white text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer"
+                className="w-full py-3 mt-1 bg-[#F37021] hover:bg-[#D95B10] disabled:opacity-60 text-white text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer"
               >
                 {isSubmitting ? 'UPDATING PASSWORD...' : 'RESET PASSWORD'}
               </button>

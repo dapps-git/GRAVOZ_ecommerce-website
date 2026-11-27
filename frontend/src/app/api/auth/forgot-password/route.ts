@@ -14,9 +14,9 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
   const fromName = process.env.SMTP_FROM_NAME || 'SERCHER Store';
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
   
-  const logoPath = path.join(process.cwd(), 'public', 'gravoz-logo.png');
+  const logoPath = path.join(process.cwd(), 'public', 'sercher-brand-logo.png');
   const hasLocalLogo = fs.existsSync(logoPath);
-  const logoSrc = hasLocalLogo ? 'cid:gravoz-logo' : `${appUrl}/gravoz-logo.png`;
+  const logoSrc = hasLocalLogo ? 'cid:sercher-logo' : `${appUrl}/sercher-brand-logo.png`;
 
   // Dynamically import nodemailer (server-side only)
   const nodemailer = await import('nodemailer');
@@ -35,9 +35,9 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
     attachments: hasLocalLogo
       ? [
           {
-            filename: 'gravoz-logo.png',
+            filename: 'sercher-brand-logo.png',
             path: logoPath,
-            cid: 'gravoz-logo',
+            cid: 'sercher-logo',
           },
         ]
       : [],
@@ -57,15 +57,15 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
           strong, b { font-weight: 600; }
         </style>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #f7f5f0; color: #1a1a1a;">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f7f5f0; width: 100%; padding: 32px 16px;">
+      <body style="margin: 0; padding: 0; background-color: #F5F5F5; color: #1a1a1a;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F5F5F5; width: 100%; padding: 32px 16px;">
           <tr>
             <td align="center">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 500px; width: 100%; background-color: #ffffff; border: 1px solid #e8decb; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 500px; width: 100%; background-color: #ffffff; border: 1px solid #E5E5E5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
                 
                 <!-- Brand Header with Official Logo -->
                 <tr>
-                  <td style="background-color: #ffffff; padding: 26px 28px 20px 28px; text-align: center; border-bottom: 1px solid #ebdccb;">
+                  <td style="background-color: #ffffff; padding: 26px 28px 20px 28px; text-align: center; border-bottom: 1px solid #FAD4BC;">
                     <a href="${appUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
                       <img 
                         src="${logoSrc}" 
@@ -74,7 +74,7 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
                         style="display: block; width: 150px; max-width: 100%; height: auto; margin: 0 auto; border: 0;"
                       />
                     </a>
-                    <p style="margin: 6px 0 0 0; color: #89591C; font-size: 10.5px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase;">
+                    <p style="margin: 6px 0 0 0; color: #F37021; font-size: 10.5px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase;">
                       Security Verification
                     </p>
                   </td>
@@ -91,8 +91,8 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
                     </p>
 
                     <!-- OTP Code Box -->
-                    <div style="background-color: #faf6ef; border: 1.5px solid #ebdccb; border-radius: 12px; padding: 22px; text-align: center; margin-bottom: 22px;">
-                      <span style="font-family: 'Montserrat', monospace; font-size: 36px; font-weight: 700; letter-spacing: 10px; color: #89591C; display: inline-block; padding-left: 10px;">
+                    <div style="background-color: #FFF3EB; border: 1.5px solid #FAD4BC; border-radius: 12px; padding: 22px; text-align: center; margin-bottom: 22px;">
+                      <span style="font-family: 'Montserrat', monospace; font-size: 36px; font-weight: 700; letter-spacing: 10px; color: #F37021; display: inline-block; padding-left: 10px;">
                         ${otp}
                       </span>
                     </div>
@@ -108,7 +108,7 @@ async function sendOTPEmail(to: string, name: string, otp: string): Promise<void
 
                 <!-- Footer -->
                 <tr>
-                  <td style="background-color: #faf7f2; padding: 18px 28px; text-align: center; border-top: 1px solid #ebdccb;">
+                  <td style="background-color: #F7F7F7; padding: 18px 28px; text-align: center; border-top: 1px solid #FAD4BC;">
                     <p style="margin: 0; font-size: 10.5px; color: #999999; font-weight: 300;">
                       © ${new Date().getFullYear()} SERCHER Footwear. All rights reserved.
                     </p>

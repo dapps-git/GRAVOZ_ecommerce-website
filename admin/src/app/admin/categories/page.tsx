@@ -227,7 +227,7 @@ export default function CategoriesPage() {
           <button
             type="button"
             onClick={openCreateModal}
-            className="h-9 px-4 rounded-md bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
+            className="h-9 px-4 rounded-md bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Category</span>
@@ -237,18 +237,18 @@ export default function CategoriesPage() {
 
       {/* ── KPI Metric Cards (5 Cards) ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Total Categories</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.total}</span>
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Active catalog groups</span>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#f4f2ee] text-slate-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#F3F3F3] text-slate-600 flex items-center justify-center flex-shrink-0">
             <FolderTree className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Men Collection</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.menCount}</span>
@@ -259,18 +259,18 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Women Collection</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.womenCount}</span>
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Women categories</span>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#fcf4e8] text-amber-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#FFF3EB] text-amber-600 flex items-center justify-center flex-shrink-0">
             <Layers className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Kids Collection</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.kidsCount}</span>
@@ -281,7 +281,7 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Category Discounts</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.discountedCount}</span>
@@ -294,7 +294,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* ── Search & Filter Bar ── */}
-      <div className="bg-white rounded-lg border border-[#e8e2d8] p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-lg border border-[#E5E5E5] p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -302,7 +302,7 @@ export default function CategoriesPage() {
             placeholder="Search category name or slug..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-md bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#89591C]"
+            className="w-full pl-9 pr-3 py-1.5 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#F37021]"
           />
         </div>
 
@@ -310,7 +310,7 @@ export default function CategoriesPage() {
           <select
             value={audienceFilter}
             onChange={(e) => setAudienceFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-md bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="px-3 py-1.5 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">All Audiences</option>
             <option value="Men">Men</option>
@@ -324,7 +324,7 @@ export default function CategoriesPage() {
               setSearch('');
               setAudienceFilter('all');
             }}
-            className="px-3 py-1.5 rounded-md text-xs font-semibold text-[#89591C] hover:bg-[#faf4ec] transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-md text-xs font-semibold text-[#F37021] hover:bg-[#FFF3EB] transition-colors cursor-pointer"
           >
             Reset
           </button>
@@ -332,11 +332,11 @@ export default function CategoriesPage() {
       </div>
 
       {/* ── Data Table ── */}
-      <div className="bg-white rounded-lg border border-[#e8e2d8] overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-lg border border-[#E5E5E5] overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#ece7de] bg-[#faf8f5] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+              <tr className="border-b border-[#E5E5E5] bg-[#F7F7F7] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                 <th className="py-3.5 pl-4 pr-3">Category</th>
                 <th className="py-3.5 px-3">Target Audience</th>
                 <th className="py-3.5 px-3">Sub-Categories / Styles</th>
@@ -346,7 +346,7 @@ export default function CategoriesPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-[#f0eae1] text-xs">
+            <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
@@ -364,11 +364,11 @@ export default function CategoriesPage() {
                   const validImg = c.image || '/products/placeholder.svg';
 
                   return (
-                    <tr key={c._id} className="hover:bg-[#faf8f5]/80 transition-colors">
+                    <tr key={c._id} className="hover:bg-[#F7F7F7]/80 transition-colors">
                       {/* Category Name & Thumbnail */}
                       <td className="py-3 pl-4 pr-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-md bg-[#faf8f5] border border-[#e8e2d8] overflow-hidden relative flex-shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] overflow-hidden relative flex-shrink-0 flex items-center justify-center">
                             <Image
                               src={validImg}
                               alt={c.name}
@@ -392,7 +392,7 @@ export default function CategoriesPage() {
                             c.targetAudience === 'Men'
                               ? 'bg-[#edf7ee] text-emerald-700'
                               : c.targetAudience === 'Women'
-                              ? 'bg-[#fcf4e8] text-amber-700'
+                              ? 'bg-[#FFF3EB] text-amber-700'
                               : 'bg-[#edf5fc] text-blue-700'
                           }`}
                         >
@@ -432,7 +432,7 @@ export default function CategoriesPage() {
                             type="button"
                             onClick={() => openEditModal(c)}
                             title="Edit Category"
-                            className="w-7 h-7 rounded-md border border-slate-200 hover:border-[#89591C] hover:bg-[#faf4ec] text-slate-600 hover:text-[#89591C] flex items-center justify-center transition-colors cursor-pointer"
+                            className="w-7 h-7 rounded-md border border-slate-200 hover:border-[#F37021] hover:bg-[#FFF3EB] text-slate-600 hover:text-[#F37021] flex items-center justify-center transition-colors cursor-pointer"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
@@ -459,8 +459,8 @@ export default function CategoriesPage() {
       {/* ── Add / Edit Modal ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="bg-white rounded-lg border border-[#e8e2d8] w-full max-w-lg overflow-hidden shadow-2xl space-y-4 p-6">
-            <div className="flex items-center justify-between border-b border-[#ece7de] pb-3">
+          <div className="bg-white rounded-lg border border-[#E5E5E5] w-full max-w-lg overflow-hidden shadow-2xl space-y-4 p-6">
+            <div className="flex items-center justify-between border-b border-[#E5E5E5] pb-3">
               <h3 className="text-sm font-bold text-slate-900">
                 {editingCat ? 'Edit Category' : 'Add New Category'}
               </h3>
@@ -482,7 +482,7 @@ export default function CategoriesPage() {
                   placeholder="e.g. Casual Sandals"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                  className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                 />
               </div>
 
@@ -492,7 +492,7 @@ export default function CategoriesPage() {
                   <select
                     value={targetAudience}
                     onChange={(e) => setTargetAudience(e.target.value as any)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   >
                     <option value="Men">Men</option>
                     <option value="Women">Women</option>
@@ -510,7 +510,7 @@ export default function CategoriesPage() {
                     placeholder="e.g. 20"
                     value={discountPercentage}
                     onChange={(e) => setDiscountPercentage(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
               </div>
@@ -522,7 +522,7 @@ export default function CategoriesPage() {
                   placeholder="Casual Sandal, Leather Shoe, Loafers, Sneakers"
                   value={subCategoriesStr}
                   onChange={(e) => setSubCategoriesStr(e.target.value)}
-                  className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                  className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                 />
               </div>
 
@@ -531,12 +531,12 @@ export default function CategoriesPage() {
                 <label className="block text-xs font-medium text-slate-700 mb-1">Category Card Image</label>
                 <div className="flex items-center gap-3">
                   {image && (
-                    <div className="relative w-12 h-12 rounded-md overflow-hidden bg-[#faf8f5] border border-[#e8e2d8]">
+                    <div className="relative w-12 h-12 rounded-md overflow-hidden bg-[#F7F7F7] border border-[#E5E5E5]">
                       <Image src={image} alt="Category" fill className="object-cover" unoptimized />
                     </div>
                   )}
 
-                  <label className="flex-1 px-3 py-2 rounded-md border border-dashed border-slate-300 hover:border-[#89591C] bg-[#faf8f5] flex items-center justify-center gap-1.5 text-xs text-slate-600 hover:text-[#89591C] cursor-pointer transition-colors">
+                  <label className="flex-1 px-3 py-2 rounded-md border border-dashed border-slate-300 hover:border-[#F37021] bg-[#F7F7F7] flex items-center justify-center gap-1.5 text-xs text-slate-600 hover:text-[#F37021] cursor-pointer transition-colors">
                     <Upload className="w-3.5 h-3.5" />
                     <span>{uploading ? 'Uploading...' : 'Upload Image'}</span>
                     <input
@@ -550,7 +550,7 @@ export default function CategoriesPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-[#ece7de]">
+              <div className="flex justify-end gap-2 pt-2 border-t border-[#E5E5E5]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
@@ -561,7 +561,7 @@ export default function CategoriesPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-md bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 rounded-md bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'Saving...' : editingCat ? 'Save Changes' : 'Create Category'}
                 </button>

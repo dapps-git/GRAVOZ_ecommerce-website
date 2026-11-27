@@ -248,12 +248,15 @@ export async function POST(req: NextRequest) {
 
     let candidateProducts: any[] = [];
 
+    const recSelect = 'name slug price discountPrice originalPrice subCategory targetAudience rating colors colorVariants.name colorVariants.colorCode images noReturnRefundExchange';
+
     // Query DB with taste matching conditions
     if (conditions.length > 0) {
       candidateProducts = await Product.find({
         ...baseQuery,
         $or: conditions,
       })
+        .select(recSelect)
         .limit(limit * 3)
         .lean();
     }
@@ -269,6 +272,7 @@ export async function POST(req: NextRequest) {
         status: 'active',
         _id: { $nin: fallbackExcluded },
       })
+        .select(recSelect)
         .limit(limit * 2)
         .lean();
 

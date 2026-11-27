@@ -612,7 +612,7 @@ export default function NewProductPage() {
     <div className="w-full space-y-5 pb-24 font-sans font-normal" style={{ fontFamily: 'var(--font-montserrat), Montserrat, sans-serif' }}>
       
       {/* ── Top Header Banner (Matches Figma Header) ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2 border-b border-[#ece7de]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2 border-b border-[#E5E5E5]">
         <div>
           <Link
             href="/admin/products"
@@ -644,7 +644,7 @@ export default function NewProductPage() {
             type="button"
             disabled={loading}
             onClick={() => handleSave('active')}
-            className="px-5 py-2 rounded-md bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
+            className="px-5 py-2 rounded-md bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
           >
             <Save className="w-3.5 h-3.5" />
             <span>{loading ? 'Saving...' : 'Save Product'}</span>
@@ -664,7 +664,7 @@ export default function NewProductPage() {
         {/* ══════════════════════════════════════════════════════════════ */}
         {/* COLUMN 1: Left Stepper Navigation                             */}
         {/* ══════════════════════════════════════════════════════════════ */}
-        <aside className="lg:col-span-3 xl:col-span-2 space-y-1 sticky top-20 bg-white p-2.5 rounded-lg border border-[#e8e2d8] shadow-2xs">
+        <aside className="lg:col-span-3 xl:col-span-2 space-y-1 sticky top-20 bg-white p-2.5 rounded-lg border border-[#E5E5E5] shadow-2xs">
           {tabsList.map((t) => {
             const isActive = activeTab === t.id;
             return (
@@ -674,20 +674,20 @@ export default function NewProductPage() {
                 onClick={() => setActiveTab(t.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-md text-xs text-left transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#faf4ec] text-[#89591C] font-semibold shadow-2xs'
-                    : 'text-slate-700 hover:text-slate-900 hover:bg-[#faf8f5] font-medium'
+                    ? 'bg-[#FFF3EB] text-[#F37021] font-semibold shadow-2xs'
+                    : 'text-slate-700 hover:text-slate-900 hover:bg-[#F7F7F7] font-medium'
                 }`}
               >
                 <span
                   className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold flex-shrink-0 ${
-                    isActive ? 'bg-[#89591C] text-white' : 'bg-[#89591C]/15 text-[#89591C]'
+                    isActive ? 'bg-[#F37021] text-white' : 'bg-[#F37021]/15 text-[#F37021]'
                   }`}
                 >
                   {t.id}
                 </span>
                 <span className="truncate flex-1">{t.label}</span>
                 {t.badge && (
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#89591C]/10 text-[#89591C] uppercase tracking-wider flex-shrink-0">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#F37021]/10 text-[#F37021] uppercase tracking-wider flex-shrink-0">
                     {t.badge}
                   </span>
                 )}
@@ -703,10 +703,10 @@ export default function NewProductPage() {
           
           {/* ── TAB 1: Basic Information ── */}
           {activeTab === 1 && (
-            <div className="bg-white rounded-lg p-5 border border-[#e8e2d8] space-y-4 shadow-2xs">
-              <div className="border-b border-[#f0eae1] pb-3">
+            <div className="bg-white rounded-lg p-5 border border-[#E5E5E5] space-y-4 shadow-2xs">
+              <div className="border-b border-[#EEEEEE] pb-3">
                 <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">1</span>
+                  <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">1</span>
                   Basic Information
                 </h2>
                 <p className="text-xs text-slate-600 font-medium mt-0.5">Core identification and catalog hierarchy details</p>
@@ -721,7 +721,7 @@ export default function NewProductPage() {
                     placeholder="e.g. Pure Leather Casual Shoe"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] font-medium"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] font-medium"
                   />
                 </div>
 
@@ -733,7 +733,7 @@ export default function NewProductPage() {
                     placeholder="e.g. JS5061"
                     value={sku}
                     onChange={(e) => setSku(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] font-mono font-medium"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] font-mono font-medium"
                   />
                 </div>
 
@@ -742,7 +742,7 @@ export default function NewProductPage() {
                   <select
                     value={targetAudience}
                     onChange={(e) => setTargetAudience(e.target.value as any)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] font-medium"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] font-medium"
                   >
                     <option value="Men">Men</option>
                     <option value="Women">Women</option>
@@ -753,12 +753,12 @@ export default function NewProductPage() {
                 <div>
                   <label className="block text-xs font-semibold text-slate-800 mb-1 flex items-center justify-between">
                     <span>Category *</span>
-                    <Link href="/admin/categories" className="text-xs text-[#89591C] font-semibold hover:underline">+ New Category</Link>
+                    <Link href="/admin/categories" className="text-xs text-[#F37021] font-semibold hover:underline">+ New Category</Link>
                   </label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] font-medium"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] font-medium"
                   >
                     <option value="">-- Select Category --</option>
                     {categories.map((c) => (
@@ -772,12 +772,12 @@ export default function NewProductPage() {
                 <div>
                   <label className="block text-xs font-semibold text-slate-800 mb-1 flex items-center justify-between">
                     <span>Brand *</span>
-                    <Link href="/admin/brands" className="text-xs text-[#89591C] font-semibold hover:underline">+ New Brand</Link>
+                    <Link href="/admin/brands" className="text-xs text-[#F37021] font-semibold hover:underline">+ New Brand</Link>
                   </label>
                   <select
                     value={brandId}
                     onChange={(e) => setBrandId(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] font-medium"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] font-medium"
                   >
                     <option value="">-- Select Brand (Default: GRAVOZ) --</option>
                     {brands.map((b) => (
@@ -795,7 +795,7 @@ export default function NewProductPage() {
                     placeholder="e.g. Casual Shoes, Leather Loafers"
                     value={subCategory}
                     onChange={(e) => setSubCategory(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] font-medium"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] font-medium"
                   />
                 </div>
 
@@ -806,7 +806,7 @@ export default function NewProductPage() {
                     placeholder="e.g. Footwear, Loafer, Sandal"
                     value={itemType}
                     onChange={(e) => setItemType(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] font-medium"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] font-medium"
                   />
                 </div>
               </div>
@@ -815,10 +815,10 @@ export default function NewProductPage() {
 
           {/* ── TAB 2: Pricing & Inventory ── */}
           {activeTab === 2 && (
-            <div className="bg-white rounded-lg p-5 border border-[#e8e2d8] space-y-4 shadow-2xs">
-              <div className="border-b border-[#f0eae1] pb-3">
+            <div className="bg-white rounded-lg p-5 border border-[#E5E5E5] space-y-4 shadow-2xs">
+              <div className="border-b border-[#EEEEEE] pb-3">
                 <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">2</span>
+                  <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">2</span>
                   Pricing &amp; Inventory
                 </h2>
                 <p className="text-xs text-slate-600 font-medium mt-0.5">Set retail MRP, percentage discounts, GST, and inventory count</p>
@@ -833,7 +833,7 @@ export default function NewProductPage() {
                     placeholder="1999"
                     value={price}
                     onChange={(e) => handleRegularPriceChange(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 font-bold text-[#89591C] focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 font-bold text-[#F37021] focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -847,7 +847,7 @@ export default function NewProductPage() {
                       placeholder="30"
                       value={discountPercent}
                       onChange={(e) => handlePercentChange(e.target.value)}
-                      className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg pl-3.5 pr-8 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#89591C]"
+                      className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg pl-3.5 pr-8 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#F37021]"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">%</span>
                   </div>
@@ -860,7 +860,7 @@ export default function NewProductPage() {
                     placeholder="1399"
                     value={discountPrice}
                     onChange={(e) => handleSalePriceChange(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-emerald-700 font-bold focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-emerald-700 font-bold focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -869,7 +869,7 @@ export default function NewProductPage() {
                   <select
                     value={gst}
                     onChange={(e) => setGst(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-[#F37021]"
                   >
                     <option value="0">0%</option>
                     <option value="5">5%</option>
@@ -887,7 +887,7 @@ export default function NewProductPage() {
                     placeholder="50"
                     value={stock}
                     onChange={(e) => setStock(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3.5 py-2.5 text-xs text-slate-900 font-semibold focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
               </div>
@@ -898,10 +898,10 @@ export default function NewProductPage() {
           {activeTab === 3 && (
             <div className="space-y-4">
               {/* Section Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-lg border border-[#e8e2d8] shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-lg border border-[#E5E5E5] shadow-2xs">
                 <div>
                   <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">3</span>
+                    <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">3</span>
                     Variants (Color &amp; Images)
                   </h2>
                   <p className="text-xs text-slate-600 font-medium mt-0.5">
@@ -912,9 +912,9 @@ export default function NewProductPage() {
                 <button
                   type="button"
                   onClick={addColorVariant}
-                  className="px-3.5 py-2 rounded-md border border-[#e8e2d8] bg-[#faf8f5] hover:bg-white text-xs font-semibold text-slate-800 flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                  className="px-3.5 py-2 rounded-md border border-[#E5E5E5] bg-[#F7F7F7] hover:bg-white text-xs font-semibold text-slate-800 flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5 text-[#89591C]" />
+                  <Plus className="w-3.5 h-3.5 text-[#F37021]" />
                   <span>Add Color Variant</span>
                 </button>
               </div>
@@ -927,10 +927,10 @@ export default function NewProductPage() {
                 return (
                   <div
                     key={variant.id}
-                    className="bg-white rounded-lg border border-[#e8e2d8] overflow-hidden shadow-2xs transition-shadow hover:shadow-xs"
+                    className="bg-white rounded-lg border border-[#E5E5E5] overflow-hidden shadow-2xs transition-shadow hover:shadow-xs"
                   >
                     {/* Card Top Bar */}
-                    <div className="flex items-center justify-between p-3.5 bg-white border-b border-[#f0eae1]">
+                    <div className="flex items-center justify-between p-3.5 bg-white border-b border-[#EEEEEE]">
                       <div className="flex items-center gap-2.5">
                         <GripVertical className="w-4 h-4 text-slate-400 cursor-grab" />
                         <span
@@ -939,7 +939,7 @@ export default function NewProductPage() {
                         />
                         <span className="text-xs font-bold text-slate-900">{variant.name || `Color ${index + 1}`}</span>
                         {isDefault && (
-                          <span className="px-2 py-0.5 rounded-md bg-[#faf4ec] text-[#89591C] text-[10px] font-bold border border-[#ebdcc9]">
+                          <span className="px-2 py-0.5 rounded-md bg-[#FFF3EB] text-[#F37021] text-[10px] font-bold border border-[#FAD4BC]">
                             Default
                           </span>
                         )}
@@ -975,7 +975,7 @@ export default function NewProductPage() {
                               value={variant.name}
                               onChange={(e) => updateVariantField(variant.id, 'name', e.target.value)}
                               placeholder="e.g. Brown, Black, Tan"
-                              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-[#89591C]"
+                              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-[#F37021]"
                             />
                           </div>
 
@@ -993,7 +993,7 @@ export default function NewProductPage() {
                                 value={variant.colorCode || '#8B4513'}
                                 onChange={(e) => updateVariantField(variant.id, 'colorCode', e.target.value)}
                                 placeholder="#8B4513"
-                                className="flex-1 bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 font-mono font-medium focus:outline-none focus:border-[#89591C]"
+                                className="flex-1 bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 font-mono font-medium focus:outline-none focus:border-[#F37021]"
                               />
                             </div>
                           </div>
@@ -1009,7 +1009,7 @@ export default function NewProductPage() {
                             {variant.images.map((img, imgIdx) => (
                               <div
                                 key={imgIdx}
-                                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-[#faf8f5] border border-[#e8e2d8] group"
+                                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-[#F7F7F7] border border-[#E5E5E5] group"
                               >
                                 <Image
                                   src={img.url}
@@ -1030,7 +1030,7 @@ export default function NewProductPage() {
 
                             {/* Add Image Button */}
                             {variant.images.length < 5 && (
-                              <label className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-2 border-dashed border-slate-300 hover:border-[#89591C] bg-[#faf8f5] hover:bg-[#faf4ec] flex flex-col items-center justify-center text-slate-600 hover:text-[#89591C] transition-all cursor-pointer">
+                              <label className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg border-2 border-dashed border-slate-300 hover:border-[#F37021] bg-[#F7F7F7] hover:bg-[#FFF3EB] flex flex-col items-center justify-center text-slate-600 hover:text-[#F37021] transition-all cursor-pointer">
                                 <Plus className="w-4 h-4 mb-0.5" />
                                 <span className="text-[10px] font-semibold text-center leading-tight px-1">
                                   {uploadingVariantId === variant.id ? 'Uploading...' : 'Add Images'}
@@ -1054,16 +1054,16 @@ export default function NewProductPage() {
               })}
 
               {/* ── Optional: Homepage Duo Spotlight Mockup Photos ── */}
-              <div className="mt-6 pt-5 border-t border-[#f0eae1]">
-                <div className="p-4 bg-[#faf4ec] border border-[#e8d7c2] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="mt-6 pt-5 border-t border-[#EEEEEE]">
+                <div className="p-4 bg-[#FFF3EB] border border-[#FAD4BC] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
                   <div className="flex items-start gap-3">
-                    <Sparkles className="w-5 h-5 text-[#89591C] flex-shrink-0 mt-0.5" />
+                    <Sparkles className="w-5 h-5 text-[#F37021] flex-shrink-0 mt-0.5" />
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-bold text-[#89591C]">
+                        <h4 className="text-xs font-bold text-[#F37021]">
                           Homepage Duo Spotlight Mockup Images (3 Photos)
                         </h4>
-                        <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-white text-[#89591C] border border-[#e8d7c2] uppercase tracking-wider">
+                        <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-white text-[#F37021] border border-[#FAD4BC] uppercase tracking-wider">
                           Optional
                         </span>
                       </div>
@@ -1075,7 +1075,7 @@ export default function NewProductPage() {
                   <button
                     type="button"
                     onClick={() => setActiveTab(9)}
-                    className="px-3.5 py-2 rounded-lg bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer flex-shrink-0 self-start sm:self-auto"
+                    className="px-3.5 py-2 rounded-lg bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer flex-shrink-0 self-start sm:self-auto"
                   >
                     <LayoutGrid className="w-3.5 h-3.5" />
                     <span>Open Mockups Layout (Tab 9) →</span>
@@ -1087,10 +1087,10 @@ export default function NewProductPage() {
 
           {/* ── TAB 4: Sizes & Stock ── */}
           {activeTab === 4 && (
-            <div className="bg-white rounded-2xl p-5 border border-[#e8e2d8] space-y-4 shadow-2xs">
-              <div className="border-b border-[#f0eae1] pb-3">
+            <div className="bg-white rounded-2xl p-5 border border-[#E5E5E5] space-y-4 shadow-2xs">
+              <div className="border-b border-[#EEEEEE] pb-3">
                 <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">4</span>
+                  <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">4</span>
                   Sizes &amp; Stock Availability
                 </h2>
                 <p className="text-xs text-slate-400 font-light mt-0.5">Select footwear sizes that will be available across variants</p>
@@ -1108,8 +1108,8 @@ export default function NewProductPage() {
                         onClick={() => toggleSizeSelection(sz)}
                         className={`w-11 h-11 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-[#89591C] text-white border-[#89591C] shadow-xs'
-                            : 'bg-[#faf8f5] text-slate-700 border-[#e8e2d8] hover:border-slate-400'
+                            ? 'bg-[#F37021] text-white border-[#F37021] shadow-xs'
+                            : 'bg-[#F7F7F7] text-slate-700 border-[#E5E5E5] hover:border-slate-400'
                         }`}
                       >
                         {sz}
@@ -1125,12 +1125,12 @@ export default function NewProductPage() {
                     placeholder="Custom size (e.g. 13, UK 8)"
                     value={customSizeInput}
                     onChange={(e) => setCustomSizeInput(e.target.value)}
-                    className="w-48 bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-48 bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                   <button
                     type="button"
                     onClick={addCustomSize}
-                    className="px-3.5 py-2 rounded-xl bg-white border border-[#e8e2d8] text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl bg-white border border-[#E5E5E5] text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
                     + Add Size
                   </button>
@@ -1141,10 +1141,10 @@ export default function NewProductPage() {
 
           {/* ── TAB 5: Description ── */}
           {activeTab === 5 && (
-            <div className="bg-white rounded-2xl p-5 border border-[#e8e2d8] space-y-4 shadow-2xs">
-              <div className="border-b border-[#f0eae1] pb-3">
+            <div className="bg-white rounded-2xl p-5 border border-[#E5E5E5] space-y-4 shadow-2xs">
+              <div className="border-b border-[#EEEEEE] pb-3">
                 <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">5</span>
+                  <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">5</span>
                   Product Description
                 </h2>
                 <p className="text-xs text-slate-400 font-light mt-0.5">Engaging story, leather craftsmanship, and comfort pitch for the storefront</p>
@@ -1156,7 +1156,7 @@ export default function NewProductPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe genuine leather craftsmanship, footbed cushioning, arch support, and occasion versatility..."
-                  className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] leading-relaxed font-light"
+                  className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl p-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] leading-relaxed font-light"
                 />
               </div>
             </div>
@@ -1164,10 +1164,10 @@ export default function NewProductPage() {
 
           {/* ── TAB 6: Features ── */}
           {activeTab === 6 && (
-            <div className="bg-white rounded-2xl p-5 border border-[#e8e2d8] space-y-4 shadow-2xs">
-              <div className="border-b border-[#f0eae1] pb-3">
+            <div className="bg-white rounded-2xl p-5 border border-[#E5E5E5] space-y-4 shadow-2xs">
+              <div className="border-b border-[#EEEEEE] pb-3">
                 <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">6</span>
+                  <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">6</span>
                   Product Features
                 </h2>
                 <p className="text-xs text-slate-400 font-light mt-0.5">Key selling points rendered as bullet points on the customer product page</p>
@@ -1180,7 +1180,7 @@ export default function NewProductPage() {
                   value={features}
                   onChange={(e) => setFeatures(e.target.value)}
                   placeholder={"• Anatomical dual-density footbed for pressure relief\n• Genuine water-resistant full-grain leather upper\n• Ultra-lightweight anti-skid TPR outsole\n• Handcrafted with luxury reinforced cross-stitching"}
-                  className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl p-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C] leading-relaxed font-light"
+                  className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl p-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021] leading-relaxed font-light"
                 />
                 <p className="text-[10px] text-slate-400">Each bullet line automatically formats inside the description accordion.</p>
               </div>
@@ -1189,10 +1189,10 @@ export default function NewProductPage() {
 
           {/* ── TAB 7: Specifications & Attributes ── */}
           {activeTab === 7 && (
-            <div className="bg-white rounded-2xl p-5 border border-[#e8e2d8] space-y-4 shadow-2xs">
-              <div className="border-b border-[#f0eae1] pb-3">
+            <div className="bg-white rounded-2xl p-5 border border-[#E5E5E5] space-y-4 shadow-2xs">
+              <div className="border-b border-[#EEEEEE] pb-3">
                 <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">7</span>
+                  <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">7</span>
                   Specifications &amp; Logistics Attributes
                 </h2>
                 <p className="text-xs text-slate-400 font-light mt-0.5">Material, closures, packing dimensions, manufacturer and HSN details</p>
@@ -1206,7 +1206,7 @@ export default function NewProductPage() {
                     placeholder="e.g. Genuine Leather, PU"
                     value={material}
                     onChange={(e) => setMaterial(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1217,7 +1217,7 @@ export default function NewProductPage() {
                     placeholder="e.g. Casual, Formal, Wedding"
                     value={occasion}
                     onChange={(e) => setOccasion(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1226,7 +1226,7 @@ export default function NewProductPage() {
                   <select
                     value={strapType}
                     onChange={(e) => setStrapType(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   >
                     <option value="No Strap">No Strap</option>
                     <option value="Ankle Strap">Ankle Strap</option>
@@ -1242,7 +1242,7 @@ export default function NewProductPage() {
                   <select
                     value={closureType}
                     onChange={(e) => setClosureType(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   >
                     <option value="Slip-On">Slip-On</option>
                     <option value="Buckle">Buckle</option>
@@ -1259,7 +1259,7 @@ export default function NewProductPage() {
                     placeholder="e.g. Loafers, Kolhapuri, Derby"
                     value={shoeType}
                     onChange={(e) => setShoeType(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1270,7 +1270,7 @@ export default function NewProductPage() {
                     placeholder="e.g. Adults (18-60)"
                     value={ageRange}
                     onChange={(e) => setAgeRange(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1281,7 +1281,7 @@ export default function NewProductPage() {
                     placeholder="e.g. GRAVOZ Artisans Pvt. Ltd."
                     value={manufacturer}
                     onChange={(e) => setManufacturer(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1292,7 +1292,7 @@ export default function NewProductPage() {
                     placeholder="e.g. 64032000"
                     value={hsnCode}
                     onChange={(e) => setHsnCode(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1304,7 +1304,7 @@ export default function NewProductPage() {
                     placeholder="32"
                     value={packingLength}
                     onChange={(e) => setPackingLength(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
                 <div>
@@ -1315,7 +1315,7 @@ export default function NewProductPage() {
                     placeholder="18"
                     value={packingWidth}
                     onChange={(e) => setPackingWidth(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
                 <div>
@@ -1326,7 +1326,7 @@ export default function NewProductPage() {
                     placeholder="12"
                     value={packingHeight}
                     onChange={(e) => setPackingHeight(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
               </div>
@@ -1335,10 +1335,10 @@ export default function NewProductPage() {
 
           {/* ── TAB 8: SEO & Status ── */}
           {activeTab === 8 && (
-            <div className="bg-white rounded-2xl p-5 border border-[#e8e2d8] space-y-5 shadow-2xs">
-              <div className="border-b border-[#f0eae1] pb-3">
+            <div className="bg-white rounded-2xl p-5 border border-[#E5E5E5] space-y-5 shadow-2xs">
+              <div className="border-b border-[#EEEEEE] pb-3">
                 <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[11px] flex items-center justify-center font-bold">8</span>
+                  <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[11px] flex items-center justify-center font-bold">8</span>
                   SEO &amp; Showcase Placements
                 </h2>
                 <p className="text-xs text-slate-400 font-light mt-0.5">Homepage badges and search engine indexing configurations</p>
@@ -1357,8 +1357,8 @@ export default function NewProductPage() {
                       key={st.id}
                       className={`px-3.5 py-2 rounded-xl border text-xs font-medium cursor-pointer transition-all ${
                         status === st.id
-                          ? 'bg-[#89591C] text-white border-[#89591C]'
-                          : 'bg-[#faf8f5] text-slate-700 border-[#e8e2d8]'
+                          ? 'bg-[#F37021] text-white border-[#F37021]'
+                          : 'bg-[#F7F7F7] text-slate-700 border-[#E5E5E5]'
                       }`}
                     >
                       <input
@@ -1378,12 +1378,12 @@ export default function NewProductPage() {
               <div className="space-y-2">
                 <label className="block text-xs font-semibold text-slate-800">Homepage Showcase Placement</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isBestSeller ? 'bg-[#faf4ec] border-[#89591C]' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
+                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isBestSeller ? 'bg-[#FFF3EB] border-[#F37021]' : 'bg-[#F7F7F7] border-[#E5E5E5]'}`}>
                     <input
                       type="checkbox"
                       checked={isBestSeller}
                       onChange={(e) => setIsBestSeller(e.target.checked)}
-                      className="w-4 h-4 rounded text-[#89591C] focus:ring-0"
+                      className="w-4 h-4 rounded text-[#F37021] focus:ring-0"
                     />
                     <div>
                       <span className="text-xs font-semibold text-slate-900 block">Best Sellers</span>
@@ -1391,7 +1391,7 @@ export default function NewProductPage() {
                     </div>
                   </label>
 
-                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isTopSeller ? 'bg-[#f0f5ec] border-[#557244]' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
+                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isTopSeller ? 'bg-[#f0f5ec] border-[#557244]' : 'bg-[#F7F7F7] border-[#E5E5E5]'}`}>
                     <input
                       type="checkbox"
                       checked={isTopSeller}
@@ -1404,7 +1404,7 @@ export default function NewProductPage() {
                     </div>
                   </label>
 
-                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isLatest ? 'bg-[#edf5fc] border-[#1d6fa4]' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
+                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isLatest ? 'bg-[#edf5fc] border-[#1d6fa4]' : 'bg-[#F7F7F7] border-[#E5E5E5]'}`}>
                     <input
                       type="checkbox"
                       checked={isLatest}
@@ -1417,7 +1417,7 @@ export default function NewProductPage() {
                     </div>
                   </label>
 
-                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isFeatured ? 'bg-[#f7eefa] border-[#7c3d8f]' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
+                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer ${isFeatured ? 'bg-[#f7eefa] border-[#7c3d8f]' : 'bg-[#F7F7F7] border-[#E5E5E5]'}`}>
                     <input
                       type="checkbox"
                       checked={isFeatured}
@@ -1430,7 +1430,7 @@ export default function NewProductPage() {
                     </div>
                   </label>
 
-                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer transition-all ${noReturnRefundExchange ? 'bg-[#fff5f5] border-[#e53e3e] shadow-2xs' : 'bg-[#faf8f5] border-[#e8e2d8]'}`}>
+                  <label className={`p-3 rounded-lg border flex items-center gap-2.5 cursor-pointer transition-all ${noReturnRefundExchange ? 'bg-[#fff5f5] border-[#e53e3e] shadow-2xs' : 'bg-[#F7F7F7] border-[#E5E5E5]'}`}>
                     <input
                       type="checkbox"
                       checked={noReturnRefundExchange}
@@ -1446,11 +1446,11 @@ export default function NewProductPage() {
               </div>
 
               {/* ── Shipping & Returns Policy Configuration (Editable with Suggested Defaults) ── */}
-              <div className="space-y-4 pt-2 border-t border-[#e8e2d8]">
+              <div className="space-y-4 pt-2 border-t border-[#E5E5E5]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                      <RotateCcw className="w-4 h-4 text-[#89591C]" />
+                      <RotateCcw className="w-4 h-4 text-[#F37021]" />
                       <span>Shipping &amp; Returns Policy Content</span>
                     </h3>
                     <p className="text-[11px] text-slate-500 font-normal">
@@ -1465,8 +1465,8 @@ export default function NewProductPage() {
                       onClick={() => applyReturnPreset('standard')}
                       className={`px-2.5 py-1 text-[11px] font-semibold rounded-md border transition-all cursor-pointer ${
                         !noReturnRefundExchange
-                          ? 'bg-[#89591C] text-white border-[#89591C]'
-                          : 'bg-white text-slate-700 border-[#e8e2d8] hover:bg-slate-50'
+                          ? 'bg-[#F37021] text-white border-[#F37021]'
+                          : 'bg-white text-slate-700 border-[#E5E5E5] hover:bg-slate-50'
                       }`}
                     >
                       Standard 7-Day
@@ -1485,7 +1485,7 @@ export default function NewProductPage() {
                     <button
                       type="button"
                       onClick={() => applyReturnPreset('extended')}
-                      className="px-2.5 py-1 text-[11px] font-semibold rounded-md border bg-white text-slate-700 border-[#e8e2d8] hover:bg-slate-50 cursor-pointer"
+                      className="px-2.5 py-1 text-[11px] font-semibold rounded-md border bg-white text-slate-700 border-[#E5E5E5] hover:bg-slate-50 cursor-pointer"
                     >
                       15-Day Exchange
                     </button>
@@ -1494,8 +1494,8 @@ export default function NewProductPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Card 1: Express Shipping */}
-                  <div className="p-3.5 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-2">
-                    <span className="text-[11px] font-bold text-[#89591C] uppercase tracking-wider block">Card 1: Shipping Details</span>
+                  <div className="p-3.5 bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#F37021] uppercase tracking-wider block">Card 1: Shipping Details</span>
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Shipping Heading</label>
                       <input
@@ -1503,7 +1503,7 @@ export default function NewProductPage() {
                         value={shippingTitle}
                         onChange={(e) => setShippingTitle(e.target.value)}
                         placeholder="Complimentary Express Shipping"
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                     <div>
@@ -1513,7 +1513,7 @@ export default function NewProductPage() {
                         value={shippingDesc}
                         onChange={(e) => setShippingDesc(e.target.value)}
                         placeholder="Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days."
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                   </div>
@@ -1522,11 +1522,11 @@ export default function NewProductPage() {
                   <div className={`p-3.5 rounded-xl border space-y-2 ${
                     noReturnRefundExchange
                       ? 'bg-[#FFF9F2] border-2 border-[#F5C78E]'
-                      : 'bg-[#FAF7F3] border-[#E5E1DC]'
+                      : 'bg-[#F7F7F7] border-[#E5E5E5]'
                   }`}>
                     <div className="flex items-center justify-between">
                       <span className={`text-[11px] font-bold uppercase tracking-wider block ${
-                        noReturnRefundExchange ? 'text-[#B45309]' : 'text-[#89591C]'
+                        noReturnRefundExchange ? 'text-[#B45309]' : 'text-[#F37021]'
                       }`}>
                         Card 2: Return &amp; Exchange Policy
                       </span>
@@ -1543,7 +1543,7 @@ export default function NewProductPage() {
                         value={returnTitle}
                         onChange={(e) => setReturnTitle(e.target.value)}
                         placeholder="7-Day Hassle-Free Returns"
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                     <div>
@@ -1553,14 +1553,14 @@ export default function NewProductPage() {
                         value={returnDesc}
                         onChange={(e) => setReturnDesc(e.target.value)}
                         placeholder="Doorstep pickup and instant exchange if size or fit is not ideal."
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                   </div>
 
                   {/* Card 3: Manufacturing Warranty */}
-                  <div className="p-3.5 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-2">
-                    <span className="text-[11px] font-bold text-[#89591C] uppercase tracking-wider block">Card 3: Warranty Coverage</span>
+                  <div className="p-3.5 bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#F37021] uppercase tracking-wider block">Card 3: Warranty Coverage</span>
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Warranty Heading</label>
                       <input
@@ -1568,7 +1568,7 @@ export default function NewProductPage() {
                         value={warrantyTitle}
                         onChange={(e) => setWarrantyTitle(e.target.value)}
                         placeholder="6-Month Manufacturing Warranty"
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                     <div>
@@ -1578,14 +1578,14 @@ export default function NewProductPage() {
                         value={warrantyDesc}
                         onChange={(e) => setWarrantyDesc(e.target.value)}
                         placeholder="Covers sole adhesion, stitching, and artisan leather construction."
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                   </div>
 
                   {/* Card 4: Payment & COD */}
-                  <div className="p-3.5 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-2">
-                    <span className="text-[11px] font-bold text-[#89591C] uppercase tracking-wider block">Card 4: Payment Terms</span>
+                  <div className="p-3.5 bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#F37021] uppercase tracking-wider block">Card 4: Payment Terms</span>
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-700 mb-0.5">Payment Heading</label>
                       <input
@@ -1593,7 +1593,7 @@ export default function NewProductPage() {
                         value={paymentTitle}
                         onChange={(e) => setPaymentTitle(e.target.value)}
                         placeholder="COD & Secure Prepaid"
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                     <div>
@@ -1603,7 +1603,7 @@ export default function NewProductPage() {
                         value={paymentDesc}
                         onChange={(e) => setPaymentDesc(e.target.value)}
                         placeholder="Pay securely via UPI, Cards, Net Banking, or Cash on Delivery."
-                        className="w-full bg-white border border-[#e8e2d8] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-md p-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
                     </div>
                   </div>
@@ -1619,7 +1619,7 @@ export default function NewProductPage() {
                     placeholder="pure-leather-casual-shoe"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1630,7 +1630,7 @@ export default function NewProductPage() {
                     placeholder={name || 'Pure Leather Casual Shoe | GRAVOZ'}
                     value={metaTitle}
                     onChange={(e) => setMetaTitle(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1641,7 +1641,7 @@ export default function NewProductPage() {
                     placeholder="Handcrafted genuine leather casual footwear with anatomical footbed comfort."
                     value={metaDescription}
                     onChange={(e) => setMetaDescription(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg p-3 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg p-3 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
 
@@ -1651,7 +1651,7 @@ export default function NewProductPage() {
                     type="text"
                     value={keywordsStr}
                     onChange={(e) => setKeywordsStr(e.target.value)}
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
               </div>
@@ -1660,16 +1660,16 @@ export default function NewProductPage() {
 
           {/* ── TAB 9: Homepage Duo Spotlight Mockups (3 Photos) ── */}
           {activeTab === 9 && (
-            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#e8e2d8] space-y-5 shadow-2xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f0eae1] pb-4">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5E5] space-y-5 shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EEEEEE] pb-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-[#89591C] text-white text-xs flex items-center justify-center font-bold">
+                  <span className="w-6 h-6 rounded-full bg-[#F37021] text-white text-xs flex items-center justify-center font-bold">
                     9
                   </span>
                   <h2 className="text-sm font-bold text-slate-900">
                     Homepage Duo Spotlight Mockups
                   </h2>
-                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-[#faf4ec] text-[#89591C] border border-[#ebdcc9] uppercase tracking-wider">
+                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-[#FFF3EB] text-[#F37021] border border-[#FAD4BC] uppercase tracking-wider">
                     Optional
                   </span>
                 </div>
@@ -1678,7 +1678,7 @@ export default function NewProductPage() {
                   <button
                     type="button"
                     onClick={handleAutoFillMockups}
-                    className="px-3 py-1.5 rounded-lg bg-[#faf4ec] border border-[#e8d7c2] hover:bg-[#f3e6d3] text-[#89591C] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg bg-[#FFF3EB] border border-[#FAD4BC] hover:bg-[#FFE6D5] text-[#F37021] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                     title="Copy first 3 images from Tab 3"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
@@ -1697,11 +1697,11 @@ export default function NewProductPage() {
               </div>
 
               {/* Homepage Slot Selector */}
-              <div className="p-3.5 sm:p-4 bg-[#faf4ec] border border-[#e8d7c2] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="p-3.5 sm:p-4 bg-[#FFF3EB] border border-[#FAD4BC] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
                 <div>
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#89591C]" />
-                    <span className="text-xs font-bold text-[#89591C]">
+                    <Sparkles className="w-4 h-4 text-[#F37021]" />
+                    <span className="text-xs font-bold text-[#F37021]">
                       Feature this product in Homepage Duo Spotlight
                     </span>
                   </div>
@@ -1721,8 +1721,8 @@ export default function NewProductPage() {
                       onClick={() => setFeatureInDuoSlot(opt.id as any)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                         featureInDuoSlot === opt.id
-                          ? 'bg-[#89591C] text-white border-[#89591C] shadow-xs'
-                          : 'bg-white text-slate-700 border-[#e8e2d8] hover:bg-[#f5ecdf]'
+                          ? 'bg-[#F37021] text-white border-[#F37021] shadow-xs'
+                          : 'bg-white text-slate-700 border-[#E5E5E5] hover:bg-[#FFEADF]'
                       }`}
                     >
                       {opt.label}
@@ -1734,10 +1734,10 @@ export default function NewProductPage() {
               {/* ── LIVE DUO CARD LAYOUT (1:1 Homepage Preview) ── */}
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                 {/* Left: The Exact Duo Cards Layout */}
-                <div className="xl:col-span-6 bg-[#faf8f5] border border-[#e8e2d8] rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs">
+                <div className="xl:col-span-6 bg-[#F7F7F7] border border-[#E5E5E5] rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                      <LayoutGrid className="w-4 h-4 text-[#89591C]" />
+                      <LayoutGrid className="w-4 h-4 text-[#F37021]" />
                       Live Duo Spotlight Preview
                     </span>
                   </div>
@@ -1745,7 +1745,7 @@ export default function NewProductPage() {
                   {/* 2 Portrait Cards Grid */}
                   <div className="grid grid-cols-2 gap-3">
                     {/* Card 1: Photo 1 (Main Mockup) + Floating Inset Badge Photo 2 */}
-                    <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[22px] overflow-hidden bg-[#f0ede8] border border-[#e8e2d8] shadow-sm group">
+                    <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[22px] overflow-hidden bg-[#F3F3F3] border border-[#E5E5E5] shadow-sm group">
                       {spotlightMockups.mainUrl ? (
                         <Image
                           src={spotlightMockups.mainUrl}
@@ -1790,7 +1790,7 @@ export default function NewProductPage() {
                             />
                           </div>
                         ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-[#f8f5f0] text-[8px] font-bold text-center leading-tight">
+                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-[#F5F5F5] text-[8px] font-bold text-center leading-tight">
                             <span>Photo 2</span>
                             <span className="text-[7px] text-slate-400">Inset</span>
                           </div>
@@ -1813,7 +1813,7 @@ export default function NewProductPage() {
                     </div>
 
                     {/* Card 2: Photo 3 (Lifestyle / Second Angle Photo) */}
-                    <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[22px] overflow-hidden bg-[#f0ede8] border border-[#e8e2d8] shadow-sm group">
+                    <div className="relative aspect-[2/3] rounded-[20px] sm:rounded-[22px] overflow-hidden bg-[#F3F3F3] border border-[#E5E5E5] shadow-sm group">
                       {spotlightMockups.lifestyleUrl ? (
                         <Image
                           src={spotlightMockups.lifestyleUrl}
@@ -1854,7 +1854,7 @@ export default function NewProductPage() {
                         {name || 'Product Title'}
                       </p>
                       <div className="flex items-baseline gap-1.5 flex-shrink-0">
-                        <span className="text-xs font-bold text-[#89591C]">
+                        <span className="text-xs font-bold text-[#F37021]">
                           ₹{discountPrice || price || 0}
                         </span>
                         {discountPrice && Number(discountPrice) < Number(price) && (
@@ -1873,14 +1873,14 @@ export default function NewProductPage() {
                 {/* Right: Explicit Photo Upload & URL Inputs */}
                 <div className="xl:col-span-6 space-y-3.5">
                   {/* Photo 1: Main Mockup Image */}
-                  <div className="p-4 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-2">
+                  <div className="p-4 bg-[#F7F7F7] rounded-xl border border-[#E5E5E5] space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[10px] flex items-center justify-center font-bold">1</span>
+                        <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[10px] flex items-center justify-center font-bold">1</span>
                         Photo 1: Main Mockup (Full Card 1)
                       </label>
                       {uploadingMockup === 'mainUrl' && (
-                        <span className="text-[10px] text-[#89591C] font-semibold animate-pulse">Uploading...</span>
+                        <span className="text-[10px] text-[#F37021] font-semibold animate-pulse">Uploading...</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
@@ -1889,9 +1889,9 @@ export default function NewProductPage() {
                         placeholder="https://res.cloudinary.com/... or paste image URL"
                         value={spotlightMockups.mainUrl}
                         onChange={(e) => setSpotlightMockups((prev) => ({ ...prev, mainUrl: e.target.value }))}
-                        className="flex-1 bg-white border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="flex-1 bg-white border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
-                      <label className="px-3 py-2 rounded-lg bg-white border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
+                      <label className="px-3 py-2 rounded-lg bg-white border border-[#E5E5E5] hover:bg-[#FFF3EB] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
                         <Upload className="w-3.5 h-3.5" />
                         <span>Upload</span>
                         <input
@@ -1908,14 +1908,14 @@ export default function NewProductPage() {
                   </div>
 
                   {/* Photo 2: Inset Thumbnail Mockup */}
-                  <div className="p-4 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-2">
+                  <div className="p-4 bg-[#F7F7F7] rounded-xl border border-[#E5E5E5] space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[10px] flex items-center justify-center font-bold">2</span>
+                        <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[10px] flex items-center justify-center font-bold">2</span>
                         Photo 2: Inset Thumbnail (Floating Badge on Card 1)
                       </label>
                       {uploadingMockup === 'thumbnailUrl' && (
-                        <span className="text-[10px] text-[#89591C] font-semibold animate-pulse">Uploading...</span>
+                        <span className="text-[10px] text-[#F37021] font-semibold animate-pulse">Uploading...</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
@@ -1924,9 +1924,9 @@ export default function NewProductPage() {
                         placeholder="https://res.cloudinary.com/... or paste image URL"
                         value={spotlightMockups.thumbnailUrl}
                         onChange={(e) => setSpotlightMockups((prev) => ({ ...prev, thumbnailUrl: e.target.value }))}
-                        className="flex-1 bg-white border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="flex-1 bg-white border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
-                      <label className="px-3 py-2 rounded-lg bg-white border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
+                      <label className="px-3 py-2 rounded-lg bg-white border border-[#E5E5E5] hover:bg-[#FFF3EB] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
                         <Upload className="w-3.5 h-3.5" />
                         <span>Upload</span>
                         <input
@@ -1943,14 +1943,14 @@ export default function NewProductPage() {
                   </div>
 
                   {/* Photo 3: Lifestyle / Angle Mockup */}
-                  <div className="p-4 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] space-y-2">
+                  <div className="p-4 bg-[#F7F7F7] rounded-xl border border-[#E5E5E5] space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-[#89591C] text-white text-[10px] flex items-center justify-center font-bold">3</span>
+                        <span className="w-5 h-5 rounded-full bg-[#F37021] text-white text-[10px] flex items-center justify-center font-bold">3</span>
                         Photo 3: Lifestyle / Angle (Full Card 2)
                       </label>
                       {uploadingMockup === 'lifestyleUrl' && (
-                        <span className="text-[10px] text-[#89591C] font-semibold animate-pulse">Uploading...</span>
+                        <span className="text-[10px] text-[#F37021] font-semibold animate-pulse">Uploading...</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
@@ -1959,9 +1959,9 @@ export default function NewProductPage() {
                         placeholder="https://res.cloudinary.com/... or paste image URL"
                         value={spotlightMockups.lifestyleUrl}
                         onChange={(e) => setSpotlightMockups((prev) => ({ ...prev, lifestyleUrl: e.target.value }))}
-                        className="flex-1 bg-white border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+                        className="flex-1 bg-white border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
                       />
-                      <label className="px-3 py-2 rounded-lg bg-white border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
+                      <label className="px-3 py-2 rounded-lg bg-white border border-[#E5E5E5] hover:bg-[#FFF3EB] text-slate-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors flex-shrink-0">
                         <Upload className="w-3.5 h-3.5" />
                         <span>Upload</span>
                         <input
@@ -1983,11 +1983,11 @@ export default function NewProductPage() {
 
           {/* ── TAB 10: Product Add-Ons & Cross-Sells ── */}
           {activeTab === 10 && (
-            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#e8e2d8] space-y-5 shadow-2xs">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5E5] space-y-5 shadow-2xs">
               {/* Tab Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f0eae1] pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EEEEEE] pb-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-[#89591C] text-white text-xs flex items-center justify-center font-bold">
+                  <span className="w-6 h-6 rounded-full bg-[#F37021] text-white text-xs flex items-center justify-center font-bold">
                     10
                   </span>
                   <div>
@@ -2007,21 +2007,21 @@ export default function NewProductPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedAddonIds(availableAddons.map((a) => a._id))}
-                    className="px-3 py-1.5 rounded-lg border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:bg-[#FFF3EB] text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
                   >
                     Select All
                   </button>
                   <button
                     type="button"
                     onClick={() => setSelectedAddonIds([])}
-                    className="px-3 py-1.5 rounded-lg border border-[#e8e2d8] hover:bg-rose-50 hover:text-rose-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:bg-rose-50 hover:text-rose-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
                   >
                     Deselect All
                   </button>
                   <Link
                     href="/admin/addons"
                     target="_blank"
-                    className="px-3 py-1.5 rounded-lg bg-[#89591C]/10 hover:bg-[#89591C]/20 text-[#89591C] text-xs font-semibold transition-colors flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-lg bg-[#F37021]/10 hover:bg-[#F37021]/20 text-[#F37021] text-xs font-semibold transition-colors flex items-center gap-1"
                   >
                     <span>Manage All Add-Ons</span>
                     <span className="text-xs">↗</span>
@@ -2031,15 +2031,15 @@ export default function NewProductPage() {
 
               {/* Add-Ons List/Cards Grid */}
               {availableAddons.length === 0 ? (
-                <div className="p-8 text-center bg-[#faf8f5] rounded-xl border border-dashed border-[#e8e2d8] space-y-3">
-                  <Sparkles className="w-8 h-8 text-[#89591C] mx-auto opacity-70" />
+                <div className="p-8 text-center bg-[#F7F7F7] rounded-xl border border-dashed border-[#E5E5E5] space-y-3">
+                  <Sparkles className="w-8 h-8 text-[#F37021] mx-auto opacity-70" />
                   <h3 className="text-sm font-bold text-slate-800">No Add-Ons Created Yet</h3>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
                     Create shoe polish kits, extra laces, cedar shoe trees, or brushes in Add-Ons Management to link them to this product.
                   </p>
                   <Link
                     href="/admin/addons"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#89591C] text-white text-xs font-semibold shadow-xs hover:bg-[#724816]"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#F37021] text-white text-xs font-semibold shadow-xs hover:bg-[#D95B10]"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Go to Add-Ons Management</span>
@@ -2061,8 +2061,8 @@ export default function NewProductPage() {
                         }}
                         className={`p-3.5 rounded-xl border-2 transition-all cursor-pointer select-none flex items-center justify-between gap-3 ${
                           isSelected
-                            ? 'border-[#89591C] bg-[#FDF8F2] shadow-xs ring-1 ring-[#89591C]/30'
-                            : 'border-[#e8e2d8] bg-white hover:border-[#c8a47a] hover:bg-[#faf6f0]'
+                            ? 'border-[#F37021] bg-[#FFF3EB] shadow-xs ring-1 ring-[#F37021]/30'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#F7B994] hover:bg-[#F7F7F7]'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -2070,8 +2070,8 @@ export default function NewProductPage() {
                           <div
                             className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                               isSelected
-                                ? 'bg-[#89591C] border-[#89591C] text-white'
-                                : 'bg-white border-[#c8c0b4]'
+                                ? 'bg-[#F37021] border-[#F37021] text-white'
+                                : 'bg-white border-[#CCCCCC]'
                             }`}
                           >
                             {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
@@ -2095,7 +2095,7 @@ export default function NewProductPage() {
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <p className={`text-xs font-bold leading-snug truncate ${
-                                isSelected ? 'text-[#5C2D0A]' : 'text-slate-900'
+                                isSelected ? 'text-[#B84909]' : 'text-slate-900'
                               }`}>
                                 {addon.name}
                               </p>
@@ -2114,7 +2114,7 @@ export default function NewProductPage() {
                         {/* Price & Active Status */}
                         <div className="flex flex-col items-end flex-shrink-0 pl-2">
                           <span className={`text-xs font-bold ${
-                            isSelected ? 'text-[#89591C]' : 'text-slate-800'
+                            isSelected ? 'text-[#F37021]' : 'text-slate-800'
                           }`}>
                             +₹{addon.price.toLocaleString('en-IN')}
                           </span>
@@ -2156,7 +2156,7 @@ export default function NewProductPage() {
                 type="button"
                 disabled={loading}
                 onClick={() => handleSave('active')}
-                className="px-6 py-2 rounded-lg bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                className="px-6 py-2 rounded-lg bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>Save &amp; Publish</span>
@@ -2169,11 +2169,11 @@ export default function NewProductPage() {
         {/* COLUMN 3: Right Live Product Summary Card (Exact Figma Card)  */}
         {/* ══════════════════════════════════════════════════════════════ */}
         <aside className="lg:col-span-3 xl:col-span-3 space-y-4 sticky top-20">
-          <div className="bg-white rounded-lg border border-[#e8e2d8] p-4.5 space-y-4 shadow-2xs">
+          <div className="bg-white rounded-lg border border-[#E5E5E5] p-4.5 space-y-4 shadow-2xs">
             <h3 className="text-xs font-bold text-slate-900 tracking-wider">Product Summary</h3>
 
             {/* Hero Image Preview Box */}
-            <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#faf8f5] border border-[#e8e2d8] flex items-center justify-center">
+            <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F7F7F7] border border-[#E5E5E5] flex items-center justify-center">
               <Image
                 src={heroImagePreview}
                 alt="Product preview"
@@ -2184,19 +2184,19 @@ export default function NewProductPage() {
             </div>
 
             {/* Product Title + Status Badge */}
-            <div className="flex items-start justify-between gap-2 pt-1 border-b border-[#f0eae1] pb-3">
+            <div className="flex items-start justify-between gap-2 pt-1 border-b border-[#EEEEEE] pb-3">
               <div>
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-tight leading-snug">
                   {name || 'PRODUCT TITLE'}
                 </h4>
               </div>
-              <span className="px-2 py-0.5 rounded-md bg-[#faf4ec] text-[#89591C] text-[10px] font-semibold border border-[#ebdcc9] capitalize flex-shrink-0">
+              <span className="px-2 py-0.5 rounded-md bg-[#FFF3EB] text-[#F37021] text-[10px] font-semibold border border-[#FAD4BC] capitalize flex-shrink-0">
                 {status}
               </span>
             </div>
 
             {/* Metadata table */}
-            <div className="space-y-2 text-xs text-slate-700 font-medium border-b border-[#f0eae1] pb-3">
+            <div className="space-y-2 text-xs text-slate-700 font-medium border-b border-[#EEEEEE] pb-3">
               <div className="flex items-center justify-between">
                 <span className="text-slate-500 font-medium">SKU:</span>
                 <span className="font-mono font-semibold text-slate-900">{sku || '—'}</span>
@@ -2224,7 +2224,7 @@ export default function NewProductPage() {
             </div>
 
             {/* Variants summary list */}
-            <div className="space-y-2 border-b border-[#f0eae1] pb-3">
+            <div className="space-y-2 border-b border-[#EEEEEE] pb-3">
               <span className="text-xs font-bold text-slate-900 block">
                 Variants ({colorVariants.length})
               </span>
@@ -2250,7 +2250,7 @@ export default function NewProductPage() {
             {/* Sizes Badges */}
             <div className="space-y-1.5">
               <span className="text-xs font-bold text-slate-900 block">Sizes</span>
-              <div className="bg-[#faf8f5] border border-[#e8e2d8] rounded-lg px-3 py-2 text-xs text-slate-800 font-medium">
+              <div className="bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs text-slate-800 font-medium">
                 {selectedSizes.length > 0 ? selectedSizes.join(', ') : 'None selected'}
               </div>
             </div>

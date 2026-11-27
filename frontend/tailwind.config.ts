@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: '#89591C',
-        'brand-dark': '#724816',
-        'brand-light': '#faf4ec',
+        brand: '#F37021',
+        'brand-dark': '#D95B10',
+        'brand-light': '#FFF3EB',
         obsidian: '#030303',
       },
       fontFamily: {

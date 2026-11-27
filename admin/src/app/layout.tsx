@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className="bg-[#faf8f5] text-[#1e293b] font-sans min-h-screen antialiased selection:bg-[#89591C] selection:text-white"
+        className="bg-[#f7f7f7] text-[#1e293b] font-sans min-h-screen antialiased selection:bg-[#F37021] selection:text-white"
         style={{ fontFamily: "'Montserrat', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
         suppressHydrationWarning
       >

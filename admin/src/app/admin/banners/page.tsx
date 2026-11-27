@@ -189,7 +189,7 @@ export default function AdminBannersPage() {
       {toast && (
         <div
           className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-md shadow-2xl flex items-center gap-3 text-white text-xs font-semibold animate-in slide-in-from-bottom-4 duration-200 ${
-            toast.type === 'success' ? 'bg-[#89591C]' : 'bg-rose-600'
+            toast.type === 'success' ? 'bg-[#F37021]' : 'bg-rose-600'
           }`}
         >
           {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -215,7 +215,7 @@ export default function AdminBannersPage() {
           <button
             type="button"
             onClick={fetchBanners}
-            className="h-9 px-3.5 rounded-md bg-white border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-9 px-3.5 rounded-md bg-white border border-[#E5E5E5] hover:bg-[#FFF3EB] text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Refresh</span>
@@ -224,7 +224,7 @@ export default function AdminBannersPage() {
             type="button"
             onClick={handleSaveAll}
             disabled={savingSlot === 'all'}
-            className="h-9 px-4 rounded-md bg-[#89591C] hover:bg-[#724816] disabled:opacity-60 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+            className="h-9 px-4 rounded-md bg-[#F37021] hover:bg-[#D95B10] disabled:opacity-60 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
           >
             <Save className="w-3.5 h-3.5" />
             <span>{savingSlot === 'all' ? 'Saving All...' : 'Save All Changes'}</span>
@@ -233,13 +233,13 @@ export default function AdminBannersPage() {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e8e2d8] overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-[#E5E5E5] overflow-x-auto">
         <button
           type="button"
           onClick={() => setActiveTab('hero_slider')}
           className={`px-4 py-2.5 text-xs font-semibold transition-all border-b-2 flex items-center gap-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'hero_slider'
-              ? 'border-[#89591C] text-[#89591C] bg-[#faf4ec]/50'
+              ? 'border-[#F37021] text-[#F37021] bg-[#FFF3EB]/50'
               : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -252,7 +252,7 @@ export default function AdminBannersPage() {
           onClick={() => setActiveTab('home_banner')}
           className={`px-4 py-2.5 text-xs font-semibold transition-all border-b-2 flex items-center gap-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'home_banner'
-              ? 'border-[#89591C] text-[#89591C] bg-[#faf4ec]/50'
+              ? 'border-[#F37021] text-[#F37021] bg-[#FFF3EB]/50'
               : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -265,7 +265,7 @@ export default function AdminBannersPage() {
           onClick={() => setActiveTab('category_banner')}
           className={`px-4 py-2.5 text-xs font-semibold transition-all border-b-2 flex items-center gap-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'category_banner'
-              ? 'border-[#89591C] text-[#89591C] bg-[#faf4ec]/50'
+              ? 'border-[#F37021] text-[#F37021] bg-[#FFF3EB]/50'
               : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -278,7 +278,7 @@ export default function AdminBannersPage() {
       {loading ? (
         <div className="grid grid-cols-1 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-lg p-6 animate-pulse h-64 border border-[#e8e2d8]" />
+            <div key={i} className="bg-white rounded-lg p-6 animate-pulse h-64 border border-[#E5E5E5]" />
           ))}
         </div>
       ) : (
@@ -287,14 +287,14 @@ export default function AdminBannersPage() {
         /* ════════════════════════════════════════════════════════════════════════ */
         <div className="space-y-4">
           {activeTab === 'hero_slider' && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#faf4ec] border border-[#e8d7c2] rounded-xl px-5 py-3 text-xs text-[#89591C]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#FFF3EB] border border-[#FAD4BC] rounded-xl px-5 py-3 text-xs text-[#F37021]">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#89591C] flex-shrink-0" />
+                <Sparkles className="w-4 h-4 text-[#F37021] flex-shrink-0" />
                 <span>
                   <strong>Top Hero Slider (4 Slides):</strong> Automatically rotates every 3 seconds on the store homepage with smooth crossfade animation and no breadcrumbs.
                 </span>
               </div>
-              <span className="text-[11px] font-semibold bg-white px-2.5 py-1 rounded-md border border-[#e8d7c2] self-start sm:self-auto flex-shrink-0">
+              <span className="text-[11px] font-semibold bg-white px-2.5 py-1 rounded-md border border-[#FAD4BC] self-start sm:self-auto flex-shrink-0">
                 Aspect Ratio: 1816 / 866
               </span>
             </div>
@@ -307,12 +307,12 @@ export default function AdminBannersPage() {
             return (
               <div
                 key={banner.slot}
-                className="bg-white border border-[#e8e2d8] rounded-lg p-5 shadow-2xs hover:border-slate-300 transition-all space-y-4"
+                className="bg-white border border-[#E5E5E5] rounded-lg p-5 shadow-2xs hover:border-slate-300 transition-all space-y-4"
               >
                 {/* Card Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f0eae1] pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EEEEEE] pb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-[#faf4ec] text-[#89591C] font-bold text-xs flex items-center justify-center border border-[#e8e2d8]">
+                    <div className="w-7 h-7 rounded-full bg-[#FFF3EB] text-[#F37021] font-bold text-xs flex items-center justify-center border border-[#E5E5E5]">
                       {index + 1}
                     </div>
                     <div>
@@ -327,7 +327,7 @@ export default function AdminBannersPage() {
                         type="checkbox"
                         checked={banner.isActive}
                         onChange={(e) => handleFieldChange(banner.slot, 'isActive', e.target.checked)}
-                        className="w-3.5 h-3.5 text-[#89591C] rounded border-slate-300 focus:ring-[#89591C]"
+                        className="w-3.5 h-3.5 text-[#F37021] rounded border-slate-300 focus:ring-[#F37021]"
                       />
                       <span>{banner.isActive ? 'Active' : 'Disabled'}</span>
                     </label>
@@ -336,7 +336,7 @@ export default function AdminBannersPage() {
                       type="button"
                       onClick={() => handleSaveBanner(banner)}
                       disabled={savingSlot === banner.slot}
-                      className="h-8 px-3.5 bg-[#89591C] hover:bg-[#724816] disabled:opacity-60 text-white text-xs font-semibold rounded-md flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="h-8 px-3.5 bg-[#F37021] hover:bg-[#D95B10] disabled:opacity-60 text-white text-xs font-semibold rounded-md flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Save className="w-3.5 h-3.5" />
                       <span>{savingSlot === banner.slot ? 'Saving...' : 'Save'}</span>
@@ -355,7 +355,7 @@ export default function AdminBannersPage() {
                       <span className="text-[10px] text-slate-400 font-mono">Target Ratio: {banner.aspectRatio || '16/9'}</span>
                     </div>
 
-                    <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-[#faf8f5] border border-[#e8e2d8] shadow-2xs group">
+                    <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-[#F7F7F7] border border-[#E5E5E5] shadow-2xs group">
                       {bannerImgUrl ? (
                         <Image
                           src={bannerImgUrl}
@@ -390,7 +390,7 @@ export default function AdminBannersPage() {
                     </div>
 
                     {uploadingField === `${banner.slot}-imageUrl` && (
-                      <div className="text-xs text-[#89591C] font-semibold flex items-center gap-1.5 animate-pulse">
+                      <div className="text-xs text-[#F37021] font-semibold flex items-center gap-1.5 animate-pulse">
                         <Upload className="w-3.5 h-3.5 animate-spin" /> Uploading to Cloudinary CDN...
                       </div>
                     )}
@@ -402,7 +402,7 @@ export default function AdminBannersPage() {
                         value={banner.imageUrl || ''}
                         onChange={(e) => handleFieldChange(banner.slot, 'imageUrl', e.target.value)}
                         placeholder="https://res.cloudinary.com/... or /images/banner.webp"
-                        className="w-full px-3 py-1.5 text-xs rounded-md border border-[#e8e2d8] focus:outline-none focus:border-[#89591C] bg-[#faf8f5]"
+                        className="w-full px-3 py-1.5 text-xs rounded-md border border-[#E5E5E5] focus:outline-none focus:border-[#F37021] bg-[#F7F7F7]"
                       />
                     </div>
                   </div>
@@ -418,7 +418,7 @@ export default function AdminBannersPage() {
                         value={banner.title || ''}
                         onChange={(e) => handleFieldChange(banner.slot, 'title', e.target.value)}
                         placeholder="e.g. Step Better. Feel the Comfort."
-                        className="w-full px-3 py-2 rounded-md border border-[#e8e2d8] text-xs text-slate-800 focus:outline-none focus:border-[#89591C] bg-[#faf8f5]"
+                        className="w-full px-3 py-2 rounded-md border border-[#E5E5E5] text-xs text-slate-800 focus:outline-none focus:border-[#F37021] bg-[#F7F7F7]"
                       />
                     </div>
 
@@ -431,7 +431,7 @@ export default function AdminBannersPage() {
                         value={banner.subtitle || ''}
                         onChange={(e) => handleFieldChange(banner.slot, 'subtitle', e.target.value)}
                         placeholder="e.g. Quality Sandals for Every Family Moment"
-                        className="w-full px-3 py-2 rounded-md border border-[#e8e2d8] text-xs text-slate-800 focus:outline-none focus:border-[#89591C] bg-[#faf8f5]"
+                        className="w-full px-3 py-2 rounded-md border border-[#E5E5E5] text-xs text-slate-800 focus:outline-none focus:border-[#F37021] bg-[#F7F7F7]"
                       />
                     </div>
 
@@ -445,7 +445,7 @@ export default function AdminBannersPage() {
                           value={banner.linkUrl || ''}
                           onChange={(e) => handleFieldChange(banner.slot, 'linkUrl', e.target.value)}
                           placeholder="e.g. /products or /category/men"
-                          className="w-full pl-3 pr-8 py-2 rounded-md border border-[#e8e2d8] text-xs text-slate-800 focus:outline-none focus:border-[#89591C] bg-[#faf8f5]"
+                          className="w-full pl-3 pr-8 py-2 rounded-md border border-[#E5E5E5] text-xs text-slate-800 focus:outline-none focus:border-[#F37021] bg-[#F7F7F7]"
                         />
                         <ExternalLink className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
                       </div>

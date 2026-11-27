@@ -10,7 +10,7 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     delivered: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     paid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    shipped: 'bg-[#faf4ec] text-[#89591C] border-[#e8e2d8]',
+    shipped: 'bg-[#FFF3EB] text-[#F37021] border-[#E5E5E5]',
     processing: 'bg-amber-50 text-amber-700 border-amber-200',
     pending: 'bg-amber-50 text-amber-700 border-amber-200',
     unpaid: 'bg-amber-50 text-amber-700 border-amber-200',

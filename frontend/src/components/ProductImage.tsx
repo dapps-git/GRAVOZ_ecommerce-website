@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { optimizeCloudinaryUrl, isDirectCdnUrl } from '@/lib/cloudinaryUrl';
 
 interface ProductImageProps {
   src?: string | null;
@@ -12,6 +13,9 @@ interface ProductImageProps {
   className?: string;
   sizes?: string;
   priority?: boolean;
+  loading?: 'lazy' | 'eager';
+  optimizeWidth?: number;
+  onLoad?: () => void;
 }
 
 export function normalizeImageUrl(src?: string | null): string {
@@ -43,12 +47,16 @@ export default function ProductImage({
   className = '',
   sizes,
   priority = false,
+  loading,
+  optimizeWidth = 500,
+  onLoad,
 }: ProductImageProps) {
   const [hasError, setHasError] = useState(false);
 
   const normalized = normalizeImageUrl(src);
   const isInvalid = hasError || !normalized || normalized === '/products/placeholder.svg';
-  const cleanSrc = isInvalid ? '/products/placeholder.svg' : normalized;
+  const rawSrc = isInvalid ? '/products/placeholder.svg' : normalized;
+  const cleanSrc = isInvalid ? '/products/placeholder.svg' : optimizeCloudinaryUrl(rawSrc, width || optimizeWidth);
   const isSvgOrData = cleanSrc.startsWith('data:') || cleanSrc.endsWith('.svg');
   
   const isAllowedOptimizedHost = (() => {
@@ -70,7 +78,7 @@ export default function ProductImage({
     }
   })();
 
-  const isUnoptimized = isSvgOrData || !isAllowedOptimizedHost;
+  const isUnoptimized = isSvgOrData || isDirectCdnUrl(cleanSrc) || !isAllowedOptimizedHost;
 
   return (
     <Image
@@ -81,7 +89,9 @@ export default function ProductImage({
       fill={fill}
       sizes={sizes}
       priority={priority}
+      loading={priority ? undefined : loading}
       unoptimized={isUnoptimized}
+      onLoad={onLoad}
       onError={() => setHasError(true)}
       className={className}
     />

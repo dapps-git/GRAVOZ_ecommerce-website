@@ -35,13 +35,13 @@ export default function BrandsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF7F3] text-[#111111] flex flex-col justify-between font-poppins">
+    <div className="min-h-screen bg-[#F7F7F7] text-[#111111] flex flex-col justify-between font-poppins">
       <Header />
 
       <main className="flex-1 max-w-[1240px] w-full mx-auto px-4 sm:px-6 md:px-10 py-10 sm:py-16 space-y-12">
         {/* Hero Section */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F6E9D7] border border-[#E5D2BA] text-[#8A5B2A] text-xs font-semibold tracking-wider uppercase">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFF3EB] border border-[#FAD4BC] text-[#F37021] text-xs font-semibold tracking-wider uppercase">
             <Sparkles className="w-3.5 h-3.5" />
             <span>SERCHER ATELIER</span>
           </div>
@@ -58,17 +58,17 @@ export default function BrandsPage() {
           {brandHighlights.map((brand, idx) => (
             <div
               key={idx}
-              className="bg-white border border-[#E5E1DC] p-6 sm:p-8 flex flex-col justify-between hover:border-[#8A5B2A] hover:shadow-lg transition-all group"
+              className="bg-white border border-[#E5E5E5] p-6 sm:p-8 flex flex-col justify-between hover:border-[#F37021] hover:shadow-lg transition-all group"
             >
               <div className="space-y-4">
-                <span className="inline-block px-2.5 py-0.5 bg-[#FAF7F3] border border-[#E5E1DC] text-[#8A5B2A] text-[10px] font-bold tracking-wider">
+                <span className="inline-block px-2.5 py-0.5 bg-[#F7F7F7] border border-[#E5E5E5] text-[#F37021] text-[10px] font-bold tracking-wider">
                   {brand.tag}
                 </span>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-[#111111] group-hover:text-[#8A5B2A] transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold text-[#111111] group-hover:text-[#F37021] transition-colors">
                     {brand.name}
                   </h3>
-                  <p className="text-xs font-semibold text-[#8A5B2A] mt-1">
+                  <p className="text-xs font-semibold text-[#F37021] mt-1">
                     {brand.tagline}
                   </p>
                 </div>
@@ -77,10 +77,10 @@ export default function BrandsPage() {
                 </p>
               </div>
 
-              <div className="pt-6 mt-6 border-t border-[#F0ECE5]">
+              <div className="pt-6 mt-6 border-t border-[#EEEEEE]">
                 <Link
                   href={brand.href}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-[#8A5B2A] hover:text-[#68421A] transition-colors"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-[#F37021] hover:text-[#D95B10] transition-colors"
                 >
                   <span>Explore Collection</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -91,9 +91,9 @@ export default function BrandsPage() {
         </div>
 
         {/* Craftsmanship Guarantee */}
-        <div className="bg-white border border-[#E5E1DC] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="bg-white border border-[#E5E5E5] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-[#FAF7F3] border border-[#E5D2BA] flex items-center justify-center text-[#8A5B2A] flex-shrink-0">
+            <div className="w-12 h-12 bg-[#F7F7F7] border border-[#FAD4BC] flex items-center justify-center text-[#F37021] flex-shrink-0">
               <Award className="w-6 h-6" />
             </div>
             <div>
@@ -103,7 +103,7 @@ export default function BrandsPage() {
           </div>
           <Link
             href="/products"
-            className="w-full sm:w-auto px-6 py-3 bg-[#8A5B2A] hover:bg-[#68421A] text-white text-xs font-bold uppercase tracking-wider text-center transition-colors flex-shrink-0"
+            className="w-full sm:w-auto px-6 py-3 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold uppercase tracking-wider text-center transition-colors flex-shrink-0"
           >
             Browse All Footwear
           </Link>

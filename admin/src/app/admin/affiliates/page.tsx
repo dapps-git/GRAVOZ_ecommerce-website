@@ -276,10 +276,10 @@ export default function AdminAffiliatesPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* ── Top Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-[#e8e2d8] shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-xl border border-[#E5E5E5] shadow-xs">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-lg bg-[#89591C]/10 flex items-center justify-center text-[#89591C]">
+            <div className="w-10 h-10 rounded-lg bg-[#F37021]/10 flex items-center justify-center text-[#F37021]">
               <Award className="w-5 h-5" />
             </div>
             <div>
@@ -297,7 +297,7 @@ export default function AdminAffiliatesPage() {
             type="button"
             onClick={fetchAffiliates}
             disabled={loading}
-            className="p-2.5 rounded-lg border border-[#e8e2d8] hover:bg-[#FAF7F3] text-slate-600 transition-colors disabled:opacity-50"
+            className="p-2.5 rounded-lg border border-[#E5E5E5] hover:bg-[#F7F7F7] text-slate-600 transition-colors disabled:opacity-50"
             title="Refresh data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -305,7 +305,7 @@ export default function AdminAffiliatesPage() {
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#89591C] hover:bg-[#724814] text-white text-sm font-medium transition-all shadow-xs"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#F37021] hover:bg-[#D95B10] text-white text-sm font-medium transition-all shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Add Influencer</span>
@@ -315,16 +315,16 @@ export default function AdminAffiliatesPage() {
 
       {/* ── Metric Cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-xl border border-[#e8e2d8] shadow-xs">
+        <div className="bg-white p-4 rounded-xl border border-[#E5E5E5] shadow-xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-xs font-medium uppercase tracking-wider">Total Influencers</span>
-            <Award className="w-4 h-4 text-[#89591C]" />
+            <Award className="w-4 h-4 text-[#F37021]" />
           </div>
           <div className="text-2xl font-bold text-slate-800">{stats?.totalInfluencers ?? 0}</div>
           <div className="text-[11px] text-slate-400 mt-1">Active affiliate partners</div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-[#e8e2d8] shadow-xs">
+        <div className="bg-white p-4 rounded-xl border border-[#E5E5E5] shadow-xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-xs font-medium uppercase tracking-wider">Associated Customers</span>
             <Users className="w-4 h-4 text-blue-600" />
@@ -333,7 +333,7 @@ export default function AdminAffiliatesPage() {
           <div className="text-[11px] text-slate-400 mt-1">Customers assigned via links</div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-[#e8e2d8] shadow-xs">
+        <div className="bg-white p-4 rounded-xl border border-[#E5E5E5] shadow-xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-xs font-medium uppercase tracking-wider">Affiliate Orders</span>
             <ShoppingCart className="w-4 h-4 text-emerald-600" />
@@ -342,7 +342,7 @@ export default function AdminAffiliatesPage() {
           <div className="text-[11px] text-slate-400 mt-1">Total attributed purchases</div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-[#e8e2d8] shadow-xs">
+        <div className="bg-white p-4 rounded-xl border border-[#E5E5E5] shadow-xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-xs font-medium uppercase tracking-wider">Total Sales</span>
             <IndianRupee className="w-4 h-4 text-violet-600" />
@@ -389,7 +389,7 @@ export default function AdminAffiliatesPage() {
       </div>
 
       {/* ── Filters & Search ── */}
-      <div className="bg-white p-4 rounded-xl border border-[#e8e2d8] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+      <div className="bg-white p-4 rounded-xl border border-[#E5E5E5] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
@@ -397,7 +397,7 @@ export default function AdminAffiliatesPage() {
             placeholder="Search by name, code, or ObjectId..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#e8e2d8] text-sm focus:outline-hidden focus:border-[#89591C] bg-[#FAF7F3]/40"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#E5E5E5] text-sm focus:outline-hidden focus:border-[#F37021] bg-[#F7F7F7]/40"
           />
         </div>
 
@@ -406,7 +406,7 @@ export default function AdminAffiliatesPage() {
           <select
             value={statusFilter}
             onChange={(e: any) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm bg-white focus:outline-hidden focus:border-[#89591C]"
+            className="px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm bg-white focus:outline-hidden focus:border-[#F37021]"
           >
             <option value="all">All Influencers</option>
             <option value="active">Active Only</option>
@@ -416,10 +416,10 @@ export default function AdminAffiliatesPage() {
       </div>
 
       {/* ── Influencers Table ── */}
-      <div className="bg-white rounded-xl border border-[#e8e2d8] overflow-hidden shadow-xs">
+      <div className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-700">
-            <thead className="bg-[#FAF7F3] text-[11px] uppercase tracking-wider text-slate-500 border-b border-[#e8e2d8]">
+            <thead className="bg-[#F7F7F7] text-[11px] uppercase tracking-wider text-slate-500 border-b border-[#E5E5E5]">
               <tr>
                 <th className="py-3 px-4 font-semibold">Influencer Name & ID</th>
                 <th className="py-3 px-4 font-semibold">Affiliate Code</th>
@@ -433,11 +433,11 @@ export default function AdminAffiliatesPage() {
                 <th className="py-3 px-4 font-semibold text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e8e2d8]">
+            <tbody className="divide-y divide-[#E5E5E5]">
               {loading ? (
                 <tr>
                   <td colSpan={10} className="py-12 text-center text-slate-400 text-sm">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#89591C] mb-2" />
+                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#F37021] mb-2" />
                     Loading affiliate influencers...
                   </td>
                 </tr>
@@ -451,12 +451,12 @@ export default function AdminAffiliatesPage() {
                 filteredInfluencers.map((inf) => (
                   <tr
                     key={inf._id}
-                    className="hover:bg-[#FAF7F3]/60 transition-colors cursor-pointer group"
+                    className="hover:bg-[#F7F7F7]/60 transition-colors cursor-pointer group"
                     onClick={() => openInfluencerDetails(inf._id)}
                   >
                     {/* Name & ID */}
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-slate-800 group-hover:text-[#89591C] transition-colors">
+                      <div className="font-semibold text-slate-800 group-hover:text-[#F37021] transition-colors">
                         {inf.name}
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
@@ -483,7 +483,7 @@ export default function AdminAffiliatesPage() {
 
                     {/* Code */}
                     <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FAF7F3] border border-[#e8e2d8] text-xs font-mono font-medium text-[#89591C]">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] text-xs font-mono font-medium text-[#F37021]">
                         {inf.affiliateCode}
                       </span>
                     </td>
@@ -500,7 +500,7 @@ export default function AdminAffiliatesPage() {
                         <button
                           type="button"
                           onClick={() => handleCopy(sanitizeLink(inf.affiliateLink), `link-${inf._id}`)}
-                          className="px-2.5 py-1 text-xs rounded bg-[#89591C]/10 hover:bg-[#89591C] text-[#89591C] hover:text-white transition-all flex items-center gap-1 flex-shrink-0"
+                          className="px-2.5 py-1 text-xs rounded bg-[#F37021]/10 hover:bg-[#F37021] text-[#F37021] hover:text-white transition-all flex items-center gap-1 flex-shrink-0"
                           title="Copy Full Affiliate Link"
                         >
                           {copiedId === `link-${inf._id}` ? (
@@ -576,7 +576,7 @@ export default function AdminAffiliatesPage() {
                       <button
                         type="button"
                         onClick={() => openInfluencerDetails(inf._id)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#89591C] text-[#89591C] hover:bg-[#89591C] hover:text-white transition-all text-xs font-medium"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#F37021] text-[#F37021] hover:bg-[#F37021] hover:text-white transition-all text-xs font-medium"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>View Orders</span>
@@ -593,7 +593,7 @@ export default function AdminAffiliatesPage() {
       {/* ── Add Influencer Modal ── */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-[#e8e2d8] max-w-lg w-full p-6 shadow-xl relative animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl border border-[#E5E5E5] max-w-lg w-full p-6 shadow-xl relative animate-in fade-in duration-200">
             <button
               type="button"
               onClick={() => setShowAddModal(false)}
@@ -603,7 +603,7 @@ export default function AdminAffiliatesPage() {
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-lg bg-[#89591C]/10 flex items-center justify-center text-[#89591C]">
+              <div className="w-9 h-9 rounded-lg bg-[#F37021]/10 flex items-center justify-center text-[#F37021]">
                 <Award className="w-5 h-5" />
               </div>
               <div>
@@ -632,7 +632,7 @@ export default function AdminAffiliatesPage() {
                   placeholder="e.g. Aisha"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm focus:outline-hidden focus:border-[#89591C]"
+                  className="w-full px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm focus:outline-hidden focus:border-[#F37021]"
                 />
               </div>
 
@@ -646,7 +646,7 @@ export default function AdminAffiliatesPage() {
                     placeholder="e.g. AISHA10"
                     value={formData.affiliateCode}
                     onChange={(e) => setFormData({ ...formData, affiliateCode: e.target.value.toUpperCase() })}
-                    className="w-full px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm uppercase font-mono focus:outline-hidden focus:border-[#89591C]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm uppercase font-mono focus:outline-hidden focus:border-[#F37021]"
                   />
                   <span className="text-[10px] text-slate-400 mt-0.5 block">Auto-generated if blank</span>
                 </div>
@@ -656,7 +656,7 @@ export default function AdminAffiliatesPage() {
                   <select
                     value={formData.status}
                     onChange={(e: any) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm bg-white focus:outline-hidden focus:border-[#89591C]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm bg-white focus:outline-hidden focus:border-[#F37021]"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -672,7 +672,7 @@ export default function AdminAffiliatesPage() {
                   <select
                     value={formData.commissionType}
                     onChange={(e: any) => setFormData({ ...formData, commissionType: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm bg-white focus:outline-hidden focus:border-[#89591C]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm bg-white focus:outline-hidden focus:border-[#F37021]"
                   >
                     <option value="percentage">Percentage (%)</option>
                     <option value="fixed">Fixed Amount (₹)</option>
@@ -689,7 +689,7 @@ export default function AdminAffiliatesPage() {
                     step="0.5"
                     value={formData.commissionValue}
                     onChange={(e) => setFormData({ ...formData, commissionValue: Number(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm focus:outline-hidden focus:border-[#89591C]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm focus:outline-hidden focus:border-[#F37021]"
                   />
                   <span className="text-[10px] text-slate-400 mt-0.5 block">Default: 5%</span>
                 </div>
@@ -705,7 +705,7 @@ export default function AdminAffiliatesPage() {
                     placeholder="influencer@gmail.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm focus:outline-hidden focus:border-[#89591C]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm focus:outline-hidden focus:border-[#F37021]"
                   />
                 </div>
 
@@ -718,7 +718,7 @@ export default function AdminAffiliatesPage() {
                     placeholder="+91..."
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg border border-[#e8e2d8] text-sm focus:outline-hidden focus:border-[#89591C]"
+                    className="w-full px-3 py-2 rounded-lg border border-[#E5E5E5] text-sm focus:outline-hidden focus:border-[#F37021]"
                   />
                 </div>
               </div>
@@ -727,14 +727,14 @@ export default function AdminAffiliatesPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-lg border border-[#e8e2d8] text-slate-700 hover:bg-slate-50 text-sm font-medium transition-colors"
+                  className="px-4 py-2 rounded-lg border border-[#E5E5E5] text-slate-700 hover:bg-slate-50 text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-lg bg-[#89591C] hover:bg-[#724814] text-white text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2 rounded-lg bg-[#F37021] hover:bg-[#D95B10] text-white text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {submitting && <RefreshCw className="w-4 h-4 animate-spin" />}
                   <span>Save Influencer</span>
@@ -748,11 +748,11 @@ export default function AdminAffiliatesPage() {
       {/* ── Influencer Details & Associated Customers/Orders Drawer ── */}
       {selectedInfluencerId && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs">
-          <div className="bg-white w-full max-w-4xl h-full shadow-2xl flex flex-col border-l border-[#e8e2d8] animate-in slide-in-from-right duration-200">
+          <div className="bg-white w-full max-w-4xl h-full shadow-2xl flex flex-col border-l border-[#E5E5E5] animate-in slide-in-from-right duration-200">
             {/* Drawer Header */}
-            <div className="p-5 border-b border-[#e8e2d8] flex items-center justify-between bg-[#FAF7F3]">
+            <div className="p-5 border-b border-[#E5E5E5] flex items-center justify-between bg-[#F7F7F7]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#89591C] text-white flex items-center justify-center font-bold text-lg">
+                <div className="w-10 h-10 rounded-lg bg-[#F37021] text-white flex items-center justify-center font-bold text-lg">
                   {detailData?.influencer?.name?.charAt(0) || 'I'}
                 </div>
                 <div>
@@ -797,16 +797,16 @@ export default function AdminAffiliatesPage() {
 
             {/* Affiliate Link Banner inside Drawer */}
             {detailData && (
-              <div className="p-4 bg-[#89591C]/5 border-b border-[#e8e2d8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="p-4 bg-[#F37021]/5 border-b border-[#E5E5E5] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <LinkIcon className="w-4 h-4 text-[#89591C] shrink-0" />
+                  <LinkIcon className="w-4 h-4 text-[#F37021] shrink-0" />
                   <span className="font-semibold text-slate-700 whitespace-nowrap">Affiliate URL:</span>
                   <span className="font-mono text-slate-600 truncate select-all">{sanitizeLink(detailData.influencer.affiliateLink)}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleCopy(sanitizeLink(detailData.influencer.affiliateLink), 'drawer-link')}
-                  className="px-3 py-1.5 rounded bg-[#89591C] hover:bg-[#724814] text-white text-xs font-medium flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
+                  className="px-3 py-1.5 rounded bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-medium flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
                 >
                   {copiedId === 'drawer-link' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedId === 'drawer-link' ? 'Copied' : 'Copy Full URL'}</span>
@@ -816,7 +816,7 @@ export default function AdminAffiliatesPage() {
 
             {/* Influencer Quick Stats */}
             {detailData && (
-              <div className="grid grid-cols-4 border-b border-[#e8e2d8] bg-white text-center text-xs divide-x divide-[#e8e2d8]">
+              <div className="grid grid-cols-4 border-b border-[#E5E5E5] bg-white text-center text-xs divide-x divide-[#E5E5E5]">
                 <div className="p-3">
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Customers</span>
                   <span className="text-base font-bold text-slate-800">{detailData.stats.totalCustomers}</span>
@@ -831,7 +831,7 @@ export default function AdminAffiliatesPage() {
                 </div>
                 <div className="p-3">
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Commission Rate</span>
-                  <span className="text-base font-bold text-[#89591C]">
+                  <span className="text-base font-bold text-[#F37021]">
                     {detailData.influencer.commissionType === 'fixed'
                       ? `₹${detailData.influencer.commissionValue}`
                       : `${detailData.influencer.commissionValue}%`}
@@ -841,13 +841,13 @@ export default function AdminAffiliatesPage() {
             )}
 
             {/* Navigation Tabs */}
-            <div className="flex items-center gap-2 px-5 pt-3 border-b border-[#e8e2d8] bg-white">
+            <div className="flex items-center gap-2 px-5 pt-3 border-b border-[#E5E5E5] bg-white">
               <button
                 type="button"
                 onClick={() => setActiveTab('customers')}
                 className={`pb-2.5 px-3 text-sm font-semibold transition-all relative ${
                   activeTab === 'customers'
-                    ? 'text-[#89591C] border-b-2 border-[#89591C]'
+                    ? 'text-[#F37021] border-b-2 border-[#F37021]'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -858,7 +858,7 @@ export default function AdminAffiliatesPage() {
                 onClick={() => setActiveTab('orders')}
                 className={`pb-2.5 px-3 text-sm font-semibold transition-all relative ${
                   activeTab === 'orders'
-                    ? 'text-[#89591C] border-b-2 border-[#89591C]'
+                    ? 'text-[#F37021] border-b-2 border-[#F37021]'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -870,7 +870,7 @@ export default function AdminAffiliatesPage() {
             <div className="flex-1 overflow-y-auto p-5">
               {detailLoading ? (
                 <div className="py-16 text-center text-slate-400">
-                  <RefreshCw className="w-7 h-7 animate-spin mx-auto text-[#89591C] mb-2" />
+                  <RefreshCw className="w-7 h-7 animate-spin mx-auto text-[#F37021] mb-2" />
                   Loading influencer customer & order breakdown...
                 </div>
               ) : activeTab === 'customers' ? (
@@ -881,9 +881,9 @@ export default function AdminAffiliatesPage() {
                       No customers have been attributed to this influencer yet.
                     </div>
                   ) : (
-                    <div className="border border-[#e8e2d8] rounded-xl overflow-hidden shadow-xs">
+                    <div className="border border-[#E5E5E5] rounded-xl overflow-hidden shadow-xs">
                       <table className="w-full text-left text-xs text-slate-700">
-                        <thead className="bg-[#FAF7F3] text-[10px] uppercase text-slate-500 border-b border-[#e8e2d8]">
+                        <thead className="bg-[#F7F7F7] text-[10px] uppercase text-slate-500 border-b border-[#E5E5E5]">
                           <tr>
                             <th className="py-2.5 px-3 font-semibold">Customer</th>
                             <th className="py-2.5 px-3 font-semibold">Contact</th>
@@ -893,7 +893,7 @@ export default function AdminAffiliatesPage() {
                             <th className="py-2.5 px-3 font-semibold text-right">Total Spent</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#e8e2d8]">
+                        <tbody className="divide-y divide-[#E5E5E5]">
                           {detailData.customers.map((c) => (
                             <tr key={c._id} className="hover:bg-slate-50">
                               <td className="py-2.5 px-3 font-medium text-slate-800">{c.name}</td>
@@ -942,7 +942,7 @@ export default function AdminAffiliatesPage() {
                         return (
                           <div
                             key={ord._id}
-                            className="bg-white p-4 rounded-xl border border-[#e8e2d8] shadow-2xs hover:border-[#89591C]/30 transition-all text-xs"
+                            className="bg-white p-4 rounded-xl border border-[#E5E5E5] shadow-2xs hover:border-[#F37021]/30 transition-all text-xs"
                           >
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
                               <div className="flex items-center gap-2">
@@ -994,7 +994,7 @@ export default function AdminAffiliatesPage() {
                               </div>
                               <div>
                                 <span className="text-[10px] text-slate-400 block uppercase">Commission Earned</span>
-                                <span className="font-bold text-[#89591C] text-sm">₹{commAmount}</span>
+                                <span className="font-bold text-[#F37021] text-sm">₹{commAmount}</span>
                                 <span className="block text-[10px] text-slate-400">
                                   Rate: {ord.commissionRate || detailData.influencer.commissionValue}%
                                 </span>

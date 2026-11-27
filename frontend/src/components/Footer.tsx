@@ -14,7 +14,7 @@ export default function Footer() {
           <div className="space-y-3.5 max-w-sm">
             <div className="relative h-8 w-36">
               <Image
-                src="/sercher-logo.png"
+                src="/sercher-brand-logo.png"
                 alt="SERCHER Official Logo"
                 fill
                 className="object-contain object-left"
@@ -32,9 +32,7 @@ export default function Footer() {
               SHOP
             </h5>
             <ul className="space-y-2 font-sansation text-xs text-slate-600">
-              <li><Link href="/category/men" className="hover:text-[#89591C] transition-colors">Men Shoes</Link></li>
-              <li><Link href="/category/women" className="hover:text-[#89591C] transition-colors">Women Shoes</Link></li>
-              <li><Link href="/category/unisex" className="hover:text-[#89591C] transition-colors">Unisex</Link></li>
+              <li><Link href="/category/men" className="hover:text-[#F37021] transition-colors">Men Shoes</Link></li>
             </ul>
           </div>
 
@@ -86,7 +84,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright & Payment Badges */}
-        <div className="mt-8 pt-6 border-t border-[#f0ece5] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-sansation">
+        <div className="mt-8 pt-6 border-t border-[#EEEEEE] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-sansation">
           <p>© {new Date().getFullYear()} SERCHER. All Rights Reserved.</p>
 
         <p className="mt-2 text-xs opacity-75 text-center">

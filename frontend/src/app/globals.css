@@ -9,16 +9,16 @@
   --font-playfair: 'Playfair Display', Georgia, serif;
 
   /* 🎨 Color System */
-  --color-primary: #8A5B2A;
-  --color-primary-hover: #68421A;
-  --color-primary-light: #F6E9D7;
-  --color-background: #FAF7F3;
+  --color-primary: #F37021;
+  --color-primary-hover: #D95B10;
+  --color-primary-light: #FFF3EB;
+  --color-background: #F7F7F7;
   --color-surface: #FFFFFF;
   --color-text-primary: #111111;
   --color-text-secondary: #555555;
   --color-text-muted: #888888;
   --color-text-light: #B6B6B6;
-  --color-border: #E5E1DC;
+  --color-border: #E5E5E5;
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
@@ -48,7 +48,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: #FAF7F3;
+  background-color: #F7F7F7;
   color: #111111;
   font-family: var(--font-poppins);
   box-sizing: border-box;
@@ -155,7 +155,7 @@ a {
 
 /* ── Style Guide Buttons ── */
 .btn-primary {
-  background-color: #8A5B2A;
+  background-color: #F37021;
   color: #FFFFFF;
   font-size: 14px;
   line-height: 20px;
@@ -165,13 +165,13 @@ a {
 }
 
 .btn-primary:hover {
-  background-color: #68421A;
+  background-color: #D95B10;
 }
 
 .btn-outline {
   background-color: transparent;
-  color: #8A5B2A;
-  border: 1px solid #8A5B2A;
+  color: #F37021;
+  border: 1px solid #F37021;
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
@@ -180,7 +180,7 @@ a {
 }
 
 .btn-outline:hover {
-  background-color: rgba(246, 233, 215, 0.4);
+  background-color: rgba(243, 112, 33, 0.08);
 }
 
 @keyframes marquee {

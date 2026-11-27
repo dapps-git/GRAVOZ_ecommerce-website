@@ -302,7 +302,7 @@ export default function StockPage() {
           </button>
           <Link
             href="/admin/products/new"
-            className="h-9 px-4 rounded-md bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
+            className="h-9 px-4 rounded-md bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Product</span>
@@ -313,19 +313,19 @@ export default function StockPage() {
       {/* ── 5 Metric KPI Cards (Matches Figma Stock Management) ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* Total Products */}
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Total Products</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stockStats.totalProducts}</span>
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">All products</span>
           </div>
-          <div className="w-10 h-10 rounded-md bg-[#faf4ec] text-[#89591C] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-md bg-[#FFF3EB] text-[#F37021] flex items-center justify-center">
             <Package className="w-5 h-5 stroke-[1.75]" />
           </div>
         </div>
 
         {/* Total Stock Units */}
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Total Stock Units</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stockStats.totalUnits}</span>
@@ -337,7 +337,7 @@ export default function StockPage() {
         </div>
 
         {/* Low Stock Items */}
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Low Stock</span>
             <span className="text-2xl font-bold text-orange-600 mt-1 block">{stockStats.lowStock}</span>
@@ -349,7 +349,7 @@ export default function StockPage() {
         </div>
 
         {/* Out of Stock */}
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Out of Stock</span>
             <span className="text-2xl font-bold text-rose-600 mt-1 block">{stockStats.outOfStock}</span>
@@ -361,7 +361,7 @@ export default function StockPage() {
         </div>
 
         {/* Stock Value */}
-        <div className="bg-white rounded-lg border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-lg border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Stock Value</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">
@@ -369,14 +369,14 @@ export default function StockPage() {
             </span>
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Estimated total</span>
           </div>
-          <div className="w-10 h-10 rounded-md bg-[#faf4ec] text-[#89591C] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-md bg-[#FFF3EB] text-[#F37021] flex items-center justify-center">
             <TrendingUp className="w-5 h-5 stroke-[1.75]" />
           </div>
         </div>
       </div>
 
       {/* ── Filter / Search Bar ── */}
-      <div className="bg-white rounded-lg border border-[#e8e2d8] p-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
+      <div className="bg-white rounded-lg border border-[#E5E5E5] p-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
         <div className="flex-1 relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -387,7 +387,7 @@ export default function StockPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-md focus:outline-none focus:border-[#89591C] placeholder:text-slate-400"
+            className="w-full pl-9 pr-4 py-2 text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-md focus:outline-none focus:border-[#F37021] placeholder:text-slate-400"
           />
         </div>
 
@@ -399,7 +399,7 @@ export default function StockPage() {
               setSelectedStockStatus(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-8.5 px-3 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-md text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="h-8.5 px-3 text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-md text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">All Stock Status</option>
             <option value="in_stock">In Stock (&gt;10)</option>
@@ -414,7 +414,7 @@ export default function StockPage() {
               setSelectedCategory(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-8.5 px-3 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-md text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="h-8.5 px-3 text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-md text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">All Categories</option>
             {categories.map((c) => (
@@ -431,7 +431,7 @@ export default function StockPage() {
               setSelectedBrand(e.target.value);
               setCurrentPage(1);
             }}
-            className="h-8.5 px-3 text-xs bg-[#faf8f5] border border-[#e8e2d8] rounded-md text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="h-8.5 px-3 text-xs bg-[#F7F7F7] border border-[#E5E5E5] rounded-md text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">All Brands</option>
             {brands.map((b) => (
@@ -444,7 +444,7 @@ export default function StockPage() {
           <button
             type="button"
             onClick={resetFilters}
-            className="px-3 py-1.5 rounded-md text-xs font-semibold text-[#89591C] hover:bg-[#faf4ec] transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-md text-xs font-semibold text-[#F37021] hover:bg-[#FFF3EB] transition-colors cursor-pointer"
           >
             Reset
           </button>
@@ -452,11 +452,11 @@ export default function StockPage() {
       </div>
 
       {/* ── Stock Inventory Table (Matches Figma + Quick +/- / Out of Stock Actions) ── */}
-      <div className="bg-white rounded-lg border border-[#e8e2d8] overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-lg border border-[#E5E5E5] overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#ece7de] bg-[#faf8f5] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+              <tr className="border-b border-[#E5E5E5] bg-[#F7F7F7] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                 <th className="py-3.5 pl-4 pr-3">Product</th>
                 <th className="py-3.5 px-3">SKU</th>
                 <th className="py-3.5 px-3">Category</th>
@@ -469,7 +469,7 @@ export default function StockPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-[#f0eae1] text-xs">
+            <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
                 <tr>
                   <td colSpan={9} className="py-12 text-center text-slate-400 font-medium">
@@ -512,11 +512,11 @@ export default function StockPage() {
 
                   return (
                     <React.Fragment key={p._id}>
-                      <tr className="hover:bg-[#faf8f5]/80 transition-colors">
+                      <tr className="hover:bg-[#F7F7F7]/80 transition-colors">
                         {/* Product Thumbnail + Name */}
                         <td className="py-3 pl-4 pr-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-md bg-[#faf8f5] border border-[#e8e2d8] overflow-hidden relative flex-shrink-0 flex items-center justify-center">
+                            <div className="w-11 h-11 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] overflow-hidden relative flex-shrink-0 flex items-center justify-center">
                               <Image
                                 src={validImg}
                                 alt={p.name}
@@ -552,7 +552,7 @@ export default function StockPage() {
                           <button
                             type="button"
                             onClick={() => toggleRowExpanded(p._id)}
-                            className="flex items-center gap-1.5 p-1 rounded-md hover:bg-[#faf4ec] text-left transition-colors cursor-pointer group"
+                            className="flex items-center gap-1.5 p-1 rounded-md hover:bg-[#FFF3EB] text-left transition-colors cursor-pointer group"
                             title="Click to view and edit stock per color variant"
                           >
                             <div className="flex items-center gap-1">
@@ -568,7 +568,7 @@ export default function StockPage() {
                                 <span className="text-[10px] text-slate-400 font-medium">+{variantCount - 3}</span>
                               )}
                             </div>
-                            <span className="text-[10px] text-[#89591C] font-semibold flex items-center gap-0.5 ml-1 group-hover:underline">
+                            <span className="text-[10px] text-[#F37021] font-semibold flex items-center gap-0.5 ml-1 group-hover:underline">
                               Colors
                               {expandedProductIds.includes(p._id) ? (
                                 <ChevronUp className="w-3 h-3" />
@@ -588,7 +588,7 @@ export default function StockPage() {
                               onClick={() => handleQuickStockChange(p._id, (p.stock || 0) - 1)}
                               disabled={(p.stock || 0) <= 0 || isUpdating}
                               title="Decrease stock by 1"
-                              className="w-6 h-6 rounded-md bg-[#faf8f5] border border-[#e8e2d8] hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-slate-700 transition-colors cursor-pointer active:scale-95"
+                              className="w-6 h-6 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-slate-700 transition-colors cursor-pointer active:scale-95"
                             >
                               <Minus className="w-3 h-3" />
                             </button>
@@ -605,12 +605,12 @@ export default function StockPage() {
                                     if (e.key === 'Enter') saveInlineStock(p._id);
                                     if (e.key === 'Escape') setEditingStockId(null);
                                   }}
-                                  className="w-14 px-1.5 py-0.5 text-xs font-bold text-center border border-[#89591C] rounded-md bg-white focus:outline-none"
+                                  className="w-14 px-1.5 py-0.5 text-xs font-bold text-center border border-[#F37021] rounded-md bg-white focus:outline-none"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => saveInlineStock(p._id)}
-                                  className="p-1 rounded-md bg-[#89591C] text-white hover:bg-[#724816]"
+                                  className="p-1 rounded-md bg-[#F37021] text-white hover:bg-[#D95B10]"
                                 >
                                   <Check className="w-3 h-3" />
                                 </button>
@@ -623,7 +623,7 @@ export default function StockPage() {
                                   setTempStockValue((p.stock || 0).toString());
                                 }}
                                 title="Click to edit stock quantity"
-                                className={`min-w-[32px] px-1.5 py-0.5 rounded-md font-bold text-xs text-center border border-transparent hover:border-[#e8e2d8] hover:bg-[#faf8f5] transition-all cursor-pointer ${
+                                className={`min-w-[32px] px-1.5 py-0.5 rounded-md font-bold text-xs text-center border border-transparent hover:border-[#E5E5E5] hover:bg-[#F7F7F7] transition-all cursor-pointer ${
                                   isInStock ? 'text-emerald-700' : isLowStock ? 'text-orange-600' : 'text-rose-600'
                                 } ${isUpdating ? 'opacity-40 animate-pulse' : ''}`}
                               >
@@ -637,7 +637,7 @@ export default function StockPage() {
                               onClick={() => handleQuickStockChange(p._id, (p.stock || 0) + 1)}
                               disabled={isUpdating}
                               title="Increase stock by 1"
-                              className="w-6 h-6 rounded-md bg-[#faf8f5] border border-[#e8e2d8] hover:bg-slate-200 disabled:opacity-30 flex items-center justify-center text-slate-700 transition-colors cursor-pointer active:scale-95"
+                              className="w-6 h-6 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] hover:bg-slate-200 disabled:opacity-30 flex items-center justify-center text-slate-700 transition-colors cursor-pointer active:scale-95"
                             >
                               <Plus className="w-3 h-3" />
                             </button>
@@ -683,8 +683,8 @@ export default function StockPage() {
                               title="Manage Color Variant Stocks"
                               className={`px-2 py-1 rounded-md border text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
                                 expandedProductIds.includes(p._id)
-                                  ? 'bg-[#89591C] text-white border-[#89591C]'
-                                  : 'border-[#e8e2d8] bg-[#faf8f5] hover:bg-[#faf4ec] text-[#89591C]'
+                                  ? 'bg-[#F37021] text-white border-[#F37021]'
+                                  : 'border-[#E5E5E5] bg-[#F7F7F7] hover:bg-[#FFF3EB] text-[#F37021]'
                               }`}
                             >
                               <Palette className="w-3 h-3" />
@@ -720,7 +720,7 @@ export default function StockPage() {
                             <Link
                               href={`/admin/products/${p._id}/edit`}
                               title="Edit Product Details"
-                              className="w-7 h-7 rounded-md border border-slate-200 hover:border-[#89591C] hover:bg-[#faf4ec] text-slate-600 hover:text-[#89591C] flex items-center justify-center transition-colors cursor-pointer"
+                              className="w-7 h-7 rounded-md border border-slate-200 hover:border-[#F37021] hover:bg-[#FFF3EB] text-slate-600 hover:text-[#F37021] flex items-center justify-center transition-colors cursor-pointer"
                             >
                               <Eye className="w-3.5 h-3.5" />
                             </Link>
@@ -730,12 +730,12 @@ export default function StockPage() {
 
                       {/* ── Expanded Inner Color Stock Management Drawer ── */}
                       {expandedProductIds.includes(p._id) && (
-                        <tr className="bg-[#faf6f0]/70 border-b border-[#e8e2d8]">
+                        <tr className="bg-[#F7F7F7]/70 border-b border-[#E5E5E5]">
                           <td colSpan={9} className="p-3.5">
-                            <div className="bg-white rounded-xl border border-[#e8d8be] p-4 shadow-xs">
-                              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#f0eae1]">
+                            <div className="bg-white rounded-xl border border-[#FAD4BC] p-4 shadow-xs">
+                              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#EEEEEE]">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 rounded-md bg-[#faf4ec] text-[#89591C] flex items-center justify-center border border-[#e8e2d8]">
+                                  <div className="w-6 h-6 rounded-md bg-[#FFF3EB] text-[#F37021] flex items-center justify-center border border-[#E5E5E5]">
                                     <Palette className="w-3.5 h-3.5" />
                                   </div>
                                   <div>
@@ -778,7 +778,7 @@ export default function StockPage() {
                                       key={cv.name}
                                       className={`p-3 rounded-lg border transition-all ${
                                         cvAvailable
-                                          ? 'bg-[#faf8f5] border-[#e8e2d8]'
+                                          ? 'bg-[#F7F7F7] border-[#E5E5E5]'
                                           : 'bg-rose-50/70 border-rose-200'
                                       }`}
                                     >
@@ -810,7 +810,7 @@ export default function StockPage() {
                                         </button>
                                       </div>
 
-                                      <div className="flex items-center justify-between pt-2 border-t border-[#f0eae1] text-xs">
+                                      <div className="flex items-center justify-between pt-2 border-t border-[#EEEEEE] text-xs">
                                         <span className="text-[11px] text-slate-600 font-medium">Color Stock:</span>
                                         <div className="flex items-center gap-1.5">
                                           <button
@@ -824,7 +824,7 @@ export default function StockPage() {
                                               )
                                             }
                                             disabled={cvStock <= 0}
-                                            className="w-6 h-6 rounded bg-white border border-[#e8e2d8] hover:bg-slate-100 disabled:opacity-40 flex items-center justify-center text-slate-700 text-xs font-bold cursor-pointer transition-colors"
+                                            className="w-6 h-6 rounded bg-white border border-[#E5E5E5] hover:bg-slate-100 disabled:opacity-40 flex items-center justify-center text-slate-700 text-xs font-bold cursor-pointer transition-colors"
                                           >
                                             -
                                           </button>
@@ -836,7 +836,7 @@ export default function StockPage() {
                                             onClick={() =>
                                               handleVariantStockChange(p._id, cv.name, cvStock + 1, true)
                                             }
-                                            className="w-6 h-6 rounded bg-white border border-[#e8e2d8] hover:bg-slate-100 flex items-center justify-center text-slate-700 text-xs font-bold cursor-pointer transition-colors"
+                                            className="w-6 h-6 rounded bg-white border border-[#E5E5E5] hover:bg-slate-100 flex items-center justify-center text-slate-700 text-xs font-bold cursor-pointer transition-colors"
                                           >
                                             +
                                           </button>
@@ -859,7 +859,7 @@ export default function StockPage() {
         </div>
 
         {/* ── Pagination ── */}
-        <div className="p-3 border-t border-[#f0eae1] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 font-normal bg-[#faf8f5]/50">
+        <div className="p-3 border-t border-[#EEEEEE] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 font-normal bg-[#F7F7F7]/50">
           <div className="flex items-center gap-2">
             <span>Showing {products.length > 0 ? (currentPage - 1) * limit + 1 : 0} to {Math.min(currentPage * limit, totalCount || products.length)} of {totalCount || products.length} products</span>
             <select
@@ -868,7 +868,7 @@ export default function StockPage() {
                 setLimit(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="px-2 py-1 rounded-md border border-[#e8e2d8] bg-white text-xs text-slate-700 focus:outline-none"
+              className="px-2 py-1 rounded-md border border-[#E5E5E5] bg-white text-xs text-slate-700 focus:outline-none"
             >
               <option value={10}>10 per page</option>
               <option value={25}>25 per page</option>
@@ -881,7 +881,7 @@ export default function StockPage() {
               type="button"
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="w-7 h-7 rounded-md border border-[#e8e2d8] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 disabled:opacity-40 cursor-pointer"
+              className="w-7 h-7 rounded-md border border-[#E5E5E5] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 disabled:opacity-40 cursor-pointer"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
@@ -890,7 +890,7 @@ export default function StockPage() {
               type="button"
               disabled={currentPage * limit >= (totalCount || products.length)}
               onClick={() => setCurrentPage((p) => p + 1)}
-              className="w-7 h-7 rounded-md border border-[#e8e2d8] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 disabled:opacity-40 cursor-pointer"
+              className="w-7 h-7 rounded-md border border-[#E5E5E5] bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 disabled:opacity-40 cursor-pointer"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>

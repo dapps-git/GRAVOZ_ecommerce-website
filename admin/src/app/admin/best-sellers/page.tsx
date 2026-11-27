@@ -61,7 +61,7 @@ export default function BestSellersPage() {
       header: 'Product',
       accessor: (row) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-[#faf8f5] overflow-hidden relative border border-[#e8e2d8] flex-shrink-0">
+          <div className="w-10 h-10 rounded-md bg-[#F7F7F7] overflow-hidden relative border border-[#E5E5E5] flex-shrink-0">
             {row.images && row.images[0]?.url ? (
               <Image src={row.images[0].url} alt={row.name} fill sizes="40px" className="object-cover" />
             ) : (
@@ -86,8 +86,8 @@ export default function BestSellersPage() {
           type="button"
           onClick={() => toggleBestSeller(row._id, row.isBestSeller)}
           className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 border ${row.isBestSeller
-              ? 'bg-[#89591C] text-white border-[#89591C] shadow-xs'
-              : 'bg-white text-slate-600 border-[#e8e2d8] hover:text-[#89591C]'
+              ? 'bg-[#F37021] text-white border-[#F37021] shadow-xs'
+              : 'bg-white text-slate-600 border-[#E5E5E5] hover:text-[#F37021]'
             }`}
         >
           <Star className={`w-3.5 h-3.5 ${row.isBestSeller ? 'fill-white text-white' : 'text-slate-400'}`} />
@@ -99,9 +99,9 @@ export default function BestSellersPage() {
 
   return (
     <div className="space-y-4 font-light">
-      <div className="flex items-center justify-between gap-4 border-b border-[#e8e2d8] pb-3">
+      <div className="flex items-center justify-between gap-4 border-b border-[#E5E5E5] pb-3">
         <p className="text-xs text-slate-500 font-normal">Pin top performing shoes for homepage featured highlights</p>
-        <div className="bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8] px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5">
+        <div className="bg-[#FFF3EB] text-[#F37021] border border-[#E5E5E5] px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <Award className="w-3.5 h-3.5" /> Top Tier Curator
         </div>
       </div>

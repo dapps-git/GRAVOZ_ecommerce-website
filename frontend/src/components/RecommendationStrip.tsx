@@ -48,6 +48,8 @@ interface Props {
   contextQuery?: string;
   /** Context product for reference taste matching */
   contextProduct?: ContextProduct;
+  /** Optional SSR preloaded recommendation pool */
+  initialProducts?: RecProduct[];
 }
 
 export default function RecommendationStrip({
@@ -57,9 +59,13 @@ export default function RecommendationStrip({
   limit = 6,
   contextQuery,
   contextProduct,
+  initialProducts,
 }: Props) {
+  const hasPreloaded = Array.isArray(initialProducts);
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const [products, setProducts] = useState<RecProduct[]>([]);
+  const [products, setProducts] = useState<RecProduct[]>(
+    hasPreloaded ? initialProducts.slice(0, limit) : []
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [sensedColor, setSensedColor] = useState<string | null>(null);
 
@@ -114,6 +120,10 @@ export default function RecommendationStrip({
   ]);
 
   useEffect(() => {
+    if (hasPreloaded && !contextProduct && !contextQuery) {
+      setProducts(initialProducts.slice(0, limit));
+      return;
+    }
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
       const handle = (window as any).requestIdleCallback(
         () => {
@@ -126,7 +136,7 @@ export default function RecommendationStrip({
       const timer = setTimeout(fetchRecommendations, 150);
       return () => clearTimeout(timer);
     }
-  }, [fetchRecommendations]);
+  }, [fetchRecommendations, hasPreloaded, initialProducts, limit, contextProduct, contextQuery]);
 
   const displayTitle = title || 'YOU MAY ALSO LIKE';
 
@@ -139,7 +149,7 @@ export default function RecommendationStrip({
       {/* Centered Section Header with View All */}
       <div className="relative flex flex-col items-center justify-center text-center px-4 space-y-1">
         <div className="flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-[#89591C]" />
+          <Sparkles className="w-3.5 h-3.5 text-[#F37021]" />
           <h2 className="font-sansation font-light text-lg sm:text-[24px] leading-[1.31] tracking-[0.08em] text-[#030303] uppercase">
             {displayTitle}
           </h2>
@@ -148,16 +158,16 @@ export default function RecommendationStrip({
           <p className="text-xs text-slate-500 font-light">{subtitle}</p>
         ) : contextProduct?.selectedColor ? (
           <p className="text-[11px] sm:text-xs text-slate-400 font-light tracking-wide">
-            Curated in <span className="font-semibold text-[#89591C]">{contextProduct.selectedColor}</span> & matching styles for your taste
+            Curated in <span className="font-semibold text-[#F37021]">{contextProduct.selectedColor}</span> & matching styles for your taste
           </p>
         ) : null}
 
         <Link
           href="/products"
-          className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 group inline-flex items-center gap-1 font-sansation text-xs sm:text-[13px] font-medium text-[#030303] hover:text-[#89591C] transition-colors mt-1 sm:mt-0"
+          className="sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2 group inline-flex items-center gap-1 font-sansation text-xs sm:text-[13px] font-medium text-[#030303] hover:text-[#F37021] transition-colors mt-1 sm:mt-0"
         >
-          <span className="underline underline-offset-4 decoration-[#e8e2d8] group-hover:decoration-[#89591C]">View All</span>
-          <ArrowRight className="w-3.5 h-3.5 text-[#89591C] group-hover:translate-x-1 transition-transform" />
+          <span className="underline underline-offset-4 decoration-[#E5E5E5] group-hover:decoration-[#F37021]">View All</span>
+          <ArrowRight className="w-3.5 h-3.5 text-[#F37021] group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
 
@@ -178,10 +188,10 @@ export default function RecommendationStrip({
       <div className="flex justify-center pt-1 sm:hidden">
         <Link
           href="/products"
-          className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#e8e2d8] bg-white text-xs font-semibold text-slate-800 hover:text-[#89591C] hover:border-[#89591C] transition-all shadow-2xs"
+          className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#E5E5E5] bg-white text-xs font-semibold text-slate-800 hover:text-[#F37021] hover:border-[#F37021] transition-all shadow-2xs"
         >
           <span>View All Products</span>
-          <ArrowRight className="w-3.5 h-3.5 text-[#89591C] group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-3.5 h-3.5 text-[#F37021] group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </section>
@@ -199,8 +209,11 @@ function RecProductCard({
   toggleWishlist: (item: any) => void;
   contextProduct?: ContextProduct;
 }) {
+  const [hovered, setHovered] = useState(false);
+  const [secondaryLoaded, setSecondaryLoaded] = useState(false);
   const mainImage = (product.images && product.images[0]?.url) || '/products/placeholder.svg';
   const secondaryImage = product.images && product.images.length > 1 ? product.images[1]?.url : null;
+  const hasSecondary = Boolean(secondaryImage && secondaryImage !== mainImage);
 
   const productColors = [
     ...(product.colors || []),
@@ -215,10 +228,11 @@ function RecProductCard({
   return (
     <Link
       href={`/products/${product._id}`}
-      className="group bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer relative"
+      onMouseEnter={() => { if (!hovered) setHovered(true); }}
+      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer relative"
     >
       {/* Product Image Card - aspect-square gives taller, bigger size, rounded-md */}
-      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#faf8f5]">
+      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#F7F7F7]">
         {/* Wishlist Button */}
         <button
           type="button"
@@ -247,34 +261,39 @@ function RecProductCard({
 
         {/* Match Badge or Final Sale Badge (top most left) */}
         {product.noReturnRefundExchange ? (
-          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
             Final Sale
           </span>
         ) : hasColorMatch ? (
-          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+          <span className="absolute top-0 left-0 z-20 px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
             In {contextProduct?.selectedColor}
           </span>
         ) : null}
 
         {/* Primary Image */}
-        <div className={`absolute inset-0 transition-opacity duration-300 ${secondaryImage ? 'group-hover:opacity-0' : ''}`}>
+        <div className={`absolute inset-0 transition-opacity duration-300 ${hasSecondary && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
           <ProductImage
             src={mainImage}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
+            optimizeWidth={500}
+            loading="lazy"
             className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
           />
         </div>
 
-        {/* Secondary Image on Desktop Hover */}
-        {secondaryImage && (
-          <div className="hidden sm:block absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Secondary Image mounted lazily on Desktop Hover */}
+        {hasSecondary && hovered && (
+          <div className={`hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
             <ProductImage
               src={secondaryImage}
               alt={`${product.name} alternate view`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
+              optimizeWidth={500}
+              loading="eager"
+              onLoad={() => setSecondaryLoaded(true)}
               className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
             />
           </div>
@@ -283,7 +302,7 @@ function RecProductCard({
 
       {/* Card Meta (Title, Rating, Price) */}
       <div className="mt-2.5 space-y-1.5">
-        <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+        <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#F37021] transition-colors leading-tight">
           {product.name}
         </h3>
 
@@ -292,7 +311,7 @@ function RecProductCard({
           const { rating, reviewsCount } = getProductRating(product);
           return (
             <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 font-normal">
-              <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+              <Star className="w-3.5 h-3.5 text-[#F37021] fill-[#F37021]" strokeWidth={1.5} />
               <span className="font-normal text-slate-700">{rating.toFixed(1)}</span>
               <span className="text-slate-400 font-light">
                 ({reviewsCount})
@@ -303,7 +322,7 @@ function RecProductCard({
 
         {/* Price */}
         <div className="flex items-baseline gap-1.5 pt-0.5">
-          <span className="text-xs sm:text-sm font-medium text-[#89591C]">₹{product.price}</span>
+          <span className="text-xs sm:text-sm font-medium text-[#F37021]">₹{product.price}</span>
           {product.originalPrice && product.originalPrice > product.price && (
             <span className="text-[10px] sm:text-[11px] text-slate-400 line-through font-light">₹{product.originalPrice}</span>
           )}

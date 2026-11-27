@@ -149,18 +149,18 @@ function LoginContent() {
         <div className="flex flex-col items-center gap-1.5">
           <Link href="/">
             <div className="relative h-10 w-44">
-              <Image src="/sercher-logo.png" alt="SERCHER" fill priority className="object-contain" sizes="176px" />
+              <Image src="/sercher-brand-logo.png" alt="SERCHER" fill priority className="object-contain" sizes="176px" />
             </div>
           </Link>
-          <p className="text-[9px] font-bold tracking-[0.25em] text-[#7a3e0b] uppercase font-sansation">
+          <p className="text-[9px] font-bold tracking-[0.25em] text-[#F37021] uppercase font-sansation">
             PREMIUM HANDCRAFTED FOOTWEAR
           </p>
           <div className="flex items-center gap-2.5">
-            <span className="w-12 h-px bg-[#7a3e0b]/40" />
-            <div className="w-3 h-3 rotate-45 border border-[#7a3e0b]/60 flex items-center justify-center">
-              <div className="w-1 h-1 bg-[#7a3e0b]" />
+            <span className="w-12 h-px bg-[#F37021]/40" />
+            <div className="w-3 h-3 rotate-45 border border-[#F37021]/60 flex items-center justify-center">
+              <div className="w-1 h-1 bg-[#F37021]" />
             </div>
-            <span className="w-12 h-px bg-[#7a3e0b]/40" />
+            <span className="w-12 h-px bg-[#F37021]/40" />
           </div>
         </div>
 
@@ -169,7 +169,7 @@ function LoginContent() {
 
           {/* Heading */}
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-[#7a3e0b] tracking-tight font-sansation">Welcome Back</h1>
+            <h1 className="text-xl font-semibold text-[#F37021] tracking-tight font-sansation">Welcome Back</h1>
             <p className="text-[11px] text-slate-500 mt-0.5 font-sansation">Login to your account</p>
           </div>
 
@@ -187,7 +187,7 @@ function LoginContent() {
             {/* Email */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-slate-700">Email</label>
-              <div className="flex items-center gap-2.5 border border-[#ddd6cc] bg-[#faf9f7] px-3 py-2.5 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all">
+              <div className="flex items-center gap-2.5 border border-[#DCDCDC] bg-[#F8F8F8] px-3 py-2.5 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all">
                 <Mail className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                 <input
                   type="email"
@@ -203,7 +203,7 @@ function LoginContent() {
             {/* Password */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-slate-700">Password</label>
-              <div className="relative flex items-center gap-2.5 border border-[#ddd6cc] bg-[#faf9f7] px-3 py-2.5 focus-within:border-[#7a3e0b] focus-within:ring-1 focus-within:ring-[#7a3e0b]/20 transition-all">
+              <div className="relative flex items-center gap-2.5 border border-[#DCDCDC] bg-[#F8F8F8] px-3 py-2.5 focus-within:border-[#F37021] focus-within:ring-1 focus-within:ring-[#F37021]/20 transition-all">
                 <Lock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -218,7 +218,7 @@ function LoginContent() {
                 </button>
               </div>
               <div className="text-right">
-                <Link href="/forgot-password" className="text-[10.5px] font-semibold text-[#7a3e0b] hover:underline">Forgot Password?</Link>
+                <Link href="/forgot-password" className="text-[10.5px] font-semibold text-[#F37021] hover:underline">Forgot Password?</Link>
               </div>
             </div>
 
@@ -226,7 +226,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-[#7a3e0b] hover:bg-[#633209] disabled:opacity-60 text-white text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer font-sansation"
+              className="w-full py-3 bg-[#F37021] hover:bg-[#D95B10] disabled:opacity-60 text-white text-[11px] font-bold tracking-[0.18em] uppercase transition-colors cursor-pointer font-sansation"
             >
               {isSubmitting ? 'LOGGING IN...' : 'LOGIN'}
             </button>
@@ -234,9 +234,9 @@ function LoginContent() {
 
           {/* OR */}
           <div className="flex items-center gap-3">
-            <span className="flex-1 h-px bg-[#e0d9d0]" />
+            <span className="flex-1 h-px bg-[#E2E2E2]" />
             <span className="text-[10px] font-semibold text-slate-400 font-sansation tracking-wider">OR</span>
-            <span className="flex-1 h-px bg-[#e0d9d0]" />
+            <span className="flex-1 h-px bg-[#E2E2E2]" />
           </div>
 
           {/* Google Sign In */}
@@ -253,7 +253,7 @@ function LoginContent() {
             Don&apos;t have an account?{' '}
             <Link
               href={`/signup${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`}
-              className="font-bold text-[#7a3e0b] hover:underline"
+              className="font-bold text-[#F37021] hover:underline"
             >
               Create Account
             </Link>
@@ -265,7 +265,7 @@ function LoginContent() {
       {/* Toast */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-5 sm:right-5 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 shadow-2xl flex items-center gap-2.5 border border-white/10 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-4 duration-300 font-sansation max-w-[90vw] sm:max-w-md">
-          <div className="w-4 h-4 bg-[#7a3e0b] flex items-center justify-center flex-shrink-0">
+          <div className="w-4 h-4 bg-[#F37021] flex items-center justify-center flex-shrink-0">
             <Check className="w-2.5 h-2.5 text-white" />
           </div>
           <span className="text-[11px]">{toastMessage}</span>
@@ -277,7 +277,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#faf8f5] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#89591C] border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#F7F7F7] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#F37021] border-t-transparent rounded-full animate-spin" /></div>}>
       <LoginContent />
     </Suspense>
   );

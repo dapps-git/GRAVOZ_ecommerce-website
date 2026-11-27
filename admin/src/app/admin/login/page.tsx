@@ -49,16 +49,16 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#faf8f5] flex items-center justify-center p-4 sm:p-6 md:p-8 font-light relative overflow-hidden">
+    <div className="min-h-screen w-full bg-[#F7F7F7] flex items-center justify-center p-4 sm:p-6 md:p-8 font-light relative overflow-hidden">
       {/* Ambient background glows */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#89591C]/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#89591C]/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#F37021]/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#F37021]/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main Split Container */}
-      <div className="w-full max-w-5xl bg-white rounded-2xl border border-[#e8e2d8] shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10">
+      <div className="w-full max-w-5xl bg-white rounded-2xl border border-[#E5E5E5] shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 relative z-10">
         
         {/* Left Side: 3D Admin Banner */}
-        <div className="lg:col-span-6 relative min-h-[340px] sm:min-h-[420px] lg:min-h-[600px] bg-white flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-[#e8e2d8]">
+        <div className="lg:col-span-6 relative min-h-[340px] sm:min-h-[420px] lg:min-h-[600px] bg-white flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-[#E5E5E5]">
           <Image
             src="/images/admin-login-banner.jpg"
             alt="GRAVOZ Admin Banner"
@@ -77,7 +77,7 @@ export default function AdminLoginPage() {
             {/* Centered SERCHER Logo */}
             <div className="flex justify-center pb-2">
               <Image
-                src="/sercher-logo.png"
+                src="/sercher-brand-logo.png"
                 alt="SERCHER Official Logo"
                 width={220}
                 height={55}
@@ -100,14 +100,14 @@ export default function AdminLoginPage() {
                   Admin Email
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-[#89591C] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-[#F37021] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="gravoxshopadmin@gmail.com"
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg pl-10 pr-4 py-3.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#89591C] focus:bg-white focus:ring-1 focus:ring-[#89591C] transition-colors"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg pl-10 pr-4 py-3.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#F37021] focus:bg-white focus:ring-1 focus:ring-[#F37021] transition-colors"
                   />
                 </div>
               </div>
@@ -117,19 +117,19 @@ export default function AdminLoginPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-[#89591C] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-[#F37021] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-lg pl-10 pr-11 py-3.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#89591C] focus:bg-white focus:ring-1 focus:ring-[#89591C] transition-colors"
+                    className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-lg pl-10 pr-11 py-3.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#F37021] focus:bg-white focus:ring-1 focus:ring-[#F37021] transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#89591C] transition-colors cursor-pointer p-0.5 focus:outline-none"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#F37021] transition-colors cursor-pointer p-0.5 focus:outline-none"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? (
@@ -144,7 +144,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-[#89591C] hover:bg-[#724816] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 cursor-pointer pt-3"
+                className="w-full py-3.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 cursor-pointer pt-3"
               >
                 {loading ? (
                   <>

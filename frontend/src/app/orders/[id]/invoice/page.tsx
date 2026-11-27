@@ -54,7 +54,7 @@ export default function OrderInvoicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center font-sans text-xs text-[#89591C]">
+      <div className="min-h-screen bg-[#F7F7F7] flex items-center justify-center font-sans text-xs text-[#F37021]">
         Loading Invoice...
       </div>
     );
@@ -62,7 +62,7 @@ export default function OrderInvoicePage() {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-[#faf8f5] flex flex-col items-center justify-center p-6 text-center space-y-4 font-sans">
+      <div className="min-h-screen bg-[#F7F7F7] flex flex-col items-center justify-center p-6 text-center space-y-4 font-sans">
         <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
           <FileText className="w-6 h-6" />
         </div>
@@ -70,7 +70,7 @@ export default function OrderInvoicePage() {
         <p className="text-xs text-slate-500 max-w-sm">{error || 'Unable to retrieve order details.'}</p>
         <Link
           href="/profile"
-          className="px-5 py-2 bg-[#89591C] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#724816] transition-colors"
+          className="px-5 py-2 bg-[#F37021] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#D95B10] transition-colors"
         >
           Return to Profile
         </Link>
@@ -95,12 +95,12 @@ export default function OrderInvoicePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f4f2ee] py-6 sm:py-10 px-3 sm:px-6 font-sans">
+    <div className="min-h-screen bg-[#F3F3F3] py-6 sm:py-10 px-3 sm:px-6 font-sans">
       {/* Top Action Bar (Hidden when printing) */}
       <div className="max-w-3xl mx-auto mb-6 flex items-center justify-between gap-3 print:hidden">
         <Link
           href={`/orders/${order._id}`}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-[#89591C] bg-white border border-[#e8e2d8] px-3.5 py-2 rounded-xl shadow-2xs transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-[#F37021] bg-white border border-[#E5E5E5] px-3.5 py-2 rounded-xl shadow-2xs transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Order
         </Link>
@@ -109,7 +109,7 @@ export default function OrderInvoicePage() {
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#89591C] hover:bg-[#724816] px-4 py-2 rounded-xl shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#F37021] hover:bg-[#D95B10] px-4 py-2 rounded-xl shadow-xs transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4" /> Print / Download PDF
           </button>
@@ -117,14 +117,14 @@ export default function OrderInvoicePage() {
       </div>
 
       {/* Official Tax Invoice Container */}
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-[#e8e2d8] p-6 sm:p-10 shadow-sm space-y-8 print:border-none print:shadow-none print:p-0 print:rounded-none">
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-[#E5E5E5] p-6 sm:p-10 shadow-sm space-y-8 print:border-none print:shadow-none print:p-0 print:rounded-none">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#ece7de] pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5E5] pb-6">
           <div>
             <div className="relative h-9 sm:h-10 w-36 sm:w-44 mb-1">
               <Image
-                src="/sercher-logo.png"
+                src="/sercher-brand-logo.png"
                 alt="SERCHER"
                 fill
                 priority
@@ -141,7 +141,7 @@ export default function OrderInvoicePage() {
           </div>
 
           <div className="sm:text-right space-y-1">
-            <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#faf4ec] text-[#89591C] border border-[#e8e2d8]">
+            <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#FFF3EB] text-[#F37021] border border-[#E5E5E5]">
               TAX INVOICE
             </span>
             <p className="text-xs font-bold text-slate-900">
@@ -158,7 +158,7 @@ export default function OrderInvoicePage() {
 
         {/* Bill To & Ship To */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-slate-600">
-          <div className="space-y-1 bg-[#faf8f5] p-4 rounded-xl border border-[#f0ece5]">
+          <div className="space-y-1 bg-[#F7F7F7] p-4 rounded-xl border border-[#EEEEEE]">
             <h3 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Billed & Shipped To:</h3>
             <p className="font-bold text-slate-800">{order.shippingAddress?.fullName || order.customerName}</p>
             <p>{order.shippingAddress?.addressLine1 || order.customerAddress}</p>
@@ -171,7 +171,7 @@ export default function OrderInvoicePage() {
             {order.customerPhone && <p className="text-slate-500">Phone: {order.customerPhone}</p>}
           </div>
 
-          <div className="space-y-1 bg-[#faf8f5] p-4 rounded-xl border border-[#f0ece5]">
+          <div className="space-y-1 bg-[#F7F7F7] p-4 rounded-xl border border-[#EEEEEE]">
             <h3 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Order Summary:</h3>
             <p><span className="text-slate-400">Order ID:</span> <span className="font-bold text-slate-800">#{order.orderNumber}</span></p>
             <p><span className="text-slate-400">Payment Method:</span> <span className="font-semibold uppercase text-slate-800">{order.paymentMethod === 'COD' ? 'Cash on Delivery (COD)' : (order.paymentMethod || 'Prepaid / Online')}</span></p>
@@ -245,16 +245,16 @@ export default function OrderInvoicePage() {
             </div>
             <div className="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-slate-200">
               <span>Grand Total:</span>
-              <span className="text-[#89591C] text-base">₹{grandTotal.toLocaleString('en-IN')}</span>
+              <span className="text-[#F37021] text-base">₹{grandTotal.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
 
         {/* Footer Guarantee & Terms */}
-        <div className="pt-6 border-t border-[#ece7de] text-center space-y-2 text-[11px] text-slate-400">
+        <div className="pt-6 border-t border-[#E5E5E5] text-center space-y-2 text-[11px] text-slate-400">
           <div className="flex items-center justify-center gap-4 text-slate-600 font-medium text-xs">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#89591C]" /> 100% Authentic Handcrafted
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F37021]" /> 100% Authentic Handcrafted
             </span>
             <span>•</span>
             <span>7-Day Easy Returns & Exchanges</span>

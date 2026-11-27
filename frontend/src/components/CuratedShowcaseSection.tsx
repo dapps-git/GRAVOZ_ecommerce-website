@@ -38,6 +38,10 @@ interface CuratedShowcaseSectionProps {
   sectionKey: 'best_sellers' | 'top_selling' | 'latest_products' | 'featured_products';
   fallbackTitle?: string;
   fallbackSubtitle?: string;
+  initialSection?: {
+    title?: string;
+    items?: ShowcaseCardItem[];
+  };
 }
 
 // Module-level deduplication cache so 4 instances share 1 single network request
@@ -68,13 +72,21 @@ export default function CuratedShowcaseSection({
   sectionKey,
   fallbackTitle = 'Best Sellers',
   fallbackSubtitle = 'Our most loved handcrafted designs',
+  initialSection,
 }: CuratedShowcaseSectionProps) {
+  const hasInitial = initialSection !== undefined;
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const [title, setTitle]     = useState(fallbackTitle);
-  const [items, setItems]     = useState<ShowcaseCardItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [title, setTitle]     = useState(initialSection?.title || fallbackTitle);
+  const [items, setItems]     = useState<ShowcaseCardItem[]>(initialSection?.items || []);
+  const [loading, setLoading] = useState(!hasInitial);
 
   useEffect(() => {
+    if (hasInitial) {
+      setTitle(initialSection?.title || fallbackTitle);
+      setItems(initialSection?.items || []);
+      setLoading(false);
+      return;
+    }
     fetchSharedHomeSections()
       .then((data) => {
         if (data?.success && data.sectionsByKey?.[sectionKey]) {
@@ -87,7 +99,7 @@ export default function CuratedShowcaseSection({
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [sectionKey]);
+  }, [sectionKey, hasInitial, initialSection, fallbackTitle]);
 
   // Don't render an empty skeleton — wait for items
   if (!loading && items.length === 0) return null;
@@ -105,12 +117,12 @@ export default function CuratedShowcaseSection({
       {loading && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex flex-col animate-pulse bg-white rounded-none border border-[#e8e2d8] p-3 sm:p-3.5">
-              <div className="w-full aspect-square rounded-none bg-[#ede9e2]" />
+            <div key={i} className="flex flex-col animate-pulse bg-white rounded-none border border-[#E5E5E5] p-3 sm:p-3.5">
+              <div className="w-full aspect-square rounded-none bg-[#EBEBEB]" />
               <div className="mt-3 space-y-2">
-                <div className="h-3.5 w-3/4 rounded-none bg-[#ddd8cf]" />
-                <div className="h-3 w-1/3 rounded-none bg-[#ddd8cf]" />
-                <div className="h-4 w-1/2 rounded-none bg-[#c9c3bc]" />
+                <div className="h-3.5 w-3/4 rounded-none bg-[#E0E0E0]" />
+                <div className="h-3 w-1/3 rounded-none bg-[#E0E0E0]" />
+                <div className="h-4 w-1/2 rounded-none bg-[#D0D0D0]" />
               </div>
             </div>
           ))}
@@ -146,8 +158,11 @@ function CuratedCardItem({
   isInWishlist: (id: string) => boolean;
   toggleWishlist: (item: any) => void;
 }) {
+  const [hovered, setHovered] = useState(false);
+  const [secondaryLoaded, setSecondaryLoaded] = useState(false);
   const mainImage = item.imageUrl || (item.images && item.images[0]) || '/products/placeholder.svg';
   const secondaryImage = item.insetImageUrl || (item.images && item.images.length > 1 ? item.images[1] : null);
+  const hasSecondary = Boolean(secondaryImage && secondaryImage !== mainImage);
 
   const href = item.linkUrl || (item.productId ? `/products/${item.productId}` : '/products');
   const discount = item.originalPrice && item.originalPrice > item.price
@@ -157,20 +172,21 @@ function CuratedCardItem({
   return (
     <Link
       href={href}
-      className="group bg-white rounded-md border border-[#e8e2d8] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+      onMouseEnter={() => { if (!hovered) setHovered(true); }}
+      className="group bg-white rounded-md border border-[#E5E5E5] p-3 sm:p-3.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer"
     >
       {/* Product Image Card - aspect-square gives bigger size, rounded-md */}
-      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#faf8f5]">
+      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#F7F7F7]">
         {/* Badge (Top Most Left if Best Seller / Discount) */}
         {discount > 0 ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               {discount}% OFF
             </span>
           </div>
         ) : sectionKey === 'best_sellers' ? (
           <div className="absolute top-0 left-0 z-20">
-            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+            <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
               BEST SELLER
             </span>
           </div>
@@ -203,24 +219,29 @@ function CuratedCardItem({
         </button>
 
         {/* Primary Image */}
-        <div className={`absolute inset-0 transition-opacity duration-300 ${secondaryImage ? 'group-hover:opacity-0' : ''}`}>
+        <div className={`absolute inset-0 transition-opacity duration-300 ${hasSecondary && secondaryLoaded ? 'sm:group-hover:opacity-0' : ''}`}>
           <ProductImage
             src={mainImage}
             alt={item.title}
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
+            optimizeWidth={500}
+            loading="lazy"
             className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
           />
         </div>
 
-        {/* Secondary Image on Desktop Hover */}
-        {secondaryImage && (
-          <div className="hidden sm:block absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Secondary Image mounted lazily on Desktop Hover */}
+        {hasSecondary && hovered && (
+          <div className={`hidden sm:block absolute inset-0 bg-[#F7F7F7] transition-opacity duration-300 ${secondaryLoaded ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
             <ProductImage
               src={secondaryImage}
               alt={`${item.title} alternate view`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
+              optimizeWidth={500}
+              loading="eager"
+              onLoad={() => setSecondaryLoaded(true)}
               className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
             />
           </div>
@@ -229,7 +250,7 @@ function CuratedCardItem({
 
       {/* Card Meta (Title, Rating, Discount Price) */}
       <div className="mt-2.5 space-y-1">
-        <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+        <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#F37021] transition-colors leading-tight">
           {item.title}
         </h3>
 
@@ -238,7 +259,7 @@ function CuratedCardItem({
           const { rating, reviewsCount } = getProductRating(item);
           return (
             <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 font-normal">
-              <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+              <Star className="w-3.5 h-3.5 text-[#F37021] fill-[#F37021]" strokeWidth={1.5} />
               <span className="font-normal text-slate-700">{rating.toFixed(1)}</span>
               <span className="text-slate-400 font-light">
                 ({reviewsCount})
@@ -249,7 +270,7 @@ function CuratedCardItem({
 
         {/* Pricing with Discount */}
         <div className="flex items-baseline gap-1.5 pt-0.5">
-          <span className="text-xs sm:text-sm font-medium text-[#89591C]">
+          <span className="text-xs sm:text-sm font-medium text-[#F37021]">
             ₹{item.price}
           </span>
           {item.originalPrice && item.originalPrice > item.price && (

@@ -59,7 +59,7 @@ export default function WishlistPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-[#030303] font-sans flex flex-col justify-between selection:bg-[#89591C]/20 selection:text-[#89591C]" style={{ fontFamily: 'var(--font-montserrat), Montserrat, sans-serif' }}>
+    <div className="min-h-screen bg-[#F7F7F7] text-[#030303] font-sans flex flex-col justify-between selection:bg-[#F37021]/20 selection:text-[#F37021]" style={{ fontFamily: 'var(--font-montserrat), Montserrat, sans-serif' }}>
       <Header />
 
       <main className="flex-1 max-w-[1240px] w-full mx-auto px-3.5 sm:px-6 md:px-10 lg:px-12 py-4 sm:py-8 space-y-6 sm:space-y-8 pb-20 lg:pb-12">
@@ -82,7 +82,7 @@ export default function WishlistPage() {
                 clearWishlist();
                 showToast('Wishlist cleared.');
               }}
-              className="text-xs font-semibold text-[#89591C] hover:underline transition-colors cursor-pointer"
+              className="text-xs font-semibold text-[#F37021] hover:underline transition-colors cursor-pointer"
             >
               Clear all
             </button>
@@ -91,8 +91,8 @@ export default function WishlistPage() {
 
         {/* ── EMPTY STATE ── */}
         {!isLoading && items.length === 0 ? (
-          <div className="py-12 sm:py-16 text-center space-y-5 bg-white rounded-md border border-[#e8e2d8] p-6 shadow-2xs max-w-lg mx-auto animate-in fade-in duration-300">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-md bg-[#faf8f5] border border-[#e8e2d8] flex items-center justify-center text-rose-500 mx-auto shadow-2xs">
+          <div className="py-12 sm:py-16 text-center space-y-5 bg-white rounded-md border border-[#E5E5E5] p-6 shadow-2xs max-w-lg mx-auto animate-in fade-in duration-300">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-md bg-[#F7F7F7] border border-[#E5E5E5] flex items-center justify-center text-rose-500 mx-auto shadow-2xs">
               <Heart className="w-10 h-10 stroke-[1.5]" />
             </div>
 
@@ -107,7 +107,7 @@ export default function WishlistPage() {
 
             <Link
               href="/products"
-              className="inline-flex items-center justify-center px-6 py-2.5 rounded-md bg-[#89591C] hover:bg-[#68421A] text-white text-xs sm:text-sm font-semibold tracking-wide shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center px-6 py-2.5 rounded-md bg-[#F37021] hover:bg-[#D95B10] text-white text-xs sm:text-sm font-semibold tracking-wide shadow-2xs transition-colors cursor-pointer"
             >
               Explore Footwear
             </Link>
@@ -120,12 +120,12 @@ export default function WishlistPage() {
               return (
                 <div
                   key={item.productId}
-                  className="bg-white rounded-md border border-[#e8e2d8] p-3.5 sm:p-4 shadow-2xs relative flex flex-row items-start sm:items-center gap-3.5 sm:gap-5 hover:shadow-md transition-all duration-300"
+                  className="bg-white rounded-md border border-[#E5E5E5] p-3.5 sm:p-4 shadow-2xs relative flex flex-row items-start sm:items-center gap-3.5 sm:gap-5 hover:shadow-md transition-all duration-300"
                 >
                   {/* Product Image (Left Side - Clickable to Product Details) */}
                   <Link
                     href={productLink}
-                    className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-md bg-[#faf8f5] flex items-center justify-center overflow-hidden border border-[#f0ece5] flex-shrink-0 hover:opacity-85 transition-opacity block cursor-pointer"
+                    className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-md bg-[#F7F7F7] flex items-center justify-center overflow-hidden border border-[#EEEEEE] flex-shrink-0 hover:opacity-85 transition-opacity block cursor-pointer"
                   >
                     <ProductImage
                       src={item.imageUrl}
@@ -154,7 +154,7 @@ export default function WishlistPage() {
                     <div className="space-y-1">
                       <Link
                         href={productLink}
-                        className="text-xs sm:text-sm font-bold text-[#111111] hover:text-[#89591C] uppercase tracking-wide truncate block transition-colors cursor-pointer"
+                        className="text-xs sm:text-sm font-bold text-[#111111] hover:text-[#F37021] uppercase tracking-wide truncate block transition-colors cursor-pointer"
                       >
                         {item.title}
                       </Link>
@@ -164,7 +164,7 @@ export default function WishlistPage() {
                         const { rating, reviewsCount } = getProductRating(item);
                         return (
                           <div className="flex items-center gap-1 text-[11px] text-slate-600">
-                            <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                            <Star className="w-3.5 h-3.5 text-[#F37021] fill-[#F37021]" strokeWidth={1.5} />
                             <span className="font-bold text-slate-800">{rating.toFixed(1)}</span>
                             <span className="text-slate-400 font-normal">({reviewsCount})</span>
                           </div>
@@ -193,7 +193,7 @@ export default function WishlistPage() {
                           removeFromWishlist(item.productId);
                           showToast(`Removed ${item.title} from wishlist.`);
                         }}
-                        className="flex-1 sm:flex-none border border-[#e8e2d8] bg-white hover:bg-slate-50 text-[#111111] text-xs font-semibold px-3.5 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                        className="flex-1 sm:flex-none border border-[#E5E5E5] bg-white hover:bg-slate-50 text-[#111111] text-xs font-semibold px-3.5 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-slate-700" />
                         <span>Remove Item</span>
@@ -217,7 +217,7 @@ export default function WishlistPage() {
                           showToast(`Moved ${item.title} to Cart! Redirecting...`);
                           router.push('/cart');
                         }}
-                        className="flex-1 sm:flex-none bg-[#89591C] hover:bg-[#68421A] text-white text-xs font-semibold px-4 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                        className="flex-1 sm:flex-none bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold px-4 py-2 rounded-md flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                       >
                         <ShoppingBag className="w-3.5 h-3.5 text-white" />
                         <span>Add to Cart</span>
@@ -237,10 +237,10 @@ export default function WishlistPage() {
             <h2 className="text-base sm:text-lg font-bold text-[#111111] whitespace-nowrap">
               Recently Viewed
             </h2>
-            <div className="h-[1px] bg-[#e8e2d8] flex-1" />
+            <div className="h-[1px] bg-[#E5E5E5] flex-1" />
             <Link
               href="/products"
-              className="text-xs font-semibold text-[#89591C] hover:underline whitespace-nowrap cursor-pointer"
+              className="text-xs font-semibold text-[#F37021] hover:underline whitespace-nowrap cursor-pointer"
             >
               View all
             </Link>
@@ -254,14 +254,14 @@ export default function WishlistPage() {
                 <Link
                   key={prod._id || idx}
                   href={`/products/${prod.slug || prod._id}`}
-                  className="group bg-white rounded-md border border-[#e8e2d8] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#89591C]/40 transition-all duration-300 cursor-pointer"
+                  className="group bg-white rounded-md border border-[#E5E5E5] p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-[#F37021]/40 transition-all duration-300 cursor-pointer"
                 >
                   {/* Card Image */}
-                  <div className="relative aspect-[4/3] w-full rounded-md overflow-hidden bg-[#faf8f5]">
+                  <div className="relative aspect-[4/3] w-full rounded-md overflow-hidden bg-[#F7F7F7]">
                     {/* Best Seller Pill (top most left) */}
                     {prod.isBestSeller && (
                       <div className="absolute top-0 left-0 z-10">
-                        <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+                        <span className="px-2.5 py-0.5 rounded-br-md rounded-tl-md text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
                           BEST SELLER
                         </span>
                       </div>
@@ -304,7 +304,7 @@ export default function WishlistPage() {
 
                   {/* Card Meta */}
                   <div className="mt-2.5 space-y-1">
-                    <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#89591C] transition-colors leading-tight">
+                    <h3 className="text-xs sm:text-[13px] font-normal text-[#111111] uppercase tracking-wide truncate group-hover:text-[#F37021] transition-colors leading-tight">
                       {prod.name}
                     </h3>
 
@@ -313,7 +313,7 @@ export default function WishlistPage() {
                       const { rating, reviewsCount } = getProductRating(prod);
                       return (
                         <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate-500 font-normal">
-                          <Star className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                          <Star className="w-3.5 h-3.5 text-[#F37021] fill-[#F37021]" strokeWidth={1.5} />
                           <span className="font-normal text-slate-700">{rating.toFixed(1)}</span>
                           <span className="text-slate-400 font-light">({reviewsCount})</span>
                         </div>
@@ -322,7 +322,7 @@ export default function WishlistPage() {
 
                     {/* Price */}
                     <div className="flex items-baseline gap-1.5 pt-0.5">
-                      <span className="text-xs sm:text-sm font-medium text-[#89591C]">
+                      <span className="text-xs sm:text-sm font-medium text-[#F37021]">
                         ₹{prod.discountPrice || prod.price}
                       </span>
                     </div>
@@ -334,10 +334,10 @@ export default function WishlistPage() {
         </div>
 
         {/* ── TRUST BADGES STRIP ── */}
-        <div className="bg-[#faf8f5] rounded-md border border-[#e8e2d8] p-3.5 sm:p-4 grid grid-cols-3 gap-2 text-center sm:text-left shadow-2xs">
+        <div className="bg-[#F7F7F7] rounded-md border border-[#E5E5E5] p-3.5 sm:p-4 grid grid-cols-3 gap-2 text-center sm:text-left shadow-2xs">
           {/* Badge 1 */}
           <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3">
-            <div className="w-8 h-8 rounded-md bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
+            <div className="w-8 h-8 rounded-md bg-white border border-[#E5E5E5] flex items-center justify-center text-[#F37021] shadow-2xs flex-shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
@@ -347,8 +347,8 @@ export default function WishlistPage() {
           </div>
 
           {/* Badge 2 */}
-          <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3 border-x border-[#e8e2d8]/80 px-1.5 sm:px-4">
-            <div className="w-8 h-8 rounded-md bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3 border-x border-[#E5E5E5]/80 px-1.5 sm:px-4">
+            <div className="w-8 h-8 rounded-md bg-white border border-[#E5E5E5] flex items-center justify-center text-[#F37021] shadow-2xs flex-shrink-0">
               <RotateCcw className="w-4 h-4" />
             </div>
             <div>
@@ -359,7 +359,7 @@ export default function WishlistPage() {
 
           {/* Badge 3 */}
           <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3">
-            <div className="w-8 h-8 rounded-md bg-white border border-[#e8e2d8] flex items-center justify-center text-[#89591C] shadow-2xs flex-shrink-0">
+            <div className="w-8 h-8 rounded-md bg-white border border-[#E5E5E5] flex items-center justify-center text-[#F37021] shadow-2xs flex-shrink-0">
               <Headphones className="w-4 h-4" />
             </div>
             <div>
@@ -376,7 +376,7 @@ export default function WishlistPage() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-20 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-md shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
-          <div className="w-5 h-5 rounded-md bg-[#89591C] flex items-center justify-center flex-shrink-0">
+          <div className="w-5 h-5 rounded-md bg-[#F37021] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>
           <span className="text-xs font-medium">{toastMessage}</span>

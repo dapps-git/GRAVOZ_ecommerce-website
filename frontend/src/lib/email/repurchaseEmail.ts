@@ -32,7 +32,7 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
   } = data;
 
   const appUrl = data.appUrl || process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
-  const logoUrl = data.logoUrl || 'cid:gravoz-logo';
+  const logoUrl = data.logoUrl || 'cid:sercher-logo';
   const currentYear = new Date().getFullYear();
 
   const isFourMonths = type === '4_months';
@@ -79,25 +79,25 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
     }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f7f5f0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; color: #1a1a1a;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f7f5f0; width: 100%; padding: 32px 16px;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; color: #1a1a1a;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F5F5F5; width: 100%; padding: 32px 16px;">
     <tr>
       <td align="center">
         <!-- Main Email Container -->
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 560px; width: 100%; background-color: #ffffff; border: 1px solid #e8decb; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.03);">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 560px; width: 100%; background-color: #ffffff; border: 1px solid #E5E5E5; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.03);">
           
           <!-- Top Header with Official GRAVOZ Logo -->
           <tr>
-            <td style="background-color: #ffffff; padding: 26px 28px 22px 28px; text-align: center; border-bottom: 1px solid #ebdccb;">
+            <td style="background-color: #ffffff; padding: 26px 28px 22px 28px; text-align: center; border-bottom: 1px solid #FAD4BC;">
               <a href="${appUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
                 <img 
                   src="${logoUrl}" 
-                  alt="GRAVOZ" 
+                  alt="SERCHER" 
                   width="160" 
                   style="display: block; width: 160px; max-width: 100%; height: auto; margin: 0 auto; border: 0;"
                 />
               </a>
-              <p style="margin: 8px 0 0 0; color: #89591C; font-size: 10.5px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase;">
+              <p style="margin: 8px 0 0 0; color: #F37021; font-size: 10.5px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase;">
                 Handcrafted Footwear · Pure Leather
               </p>
             </td>
@@ -105,8 +105,8 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
 
           <!-- Free Shipping All Over India Highlight Strip -->
           <tr>
-            <td style="background-color: #faf6ef; border-bottom: 1px solid #ebdccb; padding: 10px 18px; text-align: center;">
-              <span style="font-size: 11px; font-weight: 500; color: #89591C; letter-spacing: 0.08em; text-transform: uppercase;">
+            <td style="background-color: #FFF3EB; border-bottom: 1px solid #FAD4BC; padding: 10px 18px; text-align: center;">
+              <span style="font-size: 11px; font-weight: 500; color: #F37021; letter-spacing: 0.08em; text-transform: uppercase;">
                 🚚 100% Free Shipping All Over India
               </span>
             </td>
@@ -115,7 +115,7 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
           <!-- Hero Greeting Content -->
           <tr>
             <td style="padding: 34px 32px 28px 32px;">
-              <div style="display: inline-block; background-color: #faf4eb; border: 1px solid #ebdccb; color: #89591C; font-size: 10.5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; padding: 4px 12px; border-radius: 20px; margin-bottom: 18px;">
+              <div style="display: inline-block; background-color: #FFF3EB; border: 1px solid #FAD4BC; color: #F37021; font-size: 10.5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; padding: 4px 12px; border-radius: 20px; margin-bottom: 18px;">
                 ${badgeText}
               </div>
 
@@ -131,27 +131,27 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
                 ${questionParagraph}
               </p>
 
-              <div style="background-color: #faf7f2; border-left: 3px solid #89591C; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
-                <p style="margin: 0; font-size: 13px; font-weight: 400; color: #6e4414; line-height: 1.6;">
+              <div style="background-color: #F7F7F7; border-left: 3px solid #F37021; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+                <p style="margin: 0; font-size: 13px; font-weight: 400; color: #D95B10; line-height: 1.6;">
                   ${calloutText}
                 </p>
               </div>
 
               <!-- Product Showcase Card -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border: 1px solid #ebdccb; border-radius: 12px; overflow: hidden; margin-bottom: 8px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border: 1px solid #FAD4BC; border-radius: 12px; overflow: hidden; margin-bottom: 8px;">
                 <tr>
-                  <td align="center" style="background-color: #fdfaf6; padding: 22px; border-bottom: 1px solid #ebdccb;">
+                  <td align="center" style="background-color: #FAFAFA; padding: 22px; border-bottom: 1px solid #FAD4BC;">
                     <img 
                       src="${productImage || `${appUrl}/products/placeholder.svg`}" 
                       alt="${productName}" 
                       width="260" 
-                      style="display: block; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #ebdccb;"
+                      style="display: block; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #FAD4BC;"
                     />
                   </td>
                 </tr>
                 <tr>
                   <td style="padding: 22px 24px;">
-                    <div style="font-size: 10px; font-weight: 600; color: #89591C; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px;">
+                    <div style="font-size: 10px; font-weight: 600; color: #F37021; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px;">
                       ${isFourMonths ? 'Your Favorite Footwear Style' : 'Your Previously Purchased Design'}
                     </div>
                     <div style="font-size: 17px; font-weight: 500; color: #111111; line-height: 1.35; margin-bottom: 8px;">
@@ -169,7 +169,7 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
                     </table>
 
                     <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 18px;">
-                      <span style="font-size: 20px; font-weight: 600; color: #89591C;">
+                      <span style="font-size: 20px; font-weight: 600; color: #F37021;">
                         ₹${productPrice ? productPrice.toLocaleString('en-IN') : '1,399'}
                       </span>
                       <span style="font-size: 10.5px; font-weight: 500; color: #166534; background-color: #dcfce7; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em;">
@@ -180,7 +180,7 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
                     <!-- Buy Again Primary Button -->
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width: 100%;">
                       <tr>
-                        <td align="center" style="border-radius: 8px; background-color: #89591C;">
+                        <td align="center" style="border-radius: 8px; background-color: #F37021;">
                           <a 
                             href="${productUrl}" 
                             target="_blank" 
@@ -200,7 +200,7 @@ export function generateRepurchaseEmailHtml(data: RepurchaseEmailPayload): strin
 
           <!-- Footer -->
           <tr>
-            <td style="background-color: #faf7f2; padding: 22px 28px; text-align: center; border-top: 1px solid #ebdccb;">
+            <td style="background-color: #F7F7F7; padding: 22px 28px; text-align: center; border-top: 1px solid #FAD4BC;">
               <p style="margin: 0 0 6px 0; font-size: 11px; color: #777777; font-weight: 300;">
                 Questions or need custom sizing? Reply directly to this email or visit our store.
               </p>
@@ -254,7 +254,7 @@ export async function sendRepurchaseEmail(payload: RepurchaseEmailPayload): Prom
       },
     });
 
-    const logoPath = path.join(process.cwd(), 'public', 'gravoz-logo.png');
+    const logoPath = path.join(process.cwd(), 'public', 'sercher-brand-logo.png');
     const hasLogo = fs.existsSync(logoPath);
 
     await transporter.sendMail({
@@ -264,9 +264,9 @@ export async function sendRepurchaseEmail(payload: RepurchaseEmailPayload): Prom
       attachments: hasLogo
         ? [
             {
-              filename: 'gravoz-logo.png',
+              filename: 'sercher-brand-logo.png',
               path: logoPath,
-              cid: 'gravoz-logo',
+              cid: 'sercher-logo',
             },
           ]
         : [],

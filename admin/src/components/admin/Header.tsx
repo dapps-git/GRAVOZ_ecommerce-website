@@ -52,7 +52,7 @@ export default function Header({ adminName = 'Admin', adminEmail = 'gravoxshopad
   };
 
   return (
-    <header className="h-14 bg-white border-b border-[#e8e2d8] px-4 flex items-center justify-between sticky top-0 z-20 font-light">
+    <header className="h-14 bg-white border-b border-[#E5E5E5] px-4 flex items-center justify-between sticky top-0 z-20 font-light">
       {/* Dynamic Page Heading in Left Navbar */}
       <div className="flex items-center gap-3">
         <h1 className="text-base font-bold text-slate-900 tracking-tight">
@@ -61,8 +61,8 @@ export default function Header({ adminName = 'Admin', adminEmail = 'gravoxshopad
       </div>
 
       {/* Live Real-Time Clock & Date Widget on Right Navbar */}
-      <div className="flex items-center gap-2 bg-[#faf8f5] px-3 py-1.5 rounded-md border border-[#e8e2d8]">
-        <Clock className="w-4 h-4 text-[#89591C]" />
+      <div className="flex items-center gap-2 bg-[#F7F7F7] px-3 py-1.5 rounded-md border border-[#E5E5E5]">
+        <Clock className="w-4 h-4 text-[#F37021]" />
         <div className="text-right">
           <span className="text-xs font-bold text-slate-900 leading-none block">{timeStr || '15:09:20'}</span>
           <span className="text-[10px] text-slate-500 font-normal block">{dateStr || 'Fri, Aug 21, 2026'}</span>

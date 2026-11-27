@@ -580,7 +580,7 @@ export default function ProductInnerPage() {
 
 
   return (
-    <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between selection:bg-[#89591C]/20 selection:text-[#89591C]">
+    <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between selection:bg-[#F37021]/20 selection:text-[#F37021]">
       {/* 1. Global Navigation Header */}
       <Header />
 
@@ -616,7 +616,7 @@ export default function ProductInnerPage() {
           </p>
           <Link
             href="/products"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#030303] text-white text-xs font-semibold hover:bg-[#89591C] transition-colors"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#030303] text-white text-xs font-semibold hover:bg-[#F37021] transition-colors"
           >
             Browse All Products
           </Link>
@@ -637,7 +637,7 @@ export default function ProductInnerPage() {
               {product.subCategory || 'Casual Shoes'}
             </Link>
             <span className="text-[#98A2B3]">&gt;</span>
-            <span className="text-[#8B4A12] font-semibold truncate max-w-[160px] sm:max-w-xs whitespace-nowrap">{product.name}</span>
+            <span className="text-[#F37021] font-semibold truncate max-w-[160px] sm:max-w-xs whitespace-nowrap">{product.name}</span>
           </nav>
 
           {/* ── Product Split Layout (Desktop 2-Col | Mobile Stacked) ── */}
@@ -662,12 +662,12 @@ export default function ProductInnerPage() {
                 onTouchStart={handleGalleryTouchStart}
                 onTouchMove={handleGalleryTouchMove}
                 onTouchEnd={handleGalleryTouchEnd}
-                className="relative w-full aspect-square max-h-[420px] sm:max-h-[450px] rounded-2xl overflow-hidden bg-[#f4f2ee] border border-[#e8e2d8] shadow-2xs cursor-crosshair group select-none flex items-center justify-center touch-pan-y"
+                className="relative w-full aspect-square max-h-[420px] sm:max-h-[450px] rounded-2xl overflow-hidden bg-[#F3F3F3] border border-[#E5E5E5] shadow-2xs cursor-crosshair group select-none flex items-center justify-center touch-pan-y"
               >
                 {/* Product Badge: BEST SELLER */}
                 {(product.badge || product.isBestSeller || product.isTopSeller || product.isLatest || true) && (
                   <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                    <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#F5EFE6] text-[#68421A] border border-[#E6DBCB]">
+                    <span className="px-2.5 py-0.5 rounded-none text-[8px] sm:text-[9px] font-normal tracking-[0.08em] uppercase bg-[#FFF3EB] text-[#D95B10] border border-[#FAD4BC]">
                       {product.badge || (product.isBestSeller ? 'BEST SELLER' : product.isTopSeller ? 'TOP SELLER' : product.isLatest ? 'NEW' : 'BEST SELLER')}
                     </span>
                   </div>
@@ -823,7 +823,7 @@ export default function ProductInnerPage() {
                     setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : displayImages.length - 1));
                     setActiveHeroImage(null);
                   }}
-                  className="w-7 h-7 rounded-full border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-600 flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer"
+                  className="w-7 h-7 rounded-full border border-[#E5E5E5] hover:bg-[#FFF3EB] text-slate-600 flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer"
                   title="Previous thumbnail"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
@@ -841,10 +841,10 @@ export default function ProductInnerPage() {
                           setSelectedImageIndex(idx);
                           setActiveHeroImage(null);
                         }}
-                        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 bg-[#f4f2ee] transition-all cursor-pointer ${
+                        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 bg-[#F3F3F3] transition-all cursor-pointer ${
                           isCurrent
-                            ? 'border-2 border-[#89591C] ring-2 ring-[#89591C]/20 scale-105 shadow-xs'
-                            : 'border border-[#e8e2d8] opacity-75 hover:opacity-100 hover:border-slate-400'
+                            ? 'border-2 border-[#F37021] ring-2 ring-[#F37021]/20 scale-105 shadow-xs'
+                            : 'border border-[#E5E5E5] opacity-75 hover:opacity-100 hover:border-slate-400'
                         }`}
                       >
                         <Image
@@ -865,7 +865,7 @@ export default function ProductInnerPage() {
                     setSelectedImageIndex((prev) => (prev < displayImages.length - 1 ? prev + 1 : 0));
                     setActiveHeroImage(null);
                   }}
-                  className="w-7 h-7 rounded-full border border-[#e8e2d8] hover:bg-[#faf4ec] text-slate-600 flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer"
+                  className="w-7 h-7 rounded-full border border-[#E5E5E5] hover:bg-[#FFF3EB] text-slate-600 flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer"
                   title="Next thumbnail"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -894,7 +894,7 @@ export default function ProductInnerPage() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 text-[#8A5B2A] fill-[#8A5B2A]" strokeWidth={1.5} />
+                      <Star key={i} className="w-3.5 h-3.5 text-[#F37021] fill-[#F37021]" strokeWidth={1.5} />
                     ))}
                   </div>
                   <span className="text-[13px] text-[#555555] font-normal">
@@ -904,7 +904,7 @@ export default function ProductInnerPage() {
               </div>
 
               {/* Price Line (Price 28–32px SemiBold 600) */}
-              <div className="flex items-center justify-between border-b border-[#E5E1DC] pb-3">
+              <div className="flex items-center justify-between border-b border-[#E5E5E5] pb-3">
                 <div className="flex items-baseline gap-2.5">
                   <span className="text-[28px] sm:text-[32px] font-semibold text-[#111111] leading-[36px]">
                     ₹{product.price}
@@ -936,7 +936,7 @@ export default function ProductInnerPage() {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium border transition-all cursor-pointer ${
                     isInWishlist(product._id)
                       ? 'bg-rose-50 border-rose-200 text-rose-600'
-                      : 'bg-white border-[#E5E1DC] text-[#555555] hover:border-[#8A5B2A] hover:text-[#8A5B2A]'
+                      : 'bg-white border-[#E5E5E5] text-[#555555] hover:border-[#F37021] hover:text-[#F37021]'
                   }`}
                 >
                   <Heart className={`w-3.5 h-3.5 ${isInWishlist(product._id) ? 'fill-rose-500 text-rose-500' : ''}`} strokeWidth={1.5} />
@@ -958,9 +958,9 @@ export default function ProductInnerPage() {
                   <button
                     type="button"
                     onClick={() => setIsSizeChartOpen(true)}
-                    className="inline-flex items-center gap-1 text-[12px] font-medium text-[#8A5B2A] hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[12px] font-medium text-[#F37021] hover:underline cursor-pointer"
                   >
-                    <Ruler className="w-3.5 h-3.5 text-[#8A5B2A]" strokeWidth={1.5} /> Size Chart
+                    <Ruler className="w-3.5 h-3.5 text-[#F37021]" strokeWidth={1.5} /> Size Chart
                   </button>
                 </div>
 
@@ -978,7 +978,7 @@ export default function ProductInnerPage() {
                           disabled={true}
                           onClick={() => showToast(`Size ${item.size} is currently out of stock.`)}
                           title={`Size ${item.size} is Out of Stock`}
-                          className="relative w-10 h-10 rounded-md border border-slate-200 bg-[#FAF7F3] text-slate-300 flex items-center justify-center text-[13px] font-normal cursor-not-allowed select-none line-through opacity-60"
+                          className="relative w-10 h-10 rounded-md border border-slate-200 bg-[#F7F7F7] text-slate-300 flex items-center justify-center text-[13px] font-normal cursor-not-allowed select-none line-through opacity-60"
                         >
                           {item.size}
                           <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -996,7 +996,7 @@ export default function ProductInnerPage() {
                         className={`w-10 h-10 rounded-md border flex items-center justify-center text-[14px] transition-all cursor-pointer ${
                           isSelected
                             ? 'border-[#111111] bg-white text-[#111111] font-semibold ring-1 ring-[#111111] shadow-2xs'
-                            : 'border-[#E5E1DC] bg-white text-[#111111] font-normal hover:border-[#111111]'
+                            : 'border-[#E5E5E5] bg-white text-[#111111] font-normal hover:border-[#111111]'
                         }`}
                       >
                         {item.size}
@@ -1037,7 +1037,7 @@ export default function ProductInnerPage() {
                   <label className="text-[14px] font-medium text-[#111111]">
                     Options :
                   </label>
-                  <span className="text-[14px] font-medium text-[#8A5B2A]">{selectedColor}</span>
+                  <span className="text-[14px] font-medium text-[#F37021]">{selectedColor}</span>
                   <span className="text-[12px] text-[#888888]">({activeColorVariants.length} Colors)</span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -1102,7 +1102,7 @@ export default function ProductInnerPage() {
               <div className="space-y-3 pt-2 font-poppins">
                 
                 {/* Quantity Selector Pill: < 1 > */}
-                <div className={`flex items-center justify-between w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E8E1D9] text-[#171717] ${
+                <div className={`flex items-center justify-between w-full h-[46px] px-4 rounded-[10px] bg-white border border-[#E5E5E5] text-[#171717] ${
                   !isCurrentSizeAvailable ? 'opacity-60 pointer-events-none' : ''
                 }`}>
                   <button
@@ -1126,147 +1126,149 @@ export default function ProductInnerPage() {
                   </button>
                 </div>
 
-                {/* ADD TO CART Button (Primary Button: #8B4A12) */}
-                <button
-                  type="button"
-                  disabled={!isCurrentSizeAvailable}
-                  onClick={async () => {
-                    if (!isCurrentColorAvailable) {
-                      showToast(`Selected color "${selectedColor}" is out of stock. Please pick another color.`);
-                      return;
-                    }
-                    if (!isCurrentSizeAvailable) {
-                      showToast(
-                        !isProductInStock
-                          ? 'This product is currently out of stock.'
-                          : 'Please choose an available size.'
-                      );
-                      return;
-                    }
-                    await addToCart({
-                      productId: product._id,
-                      title: product.name,
-                      price: product.price,
-                      originalPrice: product.originalPrice,
-                      size: selectedSize,
-                      quantity: quantity,
-                      imageUrl: heroPhotoUrl,
-                      color: selectedColor,
-                      noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
-                    });
-                    // Also add selected add-ons to cart
-                    for (const addonId of selectedAddonIds) {
-                      const addon = addons.find((a) => a._id === addonId);
-                      if (addon) {
-                        await addToCart({
-                          productId: addon._id,
-                          title: addon.name,
-                          price: addon.price,
-                          size: 'One Size',
-                          quantity: 1,
-                          imageUrl: addon.imageUrl || '/products/placeholder.svg',
-                          isAddon: true,
-                        });
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                  {/* ADD TO CART Button (Primary Button: #F37021) */}
+                  <button
+                    type="button"
+                    disabled={!isCurrentSizeAvailable}
+                    onClick={async () => {
+                      if (!isCurrentColorAvailable) {
+                        showToast(`Selected color "${selectedColor}" is out of stock. Please pick another color.`);
+                        return;
                       }
-                    }
-                    const addonCount = selectedAddonIds.size;
-                    showToast(`Added ${quantity} × ${product.name} (${selectedColor} / Size ${selectedSize})${addonCount > 0 ? ` + ${addonCount} add-on${addonCount > 1 ? 's' : ''}` : ''} to Bag!`);
-                  }}
-                  className={`w-full h-[46px] sm:h-[48px] px-6 rounded-[10px] text-white text-[13px] sm:text-[14px] font-semibold uppercase tracking-wider shadow-xs transition-all flex items-center justify-center cursor-pointer ${
-                    isCurrentSizeAvailable
-                      ? 'bg-[#8B4A12] hover:bg-[#6F390C]'
-                      : 'bg-[#E8E1D9] text-[#98A2B3] cursor-not-allowed'
-                  }`}
-                >
-                  {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
-                    ? 'OUT OF STOCK'
-                    : !isCurrentColorAvailable
-                    ? `OUT OF STOCK (${(selectedColor || '').toUpperCase()})`
-                    : isCurrentSizeAvailable
-                    ? 'ADD TO CART'
-                    : 'SIZE OUT OF STOCK'}
-                </button>
-
-                {/* BUY NOW Button (Outline Button: border #8B4A12 text #8B4A12) */}
-                <button
-                  type="button"
-                  disabled={!isCurrentSizeAvailable}
-                  onClick={async () => {
-                    if (!isCurrentColorAvailable) {
-                      showToast(`Selected color "${selectedColor}" is out of stock. Please pick another color.`);
-                      return;
-                    }
-                    if (!isCurrentSizeAvailable) {
-                      showToast(
-                        !isProductInStock
-                          ? 'This product is currently out of stock.'
-                          : 'Please choose an available size.'
-                      );
-                      return;
-                    }
-                    await addToCart({
-                      productId: product._id,
-                      title: product.name,
-                      price: product.price,
-                      originalPrice: product.originalPrice,
-                      size: selectedSize,
-                      quantity: quantity,
-                      imageUrl: displayImages[0]?.url || '/products/placeholder.svg',
-                      color: selectedColor || product.colors?.[0] || 'Tan',
-                      noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
-                    });
-                    // Also add selected add-ons to cart
-                    for (const addonId of selectedAddonIds) {
-                      const addon = addons.find((a) => a._id === addonId);
-                      if (addon) {
-                        await addToCart({
-                          productId: addon._id,
-                          title: addon.name,
-                          price: addon.price,
-                          size: 'One Size',
-                          quantity: 1,
-                          imageUrl: addon.imageUrl || '/products/placeholder.svg',
-                          isAddon: true,
-                        });
+                      if (!isCurrentSizeAvailable) {
+                        showToast(
+                          !isProductInStock
+                            ? 'This product is currently out of stock.'
+                            : 'Please choose an available size.'
+                        );
+                        return;
                       }
-                    }
+                      await addToCart({
+                        productId: product._id,
+                        title: product.name,
+                        price: product.price,
+                        originalPrice: product.originalPrice,
+                        size: selectedSize,
+                        quantity: quantity,
+                        imageUrl: heroPhotoUrl,
+                        color: selectedColor,
+                        noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
+                      });
+                      // Also add selected add-ons to cart
+                      for (const addonId of selectedAddonIds) {
+                        const addon = addons.find((a) => a._id === addonId);
+                        if (addon) {
+                          await addToCart({
+                            productId: addon._id,
+                            title: addon.name,
+                            price: addon.price,
+                            size: 'One Size',
+                            quantity: 1,
+                            imageUrl: addon.imageUrl || '/products/placeholder.svg',
+                            isAddon: true,
+                          });
+                        }
+                      }
+                      const addonCount = selectedAddonIds.size;
+                      showToast(`Added ${quantity} × ${product.name} (${selectedColor} / Size ${selectedSize})${addonCount > 0 ? ` + ${addonCount} add-on${addonCount > 1 ? 's' : ''}` : ''} to Bag!`);
+                    }}
+                    className={`w-full h-[46px] sm:h-[48px] px-3 sm:px-6 rounded-[10px] text-white text-[12px] sm:text-[14px] font-semibold uppercase tracking-wider shadow-xs transition-all flex items-center justify-center whitespace-nowrap cursor-pointer ${
+                      isCurrentSizeAvailable
+                        ? 'bg-[#F37021] hover:bg-[#D95B10]'
+                        : 'bg-[#E5E5E5] text-[#98A2B3] cursor-not-allowed'
+                    }`}
+                  >
+                    {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
+                      ? 'OUT OF STOCK'
+                      : !isCurrentColorAvailable
+                      ? `OUT OF STOCK (${(selectedColor || '').toUpperCase()})`
+                      : isCurrentSizeAvailable
+                      ? 'ADD TO CART'
+                      : 'SIZE OUT OF STOCK'}
+                  </button>
 
-                    if (!isLoggedIn) {
-                      showToast('Please sign in to complete your purchase.');
-                      setTimeout(() => {
-                        router.push('/login?redirect=/cart');
-                      }, 700);
-                      return;
-                    }
+                  {/* BUY NOW Button (Outline Button: border #F37021 text #F37021) */}
+                  <button
+                    type="button"
+                    disabled={!isCurrentSizeAvailable}
+                    onClick={async () => {
+                      if (!isCurrentColorAvailable) {
+                        showToast(`Selected color "${selectedColor}" is out of stock. Please pick another color.`);
+                        return;
+                      }
+                      if (!isCurrentSizeAvailable) {
+                        showToast(
+                          !isProductInStock
+                            ? 'This product is currently out of stock.'
+                            : 'Please choose an available size.'
+                        );
+                        return;
+                      }
+                      await addToCart({
+                        productId: product._id,
+                        title: product.name,
+                        price: product.price,
+                        originalPrice: product.originalPrice,
+                        size: selectedSize,
+                        quantity: quantity,
+                        imageUrl: displayImages[0]?.url || '/products/placeholder.svg',
+                        color: selectedColor || product.colors?.[0] || 'Tan',
+                        noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
+                      });
+                      // Also add selected add-ons to cart
+                      for (const addonId of selectedAddonIds) {
+                        const addon = addons.find((a) => a._id === addonId);
+                        if (addon) {
+                          await addToCart({
+                            productId: addon._id,
+                            title: addon.name,
+                            price: addon.price,
+                            size: 'One Size',
+                            quantity: 1,
+                            imageUrl: addon.imageUrl || '/products/placeholder.svg',
+                            isAddon: true,
+                          });
+                        }
+                      }
 
-                    showToast(`Proceeding to checkout for ${product.name} (Size: ${selectedSize})...`);
-                    router.push('/checkout');
-                  }}
-                  className={`w-full h-[46px] sm:h-[48px] px-6 rounded-[10px] text-[13px] sm:text-[14px] font-semibold uppercase tracking-wider transition-all flex items-center justify-center cursor-pointer border ${
-                    isCurrentSizeAvailable
-                      ? 'border-[#8B4A12] text-[#8B4A12] bg-white hover:bg-[#FCF8F3]'
-                      : 'border-[#E8E1D9] text-[#98A2B3] bg-[#FCFAF7] cursor-not-allowed'
-                  }`}
-                >
-                  {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
-                    ? 'OUT OF STOCK'
-                    : !isCurrentColorAvailable
-                    ? `OUT OF STOCK (${(selectedColor || '').toUpperCase()})`
-                    : 'BUY NOW'}
-                </button>
+                      if (!isLoggedIn) {
+                        showToast('Please sign in to complete your purchase.');
+                        setTimeout(() => {
+                          router.push('/login?redirect=/cart');
+                        }, 700);
+                        return;
+                      }
+
+                      showToast(`Proceeding to checkout for ${product.name} (Size: ${selectedSize})...`);
+                      router.push('/checkout');
+                    }}
+                    className={`w-full h-[46px] sm:h-[48px] px-3 sm:px-6 rounded-[10px] text-[12px] sm:text-[14px] font-semibold uppercase tracking-wider transition-all flex items-center justify-center whitespace-nowrap cursor-pointer border ${
+                      isCurrentSizeAvailable
+                        ? 'border-[#F37021] text-[#F37021] bg-white hover:bg-[#FFF5EE]'
+                        : 'border-[#E5E5E5] text-[#98A2B3] bg-[#FAFAFA] cursor-not-allowed'
+                    }`}
+                  >
+                    {!isProductInStock || (product.stock !== undefined && product.stock <= 0)
+                      ? 'OUT OF STOCK'
+                      : !isCurrentColorAvailable
+                      ? `OUT OF STOCK (${(selectedColor || '').toUpperCase()})`
+                      : 'BUY NOW'}
+                  </button>
+                </div>
               </div>
 
               {/* ── Add-Ons Section ("Complete the look") ───────────────────────── */}
               {addons.length > 0 && (
-                <div className="bg-[#FAF7F2] border border-[#EDE6DC] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-2xs font-poppins">
+                <div className="bg-[#F7F7F7] border border-[#E5E5E5] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-2xs font-poppins">
                   {/* Header */}
                   <div>
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#8A5828] fill-[#8A5828] flex-shrink-0" />
+                      <Sparkles className="w-4 h-4 text-[#F37021] fill-[#F37021] flex-shrink-0" />
                       <h4 className="text-[15px] sm:text-[16px] font-bold text-[#1E293B] tracking-tight">
                         Complete the look
                       </h4>
-                      <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#F3E7D7] text-[#8C5424] rounded-full">
+                      <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#FFE6D5] text-[#F37021] rounded-full">
                         OPTIONAL ADD-ONS
                       </span>
                     </div>
@@ -1295,13 +1297,13 @@ export default function ProductInnerPage() {
                           }}
                           className={`w-full flex items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer select-none bg-white ${
                             isSelected
-                              ? 'border-[#8A5828] ring-1 ring-[#8A5828] shadow-2xs'
-                              : 'border-[#EDE8E1] hover:border-[#D8CEBF] shadow-2xs'
+                              ? 'border-[#F37021] ring-1 ring-[#F37021] shadow-2xs'
+                              : 'border-[#EAEAEA] hover:border-[#D4D4D4] shadow-2xs'
                           }`}
                         >
                           {/* Left: Thumbnail & Info */}
                           <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#F8F6F2] border border-[#EDE6DC] overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#F5F5F5] border border-[#E5E5E5] overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
                               {addon.imageUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
@@ -1336,8 +1338,8 @@ export default function ProductInnerPage() {
                             <div
                               className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition-all ${
                                 isSelected
-                                  ? 'bg-[#8A5828] border-[#8A5828] text-white shadow-2xs'
-                                  : 'bg-white border-[#D4C7B5]'
+                                  ? 'bg-[#F37021] border-[#F37021] text-white shadow-2xs'
+                                  : 'bg-white border-[#D4D4D4]'
                               }`}
                             >
                               {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
@@ -1349,7 +1351,7 @@ export default function ProductInnerPage() {
                   </div>
 
                   {selectedAddonIds.size > 0 && (
-                    <p className="text-[11.5px] text-[#8A5828] font-semibold flex items-center gap-1.5 pt-0.5">
+                    <p className="text-[11.5px] text-[#F37021] font-semibold flex items-center gap-1.5 pt-0.5">
                       <Check className="w-3.5 h-3.5" />
                       {selectedAddonIds.size} add-on{selectedAddonIds.size > 1 ? 's' : ''} selected · will be added to your bag
                     </p>
@@ -1386,15 +1388,15 @@ export default function ProductInnerPage() {
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* HORIZONTAL PRODUCT TABS (Matches Brand Style Guide v1.0)        */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-          <section className="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5E1DC] shadow-2xs">
+          <section className="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5E5E5] shadow-2xs">
             {/* Tabs Header Bar */}
-            <div className="border-b border-[#E5E1DC] flex items-center gap-6 sm:gap-8 overflow-x-auto scrollbar-none text-[14px]">
+            <div className="border-b border-[#E5E5E5] flex items-center gap-6 sm:gap-8 overflow-x-auto scrollbar-none text-[14px]">
               <button
                 type="button"
                 onClick={() => setActiveTab('description')}
                 className={`pb-3 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'description'
-                    ? 'border-[#8A5B2A] text-[#8A5B2A] font-medium'
+                    ? 'border-[#F37021] text-[#F37021] font-medium'
                     : 'border-transparent text-[#555555] font-normal hover:text-[#111111]'
                 }`}
               >
@@ -1406,7 +1408,7 @@ export default function ProductInnerPage() {
                 onClick={() => setActiveTab('features')}
                 className={`pb-3 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'features'
-                    ? 'border-[#8A5B2A] text-[#8A5B2A] font-medium'
+                    ? 'border-[#F37021] text-[#F37021] font-medium'
                     : 'border-transparent text-[#555555] font-normal hover:text-[#111111]'
                 }`}
               >
@@ -1418,7 +1420,7 @@ export default function ProductInnerPage() {
                 onClick={() => setActiveTab('details')}
                 className={`pb-3 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'details'
-                    ? 'border-[#8A5B2A] text-[#8A5B2A] font-medium'
+                    ? 'border-[#F37021] text-[#F37021] font-medium'
                     : 'border-transparent text-[#555555] font-normal hover:text-[#111111]'
                 }`}
               >
@@ -1430,7 +1432,7 @@ export default function ProductInnerPage() {
                 onClick={() => setActiveTab('shipping')}
                 className={`pb-3 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'shipping'
-                    ? 'border-[#8A5B2A] text-[#8A5B2A] font-medium'
+                    ? 'border-[#F37021] text-[#F37021] font-medium'
                     : 'border-transparent text-[#555555] font-normal hover:text-[#111111]'
                 }`}
               >
@@ -1459,7 +1461,7 @@ export default function ProductInnerPage() {
                         ]
                     ).map((item, i) => (
                       <li key={i} className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#8A5B2A] flex-shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#F37021] flex-shrink-0" />
                         <span>{item.replace(/^[•\-*]\s*/, '')}</span>
                       </li>
                     ))}
@@ -1471,15 +1473,15 @@ export default function ProductInnerPage() {
               {activeTab === 'features' && (
                 <div className="space-y-4 max-w-4xl">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC]">
+                    <div className="p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5]">
                       <h4 className="font-medium text-[14px] text-[#111111] uppercase tracking-wider mb-1">Premium Leather</h4>
                       <p className="text-[13px] text-[#555555]">Selected authentic leather with smooth finish and high durability.</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC]">
+                    <div className="p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5]">
                       <h4 className="font-medium text-[14px] text-[#111111] uppercase tracking-wider mb-1">Orthopedic Insole</h4>
                       <p className="text-[13px] text-[#555555]">Memory foam cushioning engineered for pressure relief and heel stability.</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC]">
+                    <div className="p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5]">
                       <h4 className="font-medium text-[14px] text-[#111111] uppercase tracking-wider mb-1">Anti-Skid Sole</h4>
                       <p className="text-[13px] text-[#555555]">Flexible slip-resistant outsole providing superior grip on all surfaces.</p>
                     </div>
@@ -1488,7 +1490,7 @@ export default function ProductInnerPage() {
                     <ul className="space-y-2 text-[#555555] pt-2">
                       {product.features.split('\n').filter(Boolean).map((feat, i) => (
                         <li key={i} className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#8A5B2A] flex-shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#F37021] flex-shrink-0" />
                           <span>{feat.replace(/^[•\-*]\s*/, '')}</span>
                         </li>
                       ))}
@@ -1500,7 +1502,7 @@ export default function ProductInnerPage() {
               {/* 3. Product Details Tab (Specifications Table) */}
               {activeTab === 'details' && (
                 <div className="max-w-3xl">
-                  <div className="bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl overflow-hidden divide-y divide-[#E5E1DC]">
+                  <div className="bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl overflow-hidden divide-y divide-[#E5E5E5]">
                     {[
                       { label: 'Material', value: product.material || 'Genuine Artisan Leather' },
                       { label: 'Occasion', value: product.occasion || 'Casual & Daily Wear' },
@@ -1527,9 +1529,9 @@ export default function ProductInnerPage() {
                 <div className="space-y-3 max-w-4xl">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Card 1: Express Shipping */}
-                    <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
+                    <div className="p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] space-y-1">
                       <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
-                        <Truck className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
+                        <Truck className="w-4 h-4 text-[#F37021]" strokeWidth={1.5} />
                         <span>{product.shippingAndReturn?.shippingTitle || 'Complimentary Express Shipping'}</span>
                       </div>
                       <p className="text-[13px] text-[#555555]">
@@ -1549,9 +1551,9 @@ export default function ProductInnerPage() {
                         </p>
                       </div>
                     ) : (
-                      <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
+                      <div className="p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] space-y-1">
                         <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
-                          <RotateCcw className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
+                          <RotateCcw className="w-4 h-4 text-[#F37021]" strokeWidth={1.5} />
                           <span>{product.shippingAndReturn?.returnTitle || '7-Day Hassle-Free Returns'}</span>
                         </div>
                         <p className="text-[13px] text-[#555555]">
@@ -1561,9 +1563,9 @@ export default function ProductInnerPage() {
                     )}
 
                     {/* Card 3: Manufacturing Warranty */}
-                    <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
+                    <div className="p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] space-y-1">
                       <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
-                        <ShieldCheck className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
+                        <ShieldCheck className="w-4 h-4 text-[#F37021]" strokeWidth={1.5} />
                         <span>{product.shippingAndReturn?.warrantyTitle || '6-Month Manufacturing Warranty'}</span>
                       </div>
                       <p className="text-[13px] text-[#555555]">
@@ -1572,9 +1574,9 @@ export default function ProductInnerPage() {
                     </div>
 
                     {/* Card 4: Payment Terms */}
-                    <div className="p-4 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1">
+                    <div className="p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] space-y-1">
                       <div className="flex items-center gap-2 text-[#111111] font-medium text-[14px]">
-                        <Check className="w-4 h-4 text-[#8A5B2A]" strokeWidth={1.5} />
+                        <Check className="w-4 h-4 text-[#F37021]" strokeWidth={1.5} />
                         <span>{product.shippingAndReturn?.paymentTitle || 'COD & Secure Prepaid'}</span>
                       </div>
                       <p className="text-[13px] text-[#555555]">
@@ -1590,8 +1592,8 @@ export default function ProductInnerPage() {
           {/* ═════════════════════════════════════════════════════════════════ */}
           {/* CUSTOMER REVIEWS (Positioned Directly Below Product Tabs Box)   */}
           {/* ═════════════════════════════════════════════════════════════════ */}
-          <section className="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E1DC] shadow-2xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E5E1DC]">
+          <section className="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5E5] shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E5E5E5]">
               <div className="flex items-center gap-2 flex-wrap">
                 <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
@@ -1599,7 +1601,7 @@ export default function ProductInnerPage() {
                       key={i}
                       className={`w-3.5 h-3.5 ${
                         i < Math.round(Number(avgRating) || 5)
-                          ? 'text-[#8A5B2A] fill-[#8A5B2A]'
+                          ? 'text-[#F37021] fill-[#F37021]'
                           : 'text-slate-200'
                       }`}
                       strokeWidth={1.5}
@@ -1617,7 +1619,7 @@ export default function ProductInnerPage() {
               <button
                 type="button"
                 onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
-                className="px-3 py-1.5 bg-[#8A5B2A] hover:bg-[#6e461e] text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer self-start sm:self-auto shadow-2xs"
+                className="px-3 py-1.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer self-start sm:self-auto shadow-2xs"
               >
                 {isReviewFormOpen ? 'Cancel' : 'Write a Review'}
               </button>
@@ -1625,7 +1627,7 @@ export default function ProductInnerPage() {
 
             {/* Review Form */}
             {isReviewFormOpen && (
-              <form onSubmit={handleSubmitReview} className="p-3.5 sm:p-4 bg-[#FAF7F3] border border-[#E5E1DC] rounded-xl space-y-3">
+              <form onSubmit={handleSubmitReview} className="p-3.5 sm:p-4 bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl space-y-3">
                 <h4 className="font-semibold text-xs text-[#111111]">Write a Product Review</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
@@ -1636,7 +1638,7 @@ export default function ProductInnerPage() {
                       placeholder="e.g. John Doe"
                       value={reviewName}
                       onChange={(e) => setReviewName(e.target.value)}
-                      className="w-full bg-white border border-[#E5E1DC] rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#8A5B2A]"
+                      className="w-full bg-white border border-[#E5E5E5] rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#F37021]"
                     />
                   </div>
                   <div>
@@ -1647,7 +1649,7 @@ export default function ProductInnerPage() {
                       placeholder="john@example.com"
                       value={reviewEmail}
                       onChange={(e) => setReviewEmail(e.target.value)}
-                      className="w-full bg-white border border-[#E5E1DC] rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#8A5B2A]"
+                      className="w-full bg-white border border-[#E5E5E5] rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-[#F37021]"
                     />
                   </div>
                 </div>
@@ -1664,7 +1666,7 @@ export default function ProductInnerPage() {
                         <Star
                           className={`w-4 h-4 ${
                             star <= reviewRating
-                              ? 'text-[#8A5B2A] fill-[#8A5B2A]'
+                              ? 'text-[#F37021] fill-[#F37021]'
                               : 'text-slate-300'
                           }`}
                         />
@@ -1681,13 +1683,13 @@ export default function ProductInnerPage() {
                     placeholder="Share your experience with the fit, quality, and comfort..."
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
-                    className="w-full bg-white border border-[#E5E1DC] rounded-lg p-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#8A5B2A]"
+                    className="w-full bg-white border border-[#E5E5E5] rounded-lg p-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#F37021]"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={submittingReview}
-                  className="px-4 py-1.5 bg-[#8A5B2A] hover:bg-[#6e461e] text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-1.5 bg-[#F37021] hover:bg-[#D95B10] text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {submittingReview ? 'Submitting...' : 'Submit Review'}
                 </button>
@@ -1698,7 +1700,7 @@ export default function ProductInnerPage() {
             {reviews.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {reviews.map((r: any, idx: number) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-[#FAF7F3] border border-[#E5E1DC] space-y-1.5">
+                  <div key={idx} className="p-3.5 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-xs text-[#111111]">{r.customerName}</span>
                       <div className="flex items-center gap-0.5">
@@ -1707,7 +1709,7 @@ export default function ProductInnerPage() {
                             key={i}
                             className={`w-3 h-3 ${
                               i < r.rating
-                                ? 'text-[#8A5B2A] fill-[#8A5B2A]'
+                                ? 'text-[#F37021] fill-[#F37021]'
                                 : 'text-slate-200'
                             }`}
                             strokeWidth={1.5}
@@ -1723,7 +1725,7 @@ export default function ProductInnerPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 bg-[#FAF7F3] rounded-xl border border-dashed border-[#E5E1DC] space-y-1">
+              <div className="text-center py-6 bg-[#F7F7F7] rounded-xl border border-dashed border-[#E5E5E5] space-y-1">
                 <p className="text-xs font-semibold text-slate-700">No customer reviews yet</p>
                 <p className="text-[11px] text-slate-500">Be the first to share your experience with this pair!</p>
               </div>
@@ -1731,7 +1733,7 @@ export default function ProductInnerPage() {
           </section>
 
         {/* ── Taste-Sensing "You May Also Like" Recommendation Strip ── */}
-        <div className="pt-6 sm:pt-8 border-t border-[#f0ece5]">
+        <div className="pt-6 sm:pt-8 border-t border-[#EEEEEE]">
           <RecommendationStrip
             title="YOU MAY ALSO LIKE"
             excludeIds={[productId, product._id].filter(Boolean)}
@@ -1758,7 +1760,7 @@ export default function ProductInnerPage() {
       {/* ── SIZE CHART MODAL ── */}
       {isSizeChartOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-lg rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#e8e2d8] relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-white w-full max-w-lg rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#E5E5E5] relative max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setIsSizeChartOpen(false)}
@@ -1769,7 +1771,7 @@ export default function ProductInnerPage() {
             </button>
 
             <div className="flex items-center gap-2 pb-2.5 border-b border-slate-100">
-              <Ruler className="w-4 h-4 text-[#89591C]" />
+              <Ruler className="w-4 h-4 text-[#F37021]" />
               <h3 className="text-base sm:text-lg font-bold text-[#030303]">GRAVOZ Footwear Size Guide</h3>
             </div>
 
@@ -1780,7 +1782,7 @@ export default function ProductInnerPage() {
             <div className="mt-3.5 overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-[#faf8f5] text-slate-700 border-b border-[#e8e2d8]">
+                  <tr className="bg-[#F7F7F7] text-slate-700 border-b border-[#E5E5E5]">
                     <th className="py-2 px-2.5 font-semibold">UK / India</th>
                     <th className="py-2 px-2.5 font-semibold">EU Size</th>
                     <th className="py-2 px-2.5 font-semibold">US Men</th>
@@ -1803,7 +1805,7 @@ export default function ProductInnerPage() {
                     return (
                       <tr
                         key={row.uk}
-                        className={selectedSize === row.uk ? 'bg-[#89591C]/10 font-bold text-[#89591C]' : 'hover:bg-slate-50'}
+                        className={selectedSize === row.uk ? 'bg-[#F37021]/10 font-bold text-[#F37021]' : 'hover:bg-slate-50'}
                       >
                         <td className="py-1.5 px-2.5">{row.uk}</td>
                         <td className="py-1.5 px-2.5">{row.eu}</td>
@@ -1827,7 +1829,7 @@ export default function ProductInnerPage() {
               <button
                 type="button"
                 onClick={() => setIsSizeChartOpen(false)}
-                className="px-4 py-1.5 rounded-full bg-[#030303] text-white text-xs font-semibold hover:bg-[#89591C] transition-colors cursor-pointer"
+                className="px-4 py-1.5 rounded-full bg-[#030303] text-white text-xs font-semibold hover:bg-[#F37021] transition-colors cursor-pointer"
               >
                 Got it
               </button>
@@ -1869,7 +1871,7 @@ export default function ProductInnerPage() {
       {/* ── TOAST NOTIFICATION ── */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 sm:top-auto sm:bottom-6 sm:right-6 sm:left-auto sm:translate-x-0 z-[9999] bg-[#030303] text-white px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 border border-white/20 animate-in slide-in-from-top-4 sm:slide-in-from-bottom-5 duration-300 max-w-[90vw] sm:max-w-md">
-          <div className="w-5 h-5 rounded-full bg-[#89591C] flex items-center justify-center flex-shrink-0">
+          <div className="w-5 h-5 rounded-full bg-[#F37021] flex items-center justify-center flex-shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>
           <span className="text-xs font-medium">{toastMessage}</span>

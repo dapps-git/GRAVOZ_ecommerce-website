@@ -151,10 +151,10 @@ export default function UsersPage() {
   return (
     <div className="space-y-5 font-sansation">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e8e2d8] pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5E5] pb-3">
         <div>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-[#89591C]" /> Registered Users
+            <UserCheck className="w-5 h-5 text-[#F37021]" /> Registered Users
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             All registered login accounts, authentication methods, last login timestamps, and account status
@@ -164,7 +164,7 @@ export default function UsersPage() {
         <button
           type="button"
           onClick={() => setIsCreateOpen(true)}
-          className="h-10 px-4 rounded-xl bg-[#89591C] hover:bg-[#724a17] text-white font-semibold text-xs flex items-center gap-2 transition-colors cursor-pointer shadow-sm flex-shrink-0"
+          className="h-10 px-4 rounded-xl bg-[#F37021] hover:bg-[#D95B10] text-white font-semibold text-xs flex items-center gap-2 transition-colors cursor-pointer shadow-sm flex-shrink-0"
         >
           <Plus className="w-4 h-4" /> Add User Account
         </button>
@@ -172,22 +172,22 @@ export default function UsersPage() {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="p-4 bg-white rounded-2xl border border-[#e8e2d8] shadow-2xs">
+        <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Registered Users</span>
           <span className="text-2xl font-bold text-slate-900 mt-1 block">{totalUsers}</span>
         </div>
 
-        <div className="p-4 bg-white rounded-2xl border border-[#e8e2d8] shadow-2xs">
+        <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider block">Active Accounts</span>
           <span className="text-2xl font-bold text-emerald-700 mt-1 block">{activeUsers}</span>
         </div>
 
-        <div className="p-4 bg-white rounded-2xl border border-[#e8e2d8] shadow-2xs">
+        <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-sky-600 uppercase tracking-wider block">Google OAuth Logins</span>
           <span className="text-2xl font-bold text-sky-700 mt-1 block">{googleUsers}</span>
         </div>
 
-        <div className="p-4 bg-white rounded-2xl border border-[#e8e2d8] shadow-2xs">
+        <div className="p-4 bg-white rounded-2xl border border-[#E5E5E5] shadow-2xs">
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Email & Password Users</span>
           <span className="text-2xl font-bold text-slate-900 mt-1 block">{emailUsers}</span>
         </div>
@@ -195,7 +195,7 @@ export default function UsersPage() {
 
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row items-center gap-2.5">
-        <div className="flex-1 w-full flex items-center gap-2 bg-white border border-[#e8e2d8] rounded-xl px-3 py-2 shadow-2xs">
+        <div className="flex-1 w-full flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-2 shadow-2xs">
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <input
             type="text"
@@ -209,7 +209,7 @@ export default function UsersPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-10 px-3 rounded-xl bg-white border border-[#e8e2d8] text-xs font-semibold text-slate-700 shadow-2xs"
+          className="h-10 px-3 rounded-xl bg-white border border-[#E5E5E5] text-xs font-semibold text-slate-700 shadow-2xs"
         >
           <option value="">All Statuses</option>
           <option value="active">Active Accounts</option>
@@ -219,7 +219,7 @@ export default function UsersPage() {
         <select
           value={authFilter}
           onChange={(e) => setAuthFilter(e.target.value)}
-          className="h-10 px-3 rounded-xl bg-white border border-[#e8e2d8] text-xs font-semibold text-slate-700 shadow-2xs"
+          className="h-10 px-3 rounded-xl bg-white border border-[#E5E5E5] text-xs font-semibold text-slate-700 shadow-2xs"
         >
           <option value="">All Auth Methods</option>
           <option value="google">Google Login</option>
@@ -228,11 +228,11 @@ export default function UsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-2xl border border-[#e8e2d8] overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#faf8f5] border-b border-[#e8e2d8] text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+              <tr className="bg-[#F7F7F7] border-b border-[#E5E5E5] text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                 <th className="py-3 px-4">User</th>
                 <th className="py-3 px-4">Contact</th>
                 <th className="py-3 px-4">Auth Method</th>
@@ -242,7 +242,7 @@ export default function UsersPage() {
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0eae1] text-xs text-slate-800">
+            <tbody className="divide-y divide-[#EEEEEE] text-xs text-slate-800">
               {loading ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-400">
@@ -257,7 +257,7 @@ export default function UsersPage() {
                 </tr>
               ) : (
                 users.map((u) => (
-                  <tr key={u._id} className="hover:bg-[#faf8f5]/80 transition-colors">
+                  <tr key={u._id} className="hover:bg-[#F7F7F7]/80 transition-colors">
                     {/* Name & Initials */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2.5">
@@ -349,7 +349,7 @@ export default function UsersPage() {
                         <button
                           type="button"
                           onClick={() => setSelectedUser(u)}
-                          className="p-1.5 rounded-lg text-slate-600 hover:bg-[#faf8f5] hover:text-[#89591C] transition-colors"
+                          className="p-1.5 rounded-lg text-slate-600 hover:bg-[#F7F7F7] hover:text-[#F37021] transition-colors"
                           title="View User Details"
                         >
                           <Eye className="w-4 h-4" />
@@ -389,7 +389,7 @@ export default function UsersPage() {
               placeholder="e.g. John Doe"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -401,7 +401,7 @@ export default function UsersPage() {
               placeholder="john@example.com"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
@@ -412,14 +412,14 @@ export default function UsersPage() {
               placeholder="e.g. 9876543210"
               value={newPhone}
               onChange={(e) => setNewPhone(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e2d8] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#89591C]"
+              className="w-full bg-[#F7F7F7] border border-[#E5E5E5] rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#F37021]"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2.5 bg-[#89591C] hover:bg-[#724a17] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer mt-2"
+            className="w-full py-2.5 bg-[#F37021] hover:bg-[#D95B10] text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer mt-2"
           >
             {submitting ? 'Creating User...' : 'Create Account'}
           </button>
@@ -435,7 +435,7 @@ export default function UsersPage() {
         >
           <div className="space-y-4 font-sansation text-xs text-slate-800">
             {/* Summary */}
-            <div className="p-3.5 bg-[#faf8f5] rounded-xl border border-[#e8e2d8] grid grid-cols-2 gap-3">
+            <div className="p-3.5 bg-[#F7F7F7] rounded-xl border border-[#E5E5E5] grid grid-cols-2 gap-3">
               <div>
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Email</span>
                 <span className="font-bold text-slate-900">{selectedUser.email}</span>
@@ -457,10 +457,10 @@ export default function UsersPage() {
             {/* Activity History */}
             <div>
               <span className="font-bold text-slate-900 block mb-2">Account Activity Logs:</span>
-              <div className="max-h-48 overflow-y-auto space-y-1.5 border border-[#e8e2d8] rounded-xl p-2.5 bg-[#faf8f5]">
+              <div className="max-h-48 overflow-y-auto space-y-1.5 border border-[#E5E5E5] rounded-xl p-2.5 bg-[#F7F7F7]">
                 {selectedUser.activityLogs && selectedUser.activityLogs.length > 0 ? (
                   selectedUser.activityLogs.map((act, i) => (
-                    <div key={i} className="flex items-start justify-between text-[11px] py-1 border-b border-[#f0eae1] last:border-none">
+                    <div key={i} className="flex items-start justify-between text-[11px] py-1 border-b border-[#EEEEEE] last:border-none">
                       <div>
                         <span className="font-semibold text-slate-800">{act.action}</span>
                         {act.details && <span className="text-slate-500 block">{act.details}</span>}

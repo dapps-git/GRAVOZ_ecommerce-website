@@ -275,7 +275,7 @@ export default function AddonsPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <PackagePlus className="w-6 h-6 text-[#89591C]" />
+            <PackagePlus className="w-6 h-6 text-[#F37021]" />
             Add-Ons Management
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -285,7 +285,7 @@ export default function AddonsPage() {
         <button
           type="button"
           onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#89591C] hover:bg-[#6F3D0E] text-white rounded-lg text-sm font-semibold transition-colors shadow-xs cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#F37021] hover:bg-[#D95B10] text-white rounded-lg text-sm font-semibold transition-colors shadow-xs cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           New Add-On
@@ -301,7 +301,7 @@ export default function AddonsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or SKU..."
-            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
+            className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021]"
           />
         </div>
         <div className="flex gap-1.5">
@@ -311,8 +311,8 @@ export default function AddonsPage() {
               type="button"
               onClick={() => setFilterActive(f)}
               className={`px-3 py-2 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${filterActive === f
-                  ? 'bg-[#89591C] text-white'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:border-[#89591C] hover:text-[#89591C]'
+                  ? 'bg-[#F37021] text-white'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:border-[#F37021] hover:text-[#F37021]'
                 }`}
             >
               {f}
@@ -323,7 +323,7 @@ export default function AddonsPage() {
           type="button"
           onClick={fetchAddons}
           title="Refresh"
-          className="p-2 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-[#89591C] transition-colors cursor-pointer"
+          className="p-2 rounded-lg border border-slate-200 bg-white text-slate-500 hover:text-[#F37021] transition-colors cursor-pointer"
         >
           <RefreshCw className="w-4 h-4" />
         </button>
@@ -429,7 +429,7 @@ export default function AddonsPage() {
                           type="button"
                           onClick={() => openEdit(addon)}
                           title="Edit"
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-[#89591C] hover:bg-amber-50 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-[#F37021] hover:bg-amber-50 transition-colors cursor-pointer"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
@@ -487,7 +487,7 @@ export default function AddonsPage() {
                   value={form.name}
                   onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                   placeholder="e.g. Premium Shoe Polish Kit"
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021]"
                 />
               </div>
 
@@ -502,7 +502,7 @@ export default function AddonsPage() {
                     value={form.sku}
                     onChange={(e) => setForm((p) => ({ ...p, sku: e.target.value.toUpperCase() }))}
                     placeholder="ADDON-001"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021]"
                   />
                 </div>
                 <div>
@@ -515,7 +515,7 @@ export default function AddonsPage() {
                     value={form.price}
                     onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
                     placeholder="99"
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021]"
                   />
                 </div>
 
@@ -532,7 +532,7 @@ export default function AddonsPage() {
                   onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
                   placeholder="Short description shown to customers..."
                   rows={2}
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021]"
                 />
               </div>
 
@@ -543,7 +543,7 @@ export default function AddonsPage() {
                     Product Image
                   </label>
                   {uploadingImage && (
-                    <span className="text-[11px] text-[#89591C] font-semibold animate-pulse flex items-center gap-1">
+                    <span className="text-[11px] text-[#F37021] font-semibold animate-pulse flex items-center gap-1">
                       <RefreshCw className="w-3 h-3 animate-spin" /> Uploading image...
                     </span>
                   )}
@@ -552,18 +552,18 @@ export default function AddonsPage() {
                 {/* Main Upload Dropzone & Button */}
                 <label
                   className={`w-full rounded-xl border-2 border-dashed transition-all p-4 flex flex-col items-center justify-center cursor-pointer text-center ${uploadingImage
-                      ? 'border-[#89591C] bg-[#89591C]/5 pointer-events-none'
-                      : 'border-[#e8e2d8] hover:border-[#89591C] bg-[#faf8f5] hover:bg-[#f4efe8]'
+                      ? 'border-[#F37021] bg-[#F37021]/5 pointer-events-none'
+                      : 'border-[#E5E5E5] hover:border-[#F37021] bg-[#F7F7F7] hover:bg-[#F3F3F3]'
                     }`}
                 >
                   {uploadingImage ? (
                     <div className="flex flex-col items-center gap-1.5 py-2">
-                      <RefreshCw className="w-6 h-6 text-[#89591C] animate-spin" />
-                      <span className="text-xs font-semibold text-[#89591C]">Optimizing & uploading...</span>
+                      <RefreshCw className="w-6 h-6 text-[#F37021] animate-spin" />
+                      <span className="text-xs font-semibold text-[#F37021]">Optimizing & uploading...</span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-1 py-1">
-                      <div className="w-10 h-10 rounded-full bg-[#89591C]/10 flex items-center justify-center text-[#89591C] mb-1">
+                      <div className="w-10 h-10 rounded-full bg-[#F37021]/10 flex items-center justify-center text-[#F37021] mb-1">
                         <Upload className="w-5 h-5" />
                       </div>
                       <span className="text-xs font-bold text-slate-800">
@@ -629,7 +629,7 @@ export default function AddonsPage() {
                     value={form.imageUrl}
                     onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
                     placeholder="https://..."
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C] bg-white text-slate-700"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021] bg-white text-slate-700"
                   />
                 </div>
               </div>
@@ -645,7 +645,7 @@ export default function AddonsPage() {
                     min="0"
                     value={form.stock}
                     onChange={(e) => setForm((p) => ({ ...p, stock: e.target.value }))}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021]"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">99999 = unlimited</p>
                 </div>
@@ -658,7 +658,7 @@ export default function AddonsPage() {
                     min="0"
                     value={form.displayOrder}
                     onChange={(e) => setForm((p) => ({ ...p, displayOrder: e.target.value }))}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#89591C]/20 focus:border-[#89591C]"
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F37021]/20 focus:border-[#F37021]"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">Lower = shows first</p>
                 </div>
@@ -679,8 +679,8 @@ export default function AddonsPage() {
                         type="button"
                         onClick={() => toggleCategory(value)}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${isSelected
-                            ? 'bg-[#89591C] text-white border-[#89591C]'
-                            : 'bg-white text-slate-600 border-slate-200 hover:border-[#89591C] hover:text-[#89591C]'
+                            ? 'bg-[#F37021] text-white border-[#F37021]'
+                            : 'bg-white text-slate-600 border-slate-200 hover:border-[#F37021] hover:text-[#F37021]'
                           }`}
                       >
                         {isSelected && <Check className="w-3 h-3 inline mr-1" />}
@@ -724,7 +724,7 @@ export default function AddonsPage() {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-5 py-2.5 bg-[#89591C] hover:bg-[#6F3D0E] disabled:bg-slate-300 text-white rounded-lg text-sm font-semibold transition-colors shadow-xs cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#F37021] hover:bg-[#D95B10] disabled:bg-slate-300 text-white rounded-lg text-sm font-semibold transition-colors shadow-xs cursor-pointer"
               >
                 {saving ? (
                   <>

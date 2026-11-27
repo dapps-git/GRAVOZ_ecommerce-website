@@ -348,15 +348,15 @@ export default function ProductsPage() {
               setImportResult(null);
               setIsImportModalOpen(true);
             }}
-            className="h-9 px-3.5 rounded-md bg-white border border-[#d6cfc5] hover:bg-[#faf8f5] text-slate-800 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="h-9 px-3.5 rounded-md bg-white border border-[#D4D4D4] hover:bg-[#F7F7F7] text-slate-800 text-xs font-semibold flex items-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer"
           >
-            <FileSpreadsheet className="w-4 h-4 text-[#89591C]" />
+            <FileSpreadsheet className="w-4 h-4 text-[#F37021]" />
             <span>Import Excel / CSV</span>
           </button>
 
           <Link
             href="/admin/products/new"
-            className="h-9 px-4 rounded-md bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
+            className="h-9 px-4 rounded-md bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Product</span>
@@ -367,19 +367,19 @@ export default function ProductsPage() {
       {/* ── KPI Metric Cards (5 Horizontal Cards from Figma) ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* 1. Total Products */}
-        <div className="bg-white rounded-xl border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Total Products</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.total || products.length}</span>
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">All time products</span>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#f4f2ee] text-slate-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#F3F3F3] text-slate-600 flex items-center justify-center flex-shrink-0">
             <Package className="w-5 h-5" />
           </div>
         </div>
 
         {/* 2. Active Products */}
-        <div className="bg-white rounded-xl border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Active Products</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.active || products.filter((p) => p.status === 'active').length}</span>
@@ -391,19 +391,19 @@ export default function ProductsPage() {
         </div>
 
         {/* 3. Draft Products */}
-        <div className="bg-white rounded-xl border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Draft Products</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.draft || 0}</span>
             <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Not published</span>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#fcf4e8] text-amber-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#FFF3EB] text-amber-600 flex items-center justify-center flex-shrink-0">
             <FileText className="w-5 h-5" />
           </div>
         </div>
 
         {/* 4. Out of Stock */}
-        <div className="bg-white rounded-xl border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Out of Stock</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.outOfStock || 0}</span>
@@ -415,7 +415,7 @@ export default function ProductsPage() {
         </div>
 
         {/* 5. Low Stock */}
-        <div className="bg-white rounded-xl border border-[#e8e2d8] p-4 flex items-center justify-between shadow-2xs">
+        <div className="bg-white rounded-xl border border-[#E5E5E5] p-4 flex items-center justify-between shadow-2xs">
           <div>
             <span className="text-[11px] font-medium text-slate-500 block">Low Stock</span>
             <span className="text-2xl font-bold text-slate-900 mt-1 block">{stats.lowStock || 0}</span>
@@ -428,7 +428,7 @@ export default function ProductsPage() {
       </div>
 
       {/* ── Filter & Search Bar Container (Matches Figma) ── */}
-      <div className="bg-white rounded-xl border border-[#e8e2d8] p-3 shadow-2xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+      <div className="bg-white rounded-xl border border-[#E5E5E5] p-3 shadow-2xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
         {/* Left Search Input */}
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -440,7 +440,7 @@ export default function ProductsPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-9 pr-3.5 py-2 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#89591C]"
+            className="w-full pl-9 pr-3.5 py-2 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#F37021]"
           />
         </div>
 
@@ -453,7 +453,7 @@ export default function ProductsPage() {
               setSelectedCategory(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-3 py-2 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="px-3 py-2 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">All Categories</option>
             {categories.map((c) => (
@@ -470,7 +470,7 @@ export default function ProductsPage() {
               setSelectedBrand(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-3 py-2 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="px-3 py-2 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">All Brands</option>
             {brands.map((b) => (
@@ -487,7 +487,7 @@ export default function ProductsPage() {
               setSelectedStatus(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-3 py-2 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="px-3 py-2 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -502,7 +502,7 @@ export default function ProductsPage() {
               setSelectedStockStatus(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-3 py-2 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#89591C] cursor-pointer"
+            className="px-3 py-2 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-700 font-medium focus:outline-none focus:border-[#F37021] cursor-pointer"
           >
             <option value="all">Stock Status</option>
             <option value="in_stock">In Stock (&gt;10)</option>
@@ -514,7 +514,7 @@ export default function ProductsPage() {
           <button
             type="button"
             onClick={resetFilters}
-            className="px-3 py-2 rounded-lg text-xs font-semibold text-[#89591C] hover:bg-[#faf4ec] transition-colors cursor-pointer"
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-[#F37021] hover:bg-[#FFF3EB] transition-colors cursor-pointer"
           >
             Reset
           </button>
@@ -522,17 +522,17 @@ export default function ProductsPage() {
       </div>
 
       {/* ── Data Table (Matches Figma Columns & Layout) ── */}
-      <div className="bg-white rounded-xl border border-[#e8e2d8] overflow-hidden shadow-2xs">
+      <div className="bg-white rounded-xl border border-[#E5E5E5] overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#ece7de] bg-[#faf8f5] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+              <tr className="border-b border-[#E5E5E5] bg-[#F7F7F7] text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
                 <th className="py-3.5 pl-4 pr-2 w-10">
                   <input
                     type="checkbox"
                     checked={products.length > 0 && selectedProductIds.length === products.length}
                     onChange={toggleSelectAll}
-                    className="w-3.5 h-3.5 rounded text-[#89591C] focus:ring-0 border-slate-300 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded text-[#F37021] focus:ring-0 border-slate-300 cursor-pointer"
                   />
                 </th>
                 <th className="py-3.5 px-3">Product</th>
@@ -546,7 +546,7 @@ export default function ProductsPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-[#f0eae1] text-xs">
+            <tbody className="divide-y divide-[#EEEEEE] text-xs">
               {loading ? (
                 <tr>
                   <td colSpan={9} className="py-12 text-center text-slate-400 font-medium">
@@ -605,8 +605,8 @@ export default function ProductsPage() {
                   return (
                     <tr
                       key={p._id}
-                      className={`hover:bg-[#faf8f5]/80 transition-colors ${
-                        isSelected ? 'bg-[#faf4ec]/50' : ''
+                      className={`hover:bg-[#F7F7F7]/80 transition-colors ${
+                        isSelected ? 'bg-[#FFF3EB]/50' : ''
                       }`}
                     >
                       {/* Checkbox */}
@@ -615,14 +615,14 @@ export default function ProductsPage() {
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => toggleSelectProduct(p._id)}
-                          className="w-3.5 h-3.5 rounded text-[#89591C] focus:ring-0 border-slate-300 cursor-pointer"
+                          className="w-3.5 h-3.5 rounded text-[#F37021] focus:ring-0 border-slate-300 cursor-pointer"
                         />
                       </td>
 
                       {/* Product Thumbnail & Name */}
                       <td className="py-3.5 px-3 min-w-[220px]">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] overflow-hidden relative flex-shrink-0 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] overflow-hidden relative flex-shrink-0 flex items-center justify-center">
                             <Image
                               src={validImg}
                               alt={p.name}
@@ -632,7 +632,7 @@ export default function ProductsPage() {
                             />
                           </div>
                           <div className="space-y-0.5 truncate">
-                            <h4 className="font-bold text-slate-900 text-xs uppercase tracking-tight truncate hover:text-[#89591C] transition-colors">
+                            <h4 className="font-bold text-slate-900 text-xs uppercase tracking-tight truncate hover:text-[#F37021] transition-colors">
                               <Link href={`/admin/products/${p._id}/edit`}>{p.name}</Link>
                             </h4>
                             {p.noReturnRefundExchange && (
@@ -704,7 +704,7 @@ export default function ProductsPage() {
                             Active
                           </span>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#f4f2ee] text-slate-600">
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-[#F3F3F3] text-slate-600">
                             {p.status === 'draft' ? 'Draft' : 'Inactive'}
                           </span>
                         )}
@@ -718,7 +718,7 @@ export default function ProductsPage() {
                             href={`${process.env.NEXT_PUBLIC_STORE_URL || ''}/products/${p.slug || p._id}`}
                             target="_blank"
                             title="Preview on Store"
-                            className="w-8 h-8 rounded-lg border border-slate-200 hover:border-[#89591C] hover:bg-[#faf4ec] text-slate-600 hover:text-[#89591C] flex items-center justify-center transition-colors cursor-pointer"
+                            className="w-8 h-8 rounded-lg border border-slate-200 hover:border-[#F37021] hover:bg-[#FFF3EB] text-slate-600 hover:text-[#F37021] flex items-center justify-center transition-colors cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </Link>
@@ -727,7 +727,7 @@ export default function ProductsPage() {
                           <Link
                             href={`/admin/products/${p._id}/edit`}
                             title="Edit Product"
-                            className="w-8 h-8 rounded-lg border border-slate-200 hover:border-[#89591C] hover:bg-[#faf4ec] text-slate-600 hover:text-[#89591C] flex items-center justify-center transition-colors cursor-pointer"
+                            className="w-8 h-8 rounded-lg border border-slate-200 hover:border-[#F37021] hover:bg-[#FFF3EB] text-slate-600 hover:text-[#F37021] flex items-center justify-center transition-colors cursor-pointer"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Link>
@@ -752,7 +752,7 @@ export default function ProductsPage() {
         </div>
 
         {/* ── Pagination Footer (Matches Figma) ── */}
-        <div className="p-3.5 border-t border-[#ece7de] bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+        <div className="p-3.5 border-t border-[#E5E5E5] bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
           <div>
             Showing {products.length > 0 ? (currentPage - 1) * limit + 1 : 0} to{' '}
             {Math.min(currentPage * limit, totalCount)} of {totalCount} results
@@ -766,7 +766,7 @@ export default function ProductsPage() {
                 setLimit(Number(e.target.value));
                 handlePageChange(1);
               }}
-              className="px-2.5 py-1.5 rounded-lg bg-[#faf8f5] border border-[#e8e2d8] text-xs text-slate-700 font-medium focus:outline-none cursor-pointer"
+              className="px-2.5 py-1.5 rounded-lg bg-[#F7F7F7] border border-[#E5E5E5] text-xs text-slate-700 font-medium focus:outline-none cursor-pointer"
             >
               <option value="20">20 per page</option>
               <option value="10">10 per page</option>
@@ -794,7 +794,7 @@ export default function ProductsPage() {
                     onClick={() => handlePageChange(pageNum)}
                     className={`w-7 h-7 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
                       isCurrent
-                        ? 'bg-[#89591C] text-white'
+                        ? 'bg-[#F37021] text-white'
                         : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
                     }`}
                   >
@@ -837,7 +837,7 @@ export default function ProductsPage() {
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#f4f2ee] text-[#89591C] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#F3F3F3] text-[#F37021] flex items-center justify-center">
                   <FileSpreadsheet className="w-5 h-5" />
                 </div>
                 <div>
@@ -855,7 +855,7 @@ export default function ProductsPage() {
             </div>
 
             {/* Step 1: Download Templates */}
-            <div className="mt-5 p-4 rounded-xl bg-[#faf8f5] border border-[#e8e2d8] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="mt-5 p-4 rounded-xl bg-[#F7F7F7] border border-[#E5E5E5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-xs font-bold text-slate-800 block">Need the standard format?</span>
                 <span className="text-[11px] text-slate-500 block mt-0.5">Includes sample shoes, sizes, color variants & 5 image slots.</span>
@@ -864,7 +864,7 @@ export default function ProductsPage() {
                 <a
                   href="/gravoz_product_import_template.xlsx"
                   download="gravoz_product_import_template.xlsx"
-                  className="px-2.5 py-1.5 rounded-lg bg-white border border-[#d6cfc5] hover:bg-slate-50 text-[11px] font-semibold text-[#89591C] flex items-center gap-1.5 transition-all shadow-2xs"
+                  className="px-2.5 py-1.5 rounded-lg bg-white border border-[#D4D4D4] hover:bg-slate-50 text-[11px] font-semibold text-[#F37021] flex items-center gap-1.5 transition-all shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Excel (.xlsx)</span>
@@ -872,7 +872,7 @@ export default function ProductsPage() {
                 <a
                   href="/gravoz_product_import_template.csv"
                   download="gravoz_product_import_template.csv"
-                  className="px-2.5 py-1.5 rounded-lg bg-white border border-[#d6cfc5] hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center gap-1.5 transition-all shadow-2xs"
+                  className="px-2.5 py-1.5 rounded-lg bg-white border border-[#D4D4D4] hover:bg-slate-50 text-[11px] font-semibold text-slate-700 flex items-center gap-1.5 transition-all shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>CSV</span>
@@ -897,7 +897,7 @@ export default function ProductsPage() {
                 }}
                 className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
                   isDragOver
-                    ? 'border-[#89591C] bg-[#faf8f5]'
+                    ? 'border-[#F37021] bg-[#F7F7F7]'
                     : importFile
                     ? 'border-emerald-500 bg-emerald-50/30'
                     : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
@@ -934,7 +934,7 @@ export default function ProductsPage() {
                   </div>
                 ) : (
                   <label htmlFor="excelImportInput" className="cursor-pointer block">
-                    <div className="w-12 h-12 rounded-full bg-[#f4f2ee] text-[#89591C] flex items-center justify-center mx-auto mb-3">
+                    <div className="w-12 h-12 rounded-full bg-[#F3F3F3] text-[#F37021] flex items-center justify-center mx-auto mb-3">
                       <Upload className="w-6 h-6" />
                     </div>
                     <span className="text-xs font-bold text-slate-800 block">
@@ -1002,7 +1002,7 @@ export default function ProductsPage() {
                 <button
                   type="submit"
                   disabled={!importFile || isImporting}
-                  className="h-9 px-5 rounded-lg bg-[#89591C] hover:bg-[#724816] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="h-9 px-5 rounded-lg bg-[#F37021] hover:bg-[#D95B10] text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isImporting ? (
                     <>
