@@ -51,6 +51,8 @@ declare global {
   var storefrontSnapshotPromise: Promise<StorefrontCatalogSnapshot> | undefined;
   // eslint-disable-next-line no-var
   var storefrontProductDetailCache: Map<string, ProductDetailSnapshot> | undefined;
+  // eslint-disable-next-line no-var
+  var storefrontAddonsCache: { addons: any[]; timestamp: number } | undefined;
 }
 
 const SECTION_FLAG_MAP: Record<string, string> = {
@@ -126,12 +128,150 @@ function buildSectionItemsFromCatalog(products: any[], flagField: string, limit 
     });
 }
 
+function formatProductDetailRecord(
+  product: any,
+  catMap?: Map<string, any>,
+  brandMap?: Map<string, any>,
+  addonMap?: Map<string, any>
+): any {
+  const collectedImages: Array<{ url: string; alt?: string }> = [];
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    product.images.forEach((img: any) => {
+      if (img?.url && !img.url.includes('placeholder.svg')) {
+        collectedImages.push({ url: img.url, alt: img.alt || product.name });
+      }
+    });
+  }
+
+  if (Array.isArray(product.colorVariants)) {
+    product.colorVariants.forEach((v: any) => {
+      if (Array.isArray(v.images)) {
+        v.images.forEach((img: any) => {
+          if (img?.url && !img.url.includes('placeholder.svg') && !collectedImages.some((i) => i.url === img.url)) {
+            collectedImages.push({ url: img.url, alt: img.alt || `${v.name || product.name} photo` });
+          }
+        });
+      } else if (v.imageUrl && !collectedImages.some((i) => i.url === v.imageUrl)) {
+        collectedImages.push({ url: v.imageUrl, alt: `${v.name || product.name} photo` });
+      }
+    });
+  }
+
+  if (collectedImages.length === 0) {
+    collectedImages.push({ url: '/products/placeholder.svg', alt: product.name });
+  }
+
+  const finalSellingPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : (product.price || 0);
+  const originalMrpPrice = product.discountPrice && product.discountPrice > 0 ? (product.price || product.discountPrice) : (product.originalPrice || product.price || 0);
+
+  const additionalInfoObj: Record<string, string> = {
+    'Material': product.material || 'Genuine Artisan Leather',
+    'Occasion': product.occasion || 'Casual & Daily Wear',
+    'Closure Type': product.closureType || 'Slip-On',
+    'Strap Type': product.strapType || 'No Strap',
+    'Shoe Type': product.shoeType || product.subCategory || 'Casual Shoes',
+    'Target Gender': product.targetAudience || 'Men',
+    'Age Range': product.ageRange || 'Adults',
+    'Manufacturer': product.manufacturer || 'GRAVOZ Artisans Pvt. Ltd.',
+    'HSN Code': product.hsnCode || '64032000',
+    'GST': product.gst ? `${product.gst}%` : '12%',
+    'Origin': 'India (Handcrafted)',
+  };
+
+  let formattedFeatures = '';
+  if (Array.isArray(product.features)) {
+    formattedFeatures = product.features.join('\n');
+  } else if (typeof product.features === 'string') {
+    formattedFeatures = product.features;
+  }
+
+  let resolvedBrand = 'GRAVOZ';
+  if (typeof product.brand === 'object' && product.brand !== null) {
+    resolvedBrand = product.brand.name || 'GRAVOZ';
+  } else if (product.brand) {
+    const mappedBrand = brandMap?.get(String(product.brand));
+    resolvedBrand = mappedBrand?.name || String(product.brand);
+  }
+
+  let resolvedCategoryName = 'Footwear';
+  let resolvedCategoryObj = product.category;
+  if (typeof product.category === 'object' && product.category !== null) {
+    resolvedCategoryName = product.category.name || 'Footwear';
+  } else if (product.category) {
+    const mappedCat = catMap?.get(String(product.category));
+    if (mappedCat) {
+      resolvedCategoryName = mappedCat.name || 'Footwear';
+      resolvedCategoryObj = {
+        _id: String(mappedCat._id),
+        name: String(mappedCat.name),
+        slug: mappedCat.slug,
+        targetAudience: mappedCat.targetAudience,
+      };
+    } else {
+      resolvedCategoryName = String(product.category);
+    }
+  }
+
+  const resolvedAddons = Array.isArray(product.addons)
+    ? product.addons
+        .map((a: any) => {
+          if (typeof a === 'object' && a !== null && a._id) return a;
+          return addonMap?.get(String(a)) || null;
+        })
+        .filter((a: any) => a && a.isActive !== false)
+    : undefined;
+
+  return {
+    ...product,
+    category: resolvedCategoryObj,
+    addons: resolvedAddons ?? product.addons,
+    brand: resolvedBrand,
+    categoryName: resolvedCategoryName,
+    price: finalSellingPrice,
+    originalPrice: originalMrpPrice,
+    rating: product.rating || 5.0,
+    reviewsCount: product.reviewsCount || 0,
+    images: collectedImages,
+    features: formattedFeatures,
+    additionalInfo: product.additionalInfo || additionalInfoObj,
+    noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
+    shippingAndReturn: product.shippingAndReturn || {
+      shippingTitle: 'Complimentary Express Shipping',
+      shippingDesc: 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.',
+      returnTitle: product.noReturnRefundExchange ? 'No Return • No Refund • No Exchange' : '7-Day Hassle-Free Returns',
+      returnDesc: product.noReturnRefundExchange
+        ? 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.'
+        : 'Doorstep pickup and instant exchange if size or fit is not ideal.',
+      warrantyTitle: '6-Month Manufacturing Warranty',
+      warrantyDesc: 'Covers sole adhesion, stitching, and artisan leather construction.',
+      paymentTitle: 'COD & Secure Prepaid',
+      paymentDesc: 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.',
+    },
+  };
+}
+
+function setCachedProductDetailEntry(keys: Array<string | undefined>, entry: ProductDetailSnapshot) {
+  if (!global.storefrontProductDetailCache) {
+    global.storefrontProductDetailCache = new Map<string, ProductDetailSnapshot>();
+  }
+  for (const rawKey of keys) {
+    if (!rawKey) continue;
+    const key = String(rawKey).trim();
+    if (!key) continue;
+    if (global.storefrontProductDetailCache.size > 300) {
+      const oldestKey = global.storefrontProductDetailCache.keys().next().value;
+      if (oldestKey) global.storefrontProductDetailCache.delete(oldestKey);
+    }
+    global.storefrontProductDetailCache.set(key, entry);
+  }
+}
+
 async function fetchFreshSnapshot(): Promise<StorefrontCatalogSnapshot> {
   await connectDB();
 
   const sectionKeys = Object.keys(SECTION_FLAG_MAP);
 
-  const [dbBanners, dbCategories, dbBrands, dbProducts, dbSections] = await Promise.all([
+  const [dbBanners, dbCategories, dbBrands, dbProducts, dbSections, dbAddons, dbReviews] = await Promise.all([
     Banner.find({
       isActive: true,
       slot: { $nin: ['duo_product_1', 'duo_product_2'] },
@@ -148,17 +288,36 @@ async function fetchFreshSnapshot(): Promise<StorefrontCatalogSnapshot> {
       .sort({ name: 1 })
       .lean(),
     Product.find({ status: 'active' })
-      .select(
-        'name slug sku targetAudience category brand subCategory images sizes sizeAvailability colors colorVariants.name colorVariants.colorCode price discountPrice stock isBestSeller isTopSeller isFeatured isLatest badge noReturnRefundExchange rating reviewsCount spotlightSlot featureInDuoSlot spotlightMockups createdAt'
-      )
-      .populate({ path: 'category', select: 'name slug targetAudience', model: Category, strictPopulate: false })
-      .populate({ path: 'brand', select: 'name slug', model: Brand, strictPopulate: false })
       .sort({ createdAt: -1 })
       .lean(),
     HomeSection.find({ sectionKey: { $in: sectionKeys } })
       .select('sectionKey title subtitle isActive displayOrder items')
       .lean(),
+    Addon.find({ isActive: true })
+      .sort({ displayOrder: 1, createdAt: -1 })
+      .select('_id name description price imageUrl sku stock applicableCategories displayOrder isActive')
+      .lean(),
+    Review.find({ status: 'approved' })
+      .sort({ rating: -1, createdAt: -1 })
+      .select('product customerName rating comment images videos createdAt')
+      .lean(),
   ]);
+
+  const now = Date.now();
+  const catById = new Map<string, any>((dbCategories || []).map((c: any) => [String(c._id), c]));
+  const brandById = new Map<string, any>((dbBrands || []).map((b: any) => [String(b._id), b]));
+  const addonById = new Map<string, any>((dbAddons || []).map((a: any) => [String(a._id), a]));
+  const serializedAddons = JSON.parse(JSON.stringify(dbAddons || []));
+  global.storefrontAddonsCache = { addons: serializedAddons, timestamp: now };
+
+  const reviewsByProductId = new Map<string, any[]>();
+  for (const r of dbReviews || []) {
+    if (!r?.product) continue;
+    const pid = String(r.product);
+    const list = reviewsByProductId.get(pid);
+    if (list) list.push(r);
+    else reviewsByProductId.set(pid, [r]);
+  }
 
   const catNameById = new Map<string, string>(
     (dbCategories || []).map((c: any) => [String(c._id), String(c.name || '')])
@@ -187,6 +346,31 @@ async function fetchFreshSnapshot(): Promise<StorefrontCatalogSnapshot> {
   }
 
   const serializedProducts = (dbProducts || []).map((p: any) => {
+    // Pre-populate server RAM detail cache for instant inner-page loads from storefront cards
+    const pid = String(p._id);
+    const formattedDetail = formatProductDetailRecord(p, catById, brandById, addonById);
+    const productSpecificAddons = Array.isArray(formattedDetail.addons)
+      ? formattedDetail.addons.filter((a: any) => typeof a === 'object' && a !== null && a._id && a.isActive !== false)
+      : [];
+    const pReviews = reviewsByProductId.get(pid) || [];
+    const avgRating = pReviews.length
+      ? Math.round((pReviews.reduce((s: number, r: any) => s + r.rating, 0) / pReviews.length) * 10) / 10
+      : (formattedDetail.rating || 5.0);
+
+    const detailEntry: ProductDetailSnapshot = {
+      ...JSON.parse(
+        JSON.stringify({
+          product: formattedDetail,
+          reviews: pReviews,
+          avgRating,
+          addons: productSpecificAddons.length > 0 ? productSpecificAddons : serializedAddons,
+          hasServerData: true,
+        })
+      ),
+      timestamp: now,
+    };
+    setCachedProductDetailEntry([pid, p.slug, p.seo?.slug, p.sku], detailEntry);
+
     const rawImgs = Array.isArray(p.images) ? p.images : [];
     const imageUrls: string[] = rawImgs
       .slice(0, 2)
@@ -195,13 +379,14 @@ async function fetchFreshSnapshot(): Promise<StorefrontCatalogSnapshot> {
 
     let catName = 'Footwear';
     let categoryDetails: any = null;
-    if (typeof p.category === 'object' && p.category !== null && p.category.name) {
-      catName = String(p.category.name);
+    const mappedCat = p.category ? catById.get(String(p.category)) : null;
+    if (mappedCat) {
+      catName = String(mappedCat.name);
       categoryDetails = {
-        _id: String(p.category._id),
-        name: String(p.category.name),
-        slug: p.category.slug ? String(p.category.slug) : undefined,
-        targetAudience: p.category.targetAudience ? String(p.category.targetAudience) : undefined,
+        _id: String(mappedCat._id),
+        name: String(mappedCat.name),
+        slug: mappedCat.slug ? String(mappedCat.slug) : undefined,
+        targetAudience: mappedCat.targetAudience ? String(mappedCat.targetAudience) : undefined,
       };
     } else if (p.category) {
       catName = catNameById.get(String(p.category)) || p.subCategory || 'Footwear';
@@ -209,10 +394,10 @@ async function fetchFreshSnapshot(): Promise<StorefrontCatalogSnapshot> {
       catName = String(p.subCategory);
     }
 
-    const brandName =
-      typeof p.brand === 'object' && p.brand !== null
-        ? String(p.brand.name || 'SERCHER')
-        : String(p.brand || 'SERCHER');
+    const mappedBrand = p.brand ? brandById.get(String(p.brand)) : null;
+    const brandName = mappedBrand
+      ? String(mappedBrand.name || 'SERCHER')
+      : String(p.brand || 'SERCHER');
 
     // Also resolve duo spotlight slots without running a second Product query
     const duoSlot =
@@ -425,39 +610,45 @@ export async function getStorefrontProductsData() {
   }
 }
 
+async function getCachedActiveAddons(): Promise<any[]> {
+  const now = Date.now();
+  if (global.storefrontAddonsCache && now - global.storefrontAddonsCache.timestamp < 60 * 1000) {
+    return global.storefrontAddonsCache.addons;
+  }
+  const dbAddons = await Addon.find({ isActive: true })
+    .sort({ displayOrder: 1, createdAt: -1 })
+    .select('_id name description price imageUrl sku stock applicableCategories displayOrder isActive')
+    .lean();
+  const addons = JSON.parse(JSON.stringify(dbAddons || []));
+  global.storefrontAddonsCache = { addons, timestamp: now };
+  return addons;
+}
+
 export async function resolveFormattedProductById(id: string): Promise<any | null> {
   if (!id) return null;
   await connectDB();
 
-  // Ensure referenced models are registered before .populate()
-  void Brand;
-  void Category;
-  void Addon;
-
   let product: any = null;
 
   if (mongoose.Types.ObjectId.isValid(id)) {
-    product = await Product.findById(id)
-      .populate({ path: 'category', model: Category, select: 'name slug targetAudience', strictPopulate: false })
-      .populate({ path: 'brand', model: Brand, select: 'name slug logoUrl', strictPopulate: false })
-      .populate({ path: 'addons', model: Addon, select: '_id name description price imageUrl sku stock isActive displayOrder', strictPopulate: false })
-      .lean();
+    product = await Product.findById(id).lean();
   }
 
   if (!product) {
-    const escapedName = id.replace(/-/g, ' ').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     product = await Product.findOne({
       $or: [
         { slug: id },
         { 'seo.slug': id },
         { sku: id },
-        { name: new RegExp(`^${escapedName}$`, 'i') },
       ],
-    })
-      .populate({ path: 'category', model: Category, select: 'name slug targetAudience', strictPopulate: false })
-      .populate({ path: 'brand', model: Brand, select: 'name slug logoUrl', strictPopulate: false })
-      .populate({ path: 'addons', model: Addon, select: '_id name description price imageUrl sku stock isActive displayOrder', strictPopulate: false })
-      .lean();
+    }).lean();
+  }
+
+  if (!product) {
+    const escapedName = id.replace(/-/g, ' ').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    product = await Product.findOne({
+      name: new RegExp(`^${escapedName}$`, 'i'),
+    }).lean();
   }
 
   if (!product) {
@@ -531,82 +722,13 @@ export async function resolveFormattedProductById(id: string): Promise<any | nul
 
   if (!product) return null;
 
-  const collectedImages: Array<{ url: string; alt?: string }> = [];
-  if (Array.isArray(product.images) && product.images.length > 0) {
-    product.images.forEach((img: any) => {
-      if (img?.url && !img.url.includes('placeholder.svg')) {
-        collectedImages.push({ url: img.url, alt: img.alt || product.name });
-      }
-    });
-  }
+  const snap = global.storefrontSnapshotCache;
+  const catMap = snap ? new Map(snap.categories.map((c) => [c._id, c])) : undefined;
+  const brandMap = snap ? new Map(snap.brands.map((b) => [b._id, b])) : undefined;
+  const addons = await getCachedActiveAddons();
+  const addonMap = new Map(addons.map((a: any) => [String(a._id), a]));
 
-  if (Array.isArray(product.colorVariants)) {
-    product.colorVariants.forEach((v: any) => {
-      if (Array.isArray(v.images)) {
-        v.images.forEach((img: any) => {
-          if (img?.url && !img.url.includes('placeholder.svg') && !collectedImages.some((i) => i.url === img.url)) {
-            collectedImages.push({ url: img.url, alt: img.alt || `${v.name || product.name} photo` });
-          }
-        });
-      } else if (v.imageUrl && !collectedImages.some((i) => i.url === v.imageUrl)) {
-        collectedImages.push({ url: v.imageUrl, alt: `${v.name || product.name} photo` });
-      }
-    });
-  }
-
-  if (collectedImages.length === 0) {
-    collectedImages.push({ url: '/products/placeholder.svg', alt: product.name });
-  }
-
-  const finalSellingPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : (product.price || 0);
-  const originalMrpPrice = product.discountPrice && product.discountPrice > 0 ? (product.price || product.discountPrice) : (product.originalPrice || product.price || 0);
-
-  const additionalInfoObj: Record<string, string> = {
-    'Material': product.material || 'Genuine Artisan Leather',
-    'Occasion': product.occasion || 'Casual & Daily Wear',
-    'Closure Type': product.closureType || 'Slip-On',
-    'Strap Type': product.strapType || 'No Strap',
-    'Shoe Type': product.shoeType || product.subCategory || 'Casual Shoes',
-    'Target Gender': product.targetAudience || 'Men',
-    'Age Range': product.ageRange || 'Adults',
-    'Manufacturer': product.manufacturer || 'GRAVOZ Artisans Pvt. Ltd.',
-    'HSN Code': product.hsnCode || '64032000',
-    'GST': product.gst ? `${product.gst}%` : '12%',
-    'Origin': 'India (Handcrafted)',
-  };
-
-  let formattedFeatures = '';
-  if (Array.isArray(product.features)) {
-    formattedFeatures = product.features.join('\n');
-  } else if (typeof product.features === 'string') {
-    formattedFeatures = product.features;
-  }
-
-  return {
-    ...product,
-    brand: typeof product.brand === 'object' && product.brand !== null ? product.brand.name : (product.brand || 'GRAVOZ'),
-    categoryName: typeof product.category === 'object' && product.category !== null ? product.category.name : (product.category || 'Footwear'),
-    price: finalSellingPrice,
-    originalPrice: originalMrpPrice,
-    rating: product.rating || 5.0,
-    reviewsCount: product.reviewsCount || 0,
-    images: collectedImages,
-    features: formattedFeatures,
-    additionalInfo: product.additionalInfo || additionalInfoObj,
-    noReturnRefundExchange: Boolean(product.noReturnRefundExchange),
-    shippingAndReturn: product.shippingAndReturn || {
-      shippingTitle: 'Complimentary Express Shipping',
-      shippingDesc: 'Free delivery across all pin codes in India. Metro cities delivered within 2-4 business days.',
-      returnTitle: product.noReturnRefundExchange ? 'No Return • No Refund • No Exchange' : '7-Day Hassle-Free Returns',
-      returnDesc: product.noReturnRefundExchange
-        ? 'Clearance / Old Stock Item: Sold as-is and strictly not eligible for return, doorstep exchange, or refund.'
-        : 'Doorstep pickup and instant exchange if size or fit is not ideal.',
-      warrantyTitle: '6-Month Manufacturing Warranty',
-      warrantyDesc: 'Covers sole adhesion, stitching, and artisan leather construction.',
-      paymentTitle: 'COD & Secure Prepaid',
-      paymentDesc: 'Pay securely via UPI, Cards, Net Banking, or Cash on Delivery.',
-    },
-  };
+  return formatProductDetailRecord(product, catMap, brandMap, addonMap);
 }
 
 export async function getProductDetailData(id: string): Promise<Omit<ProductDetailSnapshot, 'timestamp'>> {
@@ -615,8 +737,9 @@ export async function getProductDetailData(id: string): Promise<Omit<ProductDeta
       global.storefrontProductDetailCache = new Map<string, ProductDetailSnapshot>();
     }
 
+    const cleanId = decodeURIComponent(id || '').trim();
     const now = Date.now();
-    const cached = global.storefrontProductDetailCache.get(id);
+    const cached = global.storefrontProductDetailCache.get(cleanId) || global.storefrontProductDetailCache.get(id);
     if (cached && now - cached.timestamp < PRODUCT_DETAIL_CACHE_TTL_MS) {
       return {
         product: cached.product,
@@ -627,7 +750,17 @@ export async function getProductDetailData(id: string): Promise<Omit<ProductDeta
       };
     }
 
-    const formattedProduct = await resolveFormattedProductById(id);
+    const canQueryObjectIdDirect = mongoose.Types.ObjectId.isValid(cleanId);
+    const [formattedProduct, directReviews, activeAddons] = await Promise.all([
+      resolveFormattedProductById(cleanId),
+      canQueryObjectIdDirect
+        ? Review.find({ status: 'approved', product: new mongoose.Types.ObjectId(cleanId) })
+            .sort({ rating: -1, createdAt: -1 })
+            .lean()
+        : Promise.resolve(null),
+      getCachedActiveAddons(),
+    ]);
+
     if (!formattedProduct) {
       return {
         product: null,
@@ -642,22 +775,17 @@ export async function getProductDetailData(id: string): Promise<Omit<ProductDeta
       ? formattedProduct.addons.filter((a: any) => typeof a === 'object' && a !== null && a._id && a.isActive !== false)
       : [];
 
-    const canQueryObjectIdReviews = mongoose.Types.ObjectId.isValid(String(formattedProduct._id));
-    const [dbReviews, fallbackAddons] = await Promise.all([
-      canQueryObjectIdReviews
-        ? Review.find({ status: 'approved', product: new mongoose.Types.ObjectId(String(formattedProduct._id)) })
+    let reviewsRaw = directReviews;
+    if (!reviewsRaw) {
+      const resolvedObjectId = mongoose.Types.ObjectId.isValid(String(formattedProduct._id));
+      reviewsRaw = resolvedObjectId
+        ? await Review.find({ status: 'approved', product: new mongoose.Types.ObjectId(String(formattedProduct._id)) })
             .sort({ rating: -1, createdAt: -1 })
             .lean()
-        : Promise.resolve([]),
-      productSpecificAddons.length > 0
-        ? Promise.resolve(productSpecificAddons)
-        : Addon.find({ isActive: true })
-            .sort({ displayOrder: 1, createdAt: -1 })
-            .select('_id name description price imageUrl sku stock applicableCategories displayOrder')
-            .lean(),
-    ]);
+        : [];
+    }
 
-    const reviewsList = Array.isArray(dbReviews) ? dbReviews : [];
+    const reviewsList = Array.isArray(reviewsRaw) ? reviewsRaw : [];
     const avgRating = reviewsList.length
       ? Math.round((reviewsList.reduce((s: number, r: any) => s + r.rating, 0) / reviewsList.length) * 10) / 10
       : (formattedProduct.rating || 5.0);
@@ -667,19 +795,15 @@ export async function getProductDetailData(id: string): Promise<Omit<ProductDeta
         product: formattedProduct,
         reviews: reviewsList,
         avgRating,
-        addons: Array.isArray(fallbackAddons) ? fallbackAddons : [],
+        addons: productSpecificAddons.length > 0 ? productSpecificAddons : activeAddons,
         hasServerData: true,
       })
     );
 
-    if (global.storefrontProductDetailCache.size > 200) {
-      const oldestKey = global.storefrontProductDetailCache.keys().next().value;
-      if (oldestKey) global.storefrontProductDetailCache.delete(oldestKey);
-    }
-    global.storefrontProductDetailCache.set(id, {
-      ...payload,
-      timestamp: now,
-    });
+    setCachedProductDetailEntry(
+      [cleanId, String(formattedProduct._id), formattedProduct.slug, formattedProduct.seo?.slug, formattedProduct.sku],
+      { ...payload, timestamp: now }
+    );
 
     return payload;
   } catch {

@@ -1,9 +1,10 @@
+import Header from '@/components/Header';
+
 export default function ProductDetailLoading() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="h-10 bg-[#F37021] w-full" />
-      <div className="h-16 bg-white border-b border-[#E5E5E5] w-full" />
-      <main className="max-w-[1240px] w-full mx-auto px-4 sm:px-6 md:px-10 lg:px-12 py-6 space-y-6 animate-pulse">
+    <div className="min-h-screen bg-white text-[#030303] font-sans flex flex-col justify-between">
+      <Header />
+      <main className="flex-1 max-w-[1240px] w-full mx-auto px-4 sm:px-6 md:px-10 lg:px-12 py-6 space-y-6 animate-pulse">
         <div className="h-4 w-64 rounded bg-slate-100" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
           <div className="lg:col-span-6 space-y-3">
@@ -34,4 +35,3 @@ export default function ProductDetailLoading() {
     </div>
   );
 }
-
