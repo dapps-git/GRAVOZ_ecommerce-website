@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { unstable_cache } from 'next/cache';
 import { connectDB } from '@/lib/db';
 import { Banner } from '@/models/Banner';
 import { Category } from '@/models/Category';
@@ -8,8 +9,10 @@ import { Product } from '@/models/Product';
 import { Review } from '@/models/Review';
 import { Addon } from '@/models/Addon';
 
-const CACHE_TTL_MS = 30 * 1000; // 30 seconds in-memory cache + ISR alignment
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds fresh window
+const CACHE_STALE_TTL_MS = 5 * 60 * 1000; // 5 minutes stale-while-revalidate window
 const PRODUCT_DETAIL_CACHE_TTL_MS = 30 * 1000;
+const PRODUCT_DETAIL_STALE_TTL_MS = 5 * 60 * 1000;
 
 interface StorefrontCatalogSnapshot {
   banners: Record<string, any>;
@@ -517,13 +520,7 @@ async function fetchFreshSnapshot(): Promise<StorefrontCatalogSnapshot> {
   };
 }
 
-export async function getStorefrontSnapshot(): Promise<StorefrontCatalogSnapshot> {
-  const now = Date.now();
-  const cached = global.storefrontSnapshotCache;
-  if (cached && now - cached.timestamp < CACHE_TTL_MS) {
-    return cached;
-  }
-
+function triggerSnapshotRefresh(): Promise<StorefrontCatalogSnapshot> {
   if (!global.storefrontSnapshotPromise) {
     global.storefrontSnapshotPromise = fetchFreshSnapshot()
       .then((snap) => {
@@ -539,8 +536,23 @@ export async function getStorefrontSnapshot(): Promise<StorefrontCatalogSnapshot
         throw err;
       });
   }
-
   return global.storefrontSnapshotPromise;
+}
+
+export async function getStorefrontSnapshot(): Promise<StorefrontCatalogSnapshot> {
+  const now = Date.now();
+  const cached = global.storefrontSnapshotCache;
+  if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+    return cached;
+  }
+
+  // Serve warm snapshot instantaneously while refreshing cleanly in background
+  if (cached && now - cached.timestamp < CACHE_STALE_TTL_MS) {
+    void triggerSnapshotRefresh().catch(() => {});
+    return cached;
+  }
+
+  return triggerSnapshotRefresh();
 }
 
 export async function getStorefrontHomeData() {
@@ -610,11 +622,41 @@ export async function getStorefrontProductsData() {
   }
 }
 
+let catBrandMapCache: { catMap: Map<string, any>; brandMap: Map<string, any>; timestamp: number } | null = null;
+const productRefreshInFlight = new Map<string, Promise<Omit<ProductDetailSnapshot, 'timestamp'>>>();
+
+async function getCachedCategoryBrandMaps(): Promise<{ catMap: Map<string, any>; brandMap: Map<string, any> }> {
+  const snap = global.storefrontSnapshotCache;
+  if (snap) {
+    return {
+      catMap: new Map(snap.categories.map((c) => [c._id, c])),
+      brandMap: new Map(snap.brands.map((b) => [b._id, b])),
+    };
+  }
+
+  const now = Date.now();
+  if (catBrandMapCache && now - catBrandMapCache.timestamp < 60 * 1000) {
+    return { catMap: catBrandMapCache.catMap, brandMap: catBrandMapCache.brandMap };
+  }
+
+  await connectDB();
+  const [cats, brands] = await Promise.all([
+    Category.find({ isActive: true }).select('name slug targetAudience').lean(),
+    Brand.find({ status: { $ne: 'inactive' } }).select('name title slug').lean(),
+  ]);
+
+  const catMap = new Map((cats || []).map((c: any) => [String(c._id), c]));
+  const brandMap = new Map((brands || []).map((b: any) => [String(b._id), b]));
+  catBrandMapCache = { catMap, brandMap, timestamp: now };
+  return { catMap, brandMap };
+}
+
 async function getCachedActiveAddons(): Promise<any[]> {
   const now = Date.now();
   if (global.storefrontAddonsCache && now - global.storefrontAddonsCache.timestamp < 60 * 1000) {
     return global.storefrontAddonsCache.addons;
   }
+  await connectDB();
   const dbAddons = await Addon.find({ isActive: true })
     .sort({ displayOrder: 1, createdAt: -1 })
     .select('_id name description price imageUrl sku stock applicableCategories displayOrder isActive')
@@ -722,13 +764,101 @@ export async function resolveFormattedProductById(id: string): Promise<any | nul
 
   if (!product) return null;
 
-  const snap = global.storefrontSnapshotCache;
-  const catMap = snap ? new Map(snap.categories.map((c) => [c._id, c])) : undefined;
-  const brandMap = snap ? new Map(snap.brands.map((b) => [b._id, b])) : undefined;
-  const addons = await getCachedActiveAddons();
+  const [{ catMap, brandMap }, addons] = await Promise.all([
+    getCachedCategoryBrandMaps(),
+    getCachedActiveAddons(),
+  ]);
   const addonMap = new Map(addons.map((a: any) => [String(a._id), a]));
 
   return formatProductDetailRecord(product, catMap, brandMap, addonMap);
+}
+
+async function fetchSingleProductDetailUncached(cleanId: string): Promise<Omit<ProductDetailSnapshot, 'timestamp'>> {
+  // Always ensure MongoDB is connected before launching concurrent queries (bufferCommands: false)
+  await connectDB();
+
+  const canQueryObjectIdDirect = mongoose.Types.ObjectId.isValid(cleanId);
+  const [formattedProduct, directReviews, activeAddons] = await Promise.all([
+    resolveFormattedProductById(cleanId),
+    canQueryObjectIdDirect
+      ? Review.find({ status: 'approved', product: new mongoose.Types.ObjectId(cleanId) })
+          .sort({ rating: -1, createdAt: -1 })
+          .lean()
+      : Promise.resolve(null),
+    getCachedActiveAddons(),
+  ]);
+
+  if (!formattedProduct) {
+    return {
+      product: null,
+      reviews: [],
+      avgRating: 4.8,
+      addons: [],
+      hasServerData: false,
+    };
+  }
+
+  const productSpecificAddons = Array.isArray(formattedProduct.addons)
+    ? formattedProduct.addons.filter((a: any) => typeof a === 'object' && a !== null && a._id && a.isActive !== false)
+    : [];
+
+  let reviewsRaw = directReviews;
+  if (!reviewsRaw) {
+    const resolvedObjectId = mongoose.Types.ObjectId.isValid(String(formattedProduct._id));
+    reviewsRaw = resolvedObjectId
+      ? await Review.find({ status: 'approved', product: new mongoose.Types.ObjectId(String(formattedProduct._id)) })
+          .sort({ rating: -1, createdAt: -1 })
+          .lean()
+      : [];
+  }
+
+  const reviewsList = Array.isArray(reviewsRaw) ? reviewsRaw : [];
+  const avgRating = reviewsList.length
+    ? Math.round((reviewsList.reduce((s: number, r: any) => s + r.rating, 0) / reviewsList.length) * 10) / 10
+    : (formattedProduct.rating || 5.0);
+
+  return JSON.parse(
+    JSON.stringify({
+      product: formattedProduct,
+      reviews: reviewsList,
+      avgRating,
+      addons: productSpecificAddons.length > 0 ? productSpecificAddons : activeAddons,
+      hasServerData: true,
+    })
+  );
+}
+
+const getCachedProductDetailFromNextDataCache = unstable_cache(
+  async (cleanId: string) => fetchSingleProductDetailUncached(cleanId),
+  ['storefront-product-detail-v1'],
+  { revalidate: 30, tags: ['product-detail'] }
+);
+
+function refreshProductDetailInFlight(cleanId: string): Promise<Omit<ProductDetailSnapshot, 'timestamp'>> {
+  const existing = productRefreshInFlight.get(cleanId);
+  if (existing) return existing;
+
+  const job = (async () => {
+    let payload: Omit<ProductDetailSnapshot, 'timestamp'>;
+    try {
+      payload = await getCachedProductDetailFromNextDataCache(cleanId);
+    } catch {
+      payload = await fetchSingleProductDetailUncached(cleanId);
+    }
+
+    if (payload.hasServerData && payload.product) {
+      setCachedProductDetailEntry(
+        [cleanId, String(payload.product._id), payload.product.slug, payload.product.seo?.slug, payload.product.sku],
+        { ...payload, timestamp: Date.now() }
+      );
+    }
+    return payload;
+  })().finally(() => {
+    productRefreshInFlight.delete(cleanId);
+  });
+
+  productRefreshInFlight.set(cleanId, job);
+  return job;
 }
 
 export async function getProductDetailData(id: string): Promise<Omit<ProductDetailSnapshot, 'timestamp'>> {
@@ -738,6 +868,10 @@ export async function getProductDetailData(id: string): Promise<Omit<ProductDeta
     }
 
     const cleanId = decodeURIComponent(id || '').trim();
+    if (!cleanId) {
+      return { product: null, reviews: [], avgRating: 4.8, addons: [], hasServerData: false };
+    }
+
     const now = Date.now();
     const cached = global.storefrontProductDetailCache.get(cleanId) || global.storefrontProductDetailCache.get(id);
     if (cached && now - cached.timestamp < PRODUCT_DETAIL_CACHE_TTL_MS) {
@@ -750,62 +884,19 @@ export async function getProductDetailData(id: string): Promise<Omit<ProductDeta
       };
     }
 
-    const canQueryObjectIdDirect = mongoose.Types.ObjectId.isValid(cleanId);
-    const [formattedProduct, directReviews, activeAddons] = await Promise.all([
-      resolveFormattedProductById(cleanId),
-      canQueryObjectIdDirect
-        ? Review.find({ status: 'approved', product: new mongoose.Types.ObjectId(cleanId) })
-            .sort({ rating: -1, createdAt: -1 })
-            .lean()
-        : Promise.resolve(null),
-      getCachedActiveAddons(),
-    ]);
-
-    if (!formattedProduct) {
+    // Serve warm RAM entry instantaneously while refreshing in background
+    if (cached && cached.hasServerData && now - cached.timestamp < PRODUCT_DETAIL_STALE_TTL_MS) {
+      void refreshProductDetailInFlight(cleanId).catch(() => {});
       return {
-        product: null,
-        reviews: [],
-        avgRating: 4.8,
-        addons: [],
-        hasServerData: false,
+        product: cached.product,
+        reviews: cached.reviews,
+        avgRating: cached.avgRating,
+        addons: cached.addons,
+        hasServerData: cached.hasServerData,
       };
     }
 
-    const productSpecificAddons = Array.isArray(formattedProduct.addons)
-      ? formattedProduct.addons.filter((a: any) => typeof a === 'object' && a !== null && a._id && a.isActive !== false)
-      : [];
-
-    let reviewsRaw = directReviews;
-    if (!reviewsRaw) {
-      const resolvedObjectId = mongoose.Types.ObjectId.isValid(String(formattedProduct._id));
-      reviewsRaw = resolvedObjectId
-        ? await Review.find({ status: 'approved', product: new mongoose.Types.ObjectId(String(formattedProduct._id)) })
-            .sort({ rating: -1, createdAt: -1 })
-            .lean()
-        : [];
-    }
-
-    const reviewsList = Array.isArray(reviewsRaw) ? reviewsRaw : [];
-    const avgRating = reviewsList.length
-      ? Math.round((reviewsList.reduce((s: number, r: any) => s + r.rating, 0) / reviewsList.length) * 10) / 10
-      : (formattedProduct.rating || 5.0);
-
-    const payload = JSON.parse(
-      JSON.stringify({
-        product: formattedProduct,
-        reviews: reviewsList,
-        avgRating,
-        addons: productSpecificAddons.length > 0 ? productSpecificAddons : activeAddons,
-        hasServerData: true,
-      })
-    );
-
-    setCachedProductDetailEntry(
-      [cleanId, String(formattedProduct._id), formattedProduct.slug, formattedProduct.seo?.slug, formattedProduct.sku],
-      { ...payload, timestamp: now }
-    );
-
-    return payload;
+    return await refreshProductDetailInFlight(cleanId);
   } catch {
     return {
       product: null,
@@ -814,6 +905,29 @@ export async function getProductDetailData(id: string): Promise<Omit<ProductDeta
       addons: [],
       hasServerData: false,
     };
+  }
+}
+
+export async function getAllActiveProductRouteParams(): Promise<string[]> {
+  try {
+    await connectDB();
+    const [products, banners] = await Promise.all([
+      Product.find({ status: 'active' }).select('_id slug seo.slug').lean(),
+      Banner.find({ isActive: true, category: 'duo_showcase' }).select('slot linkUrl').lean(),
+    ]);
+
+    const paramsSet = new Set<string>();
+    for (const p of products || []) {
+      if (p?._id) paramsSet.add(String(p._id));
+      if (p?.slug) paramsSet.add(String(p.slug).trim());
+      if (p?.seo?.slug) paramsSet.add(String(p.seo.slug).trim());
+    }
+    for (const b of banners || []) {
+      if (b?.slot) paramsSet.add(String(b.slot).trim());
+    }
+    return Array.from(paramsSet).filter(Boolean);
+  } catch {
+    return [];
   }
 }
 

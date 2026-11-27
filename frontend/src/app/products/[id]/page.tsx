@@ -1,7 +1,17 @@
 import ProductDetailClient from '@/components/ProductDetailClient';
-import { getProductDetailData } from '@/lib/storefront-data';
+import { getAllActiveProductRouteParams, getProductDetailData } from '@/lib/storefront-data';
 
-export const revalidate = 30;
+export const revalidate = 60;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  try {
+    const ids = await getAllActiveProductRouteParams();
+    return ids.map((id) => ({ id }));
+  } catch {
+    return [];
+  }
+}
 
 export default async function ProductInnerPage({
   params,
