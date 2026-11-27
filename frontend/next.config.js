@@ -213,8 +213,9 @@ const nextConfig = {
 
   // ── Experimental Features ─────────────────────────────────────────────────
   experimental: {
-    // Optimize CSS loading
+    // Optimize CSS loading & tree-shake icon imports for faster compilation/bundles
     optimizeCss: false,
+    optimizePackageImports: ['lucide-react'],
   },
 };
 
